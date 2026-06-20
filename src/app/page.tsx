@@ -45,8 +45,7 @@ export default async function Home() {
 
             <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-3 leading-tight">
               Pokémon<span className="text-yellow-300">Market</span>
-              <br />
-              Intelligence
+              <br />Intelligence
             </h1>
 
             <p className="text-violet-200 text-sm sm:text-lg max-w-lg mx-auto mb-6">
@@ -69,7 +68,6 @@ export default async function Home() {
               </a>
             </div>
 
-            {/* Trust badges */}
             <div className="flex justify-center gap-6 mt-8 text-violet-300 text-xs">
               <div className="flex items-center gap-1.5">
                 <Shield size={12} />
@@ -90,7 +88,6 @@ export default async function Home() {
 
       <main className="max-w-7xl mx-auto px-4 pb-16 space-y-10 pt-6">
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Karten', value: cards.length > 0 ? `${cards.length}+` : '20+', icon: '🃏' },
@@ -105,7 +102,6 @@ export default async function Home() {
           ))}
         </div>
 
-        {/* Affiliate bar */}
         <section>
           <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
             <Shield size={10} />
@@ -124,7 +120,6 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Card sections */}
         <div id="karten" className="space-y-10">
           {topGainers.length > 0 && (
             <CardGrid cards={topGainers} title="🚀 Top Investment-Karten" />
@@ -166,14 +161,12 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Newsletter */}
         <section id="newsletter">
           <Suspense>
             <NewsletterSignup />
           </Suspense>
         </section>
 
-        {/* Footer */}
         <footer className="border-t border-gray-200 pt-6 space-y-3">
           <p className="text-xs text-gray-400 text-center max-w-xl mx-auto leading-relaxed">
             PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr.

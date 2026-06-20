@@ -166,7 +166,6 @@ export default function StudioPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-gradient-to-r from-violet-700 to-indigo-800 text-white shadow-md">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -196,7 +195,6 @@ export default function StudioPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
-        {/* System Status */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
             <h2 className="font-bold text-gray-900 text-sm">System-Status</h2>
@@ -240,7 +238,6 @@ export default function StudioPage() {
           )}
         </section>
 
-        {/* Content Generation */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50">
             <h2 className="font-bold text-gray-900 text-sm">Content erstellen</h2>
@@ -277,7 +274,6 @@ export default function StudioPage() {
             })}
           </div>
 
-          {/* Progress indicator */}
           {generating && (
             <div className="mx-4 mb-4 bg-violet-50 rounded-xl p-4 border border-violet-100">
               <div className="flex items-center justify-between mb-3">
@@ -293,7 +289,6 @@ export default function StudioPage() {
                 </div>
               </div>
 
-              {/* Steps */}
               <div className="space-y-2">
                 {STEPS[generating].map((step, i) => (
                   <div key={step} className="flex items-center gap-2">
@@ -332,7 +327,6 @@ export default function StudioPage() {
           )}
         </section>
 
-        {/* Output */}
         {output && (
           <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
@@ -360,9 +354,8 @@ export default function StudioPage() {
               </div>
             </div>
 
-            {/* Publish bar */}
             {(output.type === 'market' || output.type === 'newsletter') && (
-              <div className="mx-4 mt-0 mb-3 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
+              <div className="mx-4 mt-3 mb-3 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
                 <Globe size={15} className="text-violet-600 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-violet-800">Marktbericht veröffentlichen</p>
@@ -393,13 +386,13 @@ export default function StudioPage() {
                 )}
               </div>
             )}
+
             <div className="p-4">
               <OutputView type={output.type} content={output.content} />
             </div>
           </section>
         )}
 
-        {/* Quick Links */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { href: 'https://dev.pokemontcg.io/', label: 'Pokémon API', sub: 'Key verwalten' },

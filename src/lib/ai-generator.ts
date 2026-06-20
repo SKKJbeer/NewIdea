@@ -126,7 +126,7 @@ export async function generateVideoScript(
     messages: [
       {
         role: 'user',
-        content: `Du erstellst ein ${format === 'youtube' ? 'YouTube-Video (5 Minuten)' : 'Short/TikTok (60 Sekunden)'} Skript auf Deutsch für "PokéMarket Intelligence" — ein Kanal über Pokémon-Karten als Investment.\n\nAktuelle Top-Karten:\n${cardInfo}\n\nErstelle ein vollständiges Video-Skript mit:\n- Mitreißendem Titel (SEO-optimiert)\n- YouTube-Beschreibung (mit Affiliate-Hinweis)\n- Tags (10-15 Stück)\n- Szenen-Beschreibungen für automatische Video-Erstellung\n- Vollständiger Voiceover-Text\n\nAntworte im JSON-Format:\n{\n  "title": "...",\n  "description": "...",\n  "tags": [...],\n  "voiceoverText": "...",\n  "scenes": [\n    {\n      "type": "intro|card_spotlight|chart|cta|outro",\n      "duration": 10,\n      "text": "Text auf Screen",\n      "narration": "Voiceover-Text",\n      "cardId": "optional-card-id"\n    }\n  ]\n}`,
+        content: `Du erstellst ein ${format === 'youtube' ? 'YouTube-Video (5 Minuten)' : 'Short/TikTok (60 Sekunden)'} Skript auf Deutsch für "PokéMarket Intelligence".\n\nAktuelle Top-Karten:\n${cardInfo}\n\nAntworte im JSON-Format:\n{\n  "title": "...",\n  "description": "...",\n  "tags": [...],\n  "voiceoverText": "...",\n  "scenes": [{"type": "intro", "duration": 10, "text": "...", "narration": "..."}]\n}`,
       },
     ],
   });
@@ -171,7 +171,7 @@ export async function generateSocialPosts(
     messages: [
       {
         role: 'user',
-        content: `Erstelle 3 Social-Media-Posts auf Deutsch für "PokéMarket Intelligence" (Pokémon Investment Kanal).\n\nHighlight dieser Woche: ${cardInfo}\nMarkttrend: ${summary.weeklyReport.slice(0, 200)}\n\nErstelle Posts für:\n1. Instagram (max. 300 Zeichen + 10 Hashtags)\n2. Twitter/X (max. 240 Zeichen + 5 Hashtags)\n3. TikTok Caption (max. 150 Zeichen + 8 Hashtags)\n\nAntworte im JSON-Format:\n[\n  {"platform": "instagram", "caption": "...", "hashtags": [...]},\n  {"platform": "twitter", "caption": "...", "hashtags": [...]},\n  {"platform": "tiktok", "caption": "...", "hashtags": [...]}\n]`,
+        content: `Erstelle 3 Social-Media-Posts auf Deutsch für "PokéMarket Intelligence".\n\nHighlight: ${cardInfo}\nMarkttrend: ${summary.weeklyReport.slice(0, 200)}\n\nAntworte im JSON-Format:\n[\n  {"platform": "instagram", "caption": "...", "hashtags": [...]},\n  {"platform": "twitter", "caption": "...", "hashtags": [...]},\n  {"platform": "tiktok", "caption": "...", "hashtags": [...]}\n]`,
       },
     ],
   });
