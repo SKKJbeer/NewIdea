@@ -64,6 +64,32 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
   });
 }
 
+export async function searchCards(query: string, limit = 30): Promise<PokemonCard[]> {
+  const term = query.trim();
+  if (!term) return [];
+
+  // TCG-API: Wildcard-Suche über den Kartennamen, z.B. name:"*charizard*"
+  const escaped = term.replace(/"/g, '');
+  const response = await axios.get(`${TCG_API_BASE}/cards`, {
+    headers: {
+      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
+    },
+    params: {
+      q: `name:"*${escaped}*"`,
+      pageSize: limit,
+      orderBy: '-set.releaseDate',
+    },
+  });
+
+  const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
+  // Karten mit Preis zuerst, dann nach Marktpreis absteigend
+  return cards.sort((a, b) => {
+    const pa = a.prices.holofoil?.market || a.prices.market || 0;
+    const pb = b.prices.holofoil?.market || b.prices.market || 0;
+    return pb - pa;
+  });
+}
+
 export async function fetchCardById(id: string): Promise<PokemonCard | null> {
   try {
     const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {

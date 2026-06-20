@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, LayoutDashboard } from 'lucide-react';
+import { Zap, LayoutDashboard, Search } from 'lucide-react';
 
 export function NavBar() {
   return (
@@ -17,6 +17,13 @@ export function NavBar() {
         </Link>
 
         <div className="flex items-center gap-1">
+          <Link
+            href="/suche"
+            className="flex items-center gap-1 text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5"
+          >
+            <Search size={13} />
+            <span className="hidden sm:inline">Suche</span>
+          </Link>
           <Link
             href="/marktbericht"
             className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"

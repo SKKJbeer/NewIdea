@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
 import { CardGrid } from '@/components/CardGrid';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
+import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
 import { TrendingUp, Zap, Shield, Mail } from 'lucide-react';
@@ -49,6 +50,9 @@ export default async function Home() {
               Echtzeit-Preise, Investment-Scores und KI-Marktberichte
               für Pokémon-Karten-Sammler.
             </p>
+            <div className="mb-6">
+              <SearchBox placeholder="Karte suchen, z.B. Charizard — was ist sie wert?" />
+            </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
               <a href="#newsletter" className="bg-white text-violet-700 font-bold px-6 py-3 rounded-xl hover:bg-violet-50 transition-colors flex items-center gap-2 justify-center text-sm">
                 <Mail size={16} /> Kostenlos anmelden
