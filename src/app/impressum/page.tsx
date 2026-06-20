@@ -33,9 +33,7 @@ export default function Impressum() {
 
           <section>
             <h2 className="font-bold text-gray-900 mb-2">Kontakt</h2>
-            <p>
-              E-Mail: [deine@email.de]
-            </p>
+            <p>E-Mail: [deine@email.de]</p>
           </section>
 
           <section>
@@ -51,26 +49,13 @@ export default function Impressum() {
             <h2 className="font-bold text-gray-900 mb-2">Haftungsausschluss</h2>
             <h3 className="font-semibold mt-3 mb-1">Haftung für Inhalte</h3>
             <p>
-              Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die
-              Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr
-              übernommen werden. Die Inhalte stellen keine Anlageberatung dar und ersetzen diese
-              nicht. Investitionsentscheidungen liegen allein in der Verantwortung des Nutzers.
+              Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Die Inhalte
+              stellen keine Anlageberatung dar und ersetzen diese nicht.
             </p>
             <h3 className="font-semibold mt-3 mb-1">Haftung für Links</h3>
             <p>
               Diese Website enthält Links zu externen Websites Dritter, auf deren Inhalte wir
-              keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
-              Anbieter oder Betreiber der Seiten verantwortlich.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-bold text-gray-900 mb-2">Urheberrecht</h2>
-            <p>
-              Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
-              unterliegen dem deutschen Urheberrecht. Pokémon und alle damit verbundenen Namen,
-              Charaktere und Logos sind Marken von Nintendo/Creatures Inc./GAME FREAK inc.
-              Kartenbilder und Daten werden über die Pokémon TCG API bereitgestellt.
+              keinen Einfluss haben.
             </p>
           </section>
 
@@ -78,14 +63,13 @@ export default function Impressum() {
             <h2 className="font-bold text-gray-900 mb-2">Affiliate-Hinweis</h2>
             <p>
               Diese Website enthält Affiliate-Links. Wenn du über diese Links einkaufst, erhalten
-              wir eine kleine Provision — für dich entstehen dabei keine Mehrkosten. Die redaktionelle
-              Unabhängigkeit dieser Website ist davon nicht beeinflusst.
+              wir eine kleine Provision — für dich entstehen dabei keine Mehrkosten.
             </p>
           </section>
 
           <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">
             Bitte trage deine persönlichen Kontaktdaten in die eckigen Klammern ein,
-            bevor diese Seite live geht. Ein Impressum ist in Deutschland gesetzlich vorgeschrieben.
+            bevor diese Seite live geht.
           </p>
         </div>
       </div>

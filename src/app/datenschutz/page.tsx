@@ -109,8 +109,6 @@ export default function Datenschutz() {
           <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">
             Stand: Juni 2026 —
             Trage deine persönlichen Daten in die eckigen Klammern ein, bevor diese Seite live geht.
-            Bei Unsicherheiten: Einen Anwalt oder den kostenlosen DSE-Generator der Kanzlei Dr. Schwenke
-            nutzen.
           </p>
         </div>
       </div>
