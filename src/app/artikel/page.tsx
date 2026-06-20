@@ -118,7 +118,7 @@ export default function ArtikelListPage() {
           </Link>
         ))}
 
-        {/* Footer note */}
+        {/* Footer */}
         <p className="text-center text-xs text-gray-400 pt-4">
           Alle Inhalte werden automatisch von KI generiert und stellen keine Finanzberatung dar.
         </p>

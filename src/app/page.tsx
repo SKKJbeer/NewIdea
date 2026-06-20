@@ -45,7 +45,8 @@ export default async function Home() {
 
             <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-3 leading-tight">
               Pokémon<span className="text-yellow-300">Market</span>
-              <br />Intelligence
+              <br />
+              Intelligence
             </h1>
 
             <p className="text-violet-200 text-sm sm:text-lg max-w-lg mx-auto mb-6">

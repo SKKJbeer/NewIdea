@@ -124,7 +124,7 @@ export default async function MarktberichtPage() {
             <span className="text-xl">⚠️</span>
             <div>
               <p className="font-semibold">Marktdaten gerade nicht verfügbar</p>
-              <p className="text-xs mt-1 text-amber-600">Bitte später erneut versuchen.</p>
+              <p className="text-xs mt-1 text-amber-600">Pokémon TCG API-Key prüfen oder später erneut versuchen.</p>
             </div>
           </div>
         )}

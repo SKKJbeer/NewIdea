@@ -52,11 +52,11 @@ export async function GET(request: Request) {
     results.socialPosts = `${socialPosts.length} posts scheduled`;
     console.log(`✅ ${socialPosts.length} social posts scheduled`);
 
-    // 7. Trigger page regeneration
+    // Trigger page regeneration
     revalidatePath('/marktbericht');
     revalidatePath('/artikel');
-    results.pages = 'revalidated';
-    console.log('✅ Marktbericht + Blog revalidated');
+    results.marktbericht = 'revalidated';
+    console.log('✅ Marktbericht + Artikel-Blog revalidated');
 
     return NextResponse.json({
       success: true,

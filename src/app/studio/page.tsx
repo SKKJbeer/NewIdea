@@ -362,7 +362,7 @@ export default function StudioPage() {
 
             {/* Publish bar */}
             {(output.type === 'market' || output.type === 'newsletter') && (
-              <div className="mx-4 mt-3 mb-0 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
+              <div className="mx-4 mt-0 mb-3 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
                 <Globe size={15} className="text-violet-600 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-violet-800">Marktbericht veröffentlichen</p>
@@ -449,7 +449,7 @@ function OutputView({ type, content }: { type: GenType; content: unknown }) {
         <div>
           <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Newsletter-Vorschau</p>
           <div
-            className="border border-gray-100 rounded-xl overflow-hidden max-h-96 overflow-y-auto"
+            className="border border-gray-100 rounded-xl p-3 text-sm bg-gray-50 max-h-72 overflow-auto"
             dangerouslySetInnerHTML={{ __html: c.htmlContent }}
           />
         </div>
