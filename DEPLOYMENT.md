@@ -100,7 +100,26 @@ Speichere dir die `/studio`-Adresse als Lesezeichen — das ist dein Cockpit.
 
 - Jeden **Montag 07:00 Uhr** läuft die Wochen-Automatik (Cron-Job)
 - Sie erstellt Marktbericht, Newsletter-Entwurf, Video-Skripte & Social-Posts
+- Jeden **Tag 08:00 Uhr** wird der Tagesartikel vorgewärmt und — falls Supabase
+  eingerichtet ist — die aktuellen Karten-Preise gespeichert
 - Sobald du die weiteren Keys (Beehiiv etc.) einträgst, wird auch automatisch gepusht
+
+---
+
+## 📈 Optional: Echte Preis-Historie mit Supabase
+
+Standardmäßig zeigt der Preis-Verlauf die echten Cardmarket-Durchschnitte
+(Ø 1/7/30 Tage). Für einen **tag-genauen** echten Verlauf:
+
+1. Kostenloses Projekt auf [supabase.com](https://supabase.com/) anlegen
+2. Im **SQL-Editor** den Inhalt von `supabase/migrations/0001_price_snapshots.sql` ausführen
+3. In Vercel zwei Variablen eintragen (Project Settings → API in Supabase):
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+4. Neu deployen
+
+Ab dann sammelt der tägliche Cron-Job echte Preise, und jede aufgerufene Karte
+baut über die Zeit ihre eigene tag-genaue Historie auf.
 
 ---
 

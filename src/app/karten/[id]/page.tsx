@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
+import { after } from 'next/server';
 import Link from 'next/link';
 import { ArrowLeft, TrendingUp, TrendingDown, Star, ShoppingCart, ExternalLink } from 'lucide-react';
 import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
+import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import type { Metadata } from 'next';
 
@@ -28,8 +30,29 @@ export default async function CardDetailPage({ params }: Props) {
   const trend = card.trendPercent || 0;
   const isPositive = trend >= 0;
   const score = calculateInvestmentScore(card);
-  const realData = card.realData && card.priceHistory && card.priceHistory.length >= 2;
-  const history = realData ? card.priceHistory! : generatePriceHistory(price, 30);
+
+  // Heutigen Preis nach dem Rendern speichern, damit jede aufgerufene Karte
+  // über die Zeit eine echte, tageweise Historie aufbaut.
+  after(async () => {
+    await recordPriceSnapshot(card);
+  });
+
+  // 3 Stufen, von echt nach Näherung:
+  // 1) tageweise gespeicherte Preise (Supabase)  2) Cardmarket-Durchschnitte  3) Beispiel
+  const stored = await getStoredPriceHistory(id, 30);
+  let history: { date: string; price: number }[];
+  let historyKind: 'daily' | 'cardmarket' | 'sample';
+  if (stored.length >= 5) {
+    history = stored;
+    historyKind = 'daily';
+  } else if (card.realData && card.priceHistory && card.priceHistory.length >= 2) {
+    history = card.priceHistory;
+    historyKind = 'cardmarket';
+  } else {
+    history = generatePriceHistory(price, 30);
+    historyKind = 'sample';
+  }
+  const realData = historyKind !== 'sample';
 
   const scoreColor = score >= 70 ? 'text-green-600 bg-green-50' : score >= 50 ? 'text-yellow-600 bg-yellow-50' : 'text-gray-500 bg-gray-50';
   const scoreLabel = score >= 70 ? 'Starkes Investment' : score >= 50 ? 'Mittleres Potenzial' : 'Vorsicht geboten';
@@ -101,10 +124,14 @@ export default async function CardDetailPage({ params }: Props) {
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mt-6">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-            <h2 className="font-bold text-gray-900">Preis-Historie (30 Tage)</h2>
-            {realData ? (
+            <h2 className="font-bold text-gray-900">Preis-Historie ({history.length} {history.length === 1 ? 'Tag' : 'Tage'})</h2>
+            {historyKind === 'daily' ? (
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
-                ✓ Echte Cardmarket-Durchschnitte
+                ✓ Echte tägliche Preise
+              </span>
+            ) : historyKind === 'cardmarket' ? (
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
+                ✓ Cardmarket-Durchschnitte
               </span>
             ) : (
               <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-full">
@@ -113,9 +140,13 @@ export default async function CardDetailPage({ params }: Props) {
             )}
           </div>
           <PriceChart data={history} />
-          {realData ? (
+          {historyKind === 'daily' ? (
             <p className="text-xs text-gray-400 mt-3">
-              Basierend auf realen Cardmarket-Durchschnittspreisen (Ø 1/7/30 Tage &amp; Trend), zwischen den Eckwerten interpoliert.
+              Echte, täglich erfasste Cardmarket-Preise. Der Verlauf wird mit jedem Tag genauer.
+            </p>
+          ) : historyKind === 'cardmarket' ? (
+            <p className="text-xs text-gray-400 mt-3">
+              Basierend auf realen Cardmarket-Durchschnittspreisen (Ø 1/7/30 Tage &amp; Trend), zwischen den Eckwerten interpoliert. Sobald täglich Preise erfasst werden, entsteht hier ein tag-genauer Verlauf.
             </p>
           ) : (
             <p className="text-xs text-amber-600 mt-3">
