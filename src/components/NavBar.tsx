@@ -16,10 +16,22 @@ export function NavBar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Link
+            href="/marktbericht"
+            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
+          >
+            Marktbericht
+          </Link>
+          <Link
+            href="/artikel"
+            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
+          >
+            Blog
+          </Link>
           <a
             href="#newsletter"
-            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-3 py-1.5"
+            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
           >
             Newsletter
           </a>
