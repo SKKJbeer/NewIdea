@@ -25,7 +25,7 @@ export function CardGrid({ cards, title }: CardGridProps) {
 }
 
 function CardItem({ card }: { card: PokemonCard }) {
-  const price = card.prices.holofoil?.market || card.prices.market || 0;
+  const price = card.prices.market || card.prices.holofoil?.market || 0;
   const trend = card.trendPercent || 0;
   const isPositive = trend >= 0;
   const score = card.investmentScore || 0;
@@ -52,6 +52,9 @@ function CardItem({ card }: { card: PokemonCard }) {
 
       <div className="p-3">
         <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-1">{card.name}</p>
+        {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
+          <p className="text-xs text-violet-500 leading-tight line-clamp-1">🇩🇪 {card.nameDe}</p>
+        )}
         <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{card.set}</p>
 
         <div className="flex items-center justify-between mt-2">

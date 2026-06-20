@@ -181,6 +181,6 @@ export async function generateSocialPosts(
 }
 
 function formatPrice(card: PokemonCard): string {
-  const price = card.prices.holofoil?.market || card.prices.market || 0;
+  const price = card.prices.market || card.prices.holofoil?.market || 0;
   return price > 0 ? `${price.toFixed(2)} €` : 'N/A';
 }

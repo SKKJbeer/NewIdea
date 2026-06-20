@@ -1,6 +1,7 @@
 export interface PokemonCard {
   id: string;
   name: string;
+  nameDe?: string;
   set: string;
   setCode: string;
   rarity: string;
@@ -10,6 +11,10 @@ export interface PokemonCard {
   priceHistory?: PriceDataPoint[];
   investmentScore?: number;
   trendPercent?: number;
+  // Herkunft des Preises: 'cardmarket' = echte EUR-Daten, 'tcgplayer' = USD-Näherung
+  priceSource?: 'cardmarket' | 'tcgplayer' | 'none';
+  // true, wenn Trend & Verlauf aus echten Cardmarket-Durchschnitten stammen
+  realData?: boolean;
 }
 
 export interface CardPrices {

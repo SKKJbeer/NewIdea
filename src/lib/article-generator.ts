@@ -169,7 +169,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     const cards = await fetchTrendingCards(10);
     cardSummary = cards
       .slice(0, 6)
-      .map((c) => `${c.name} (${c.set}): ${(c.prices.holofoil?.market || c.prices.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
+      .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
       .join('\n');
   } catch {}
 

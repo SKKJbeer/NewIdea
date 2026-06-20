@@ -25,8 +25,8 @@ export default async function Home() {
 
   const topValue = [...cards]
     .sort((a, b) => {
-      const pa = a.prices.holofoil?.market || a.prices.market || 0;
-      const pb = b.prices.holofoil?.market || b.prices.market || 0;
+      const pa = a.prices.market || a.prices.holofoil?.market || 0;
+      const pb = b.prices.market || b.prices.holofoil?.market || 0;
       return pb - pa;
     })
     .slice(0, 10);

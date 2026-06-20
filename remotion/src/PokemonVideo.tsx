@@ -52,7 +52,7 @@ function IntroScene({ scene, frame, fps, branding }: { scene: Scene; frame: numb
 function CardSpotlightScene({ scene, frame, fps }: { scene: Scene; frame: number; fps: number }) {
   const opacity = spring({ frame, fps, config: { damping: 30 } });
   const cardSlide = interpolate(frame, [0, 15], [-100, 0], { extrapolateRight: 'clamp' });
-  const price = scene.card?.prices.holofoil?.market || scene.card?.prices.market || 0;
+  const price = scene.card?.prices.market || scene.card?.prices.holofoil?.market || 0;
   const trend = scene.card?.trendPercent || 0;
   return (
     <AbsoluteFill style={{ background: 'linear-gradient(180deg,#1a0a2e,#0f0a1a)', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 80, gap: 60 }}>

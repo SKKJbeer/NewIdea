@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PokemonCard, CardPrices } from '@/types';
+import { germanToEnglishName, englishToGermanName } from './pokemon-names-de';
 
 const TCG_API_BASE = 'https://api.pokemontcg.io/v2';
 const CARDMARKET_BASE = 'https://api.cardmarket.com/ws/v2.0';
@@ -20,8 +21,8 @@ export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
 
   const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
   return cards.sort((a, b) => {
-    const pa = a.prices.holofoil?.market || a.prices.market || 0;
-    const pb = b.prices.holofoil?.market || b.prices.market || 0;
+    const pa = a.prices.market || a.prices.holofoil?.market || 0;
+    const pb = b.prices.market || b.prices.holofoil?.market || 0;
     return pb - pa;
   });
 }
@@ -39,8 +40,8 @@ export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
 
   const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
   return cards.sort((a, b) => {
-    const pa = a.prices.holofoil?.market || a.prices.market || 0;
-    const pb = b.prices.holofoil?.market || b.prices.market || 0;
+    const pa = a.prices.market || a.prices.holofoil?.market || 0;
+    const pb = b.prices.market || b.prices.holofoil?.market || 0;
     return pb - pa;
   });
 }
@@ -58,8 +59,8 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
 
   const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
   return cards.sort((a, b) => {
-    const pa = a.prices.holofoil?.market || a.prices.market || 0;
-    const pb = b.prices.holofoil?.market || b.prices.market || 0;
+    const pa = a.prices.market || a.prices.holofoil?.market || 0;
+    const pb = b.prices.market || b.prices.holofoil?.market || 0;
     return pb - pa;
   });
 }
@@ -68,8 +69,12 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   const term = query.trim();
   if (!term) return [];
 
+  // Deutsche Eingabe (z.B. "Glurak") in den englischen Namen ("Charizard") übersetzen,
+  // den die TCG-API erwartet. Englische Eingaben bleiben unverändert.
+  const translated = germanToEnglishName(term);
+
   // TCG-API: Wildcard-Suche über den Kartennamen, z.B. name:"*charizard*"
-  const escaped = term.replace(/"/g, '');
+  const escaped = translated.replace(/"/g, '');
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: {
       'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
@@ -84,8 +89,8 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
   // Karten mit Preis zuerst, dann nach Marktpreis absteigend
   return cards.sort((a, b) => {
-    const pa = a.prices.holofoil?.market || a.prices.market || 0;
-    const pb = b.prices.holofoil?.market || b.prices.market || 0;
+    const pa = a.prices.market || a.prices.holofoil?.market || 0;
+    const pb = b.prices.market || b.prices.holofoil?.market || 0;
     return pb - pa;
   });
 }
@@ -121,7 +126,42 @@ export async function fetchRecentSets(): Promise<Array<{ id: string; name: strin
   }));
 }
 
-// Simulate price history for demonstration (replace with real DB data)
+// Baut einen 30-Tage-Verlauf aus den ECHTEN Cardmarket-Durchschnittspreisen.
+// Ankerpunkte: avg30 (vor 30 Tagen), avg7 (vor 7 Tagen), avg1 (gestern), trendPrice (heute).
+// Zwischen den Ankern wird linear interpoliert — die Eckwerte sind reale Marktdaten.
+export function buildCardmarketHistory(cm: Record<string, number>): { date: string; price: number }[] {
+  const today = new Date();
+  const anchors: Array<{ daysAgo: number; price: number }> = [];
+  if (cm.avg30 > 0) anchors.push({ daysAgo: 30, price: cm.avg30 });
+  if (cm.avg7 > 0) anchors.push({ daysAgo: 7, price: cm.avg7 });
+  if (cm.avg1 > 0) anchors.push({ daysAgo: 1, price: cm.avg1 });
+  const current = cm.trendPrice || cm.averageSellPrice;
+  if (current > 0) anchors.push({ daysAgo: 0, price: current });
+
+  if (anchors.length < 2) return [];
+  anchors.sort((a, b) => b.daysAgo - a.daysAgo); // ältester zuerst
+
+  const series: { date: string; price: number }[] = [];
+  const push = (daysAgo: number, price: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - daysAgo);
+    series.push({ date: d.toISOString().split('T')[0], price: Math.round(price * 100) / 100 });
+  };
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const start = anchors[i];
+    const end = anchors[i + 1];
+    const span = start.daysAgo - end.daysAgo;
+    for (let step = 0; step < span; step++) {
+      const frac = step / span;
+      push(start.daysAgo - step, start.price + (end.price - start.price) * frac);
+    }
+  }
+  const last = anchors[anchors.length - 1];
+  push(last.daysAgo, last.price);
+  return series;
+}
+
+// Fallback-Verlauf, wenn keine Cardmarket-Daten vorliegen (klar als Beispiel gekennzeichnet in der UI).
 export function generatePriceHistory(basePrice: number, days = 30) {
   const history = [];
   let price = basePrice * 0.8;
@@ -141,7 +181,7 @@ export function generatePriceHistory(basePrice: number, days = 30) {
 
 export function calculateInvestmentScore(card: PokemonCard): number {
   let score = 50;
-  const price = card.prices.holofoil?.market || card.prices.market || 0;
+  const price = card.prices.market || card.prices.holofoil?.market || 0;
 
   if (price > 100) score += 20;
   else if (price > 50) score += 10;
@@ -161,27 +201,52 @@ function mapApiCardToCard(apiCard: Record<string, unknown>): PokemonCard {
   const tcgprices = apiCard.tcgplayer as Record<string, unknown> | undefined;
   const priceData = (tcgprices?.prices as Record<string, unknown>) || {};
 
+  // Cardmarket = echte EUR-Daten (für deutsche Community bevorzugt)
+  const cmRoot = apiCard.cardmarket as Record<string, unknown> | undefined;
+  const cm = (cmRoot?.prices as Record<string, number>) || undefined;
+
+  const eurPrice = cm ? (cm.trendPrice || cm.averageSellPrice || cm.avg7 || cm.avg30 || 0) : 0;
+  const tcgHolo = priceData.holofoil as CardPrices['holofoil'];
+  const tcgNormal = priceData.normal as CardPrices['normal'];
+  const tcgMarket = tcgHolo?.market || tcgNormal?.market || 0;
+
   const prices: CardPrices = {
-    market: (tcgprices as Record<string, number> | undefined)?.market,
-    holofoil: priceData.holofoil as CardPrices['holofoil'],
+    market: eurPrice || tcgMarket,
+    holofoil: tcgHolo,
     reverseHolofoil: priceData.reverseHolofoil as CardPrices['reverseHolofoil'],
-    normal: priceData.normal as CardPrices['normal'],
+    normal: tcgNormal,
   };
+
+  // Echter Trend aus Cardmarket: aktueller Trendpreis vs. 30-Tage-Schnitt
+  let trendPercent = 0;
+  let realData = false;
+  let priceHistory: PokemonCard['priceHistory'];
+  if (cm && cm.avg30 > 0) {
+    const current = cm.trendPrice || cm.avg1 || cm.averageSellPrice || cm.avg30;
+    trendPercent = ((current - cm.avg30) / cm.avg30) * 100;
+    realData = true;
+    const hist = buildCardmarketHistory(cm);
+    if (hist.length >= 2) priceHistory = hist;
+  }
 
   const images = apiCard.images as Record<string, string> | undefined;
   const setData = apiCard.set as Record<string, unknown> | undefined;
-  const trendPercent = (Math.random() - 0.4) * 30;
 
+  const cardName = apiCard.name as string;
   const card: PokemonCard = {
     id: apiCard.id as string,
-    name: apiCard.name as string,
+    name: cardName,
+    nameDe: englishToGermanName(cardName) || undefined,
     set: (setData?.name as string) || '',
     setCode: (setData?.id as string) || '',
     rarity: (apiCard.rarity as string) || 'Unknown',
     imageUrl: images?.small || '',
     imageUrlHiRes: images?.large,
     prices,
+    priceHistory,
     trendPercent: Math.round(trendPercent * 10) / 10,
+    priceSource: eurPrice ? 'cardmarket' : tcgMarket ? 'tcgplayer' : 'none',
+    realData,
   };
 
   card.investmentScore = calculateInvestmentScore(card);
