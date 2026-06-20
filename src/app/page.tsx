@@ -17,12 +17,17 @@ export default async function Home() {
     error = true;
   }
 
-  const topGainers = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0)).slice(0, 10);
-  const topValue = [...cards].sort((a, b) => {
-    const pa = a.prices.holofoil?.market || a.prices.market || 0;
-    const pb = b.prices.holofoil?.market || b.prices.market || 0;
-    return pb - pa;
-  }).slice(0, 10);
+  const topGainers = [...cards]
+    .sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0))
+    .slice(0, 10);
+
+  const topValue = [...cards]
+    .sort((a, b) => {
+      const pa = a.prices.holofoil?.market || a.prices.market || 0;
+      const pb = b.prices.holofoil?.market || b.prices.market || 0;
+      return pb - pa;
+    })
+    .slice(0, 10);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -34,16 +39,27 @@ export default async function Home() {
               KI-gestützte Marktanalyse • Täglich aktualisiert
             </div>
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4">
-              Pokémon<span className="text-yellow-300">Market</span><br />Intelligence
+              Pokémon<span className="text-yellow-300">Market</span>
+              <br />
+              Intelligence
             </h1>
             <p className="text-violet-200 text-lg max-w-xl mx-auto mb-8">
-              Echtzeit-Preisanalysen, Investment-Scores und KI-Marktberichte für Pokémon-Karten-Sammler und Investoren.
+              Echtzeit-Preisanalysen, Investment-Scores und KI-Marktberichte für
+              Pokémon-Karten-Sammler und Investoren.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="#newsletter" className="bg-white text-violet-700 font-bold px-6 py-3 rounded-xl hover:bg-violet-50 transition-colors flex items-center gap-2 justify-center">
+              <a
+                href="#newsletter"
+                className="bg-white text-violet-700 font-bold px-6 py-3 rounded-xl hover:bg-violet-50 transition-colors flex items-center gap-2 justify-center"
+              >
                 <Mail size={18} /> Newsletter abonnieren
               </a>
-              <a href="https://youtube.com/@pokemarketintelligence" target="_blank" rel="noopener noreferrer" className="bg-red-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-red-700 transition-colors flex items-center gap-2 justify-center">
+              <a
+                href="https://youtube.com/@pokemarketintelligence"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-red-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-red-700 transition-colors flex items-center gap-2 justify-center"
+              >
                 <PlayCircle size={18} /> YouTube ansehen
               </a>
             </div>
@@ -58,8 +74,15 @@ export default async function Home() {
         </section>
 
         <div className="grid grid-cols-3 gap-4">
-          {[{ label: 'Karten analysiert', value: cards.length.toString() }, { label: 'Updates täglich', value: '24' }, { label: 'Newsletter', value: 'Kostenlos' }].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm">
+          {[
+            { label: 'Karten analysiert', value: cards.length.toString() },
+            { label: 'Updates täglich', value: '24' },
+            { label: 'Newsletter', value: 'Kostenlos' },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm"
+            >
               <p className="text-2xl font-black text-violet-700">{stat.value}</p>
               <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
             </div>
@@ -72,15 +95,31 @@ export default async function Home() {
           </div>
         )}
 
-        {topGainers.length > 0 && <CardGrid cards={topGainers} title="🚀 Top Investment-Karten dieser Woche" />}
-        {topValue.length > 0 && <CardGrid cards={topValue} title="💎 Höchste Kartenwerte" />}
+        {topGainers.length > 0 && (
+          <CardGrid cards={topGainers} title="🚀 Top Investment-Karten dieser Woche" />
+        )}
 
-        <section id="newsletter"><Suspense><NewsletterSignup /></Suspense></section>
+        {topValue.length > 0 && (
+          <CardGrid cards={topValue} title="💎 Höchste Kartenwerte" />
+        )}
 
-        <footer className="border-t border-gray-200 pt-6 pb-10">
+        <section id="newsletter">
+          <Suspense>
+            <NewsletterSignup />
+          </Suspense>
+        </section>
+
+        <footer className="border-t border-gray-200 pt-6 pb-10 space-y-3">
           <p className="text-xs text-gray-400 text-center max-w-2xl mx-auto">
-            PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr. Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision — für dich ohne Mehrkosten.
+            PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr.
+            Pokémon-Karten sind Sachwerte mit Marktrisiken. Affiliate-Links: Bei Käufen über
+            unsere Links erhalten wir eine kleine Provision — für dich ohne Mehrkosten.
           </p>
+          <div className="flex justify-center gap-4 text-xs">
+            <a href="/impressum" className="text-gray-400 hover:text-violet-600 transition-colors">Impressum</a>
+            <span className="text-gray-200">|</span>
+            <a href="/datenschutz" className="text-gray-400 hover:text-violet-600 transition-colors">Datenschutz</a>
+          </div>
         </footer>
       </div>
     </main>
