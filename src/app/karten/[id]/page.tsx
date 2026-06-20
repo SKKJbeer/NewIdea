@@ -39,10 +39,10 @@ export default async function CardDetailPage({ params }: Props) {
 
   // 3 Stufen, von echt nach Näherung:
   // 1) tageweise gespeicherte Preise (Supabase)  2) Cardmarket-Durchschnitte  3) Beispiel
-  const stored = await getStoredPriceHistory(id, 30);
+  const stored = await getStoredPriceHistory(id, 90);
   let history: { date: string; price: number }[];
   let historyKind: 'daily' | 'cardmarket' | 'sample';
-  if (stored.length >= 5) {
+  if (stored.length >= 2) {
     history = stored;
     historyKind = 'daily';
   } else if (card.realData && card.priceHistory && card.priceHistory.length >= 2) {
@@ -127,7 +127,7 @@ export default async function CardDetailPage({ params }: Props) {
             <h2 className="font-bold text-gray-900">Preis-Historie ({history.length} {history.length === 1 ? 'Tag' : 'Tage'})</h2>
             {historyKind === 'daily' ? (
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
-                ✓ Echte tägliche Preise
+                ✓ Echte Preise · täglich erfasst
               </span>
             ) : historyKind === 'cardmarket' ? (
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
@@ -142,7 +142,7 @@ export default async function CardDetailPage({ params }: Props) {
           <PriceChart data={history} />
           {historyKind === 'daily' ? (
             <p className="text-xs text-gray-400 mt-3">
-              Echte, täglich erfasste Cardmarket-Preise. Der Verlauf wird mit jedem Tag genauer.
+              Echte Cardmarket-Preise — ab jetzt täglich erfasst. Der Verlauf wird mit jedem Tag dichter und genauer.
             </p>
           ) : historyKind === 'cardmarket' ? (
             <p className="text-xs text-gray-400 mt-3">
