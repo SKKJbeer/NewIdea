@@ -1,97 +1,101 @@
-# 📊 Projekt-Status & Aufgaben — PokéMarket Intelligence
+# Projekt-Status — PokéMarket Intelligence
 
-**Stand:** 20. Juni 2026
-**Branch:** `claude/side-project-monetization-srmacs`
+**Version:** `v0.4.0` · **Stand:** 20. Juni 2026 · **Branch:** `main`
 
-Diese Datei ist unser **gemeinsames Logbuch**: Was ist entschieden, was ist gebaut, was ist offen.
+Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
+
+> Versionsverlauf: siehe [CHANGELOG.md](./CHANGELOG.md) · Live auf der Website: `/changelog`
 
 ---
 
-## ✅ Was bereits gebaut & fertig ist
+## Was in welcher Version gebaut wurde
+
+| Version | Datum | Inhalt |
+|---|---|---|
+| v0.1.0 | 20.06.2026 | Grundsystem: Homepage, Studio, Cron-Pipeline, KI-Engine, Newsletter, Video |
+| v0.2.0 | 20.06.2026 | Impressum, Datenschutz, Karten-Detailseiten, Preis-Chart |
+| v0.3.0 | 20.06.2026 | Mobile-Optimierung, Studio-Überarbeitung (localStorage, Timer, Fortschritt) |
+| v0.4.0 | 20.06.2026 | Marktbericht, Blog, täglicher Cron, Artikel-Generator, Newsletter-Template |
+
+---
+
+## Aktueller Stand (v0.4.0)
 
 | Bereich | Status | Details |
 |---|---|---|
-| Web-Dashboard (öffentlich) | ✅ Fertig | Startseite mit Kartenpreisen, Investment-Scores, Newsletter-Anmeldung |
-| **Steuerzentrale `/studio`** | ✅ Fertig | Status-Übersicht + Content-Generierung auf Knopfdruck |
-| KI-Content-Engine | ✅ Fertig | Marktbericht, Newsletter, Video-Skript, Social-Posts |
-| Kartendaten-Anbindung | ✅ Fertig | Pokémon TCG API |
-| Newsletter-System | ✅ Fertig (Code) | Beehiiv — pusht als Entwurf |
-| Video-Animationen | ✅ Fertig (Code) | Remotion: YouTube (16:9) + Shorts (9:16) |
-| Video-Stimme | ✅ Fertig (Code) | ElevenLabs KI-Sprecher |
-| Social-Media-Planung | ✅ Fertig (Code) | Buffer: Insta/TikTok/Twitter |
-| Wöchentliche Vollautomatik | ✅ Fertig (Code) | Cron-Job montags 07:00 |
-| Affiliate-Integration | ✅ Fertig (Code) | Cardmarket, Amazon, Trade Republic |
-
-> "Fertig (Code)" = programmiert und einsatzbereit, braucht aber noch deinen API-Key, um live zu gehen.
-
----
-
-## 🎯 Unsere Entscheidungen (Logbuch)
-
-Damit wir immer nachvollziehen können, WARUM wir was machen:
-
-1. **Projektrichtung:** Pokémon-Investment-Portal (statt reiner Finanzblog) — wegen deiner Leidenschaft + bestehender Content-Erfahrung + schnellerer Community-Reaktion.
-2. **Maximale Automatisierung:** KI übernimmt die gesamte Content-Erstellung. Du steuerst & gibst frei.
-3. **Review-Modus als Standard:** Inhalte gehen erst als Entwurf raus (Schutz vor Qualitätsproblemen). Auto-Publish ist optional zuschaltbar.
-4. **Tech-Stack:** Next.js + Vercel + Claude + Remotion — kostengünstig (0–20 €/Monat).
-5. **Einkommensziel:** 100–500 €/Monat in 6–12 Monaten über Affiliate + Newsletter + AdSense.
+| Startseite `/` | ✅ Fertig | Kartenpreise, Investment-Scores, Blog-Teaser, Newsletter |
+| Marktbericht `/marktbericht` | ✅ Fertig | KI-Wochenanalyse, ISR 7 Tage |
+| Blog-Index `/artikel` | ✅ Fertig | 14 Tage, Featured-Card, ISR 1h |
+| Tagesartikel `/artikel/[date]` | ✅ Fertig | 7 Typen, ISR 24h, KI-generiert |
+| Karten-Detail `/karten/[id]` | ✅ Fertig | Preis, Score, Chart |
+| Content Studio `/studio` | ✅ Fertig | Generierung, localStorage, Timer, Veröffentlichen-Button |
+| Impressum & Datenschutz | ✅ Fertig (Platzhalter) | Echte Daten noch eintragen! |
+| Wöchentlicher Cron (Mo 07:00) | ✅ Fertig (Code) | Braucht API-Keys in Vercel |
+| Täglicher Cron (08:00) | ✅ Fertig (Code) | Braucht `NEXT_PUBLIC_SITE_URL` in Vercel |
+| Newsletter-System (Beehiiv) | ✅ Fertig (Code) | Braucht `BEEHIIV_API_KEY` |
+| Video-Pipeline (Remotion) | ✅ Fertig (Code) | Braucht `ELEVENLABS_API_KEY` |
+| Social-Media (Buffer) | ✅ Fertig (Code) | Braucht `BUFFER_ACCESS_TOKEN` |
+| Affiliate-Links | ✅ Fertig (Code) | Eigene Links in Vercel-Env eintragen |
 
 ---
 
-## 📋 Offene Aufgaben — von dir abzuarbeiten
+## Offene Aufgaben — von dir abzuarbeiten
 
-### 🔴 Priorität 1 — Damit überhaupt etwas läuft
+### Priorität 1 — Damit der tägliche Cron läuft
 
-- [ ] **Pokémon TCG API-Key** holen → https://dev.pokemontcg.io/
-- [ ] **Claude API-Key** holen → https://console.anthropic.com/
-- [ ] `.env.local` anlegen (Vorlage: `.env.example`) und beide Keys eintragen
-- [ ] `npm install && npm run dev` → `/studio` öffnen → "Marktbericht" testen
+- [ ] **`NEXT_PUBLIC_SITE_URL`** in Vercel eintragen (z. B. `https://newidea.vercel.app`)
+  → Ohne diesen Wert wärmt der tägliche Cron `localhost:3000` vor — nutzlos
 
-### 🟠 Priorität 2 — Online gehen
+### Priorität 2 — Rechtliches (in Deutschland Pflicht!)
 
-- [ ] **Vercel-Account** erstellen → https://vercel.com/ (mit GitHub einloggen)
-- [ ] Repo bei Vercel importieren → deployen
-- [ ] Alle Env-Vars in Vercel-Einstellungen eintragen
-- [ ] Domain wählen (kostenlos: `dein-projekt.vercel.app`, oder eigene ~10 €/Jahr)
+- [ ] **Impressum** `/impressum` — eckige Klammern mit echten Daten ersetzen
+- [ ] **Datenschutz** `/datenschutz` — eckige Klammern mit echten Daten ersetzen
 
-### 🟡 Priorität 3 — Geld verdienen aktivieren
+### Priorität 3 — Newsletter live schalten
 
-- [ ] **Cardmarket-Affiliate** anmelden → deinen Link in `.env.local` eintragen
-- [ ] **Amazon PartnerNet** anmelden → Link eintragen
-- [ ] **Trade Republic Affiliate** (oder anderer Broker) → Link eintragen
+- [ ] **Beehiiv-Account** erstellen → https://beehiiv.com/
+- [ ] `BEEHIIV_API_KEY` in Vercel eintragen
+- [ ] `BEEHIIV_PUBLICATION_ID` in Vercel eintragen
 
-### 🟢 Priorität 4 — Reichweite & Publishing
+### Priorität 4 — Affiliate-Einnahmen aktivieren
 
-- [ ] **Beehiiv-Account** (Newsletter) → API-Key + Publication-ID eintragen
-- [ ] **ElevenLabs-Account** (Video-Stimme) → API-Key eintragen
-- [ ] **YouTube-Kanal** erstellen + YouTube Data API einrichten (OAuth)
-- [ ] **Buffer-Account** für Social-Media-Planung (kostenpflichtig)
+- [ ] **Cardmarket-Affiliate** anmelden → eigenen Link in `NEXT_PUBLIC_CARDMARKET_URL` eintragen
+- [ ] **Amazon PartnerNet** anmelden → Link in `NEXT_PUBLIC_AMAZON_URL` eintragen
+- [ ] **Trade Republic** Affiliate → Link in `NEXT_PUBLIC_TRADE_REPUBLIC_URL` eintragen
 
-### ⚪ Priorität 5 — Rechtliches (Pflicht in Deutschland!)
+### Priorität 5 — Optionale Erweiterungen
 
-- [ ] **Impressum** erstellen (Pflicht für Websites)
-- [ ] **Datenschutzerklärung** (DSGVO)
-- [ ] **Affiliate-Kennzeichnung** prüfen (ist im Code vorbereitet)
-- [ ] Hinweis: Keine Anlageberatung — nur Information (rechtlich wichtig bei Finanz-Content)
+- [ ] `ELEVENLABS_API_KEY` — Video-Vertonung aktivieren
+- [ ] `BUFFER_ACCESS_TOKEN` — Social-Media-Planung aktivieren
+- [ ] YouTube-Kanal erstellen + YouTube Data API einrichten
 
 ---
 
-## 🔮 Geplante Features (Backlog — kommt später)
+## Unsere Entscheidungen (Logbuch)
 
-Ideen für die Zukunft, noch nicht gebaut. Hier können wir jederzeit ergänzen:
-
-- [ ] **Preis-Historie speichern** (echte Datenbank statt simulierter Trends) — Supabase ist vorbereitet
-- [ ] **Einzelne Karten-Detailseiten** mit Preis-Charts
-- [ ] **Auto-Publish-Modus** (echtes 100% ohne deinen Klick)
-- [ ] **Thumbnail-Generator** für YouTube (automatisch)
-- [ ] **Paid-Newsletter-Tier** (Premium-Analysen 5–9 €/Monat)
-- [ ] **A/B-Tests** für Betreffzeilen & Titel
-- [ ] **Analytics-Dashboard** (Einnahmen, Klicks, Conversions)
-- [ ] **Mehr Affiliate-Partner** (eBay, lokale Kartenshops)
+1. **Projektrichtung:** Pokémon-Investment-Portal — wegen bestehender Content-Erfahrung + Community
+2. **Maximale Automatisierung:** KI übernimmt Content-Erstellung, du steuerst & gibst frei
+3. **Review-Modus als Standard:** Inhalte gehen erst als Entwurf raus
+4. **Tech-Stack:** Next.js + Vercel + Claude + Remotion — 0–20 €/Monat Betriebskosten
+5. **ISR statt Datenbank:** Artikel sind datums-basiert, kein DB-Setup nötig
+6. **Versionierung:** Jede Änderung bekommt eine Versionsnummer im CHANGELOG + /changelog
+7. **Einkommensziel:** 100–500 €/Monat in 6–12 Monaten
 
 ---
 
-## 📈 Realistischer Fahrplan
+## Backlog (geplante Features)
+
+- [ ] Echte Preis-Datenbank (Supabase) statt simulierter Trends
+- [ ] Auto-Publish-Modus (ohne deinen Klick)
+- [ ] Analytics-Dashboard (Einnahmen, Klicks, Conversions)
+- [ ] Paid-Newsletter-Tier (5–9 €/Monat Premium-Analysen)
+- [ ] YouTube-Thumbnail-Generator
+- [ ] A/B-Tests für Betreffzeilen
+- [ ] Mehr Affiliate-Partner (eBay, lokale Kartenshops)
+
+---
+
+## Fahrplan
 
 | Zeitraum | Ziel | Erwartetes Einkommen |
 |---|---|---|
@@ -102,13 +106,4 @@ Ideen für die Zukunft, noch nicht gebaut. Hier können wir jederzeit ergänzen:
 
 ---
 
-## 💬 Wie wir zusammenarbeiten
-
-- **Diese Datei (`STATUS.md`)** ist unser Logbuch — ich aktualisiere sie bei jeder Änderung.
-- **Du hakst ab**, was du erledigt hast — oder sagst mir Bescheid, dann mache ich es.
-- **Neue Ideen?** Sag sie mir, ich trage sie ins Backlog ein.
-- **Etwas unklar?** Frag jederzeit — ich erkläre es.
-
----
-
-*Zuletzt aktualisiert von Claude — Content Studio & Dokumentation hinzugefügt.*
+*Zuletzt aktualisiert: v0.4.0 — 20. Juni 2026*
