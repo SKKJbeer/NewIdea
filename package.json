@@ -1,0 +1,43 @@
+{
+  "name": "pokemarketapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "video:preview": "remotion studio remotion/src/index.ts",
+    "video:render:youtube": "remotion render remotion/src/index.ts PokemonVideoYouTube out/youtube.mp4",
+    "video:render:shorts": "remotion render remotion/src/index.ts PokemonVideoShorts out/shorts.mp4"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "@radix-ui/react-dialog": "^1.1.17",
+    "@radix-ui/react-tooltip": "^1.2.10",
+    "@remotion/cli": "^4.0.481",
+    "@remotion/player": "^4.0.481",
+    "@supabase/supabase-js": "^2.108.2",
+    "axios": "^1.18.0",
+    "cheerio": "^1.2.0",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.21.0",
+    "next": "16.2.9",
+    "node-cron": "^4.4.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "remotion": "^4.0.481",
+    "resend": "^6.14.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
