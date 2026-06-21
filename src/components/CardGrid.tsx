@@ -7,28 +7,54 @@ import { TrendingUp, TrendingDown, Star } from 'lucide-react';
 interface CardGridProps {
   cards: PokemonCard[];
   title?: string;
+  compact?: boolean;
 }
 
-export function CardGrid({ cards, title }: CardGridProps) {
+export function CardGrid({ cards, title, compact = false }: CardGridProps) {
   return (
     <section>
       {title && (
         <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className={compact
+        ? 'grid grid-cols-3 sm:grid-cols-6 gap-2'
+        : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
+      }>
         {cards.map((card) => (
-          <CardItem key={card.id} card={card} />
+          <CardItem key={card.id} card={card} compact={compact} />
         ))}
       </div>
     </section>
   );
 }
 
-function CardItem({ card }: { card: PokemonCard }) {
+function CardItem({ card, compact }: { card: PokemonCard; compact?: boolean }) {
   const price = card.prices.market || card.prices.holofoil?.market || 0;
   const trend = card.trendPercent || 0;
   const isPositive = trend >= 0;
   const score = card.investmentScore || 0;
+
+  if (compact) {
+    return (
+      <Link href={`/karten/${card.id}`} className="block group">
+        <div className="bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all overflow-hidden">
+          <div className="bg-gradient-to-br from-violet-50 to-indigo-50 aspect-[3/4]">
+            {card.imageUrl ? (
+              <img src={card.imageUrl} alt={card.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-2xl">🃏</div>
+            )}
+          </div>
+          <div className="p-1.5">
+            <p className="text-[10px] font-semibold text-gray-800 leading-tight line-clamp-1">{card.name}</p>
+            <p className="text-[10px] font-bold text-gray-600 tabular-nums">
+              {price > 0 ? `${price.toFixed(0)} €` : '—'}
+            </p>
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link href={`/karten/${card.id}`} className="block">
