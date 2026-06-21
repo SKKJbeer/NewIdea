@@ -23,6 +23,7 @@ export interface Article {
   sections: Array<{ heading: string; content: string; highlight?: FeaturedCard }>;
   keyPoints: string[];
   tags: string[];
+  sources?: Array<{ label: string; url: string }>;
   readingTimeMin: number;
   generatedAt: string;
 }
@@ -82,7 +83,11 @@ const JSON_SCHEMA = `{
     {"heading": "Dritte Abschnittsaussage", "content": "..."}
   ],
   "keyPoints": ["Takeaway 1 — kurz und merkbar", "Takeaway 2", "Takeaway 3"],
-  "tags": ["pokémon karten", "tcg", "investment", "weiteres keyword"]
+  "tags": ["pokémon karten", "tcg", "investment", "weiteres keyword"],
+  "sources": [
+    {"label": "Quelle oder Plattform — was dort zu finden ist", "url": "https://..."},
+    {"label": "Weitere Quelle", "url": "https://..."}
+  ]
 }`;
 
 // Spezielles Schema für den Wochenrückblick — reichhaltiger, unterhaltsamer
@@ -117,7 +122,11 @@ const RUECKBLICK_SCHEMA = `{
     }
   ],
   "keyPoints": ["Das wichtigste Takeaway der Woche", "Was du tun oder lassen solltest", "Die Überraschung der Woche"],
-  "tags": ["wochenrückblick", "pokemon tcg", "pokémon news", "investment woche"]
+  "tags": ["wochenrückblick", "pokemon tcg", "pokémon news", "investment woche"],
+  "sources": [
+    {"label": "Cardmarket — Preisdaten dieser Woche", "url": "https://www.cardmarket.com/en/Pokemon"},
+    {"label": "Weitere verwendete Quelle", "url": "https://..."}
+  ]
 }`;
 
 // Vollwertige Evergreen-Artikel als Fallback — im Marco-Persona-Stil.
@@ -445,6 +454,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     sections: Array<{ heading: string; content: string; cardRef?: string }>;
     keyPoints: string[];
     tags: string[];
+    sources?: Array<{ label: string; url: string }>;
   }
 
   try {
@@ -473,6 +483,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       sections: matchSectionHighlights(data.sections || [], trendingCards),
       keyPoints: data.keyPoints || [],
       tags: data.tags || [],
+      sources: data.sources || [],
       readingTimeMin: Math.max(1, Math.ceil(wordCount / 200)),
       generatedAt: new Date().toISOString(),
     };

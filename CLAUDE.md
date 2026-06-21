@@ -85,6 +85,25 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 - **Echte Karten & Sets**: Nur Namen und Set-Codes aus der echten TCG-Datenbank verwenden
 - **Echte Preise**: Nur Werte aus der TCG API oder Cardmarket (über API geliefert)
 
+### Quellen-Pflicht (IMMER!)
+
+**Jeder Artikel und Beitrag MUSS direkte Quellenlinks enthalten.** Das `Article`-Interface hat ein `sources`-Feld:
+
+```typescript
+sources?: Array<{ label: string; url: string }>
+```
+
+Gute Quellen je nach Artikeltyp:
+| Typ | Quellen |
+|---|---|
+| Marktanalyse, Preise | [Cardmarket](https://www.cardmarket.com/en/Pokemon) |
+| Set-Info, Karten-Daten | [Bulbapedia](https://bulbapedia.bulbagarden.net) |
+| Offizielle Produkte | [pokemon.com/de](https://www.pokemon.com/de/pokemon-tcg/) |
+| Grading | [PSA](https://www.psacard.com/gradingstandards), [BGS](https://www.beckett.com/grading/services), [CGC](https://www.cgccards.com) |
+| Turniere | [Limitless TCG](https://limitlesstcg.com/tournaments), [pokemon.com/events](https://www.pokemon.com/de/pokemon-events/) |
+| Zubehör | [Dragon Shield](https://www.dragonshield.com), [Ultra PRO](https://www.ultrapro.com), [BCW](https://www.bcwsupplies.com) |
+| USA-Preise | [TCGPlayer](https://www.tcgplayer.com/categories/trading-and-collectible-card-games/pokemon) |
+
 ### Review-Pflicht vor jedem Content-Commit
 
 Vor jedem Commit der Artikel-Inhalte (static-articles.ts, Fallback-Artikel, etc.) prüfen:
@@ -93,6 +112,7 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, Fallback-Artikel, etc.
 - [ ] Alle genannten Preise basieren auf echten Daten oder sind explizit als Beispiel markiert
 - [ ] Alle genannten Events/Turniere/Ankündigungen sind real oder klar als hypothetisch kenntlich
 - [ ] Kein Satz behauptet eine Tatsache die ich nicht belegen kann
+- [ ] `sources`-Array enthält mindestens eine direkte Quellenangabe
 
 **Bei KI-generierten Artikeln (Marco-Persona):** Die KI darf Meinungen äußern und Trends erklären, aber niemals konkrete Zahlen, Daten oder Events erfinden. Das `buildPrompt()` in `article-generator.ts` enthält deshalb den Hinweis "Nutze echte Zahlen und Karten-Namen".
 

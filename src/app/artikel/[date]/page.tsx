@@ -158,6 +158,27 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                 ))}
               </div>
             )}
+
+            {/* Sources */}
+            {article.sources && article.sources.length > 0 && (
+              <section className="bg-gray-50 rounded-2xl border border-gray-100 p-4">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Quellen</p>
+                <ul className="space-y-1">
+                  {article.sources.map((src, i) => (
+                    <li key={i} className="text-xs">
+                      <a
+                        href={src.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-violet-600 hover:text-violet-800 hover:underline"
+                      >
+                        {src.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </>
         ) : null}
 
