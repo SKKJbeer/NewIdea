@@ -96,7 +96,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
               type="password"
               value={pw}
               onChange={(e) => setPw(e.target.value)}
-              placeholder="Passwort (CRON_SECRET)"
+              placeholder="Passwort"
               autoFocus
               className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-100"
             />
