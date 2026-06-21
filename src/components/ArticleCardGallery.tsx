@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { FeaturedCard } from '@/lib/article-generator';
+import { BoosterPackImage } from './BoosterPackImage';
 
 const ACCENT: Record<string, string> = {
   violet:  '#7c3aed',
@@ -57,16 +58,16 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
                   loading="lazy"
                 />
               </div>
-              <p className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2">{card.name}</p>
-              {/* Set logo — shows which booster/set the card comes from */}
+              <p className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2 mt-1">{card.name}</p>
+              {/* Booster pack product image */}
               {card.setCode && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={`https://images.pokemontcg.io/${card.setCode}/logo.png`}
-                  alt={card.set}
-                  className="h-4 mx-auto mt-1 object-contain opacity-60"
-                  loading="lazy"
-                />
+                <div className="mt-1.5 flex justify-center">
+                  <BoosterPackImage
+                    setCode={card.setCode}
+                    setName={card.set}
+                    className="h-14 object-contain drop-shadow-sm"
+                  />
+                </div>
               )}
               <div className="flex items-center justify-center gap-1 mt-0.5">
                 {card.price > 0 && (

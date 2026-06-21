@@ -25,6 +25,28 @@ export interface Article {
   generatedAt: string;
 }
 
+// Static preview titles shown in the blog listing (without date params)
+export const ARTICLE_PREVIEW_TITLES: Record<ArticleType, string> = {
+  markt:      'Pokémon-Markt im Check: Was sich gerade wirklich lohnt',
+  karte:      'Karte unter der Lupe: Charizard ex — warum Glurak nicht aufhört zu steigen',
+  strategie:  'Die 3-Stufen-Strategie: So baust du ein Portfolio das wirklich wächst',
+  set:        'Set im Check: Pokémon 151 — das beste moderne Investment-Set erklärt',
+  ausblick:   'Wochenend-Ausblick: Was Sammler & Investoren jetzt wissen sollten',
+  guide:      'Pokémon-Fälschungen erkennen: So schützt du dich vor gefakten Karten',
+  rueckblick: 'Wochenrückblick: Was der Markt diese Woche gelehrt hat',
+};
+
+// Short teaser line shown under each title in the listing
+export const ARTICLE_PREVIEW_SUBTITLES: Record<ArticleType, string> = {
+  markt:      'Welche Karten diese Woche gewinnen und verlieren — mit echten Zahlen.',
+  karte:      'Eine Karte im Spotlight: Geschichte, Preis und Zukunftspotenzial.',
+  strategie:  'Konkrete Tipps: wie du kaufst, wann du kaufst — ehrlich über Risiken.',
+  set:        'Welche Chase-Cards lohnen sich? Sealed oder Einzelkarten? Der Check.',
+  ausblick:   'Was kaufen, was meiden, worauf achten — dein Überblick fürs Wochenende.',
+  guide:      'Schritt für Schritt erklärt — praktisch für Einsteiger und Fortgeschrittene.',
+  rueckblick: 'Was lief gut, was schlecht, was lernen wir — ungeschönt.',
+};
+
 export const DAY_TYPE: Record<number, ArticleType> = {
   0: 'rueckblick',
   1: 'markt',

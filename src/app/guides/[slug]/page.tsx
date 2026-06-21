@@ -5,6 +5,7 @@ import { NavBar } from '@/components/NavBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { getGuide, GUIDES } from '@/lib/guides';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
@@ -109,12 +110,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                           loading="lazy"
                         />
                         {card.setId && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`https://images.pokemontcg.io/${card.setId}/logo.png`}
-                            alt="Set"
-                            className="w-14 mt-1 object-contain opacity-55"
-                            loading="lazy"
+                          <BoosterPackImage
+                            setCode={card.setId}
+                            setName={card.name}
+                            className="w-14 mt-1.5 object-contain"
                           />
                         )}
                       </div>
