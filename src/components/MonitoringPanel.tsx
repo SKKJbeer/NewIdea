@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   CheckCircle2, XCircle, AlertCircle, Loader2,
   Key, Link2, FileText, Zap, Server, RefreshCw, ExternalLink,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, BookMarked, GitBranch,
 } from 'lucide-react';
 
 interface ApiKeyStatus {
@@ -40,12 +40,31 @@ interface FeatureStatus {
   effect: string;
 }
 
+interface SkillInfo {
+  name: string;
+  title: string;
+  description: string;
+  lastModified: string;
+}
+
+interface WorkflowInfo {
+  name: string;
+  endpoint: string;
+  schedule: string;
+  scheduleLabel: string;
+  description: string;
+  active: boolean;
+  trigger: string;
+}
+
 interface MonitoringData {
   build: { version: string; siteUrl: string | null; siteUrlMissing: boolean; nodeEnv: string };
   apiKeys: Record<string, ApiKeyStatus>;
   affiliates: Record<string, AffiliateStatus>;
   legal: Record<string, LegalStatus>;
   features: { supabaseConnected: boolean } & Record<string, FeatureStatus>;
+  skills: SkillInfo[];
+  workflows: WorkflowInfo[];
   checkedAt: string;
 }
 
@@ -293,6 +312,76 @@ export function MonitoringPanel() {
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold text-gray-900 leading-tight">{info.label}</p>
                 <p className="text-[10px] text-gray-400 leading-tight mt-0.5">{info.effect}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Skills */}
+      {data.skills.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+          <SectionTitle icon={BookMarked} title="Claude Skills" score={data.skills.length} total={data.skills.length} />
+          <div className="space-y-2">
+            {data.skills.map((skill) => (
+              <div key={skill.name} className="border border-gray-100 rounded-xl px-3 py-2.5 bg-violet-50/30">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <code className="text-[11px] font-mono font-bold text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded">
+                        /{skill.name}
+                      </code>
+                      <span className="text-xs font-semibold text-gray-800 leading-tight">{skill.title.replace(/^.+?—\s*/, '')}</span>
+                    </div>
+                    {skill.description && (
+                      <p className="text-[11px] text-gray-400 mt-1 leading-snug line-clamp-2">{skill.description}</p>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-gray-300 shrink-0 mt-0.5">
+                    {new Date(skill.lastModified).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-300 mt-3">
+            Automatisch aus <code className="font-mono">.claude/commands/</code> gelesen — neue Skills erscheinen sofort hier.
+          </p>
+        </div>
+      )}
+
+      {/* Automation Workflows */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <SectionTitle
+          icon={GitBranch}
+          title="Automation Workflows"
+          score={data.workflows.filter((w) => w.active).length}
+          total={data.workflows.length}
+        />
+        <div className="space-y-2">
+          {data.workflows.map((wf) => (
+            <div key={wf.endpoint} className={`border rounded-xl px-3 py-2.5 ${
+              wf.active ? 'border-emerald-100 bg-emerald-50/30' : 'border-gray-100'
+            }`}>
+              <div className="flex items-start gap-3">
+                <StatusIcon ok={wf.active} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-semibold text-gray-900">{wf.name}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      wf.trigger === 'Vercel Cron'
+                        ? 'bg-indigo-50 text-indigo-600'
+                        : wf.trigger === 'Manuell'
+                        ? 'bg-gray-100 text-gray-500'
+                        : 'bg-blue-50 text-blue-600'
+                    }`}>{wf.trigger}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{wf.description}</p>
+                  <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                    <span className="text-[10px] font-mono text-violet-500">{wf.scheduleLabel}</span>
+                    <code className="text-[10px] font-mono text-gray-300">{wf.endpoint}</code>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

@@ -1,5 +1,74 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import fs from 'fs';
+import path from 'path';
+
+// Read skills dynamically from .claude/commands/ — auto-updates when files are added/changed
+function getSkills() {
+  const dir = path.join(process.cwd(), '.claude', 'commands');
+  try {
+    return fs.readdirSync(dir)
+      .filter((f) => f.endsWith('.md'))
+      .map((file) => {
+        const content = fs.readFileSync(path.join(dir, file), 'utf-8');
+        const titleMatch = content.match(/^#\s+(.+)$/m);
+        // First non-empty line after the title heading
+        const lines = content.split('\n');
+        const descLine = lines.find((l, i) => i > 0 && l.trim() && !l.startsWith('#') && !l.startsWith('Du bist')) ?? '';
+        const stats = fs.statSync(path.join(dir, file));
+        return {
+          name: file.replace('.md', ''),
+          title: titleMatch?.[1]?.trim() || file.replace('.md', ''),
+          description: descLine.replace(/[*_`]/g, '').trim().slice(0, 140),
+          lastModified: stats.mtime.toISOString(),
+        };
+      });
+  } catch {
+    return [];
+  }
+}
+
+// Describe automation workflows — derived from vercel.json + known API routes
+function getWorkflows(cronActive: boolean) {
+  return [
+    {
+      name: 'Wöchentliche Marktanalyse',
+      endpoint: '/api/cron',
+      schedule: '0 7 * * 1',
+      scheduleLabel: 'Montags 07:00 UTC',
+      description: 'Generiert KI-Marktbericht, bereitet Newsletter vor, speichert Preis-Snapshots',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Täglicher Preis-Cron',
+      endpoint: '/api/cron/daily',
+      schedule: '0 8 * * *',
+      scheduleLabel: 'Täglich 08:00 UTC',
+      description: 'Speichert aktuelle Preise in Supabase, wärmt Blog- und Karten-Cache auf',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'KI-Blog-Generierung',
+      endpoint: '/api/generate',
+      schedule: 'On Demand',
+      scheduleLabel: 'Manuell (Studio)',
+      description: 'Generiert Marktberichte, Newsletter-Texte, Video-Skripte via Claude API',
+      active: env('ANTHROPIC_API_KEY'),
+      trigger: 'Manuell',
+    },
+    {
+      name: 'Newsletter-Versand',
+      endpoint: '/api/newsletter',
+      schedule: 'On Demand',
+      scheduleLabel: 'Bei Anmeldung / Manuell',
+      description: 'Sendet Newsletter über Beehiiv; sammelt Anmeldungen auch ohne Key',
+      active: env('BEEHIIV_API_KEY') && env('BEEHIIV_PUBLICATION_ID'),
+      trigger: 'Webhook',
+    },
+  ];
+}
 
 function env(key: string) {
   return Boolean(process.env[key]);
@@ -123,6 +192,10 @@ export async function GET() {
       video: { working: env('ELEVENLABS_API_KEY'), label: 'Video-Pipeline (ElevenLabs)', effect: 'Skript-Generator funktioniert, Stimme fehlt' },
       socialMedia: { working: env('BUFFER_ACCESS_TOKEN'), label: 'Social-Media-Auto-Post', effect: 'Posts werden generiert, aber nicht geplant' },
     },
+
+    // Skills & Workflows
+    skills: getSkills(),
+    workflows: getWorkflows(env('CRON_SECRET') && !!siteUrl),
 
     checkedAt: new Date().toISOString(),
   };
