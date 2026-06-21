@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
+import { STATIC_ARTICLES } from './static-articles';
 import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
@@ -347,6 +348,18 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
       .join('\n');
   } catch {}
+
+  // Statisch vorgeschriebene Artikel haben immer Vorrang (garantierter Content).
+  if (STATIC_ARTICLES[date]) {
+    const staticArticle = STATIC_ARTICLES[date];
+    return {
+      ...staticArticle,
+      featuredCards: staticArticle.featuredCards?.length
+        ? staticArticle.featuredCards
+        : matchFeaturedCards([], trendingCards),
+      generatedAt: new Date().toISOString(),
+    };
+  }
 
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
