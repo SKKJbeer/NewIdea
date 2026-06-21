@@ -138,13 +138,36 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 **Größenrichtlinien:**
 | Kontext | Klasse | Beispiel |
 |---|---|---|
-| Karten-Detailseite | `h-24 w-auto drop-shadow-md` | Groß, rechts neben Kartenname |
+| Karten-Detailseite Showcase | `h-48 w-auto drop-shadow-xl` | Groß, eigene Sektion "Aus diesem Booster-Set" |
 | Kartenraster (CardGrid) | `h-5 w-auto` | Klein, inline neben Set-Name |
 | Artikel/Guides | `h-14 object-contain drop-shadow-sm` | Mittel, unter Kartenbild |
 
 **Fallback:** Wenn das Boosterpack-Bild nicht lädt (ältere Sets), fällt die Komponente automatisch auf das Set-Logo zurück — kein manueller Fallback nötig.
 
 **WICHTIG:** Bei neuen Seiten/Komponenten die Karten zeigen → sofort `BoosterPackImage` einbauen. Kein Set-Name als reiner Text ohne Bild daneben!
+
+### Boosterpack-Bilder immer mit Affiliate-Links verknüpfen (PENDING — sobald Links bereit)
+
+**REGEL:** Jedes Boosterpack-Bild und jede Erwähnung eines Sets/Boosters MUSS mit einem Affiliate-Link verknüpft sein — damit Nutzer direkt zum Kauf gelangen und wir eine Provision erhalten.
+
+**Aktueller Stand:** Auf der Karten-Detailseite gibt es bereits einen Amazon-Suchlink. Alle anderen Stellen warten auf die eigenen Affiliate-Links.
+
+**Sobald `NEXT_PUBLIC_AMAZON_URL` und/oder `NEXT_PUBLIC_CARDMARKET_URL` in Vercel gesetzt sind:**
+
+1. **Alle `BoosterPackImage`-Vorkommen** in einem `<a>`-Tag wrappen:
+   ```tsx
+   <a href={process.env.NEXT_PUBLIC_AMAZON_URL || `https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${setName} Booster`)}`}
+      target="_blank" rel="noopener noreferrer sponsored">
+     <BoosterPackImage setCode={setCode} setName={setName} className="..." />
+   </a>
+   ```
+2. **"Aus diesem Booster-Set"-Sektion** auf der Karten-Detailseite: Link auf eigene Affiliate-URL aktualisieren
+3. **Artikel-Sektionen mit `section.highlight`**: Boosterpack-Bild dort ebenfalls verlinken
+4. **CardGrid**: Kleines Boosterpack-Bild neben Set-Name mit Link versehen
+
+**Bis die Links bereit sind:** Generic Amazon-Suche als Fallback (wie aktuell) — nie ohne irgendeinen Link lassen.
+
+**Überall immer:** `rel="noopener noreferrer sponsored"` + `* Affiliate-Link`-Hinweis darunter (Pflicht per Gesetz).
 
 ---
 
@@ -182,16 +205,18 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 
 ### Noch nicht konfiguriert (optional)
 
-| Variable | Zweck |
-|---|---|
-| `BEEHIIV_API_KEY` | Newsletter automatisch versenden |
-| `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden |
-| `ELEVENLABS_API_KEY` | KI-Stimme für Videos |
-| `YOUTUBE_ACCESS_TOKEN` | Videos automatisch hochladen |
-| `BUFFER_ACCESS_TOKEN` | Social-Media-Posts planen |
-| `NEXT_PUBLIC_CARDMARKET_URL` | Eigener Cardmarket-Affiliate-Link |
-| `NEXT_PUBLIC_AMAZON_URL` | Eigener Amazon-Affiliate-Link |
-| `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link |
+| Variable | Zweck | Was sich ändert wenn gesetzt |
+|---|---|---|
+| `BEEHIIV_API_KEY` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
+| `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
+| `ELEVENLABS_API_KEY` | KI-Stimme für Videos | Video-Cron aktiv |
+| `YOUTUBE_ACCESS_TOKEN` | Videos automatisch hochladen | Video-Cron aktiv |
+| `BUFFER_ACCESS_TOKEN` | Social-Media-Posts planen | Social-Cron aktiv |
+| `NEXT_PUBLIC_AMAZON_URL` | ⭐ Eigener Amazon-Affiliate-Link (Booster) | **Alle Boosterpack-Bilder + Kauflinks auf diesen Link umstellen** |
+| `NEXT_PUBLIC_CARDMARKET_URL` | ⭐ Eigener Cardmarket-Affiliate-Link | **Alle Cardmarket-Kauflinks auf diesen Link umstellen** |
+| `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Trade Republic-Link sichtbar |
+
+**⭐ = Hat direkten Einfluss auf Monetisierung** — sobald gesetzt, sofort alle betroffenen Stellen updaten (siehe UI-Design-Regeln → Boosterpack-Links).
 
 ### Sicherheitshinweis
 
@@ -236,6 +261,46 @@ Settings → API → regenerate service_role key). Neuen Wert danach in Vercel a
 7. **Manuelles `<head>` in layout.tsx verboten** → Next.js injiziert CSS-Links in den Head. Ein zweites `<head>` in `layout.tsx` verhindert das → kein CSS. Niemals `<head>` in `layout.tsx` schreiben; stattdessen `metadata`-Export verwenden.
 8. **`cookies()` macht Seiten voll-dynamisch (kein ISR-Cache)** → `cookies()` oder `headers()` in einem Server-Component macht die ganze Seite zu `ƒ Dynamic` — kein CDN-Cache, jeder Request trifft den Server. Für die Homepage wurde `getLang()` (das `cookies()` nutzt) entfernt → Seite ist wieder `○ Static` mit ISR. Sprachumschaltung nur in Client-Komponenten (NavBar) per Cookie, nicht im Server-Rendering.
 9. **Externe Bilder** → `<img>` für externe URLs (pokemontcg.io) direkt nutzen, oder `next/image` mit `remotePatterns` in `next.config.ts` konfigurieren. Nicht konfigurierte Domains crashen den Build.
+
+---
+
+## Monetisierungsstrategie & Business-Plan
+
+### Einnahmequellen (geplant / in Umsetzung)
+
+| Quelle | Status | Nächster Schritt |
+|---|---|---|
+| **Amazon Affiliate** (Booster-Packs) | 🔄 Generischer Link aktiv | Eigenen Affiliate-Link beantragen → `NEXT_PUBLIC_AMAZON_URL` setzen |
+| **Cardmarket Affiliate** (Einzelkarten) | 🔄 Generischer Link aktiv | Eigenen Affiliate-Link beantragen → `NEXT_PUBLIC_CARDMARKET_URL` setzen |
+| **Trade Republic Affiliate** | ⏳ Noch nicht aktiv | Link beantragen → `NEXT_PUBLIC_TRADE_REPUBLIC_URL` setzen |
+| **Newsletter** (Beehiiv) | ⏳ API nicht konfiguriert | `BEEHIIV_API_KEY` setzen |
+
+### Affiliate-Link-Strategie (PFLICHT wenn Links bereit)
+
+**Kernprinzip:** Jeder Booster, jede Karte, jedes Set das auf der Seite erscheint, ist eine Kaufgelegenheit — und muss verlinkt sein.
+
+**Umsetzungsreihenfolge sobald eigene Affiliate-Links vorliegen:**
+
+1. `NEXT_PUBLIC_AMAZON_URL` in Vercel setzen (eigener Amazon-Affiliate-Tracking-Link)
+2. `NEXT_PUBLIC_CARDMARKET_URL` in Vercel setzen (eigener Cardmarket-Affiliate-Link)
+3. Alle Boosterpack-Bilder und Erwähnungen auf diese Links umstellen:
+   - `BoosterPackImage`-Komponente: immer in `<a href={affiliateUrl}>` wrappen
+   - "Aus diesem Booster-Set"-Sektion auf Karten-Detailseite: Link aktualisieren
+   - CardGrid: Kleines Boosterpack-Bild mit Affiliate-Link versehen
+   - Artikel-Sektionen mit Karten-Highlights: Booster-Link ergänzen
+   - Kaufen-Buttons überall: auf Affiliate-URLs umleiten
+
+**Rechtliches:**
+- Immer `rel="noopener noreferrer sponsored"` auf Affiliate-Links
+- Immer `* Affiliate-Link`-Hinweis in der Nähe (Kennzeichnungspflicht)
+- Datenschutzerklärung enthält bereits entsprechenden Hinweis
+
+### Content-Monetisierungsprinzip
+
+Jeder Artikel, Wochenrückblick und Guide ist gleichzeitig Content UND Verkaufschance:
+- Marco empfiehlt eine Karte → Kauflink zur Karte auf Cardmarket
+- Marco erwähnt ein Set → Booster-Pack-Bild mit Amazon-Affiliate-Link
+- Guide zu Lagerung → Links zu Dragon Shield / Ultra PRO / BCW (zukünftig Affiliate)
 
 ---
 
