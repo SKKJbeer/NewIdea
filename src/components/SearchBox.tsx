@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Suggestion {
   id: string;
@@ -125,9 +126,9 @@ export function SearchBox({
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-violet-50 transition-colors"
                 >
-                  <div className="flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-violet-50 to-indigo-50">
+                  <div className="relative flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-violet-50 to-indigo-50">
                     {s.imageUrl ? (
-                      <img src={s.imageUrl} alt={s.name} className="h-full w-full object-contain" />
+                      <Image src={s.imageUrl} alt={s.name} fill sizes="32px" className="object-contain" />
                     ) : (
                       <span className="text-sm">🃏</span>
                     )}

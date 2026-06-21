@@ -2,8 +2,6 @@ import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
 import { SearchBox } from '@/components/SearchBox';
 import { searchCards } from '@/lib/pokemon-api';
-import { getLang } from '@/lib/get-lang';
-import { t } from '@/lib/i18n';
 import { Search, SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -16,12 +14,12 @@ export async function generateMetadata({
   const query = (q || '').trim();
   if (query) {
     return {
-      title: `„${query}" Pokémon Karte Preis — PokéMarket Intelligence`,
+      title: `„${query}" Pokémon Karte Preis`,
       description: `Cardmarket-Preise, Trend und Investment-Score für Pokémon-Karten mit „${query}". Echtzeit-Daten ohne Gewähr.`,
     };
   }
   return {
-    title: 'Pokémon-Karten suchen — Werte & Preisverlauf | PokéMarket Intelligence',
+    title: 'Pokémon-Karten suchen — Werte & Preisverlauf',
     description:
       'Suche gezielt nach Pokémon-Karten und sieh sofort Marktwert, Trend und 30-Tage-Preisverlauf. Finde heraus, wie viel deine Karten wert sind.',
   };
@@ -32,7 +30,7 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  const [{ q }, lang] = await Promise.all([searchParams, getLang()]);
+  const { q } = await searchParams;
   const query = (q || '').trim();
 
   let results = [] as Awaited<ReturnType<typeof searchCards>>;
@@ -76,19 +74,15 @@ export default async function SearchPage({
         <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 sm:py-14 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 text-violet-200 text-xs mb-4">
             <Search size={12} />
-            {t(lang, 'search_badge')}
+            Karten-Suche
           </div>
           <h1 className="text-2xl sm:text-4xl font-black mb-3">
-            {t(lang, 'search_h1_a')}<br className="sm:hidden" />{' '}
-            <span className="text-yellow-300">{t(lang, 'search_h1_b')}</span>
+            Was ist deine Karte <span className="text-yellow-300">wert?</span>
           </h1>
-          <p className="text-violet-200 text-sm max-w-md mx-auto mb-6">{t(lang, 'search_sub')}</p>
-          <SearchBox
-            initialQuery={query}
-            autoFocus={!query}
-            placeholder={t(lang, 'search_placeholder')}
-            searchBtn={t(lang, 'search_btn')}
-          />
+          <p className="text-violet-200 text-sm max-w-md mx-auto mb-6">
+            Suche eine Pokémon-Karte und sieh sofort Marktwert, Trend und 30-Tage-Preisverlauf.
+          </p>
+          <SearchBox initialQuery={query} autoFocus={!query} />
         </div>
       </header>
 
@@ -96,29 +90,23 @@ export default async function SearchPage({
         {query.length < 2 ? (
           <div className="text-center text-gray-400 py-16">
             <Search size={40} className="mx-auto mb-4 opacity-40" />
-            <p className="text-sm">{t(lang, 'search_min_chars')}</p>
+            <p className="text-sm">Gib mindestens 2 Zeichen ein, z.&nbsp;B. „Pikachu", „Charizard" oder „Mewtu".</p>
           </div>
         ) : error ? (
           <div className="max-w-md mx-auto bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800 text-center">
-            <p className="font-semibold">⚠️ {t(lang, 'search_error')}</p>
-            <p className="text-sm mt-1 text-amber-600">{t(lang, 'search_error_sub')}</p>
+            <p className="font-semibold">⚠️ Suche momentan nicht verfügbar</p>
+            <p className="text-sm mt-1 text-amber-600">Bitte versuche es später erneut.</p>
           </div>
         ) : results.length === 0 ? (
           <div className="text-center text-gray-400 py-16">
             <SearchX size={40} className="mx-auto mb-4 opacity-40" />
-            <p className="text-sm">
-              {t(lang, 'search_no_results_pre')}{' '}
-              „<span className="font-semibold text-gray-600">{query}</span>"{' '}
-              {t(lang, 'search_no_results_post')}
-            </p>
-            <p className="text-xs mt-1">{t(lang, 'search_no_results_tip')}</p>
+            <p className="text-sm">Keine Karten für „<span className="font-semibold text-gray-600">{query}</span>" gefunden.</p>
+            <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
           </div>
         ) : (
           <>
             <p className="text-sm text-gray-500 mb-5">
-              <span className="font-semibold text-gray-900">{results.length}</span>{' '}
-              {t(lang, 'search_results_count')} „
-              <span className="font-semibold text-gray-900">{query}</span>"
+              <span className="font-semibold text-gray-900">{results.length}</span> Treffer für „<span className="font-semibold text-gray-900">{query}</span>"
             </p>
             <CardGrid cards={results} />
           </>

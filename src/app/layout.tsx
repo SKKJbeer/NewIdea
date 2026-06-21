@@ -59,9 +59,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="de" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <head>
-        <link rel="preconnect" href="https://api.pokemontcg.io" />
-      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
