@@ -79,20 +79,39 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 
 ## Env-Variablen (Vercel)
 
-| Variable | Pflicht | Zweck |
-|---|---|---|
-| `POKEMON_TCG_API_KEY` | ✅ | TCG API Key |
-| `ANTHROPIC_API_KEY` | ✅ | Artikel-Generierung |
-| `CRON_SECRET` | ✅ | Absicherung der Cron-Endpoints |
-| `SUPABASE_URL` | ⚠️ | Preis-Snapshots (ohne: kein DB-Verlauf) |
-| `SUPABASE_SERVICE_ROLE_KEY` | ⚠️ | Supabase Schreibrecht (service role, nicht anon!) |
-| `NEXT_PUBLIC_SITE_URL` | ⚠️ | Täglicher Cron + SEO canonical URLs |
-| `BEEHIIV_API_KEY` | optional | Newsletter |
-| `BEEHIIV_PUBLICATION_ID` | optional | Newsletter |
+### Bereits konfiguriert — IN VERCEL GESETZT ✅
 
-**ACHTUNG:** Der Supabase-Service-Role-Key wurde in einer früheren Chat-Session
+Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun als wären sie unkonfiguriert!
+
+| Variable | Status | Zweck |
+|---|---|---|
+| `POKEMON_TCG_API_KEY` | ✅ **Gesetzt** | TCG API Key — Kartenpreise & -daten |
+| `ANTHROPIC_API_KEY` | ✅ **Gesetzt** | KI-Artikel-Generierung (Claude) |
+| `CRON_SECRET` | ✅ **Gesetzt** | Absicherung der Cron-Endpoints |
+| `SUPABASE_URL` | ✅ **Gesetzt** | Supabase Projekt-URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ **Gesetzt** | Supabase Schreibrecht (service role) |
+| `NEXT_PUBLIC_SITE_URL` | ✅ **Gesetzt** | Canonical URLs + Cron-Warmup |
+
+**Folge:** Der tägliche Cron (08:00 UTC) speichert echte Preisschnappschüsse in Supabase. Daten werden bereits gesammelt.
+
+### Noch nicht konfiguriert (optional)
+
+| Variable | Zweck |
+|---|---|
+| `BEEHIIV_API_KEY` | Newsletter automatisch versenden |
+| `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden |
+| `ELEVENLABS_API_KEY` | KI-Stimme für Videos |
+| `YOUTUBE_ACCESS_TOKEN` | Videos automatisch hochladen |
+| `BUFFER_ACCESS_TOKEN` | Social-Media-Posts planen |
+| `NEXT_PUBLIC_CARDMARKET_URL` | Eigener Cardmarket-Affiliate-Link |
+| `NEXT_PUBLIC_AMAZON_URL` | Eigener Amazon-Affiliate-Link |
+| `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link |
+
+### Sicherheitshinweis
+
+Der Supabase-Service-Role-Key wurde in einer früheren Chat-Session versehentlich
 offengelegt. Der Nutzer wurde gebeten, ihn zu **rotieren** (Supabase Dashboard →
-Settings → API → regenerate service_role key) und den neuen Wert in Vercel einzutragen.
+Settings → API → regenerate service_role key). Neuen Wert danach in Vercel aktualisieren.
 
 ---
 
@@ -123,3 +142,10 @@ Settings → API → regenerate service_role key) und den neuen Wert in Vercel e
 | v0.5.1 | 21.06.2026 | CLAUDE.md erstellt, STATUS.md aktualisiert | `952c580` |
 | v0.5.2 | 21.06.2026 | BUGFIX: Kompletter Style-Verlust durch JSON-Import in next.config.ts | `bdceaf8` |
 | v0.5.3 | 21.06.2026 | BUGFIX: CSS-Fix (<head>-Tag entfernt) + Homepage Static/ISR statt Dynamic + next/image überall | `b0a0cd0` |
+| v0.8.0 | 21.06.2026 | Marco-Skill (/artikel-schreiben), Artikel-Bilder (FeaturedCards + Gallery), Booster-Set-Logos in Guides | — |
+| v0.9.0 | 21.06.2026 | NavBar-Redesign (rückgängig gemacht in 0.9.1), Blog-Fallback-Artikel mit echtem Marco-Inhalt | — |
+| v0.9.1 | 21.06.2026 | NavBar auf Single-Top-Bar zurückgesetzt (Bottom-Tab-Bar hat Layout zerstört) | — |
+| v0.9.2 | 21.06.2026 | ArticleCardGallery (Recharts-Preischart), Guide-Karten mit echten Bildern (kein 🃏-Emoji mehr) | — |
+| v0.9.3 | 21.06.2026 | Booster-Set-Logo unter allen Karten (Artikel + Guides), Skill-Datei erweitert | — |
+| v0.9.4 | 21.06.2026 | Studio/Monitoring: Skills & Workflows-Sektion (auto-liest .claude/commands/) | `6d3bb95` |
+| v0.9.5 | 21.06.2026 | Booster-Pack-Artwork (assets.pokemon.com CDN + Fallback), Blog-Listing mit echten Titeln | `0a5888c` |
