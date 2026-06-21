@@ -132,7 +132,7 @@ export default async function Home() {
                     <span className="flex h-5 w-5 items-center justify-center rounded bg-violet-50">
                       <Gem size={11} className="text-violet-600" />
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Höchstwert</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Top SIR</span>
                   </div>
                   <p className="text-2xl font-black tabular-nums leading-none text-violet-700">
                     {topCardPrice > 0 ? `${topCardPrice.toFixed(0)} €` : '–'}
@@ -245,7 +245,8 @@ export default async function Home() {
             <div className="mb-3 flex items-end justify-between">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Karten</p>
-                <h2 className="text-base font-bold text-gray-700">Wertvollste Karten</h2>
+                <h2 className="text-base font-bold text-gray-700">Teuerste SIR &amp; Hyper Rares</h2>
+                <p className="text-[10px] text-gray-400 mt-0.5">Special Illustration Rare · Hyper Rare · aus aktueller Datenbankabfrage</p>
               </div>
               <a href="/suche" className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-800">
                 Alle durchsuchen <ArrowRight size={13} />
