@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -157,8 +158,19 @@ export default async function CardDetailPage({ params }: Props) {
 
           <div className="space-y-4">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{card.set}</p>
-              <h1 className="text-2xl font-black text-gray-900">{card.name}</h1>
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{card.set}</p>
+                  <h1 className="text-2xl font-black text-gray-900">{card.name}</h1>
+                </div>
+                {card.setCode && (
+                  <BoosterPackImage
+                    setCode={card.setCode}
+                    setName={card.set}
+                    className="h-24 w-auto object-contain drop-shadow-md shrink-0"
+                  />
+                )}
+              </div>
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
                 <p className="text-sm font-semibold text-violet-600 mt-0.5">🇩🇪 {card.nameDe}</p>
               )}

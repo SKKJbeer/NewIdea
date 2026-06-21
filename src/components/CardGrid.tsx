@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PokemonCard } from '@/types';
 import { TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { BoosterPackImage } from './BoosterPackImage';
 
 interface CardGridProps {
   cards: PokemonCard[];
@@ -88,7 +89,16 @@ function CardItem({ card, compact }: { card: PokemonCard; compact?: boolean }) {
           {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
             <p className="text-xs text-violet-500 leading-tight line-clamp-1">🇩🇪 {card.nameDe}</p>
           )}
-          <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{card.set}</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {card.setCode && (
+              <BoosterPackImage
+                setCode={card.setCode}
+                setName={card.set}
+                className="h-5 w-auto object-contain shrink-0"
+              />
+            )}
+            <p className="text-xs text-gray-400 line-clamp-1 min-w-0">{card.set}</p>
+          </div>
 
           <div className="flex items-center justify-between mt-2">
             <span className="text-base font-bold text-gray-900">
