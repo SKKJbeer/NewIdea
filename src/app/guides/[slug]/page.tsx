@@ -96,14 +96,24 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             {section.cards && section.cards.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
                 {section.cards.map((card) => (
-                  <div key={card.name} className="border border-gray-100 rounded-xl p-3 bg-gray-50">
-                    <div className="flex items-start gap-2">
-                      <span className="text-xl shrink-0">🃏</span>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-gray-900 leading-tight">{card.name}</p>
-                        <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${c.badge}`}>{card.rarity}</span>
-                        <p className="text-[11px] text-gray-500 mt-1 leading-snug">{card.why}</p>
-                      </div>
+                  <div key={card.name} className="border border-gray-100 rounded-xl p-3 bg-gray-50 flex items-start gap-3">
+                    {card.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.name}
+                        width={56}
+                        height={78}
+                        className="w-14 shrink-0 rounded-md object-contain"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="text-xl shrink-0 mt-1">🃏</span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-gray-900 leading-tight">{card.name}</p>
+                      <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${c.badge}`}>{card.rarity}</span>
+                      <p className="text-[11px] text-gray-500 mt-1 leading-snug">{card.why}</p>
                     </div>
                   </div>
                 ))}

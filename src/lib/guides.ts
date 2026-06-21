@@ -2,7 +2,7 @@ export interface GuideSection {
   heading: string;
   content: string;
   tip?: string;
-  cards?: Array<{ name: string; rarity: string; why: string }>;
+  cards?: Array<{ name: string; rarity: string; why: string; imageUrl?: string }>;
 }
 
 export interface Guide {
@@ -41,9 +41,9 @@ export const GUIDES: Guide[] = [
         heading: '🎯 Was macht eine Karte wertvoll?',
         content: 'Es gibt genau drei Faktoren, die zusammenkommen müssen: Beliebtheit des Pokémon (Charizard, Pikachu, Mewtu und Eevee schlagen alles andere), Seltenheit der Karte (Special Illustration Rares und Hyper Rares sind die wertvollsten modernen Karten) und natürlich der Zustand. Ein Charizard ex Special Illustration Rare in perfektem Zustand kann über 300 € erzielen — dieselbe Karte mit einem Kratzer vielleicht nur 80 €.',
         cards: [
-          { name: 'Charizard ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Ikonisches Pokémon + höchste Seltenheitsstufe = dauerhaft gefragt' },
-          { name: 'Pikachu ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Das Maskottchen der Serie — wird nie an Beliebtheit verlieren' },
-          { name: 'Umbreon VMAX', rarity: 'Alternate Art', why: 'Fansavorit Eevee-Evo + atemberaubendes Artwork = Kultstatus' },
+          { name: 'Charizard ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Ikonisches Pokémon + höchste Seltenheitsstufe = dauerhaft gefragt', imageUrl: 'https://images.pokemontcg.io/sv3pt5/201.png' },
+          { name: 'Pikachu ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Das Maskottchen der Serie — wird nie an Beliebtheit verlieren', imageUrl: 'https://images.pokemontcg.io/sv3pt5/205.png' },
+          { name: 'Umbreon VMAX', rarity: 'Alternate Art', why: 'Fansavorit Eevee-Evo + atemberaubendes Artwork = Kultstatus', imageUrl: 'https://images.pokemontcg.io/swsh7/215.png' },
         ],
       },
       {
@@ -85,8 +85,8 @@ export const GUIDES: Guide[] = [
         heading: '⭐ Rare Holo, Ultra Rare & EX/V-Karten',
         content: 'Hier wird es interessanter. Rare Holos glänzen und schimmern — erkennbar am Stern mit H (★H) oder dem Glitzer-Hintergrund. Ultra Rares (doppelter Stern ★★) sind die klassischen Full-Art-Karten, EX, GX, V und VMAX-Karten fallen hier hinein. Preise: 5–50 € je nach Pokémon und Set. Diese Karten bilden das Rückgrat vieler Sammlungen und können bei sehr beliebten Pokémon deutlich steigen.',
         cards: [
-          { name: 'Charizard V (Celebrations)', rarity: 'Ultra Rare', why: 'Hyped Set, ikonisches Design — stabiler Wertzuwachs über die Zeit' },
-          { name: 'Pikachu VMAX (Vivid Voltage)', rarity: 'Ultra Rare Rainbow', why: 'Rainbow Rares sind eine eigene Kategorie mit treuer Fanbasis' },
+          { name: 'Charizard V (Celebrations)', rarity: 'Ultra Rare', why: 'Hyped Set, ikonisches Design — stabiler Wertzuwachs über die Zeit', imageUrl: 'https://images.pokemontcg.io/cel25/4.png' },
+          { name: 'Pikachu VMAX Rainbow (Vivid Voltage)', rarity: 'Ultra Rare Rainbow', why: 'Rainbow Rares sind eine eigene Kategorie mit treuer Fanbasis', imageUrl: 'https://images.pokemontcg.io/swsh4/188.png' },
         ],
       },
       {
@@ -98,7 +98,8 @@ export const GUIDES: Guide[] = [
         heading: '👑 Hyper Rare & Gold-Karten — das absolute Rarste',
         content: 'Hyper Rares (früher "Secret Rares") sind die Karten über der normalen Setnummer hinaus — du erkennst sie an der Nummer "200/198" oder ähnlichem. Gold-Karten mit Trainer-Items oder Energie in Gold-Ausführung fallen ebenfalls hierher. Ihre Druckrate ist nochmal deutlich seltener als SIRs. Wertpotenzial: 20–200 €, aber durch die größere Anzahl an Hyper Rares pro Set oft etwas weniger exklusiv als SIRs.',
         cards: [
-          { name: 'Pokéball (Gold, 151 Set)', rarity: 'Hyper Rare', why: 'Gold-Trainer-Karten haben eine eigene treue Fanbasis bei Completionists' },
+          { name: 'Pokéball (Gold, 151 Set)', rarity: 'Hyper Rare', why: 'Gold-Trainer-Karten haben eine eigene treue Fanbasis bei Completionists', imageUrl: 'https://images.pokemontcg.io/sv3pt5/207.png' },
+          { name: 'Mewtu ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Legendäres Pokémon, limitierte SIR — einer der konstantesten Preisheber', imageUrl: 'https://images.pokemontcg.io/sv3pt5/204.png' },
         ],
       },
     ],
@@ -136,8 +137,8 @@ export const GUIDES: Guide[] = [
         heading: '📖 Binder für die Sammlung — richtig oder falsch?',
         content: 'Für Karten unter 5 € sind Binder mit Folientaschen perfekt — ordentlich sortiert und jederzeit zugänglich. Achte auf Side-Loading-Binder (Karten fallen nicht raus) und Folientaschen ohne PVC (PVC kann die Karte über Zeit beschädigen). Für Karten über 20 € gilt jedoch: Nicht in den Binder. Der Reibungskontakt beim Ein- und Ausschieben hinterlässt über Monate feine Kratzer.',
         cards: [
-          { name: 'Fürs Binder (bis 10 €)', rarity: 'Rare Holo & darunter', why: 'Schneller Zugriff, Reibung weniger kritisch bei günstigeren Karten' },
-          { name: 'Toploader/Magnet (über 20 €)', rarity: 'Ultra Rare aufwärts', why: 'Maximaler Schutz, kein Reibungskontakt, optimal für Wertzuwachs' },
+          { name: 'Charizard ex (Paldea Evolved)', rarity: 'Ultra Rare', why: 'Typisches Binder-Kandidat — schöne Karte, aber im Binder ok bis ~20 €', imageUrl: 'https://images.pokemontcg.io/sv2/228.png' },
+          { name: 'Charizard ex SIR (151)', rarity: 'Special Illustration Rare', why: 'Diese Karte gehört NICHT in den Binder — Toploader oder Magnethalter Pflicht', imageUrl: 'https://images.pokemontcg.io/sv3pt5/201.png' },
         ],
       },
       {
@@ -175,8 +176,8 @@ export const GUIDES: Guide[] = [
         heading: '📏 Die Grade-Skala erklärt (1–10)',
         content: 'Grade 10 "Gem Mint" — praktisch perfekte Karte, scharf zentriert, keine Fehler erkennbar. Grade 9 "Mint" — minimale Unvollkommenheiten, die man nur bei genauer Betrachtung sieht. Grade 8 "Near Mint-Mint" — leichte Abnutzung sichtbar, aber optisch noch sehr ansprechend. Grade 7 und darunter — sichtbare Gebrauchsspuren, für Investoren kaum interessant. Wichtig: Der Unterschied zwischen PSA 9 und PSA 10 ist oft nicht sichtbar mit bloßem Auge — kostet aber manchmal das Dreifache.',
         cards: [
-          { name: 'PSA 10', rarity: 'Gem Mint', why: 'Der heilige Gral — nur 15–30 % der eingesendeten Karten erreichen diesen Grade' },
-          { name: 'PSA 9', rarity: 'Mint', why: 'Sehr wertvoll, deutlich häufiger — gutes Rendite/Kosten-Verhältnis' },
+          { name: 'Charizard (Base Set Shadowless)', rarity: 'Holo Rare', why: 'PSA-10-Exemplare dieser Karte erzielen 5–10× den Ungraded-Wert — der Grading-Klassiker', imageUrl: 'https://images.pokemontcg.io/base1/4.png' },
+          { name: 'Pikachu Illustrator', rarity: 'Promo', why: 'Die wertvollste gegradedte Karte der Welt — PSA-10 erzielte 5,2 Mio $', imageUrl: 'https://images.pokemontcg.io/swsh12pt5gg/GG70.png' },
         ],
         tip: '🔍 Zentrierung prüfen: Halte die Karte schräg ins Licht und schau, ob der weiße Rand auf allen vier Seiten gleich breit ist. Ungleichmäßige Zentrierung ist der häufigste Grund für keinen PSA 10.',
       },
