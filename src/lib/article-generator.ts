@@ -1,11 +1,22 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
+import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
+
+export interface FeaturedCard {
+  name: string;
+  imageUrl: string;
+  price: number;
+  trend: number;
+  rarity: string;
+  set: string;
+}
 
 export interface Article {
   title: string;
   intro: string;
+  featuredCards?: FeaturedCard[];
   sections: Array<{ heading: string; content: string }>;
   keyPoints: string[];
   tags: string[];
@@ -34,14 +45,18 @@ export const ARTICLE_META: Record<ArticleType, { label: string; category: string
 };
 
 const JSON_SCHEMA = `{
-  "title": "SEO-optimierter Titel (60-80 Zeichen, mit 'Pokémon' Keyword)",
-  "intro": "Einleitung (2-3 packende Sätze)",
-  "sections": [
-    {"heading": "Abschnittstitel", "content": "3-4 Sätze Inhalt"},
-    {"heading": "Abschnittstitel", "content": "3-4 Sätze Inhalt"},
-    {"heading": "Abschnittstitel", "content": "3-4 Sätze Inhalt"}
+  "title": "SEO-Titel (60-80 Zeichen, Pokémon-Keyword enthalten)",
+  "intro": "2-3 packende Eröffnungssätze — starte mit einer überraschenden Zahl oder Aussage",
+  "featuredCards": [
+    {"name": "Exakter englischer Kartenname aus TCG-Datenbank"},
+    {"name": "Weiterer Kartenname"}
   ],
-  "keyPoints": ["Kernaussage 1", "Kernaussage 2", "Kernaussage 3"],
+  "sections": [
+    {"heading": "Konkrete Aussage als Überschrift (keine Fragen)", "content": "3-4 lockere, konkrete Sätze mit Zahlen"},
+    {"heading": "Zweite Abschnittsaussage", "content": "..."},
+    {"heading": "Dritte Abschnittsaussage", "content": "..."}
+  ],
+  "keyPoints": ["Takeaway 1 — kurz und merkbar", "Takeaway 2", "Takeaway 3"],
   "tags": ["pokémon karten", "tcg", "investment", "weiteres keyword"]
 }`;
 
@@ -144,19 +159,65 @@ function fallbackArticle(type: ArticleType, dateLabel: string, cardSummary: stri
 }
 
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {
-  const base = `Du bist ein Pokémon-TCG-Investment-Experte und schreibst für einen deutschen Blog. Antworte NUR mit validem JSON, kein Text davor oder danach:\n${JSON_SCHEMA}`;
+  const persona = `Du bist Marco, Pokémon-TCG-Experte mit 15+ Jahren Erfahrung. Du hast die Base-Set-Ära live miterlebt, auf Turnieren gespielt und Tausende Karten bewertet. Du schreibst für einen deutschen Blog — locker, konkret und leicht unterhaltsam. Wichtig: Einfache Sprache, Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze echte Zahlen und Karten-Namen. Kein Finanz-Bullshit, klare Meinung. Antworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
 
   const contexts: Record<ArticleType, string> = {
-    markt: `Schreibe eine Marktanalyse für ${dateLabel}. Analysiere die Trends und gib Investment-Einschätzungen.\n\nAktuelle Karten-Preise:\n${cards}`,
-    karte: `Wähle die spannendste Karte aus den aktuellen Daten und analysiere sie tiefgehend für ${dateLabel}.\n\nAktuelle Karten-Preise:\n${cards}`,
-    strategie: `Erkläre eine konkrete Investment-Strategie für Pokémon-Karten, relevant für ${dateLabel}.\n\nAktuelle Marktdaten:\n${cards}`,
-    set: `Analysiere ein aktuell interessantes Pokémon-TCG-Set basierend auf den Daten vom ${dateLabel}.\n\nAktuelle Karten (mit Set-Info):\n${cards}`,
-    ausblick: `Gib einen Ausblick auf das Wochenende — was sollten Investoren kaufen/verkaufen? Stand: ${dateLabel}.\n\nAktuelle Marktdaten:\n${cards}`,
-    guide: `Schreibe einen praktischen Sammler-Guide, der für Anfänger und Fortgeschrittene nützlich ist. Stand: ${dateLabel}.\n\nKontext — aktuelle Top-Karten:\n${cards}`,
-    rueckblick: `Blicke auf die vergangene Woche zurück und ziehe Lehren für die kommende Woche. Stand: ${dateLabel}.\n\nDiese Woche im Markt:\n${cards}`,
+    markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit einer überraschenden Preisveränderung. Analysiere Trends, nenne Gewinner und Verlierer. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,
+    karte:      `Wähle die spannendste Karte aus den Daten und analysiere sie tiefgehend (Geschichte, Artwork, Preisentwicklung, Zukunftspotenzial). Stand: ${dateLabel}. Füge diese Karte + 2-3 vergleichbare in featuredCards ein.\n\nAktuelle Karten:\n${cards}`,
+    strategie:  `Erkläre eine konkrete, umsetzbare Investment-Strategie für ${dateLabel}. Sei ehrlich über Risiken. Gib Beispielkarten für die Strategie — in featuredCards eintragen.\n\nMarktdaten:\n${cards}`,
+    set:        `Analysiere ein aktuell interessantes Pokémon-TCG-Set. Welche Chase-Cards lohnen sich? Sealed oder Einzelkarten? Stand: ${dateLabel}. Die Top-Karten des Sets in featuredCards eintragen.\n\nKarten (mit Set-Info):\n${cards}`,
+    ausblick:   `Gib einen konkreten Ausblick: Was kaufen, was meiden, worauf achten — für das Wochenende ab ${dateLabel}. Empfohlene Karten in featuredCards.\n\nAktuelle Daten:\n${cards}`,
+    guide:      `Schreibe einen unterhaltsamen Guide — praktisch für Einsteiger, trotzdem interessant für Fortgeschrittene. Mit echten Karten-Beispielen. Stand: ${dateLabel}. Beispielkarten in featuredCards.\n\nKontext:\n${cards}`,
+    rueckblick: `Wochenrückblick ${dateLabel}: Was lief gut, was schlecht, was lernen wir daraus? Locker und ehrlich. Die Karten der Woche in featuredCards.\n\nWochendaten:\n${cards}`,
   };
 
-  return `${base}\n\n${contexts[type]}`;
+  return `${persona}\n\n${contexts[type]}`;
+}
+
+function matchFeaturedCards(
+  aiNames: Array<{ name: string }>,
+  trendingCards: PokemonCard[],
+): FeaturedCard[] {
+  // Try to match AI-suggested card names against fetched card data
+  const matched: FeaturedCard[] = [];
+  const used = new Set<string>();
+
+  for (const { name } of aiNames) {
+    const lower = name.toLowerCase();
+    const found = trendingCards.find(
+      (c) => !used.has(c.id) && (c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase())),
+    );
+    if (found) {
+      used.add(found.id);
+      matched.push({
+        name: found.name,
+        imageUrl: found.imageUrl,
+        price: found.prices.market || found.prices.holofoil?.market || 0,
+        trend: found.trendPercent || 0,
+        rarity: found.rarity,
+        set: found.set,
+      });
+    }
+  }
+
+  // Pad with top trending cards that have images if we have fewer than 3
+  if (matched.length < 3) {
+    for (const c of trendingCards) {
+      if (matched.length >= 4) break;
+      if (used.has(c.id) || !c.imageUrl) continue;
+      used.add(c.id);
+      matched.push({
+        name: c.name,
+        imageUrl: c.imageUrl,
+        price: c.prices.market || c.prices.holofoil?.market || 0,
+        trend: c.trendPercent || 0,
+        rarity: c.rarity,
+        set: c.set,
+      });
+    }
+  }
+
+  return matched.filter((c) => c.imageUrl);
 }
 
 export async function generateArticle(type: ArticleType, date: string): Promise<Article> {
@@ -164,23 +225,27 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
+  let trendingCards: PokemonCard[] = [];
   let cardSummary = 'Keine aktuellen Daten verfügbar';
   try {
-    const cards = await fetchTrendingCards(10);
-    cardSummary = cards
+    trendingCards = await fetchTrendingCards(10);
+    cardSummary = trendingCards
       .slice(0, 6)
       .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
       .join('\n');
   } catch {}
 
-  // Ohne API-Key gar nicht erst die KI ansprechen — direkt vollwertigen Fallback liefern.
+  // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
-    return fallbackArticle(type, dateLabel, cardSummary);
+    const fallback = fallbackArticle(type, dateLabel, cardSummary);
+    fallback.featuredCards = matchFeaturedCards([], trendingCards);
+    return fallback;
   }
 
   interface ArticleData {
     title: string;
     intro: string;
+    featuredCards?: Array<{ name: string }>;
     sections: Array<{ heading: string; content: string }>;
     keyPoints: string[];
     tags: string[];
@@ -198,15 +263,17 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const data: ArticleData = JSON.parse(jsonMatch?.[0] || '{}');
 
-    // Unvollständige KI-Antwort? Dann lieber den vollwertigen Fallback.
     if (!data.title || !data.sections || data.sections.length === 0) {
-      return fallbackArticle(type, dateLabel, cardSummary);
+      const fallback = fallbackArticle(type, dateLabel, cardSummary);
+      fallback.featuredCards = matchFeaturedCards([], trendingCards);
+      return fallback;
     }
 
     const wordCount = [data.intro, ...(data.sections || []).map((s) => s.content)].join(' ').split(' ').length;
     return {
       title: data.title,
       intro: data.intro || '',
+      featuredCards: matchFeaturedCards(data.featuredCards || [], trendingCards),
       sections: data.sections || [],
       keyPoints: data.keyPoints || [],
       tags: data.tags || [],
@@ -214,7 +281,8 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       generatedAt: new Date().toISOString(),
     };
   } catch {
-    // KI nicht erreichbar / Fehler → vollwertiger Fallback statt leerer Seite.
-    return fallbackArticle(type, dateLabel, cardSummary);
+    const fallback = fallbackArticle(type, dateLabel, cardSummary);
+    fallback.featuredCards = matchFeaturedCards([], trendingCards);
+    return fallback;
   }
 }

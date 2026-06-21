@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { generateArticle, DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
+import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -86,10 +87,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           </div>
         ) : article ? (
           <>
+            {/* Intro */}
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
               <p className="text-gray-700 text-base leading-relaxed font-medium">{article.intro}</p>
             </section>
 
+            {/* Card gallery + price chart */}
+            {article.featuredCards && article.featuredCards.length > 0 && (
+              <ArticleCardGallery cards={article.featuredCards} accentColor={meta.color} />
+            )}
+
+            {/* Key points */}
             {article.keyPoints.length > 0 && (
               <section className="bg-violet-50 rounded-2xl border border-violet-100 p-5">
                 <p className="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-3">Das Wichtigste auf einen Blick</p>
@@ -104,13 +112,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
               </section>
             )}
 
+            {/* Sections */}
             {article.sections.map((section, i) => (
               <section key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
                 <h2 className="text-base font-black text-gray-900 mb-3">{section.heading}</h2>
-                <p className="text-gray-700 text-sm leading-relaxed">{section.content}</p>
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{section.content}</p>
               </section>
             ))}
 
+            {/* Tags */}
             {article.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 items-center pt-1">
                 <Tag size={12} className="text-gray-400" />
