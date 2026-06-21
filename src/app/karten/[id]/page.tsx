@@ -158,19 +158,8 @@ export default async function CardDetailPage({ params }: Props) {
 
           <div className="space-y-4">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{card.set}</p>
-                  <h1 className="text-2xl font-black text-gray-900">{card.name}</h1>
-                </div>
-                {card.setCode && (
-                  <BoosterPackImage
-                    setCode={card.setCode}
-                    setName={card.set}
-                    className="h-24 w-auto object-contain drop-shadow-md shrink-0"
-                  />
-                )}
-              </div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{card.set}</p>
+              <h1 className="text-2xl font-black text-gray-900">{card.name}</h1>
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
                 <p className="text-sm font-semibold text-violet-600 mt-0.5">🇩🇪 {card.nameDe}</p>
               )}
@@ -209,6 +198,29 @@ export default async function CardDetailPage({ params }: Props) {
                 {scoreLabel}
               </p>
             </div>
+
+            {card.setCode && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Aus diesem Booster-Set</p>
+                <div className="flex flex-col items-center">
+                  <BoosterPackImage
+                    setCode={card.setCode}
+                    setName={card.set}
+                    className="h-48 w-auto object-contain drop-shadow-xl"
+                  />
+                  <p className="text-sm font-semibold text-gray-700 mt-3 text-center leading-snug">{card.set}</p>
+                </div>
+                <a
+                  href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.set} Booster`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-gray-900 rounded-xl py-2.5 font-semibold text-sm transition-colors"
+                >
+                  Booster auf Amazon kaufen <ExternalLink size={13} className="opacity-70" />
+                </a>
+                <p className="text-xs text-gray-400 text-center mt-1.5">* Affiliate-Link</p>
+              </div>
+            )}
           </div>
         </div>
 
