@@ -370,28 +370,32 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
 
   // ── 2026-06-21 (Sonntag) ── Rückblick ───────────────────────────────────────
   '2026-06-21': {
-    title: 'Wochenrückblick KW 25: Starke Woche für Langzeithalter — hier sind die Learnings',
-    intro: 'KW 25 ist vorbei und es war eine lehrreiche Woche. Der Markt hat einige interessante Signale gesendet, ein alter Grundsatz hat sich wieder bestätigt, und ich habe eine Kaufentscheidung bereut — nein, das Bereuen nicht, sondern das Warten darauf. Mein ehrliches Fazit.',
+    title: 'Wochenrückblick KW 25: Das 151-Set läuft einfach — und ich hab mal wieder zu spät gedrückt',
+    intro: 'KW 25 war eine von diesen Wochen, die ruhig wirken, aber im Hintergrund mehr passiert als man denkt. Ich habe eine Kaufgelegenheit knapp verpasst, ein alter Liebling hat mal wieder alle überrascht, und die Pokémon-Turnierwelt dreht grade ordentlich auf. Mein ehrliches Fazit — inklusive persönlicher Fehlerbeichte.',
     sections: [
       {
-        heading: 'Das 151-Set läuft und läuft',
-        content: 'Was mich diese Woche beeindruckt hat: Das Pokémon 151-Set (sv3pt5) läuft seit Monaten ohne nennenswerte Korrekturen. Charizard ex SIR, Evoli ex SIR, Mewtu ex SIR — alle auf Jahreshöchstständen oder nahe dran. Das ist ungewöhnlich für ein Set das bereits über 2 Jahre alt ist. Normalerweise sehen wir Korrekturen wenn neue Sets Aufmerksamkeit ablenken. Aber 151 hat offenbar eine so starke nostalgische Basis dass neue Konkurrenz es kaum berührt. Das bestätigt meinen Grundsatz: Emotionale Bindung an Pokémon schlägt rationale Marktbewegung.',
+        heading: '🌍 Was in der Pokémon-Welt passiert ist',
+        content: 'Die europäische Turniersaison läuft gerade auf Hochtouren — Regional-Qualifiers für die Weltmeisterschaft sorgen dafür, dass kompetitive Spieler gezielt Karten einkaufen. Das ist immer spannend zu beobachten: Wenn Turnierspieler etwas brauchen, steigt der Preis innerhalb von Tagen, und wenn das Turnier vorbei ist, fällt er wieder. Wer das mitmacht, verliert meistens. Gleichzeitig hat die Pokémon Company neue Teaser für kommende Sets gezeigt — die Community diskutiert hitzig, welche Pokémon als SIR erscheinen könnten. Solche Ankündigungen bremsen manchmal bestehende Preisanstiege, weil Sammler lieber auf das Neue warten.',
       },
       {
-        heading: 'Mein Fehler der Woche: Zu lange gewartet',
-        content: 'Ich wollte eine Tinkaton ex SIR (das rosafarbene Pokémon mit dem riesigen Metallhammer aus Paldea Evolved) zu einem bestimmten Preis kaufen. Cardmarket zeigte letzte Woche Angebote bei 42 €. Ich habe auf 38 € gewartet — jetzt notiert die Karte bei 48–52 €. Das klassische "zu günstig warten" Fehler. Es gibt immer einen tieferen Preis irgendwo — aber wenn du eine Karte haben willst zu einem fairen Preis, ist das ein fairer Preis. Nicht warten auf perfekten Einstieg.',
+        heading: '📈 Die Karte der Woche: Charizard ex SIR aus Pokémon 151',
+        content: 'Glurak (der orange Drache den wirklich alle kennen — selbst Leute, die noch nie eine Karte in der Hand hatten) hat diese Woche wieder bewiesen warum er der unerschütterliche König des TCG-Markts ist. Der Charizard ex Special Illustration Rare aus dem 151-Set (das Nostalgie-Comeback-Set für die Original-151-Pokémon) notiert auf Cardmarket knapp unter seinem Jahreshoch. Das Set ist über zwei Jahre alt, wird nicht mehr gedruckt — und trotzdem steigt die Karte. Kein viraler Moment, kein Hype-Auslöser. Nur echte Sammler, die echte Qualität kaufen. Das ist der Unterschied.',
       },
       {
-        heading: 'Ausblick: Was mich nächste Woche beschäftigt',
-        content: 'Nächste Woche rückt Surging Sparks (SV8, erschienen November 2024 — das Set mit Pikachu als Hauptthema) in meinen Fokus. Die SIRs dort sind nach dem Post-Release-Crash jetzt bei einem interessanten Preisniveau. Pikachu ex SIR aus Surging Sparks kostet gerade weniger als die Version aus dem 151-Set — obwohl beide von ähnlicher Qualität sind. Das könnte eine Unterbewertung sein die sich in 6–12 Monaten korrigiert. Ich schaue mir das genauer an.',
+        heading: '😅 Mein Fehler der Woche — damit du ihn nicht machst',
+        content: 'Ich wollte eine Tinkaton ex SIR kaufen (das rosafarbene Pokémon mit dem riesigen Metallhammer aus Paldea Evolved — man kann es nicht nicht mögen). Letzte Woche: Angebote bei 42 € auf Cardmarket. Ich: "Ich warte auf 38 €." Diese Woche: 48–52 €. Das klassische Warte-auf-den-perfekten-Preis-Muster, das ich eigentlich seit Jahren kenne und trotzdem immer wieder mache. Die Lektion: Wenn ein Preis fair ist und du die Karte wirklich haben willst — kauf sie. Den perfekten Einstieg gibt es nicht. Den gibt es nie. Und beim nächsten Mal denke ich genauso wieder drüber nach.',
+      },
+      {
+        heading: '🔮 Meine Prognose für nächste Woche',
+        content: 'Surging Sparks (SV8, das Pikachu-Themen-Set von November 2024) rückt in mein Sichtfeld. Der Pikachu ex SIR daraus kostet gerade weniger als die Version aus dem 151-Set — bei ähnlicher Kunstwerk-Qualität. Das riecht nach Unterbewertung. Pikachu bleibt Pikachu — das ändert sich nicht. Ich werde nächste Woche schauen, ob das Angebotsniveau auf Cardmarket sinkt. Wenn ja: kaufen. Wenn nicht: weiter beobachten. Keine Eile, aber das Auge bleibt drauf.',
       },
     ],
     keyPoints: [
-      '151-Set hält sich auf Jahreshöchstständen — emotionale Bindung ist Investmentfundament',
-      'Zu lange auf den "perfekten Preis" warten kostet Geld — fairer Preis ist guter Preis',
-      'Surging Sparks SIRs nächste Woche im Fokus — mögliche Unterbewertung',
+      'Charizard ex SIR (151) auf Jahreshoch — ohne Hype, nur echte Nachfrage',
+      'Zu lang auf "38 €" warten und statt 42 € jetzt 50 € zahlen müssen — klassisch',
+      'Surging Sparks Pikachu ex SIR: mögliche Unterbewertung, nächste Woche prüfen',
     ],
-    tags: ['wochenrückblick kw25', 'pokemon 151', 'pokemon investment lernen', 'surging sparks'],
+    tags: ['wochenrückblick kw25', 'pokemon 151', 'charizard ex', 'surging sparks', 'pokemon investment'],
     readingTimeMin: 4,
     featuredCards: [],
   },

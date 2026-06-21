@@ -9,13 +9,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Find current Monday in UTC (cron fires on Monday 06:00 UTC)
+  // Cron fires Monday 06:00 UTC — recap is dated to the previous Sunday
+  // (day 0 = Sun: today; day 1 = Mon: yesterday; etc.)
   const now = new Date();
-  const day = now.getUTCDay(); // 0=Sun, 1=Mon, ...
-  const offset = day === 0 ? -6 : 1 - day; // days back to Monday
-  const monday = new Date(now);
-  monday.setUTCDate(now.getUTCDate() + offset);
-  const date = monday.toISOString().split('T')[0];
+  const sunday = new Date(now);
+  sunday.setUTCDate(now.getUTCDate() - now.getUTCDay());
+  const date = sunday.toISOString().split('T')[0];
 
   try {
     const article = await generateArticle('rueckblick', date);
