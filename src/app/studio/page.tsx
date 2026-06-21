@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Zap, CheckCircle2, XCircle, Loader2, FileText, Mail,
   Video, Share2, RefreshCw, Sparkles, ExternalLink,
-  Clock, Copy, Check, Trash2, LayoutDashboard, Globe,
+  Clock, Copy, Check, Trash2, Globe, Lock, Activity,
 } from 'lucide-react';
 import Link from 'next/link';
 import { publishMarktbericht } from '@/app/actions';
+import { MonitoringPanel } from '@/components/MonitoringPanel';
 
 interface Integration {
   name: string;
@@ -25,6 +26,7 @@ interface StatusResponse {
 }
 
 type GenType = 'market' | 'newsletter' | 'video-youtube' | 'video-shorts' | 'social';
+type Tab = 'content' | 'monitoring';
 
 interface SavedOutput {
   type: GenType;
@@ -49,8 +51,78 @@ const LABELS: Record<GenType, string> = {
 };
 
 const STORAGE_KEY = 'studio_last_output';
+const SESSION_KEY = 'studio_ok';
+
+function PasswordGate({ onAuth }: { onAuth: () => void }) {
+  const [pw, setPw] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/studio-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        onAuth();
+      } else {
+        setError('Falsches Passwort');
+        setPw('');
+      }
+    } catch {
+      setError('Verbindungsfehler');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-xs">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 mx-auto mb-4">
+            <Lock size={22} className="text-violet-600" />
+          </div>
+          <h1 className="text-lg font-black text-gray-900 mb-1">Studio</h1>
+          <p className="text-xs text-gray-400 mb-6">Nur für interne Nutzung</p>
+          <form onSubmit={submit} className="space-y-3">
+            <input
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder="Passwort (CRON_SECRET)"
+              autoFocus
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-100"
+            />
+            {error && <p className="text-xs text-rose-600">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading || pw.length === 0}
+              className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 size={15} className="animate-spin" /> : null}
+              Einloggen
+            </button>
+          </form>
+        </div>
+        <p className="text-center mt-4">
+          <Link href="/" className="text-xs text-gray-400 hover:text-violet-600">← Zurück zur Website</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function StudioPage() {
+  const [authed, setAuthed] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [tab, setTab] = useState<Tab>('content');
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [generating, setGenerating] = useState<GenType | null>(null);
@@ -65,6 +137,8 @@ export default function StudioPage() {
   const stepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') setAuthed(true);
+    setAuthChecked(true);
     loadStatus();
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -162,173 +236,202 @@ export default function StudioPage() {
     return `vor ${Math.floor(mins / 60)} Std`;
   }
 
+  // Avoid flash before sessionStorage is read
+  if (!authChecked) return null;
+  if (!authed) return <PasswordGate onAuth={() => setAuthed(true)} />;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="sticky top-0 z-40 bg-gradient-to-r from-violet-700 to-indigo-800 text-white shadow-md">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-white/15 rounded-xl p-2"><Zap size={20} className="text-yellow-300" /></div>
+            <div className="bg-white/15 rounded-xl p-2"><Zap size={18} className="text-yellow-300" /></div>
             <div>
-              <h1 className="text-base font-black leading-tight">Content Studio</h1>
-              <p className="text-violet-200 text-xs">PokéMarket Intelligence</p>
+              <h1 className="text-sm font-black leading-tight">PokéMarket Studio</h1>
+              <p className="text-violet-200 text-[10px]">Interne Steuerung</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={loadStatus} className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 text-xs transition-colors">
-              <RefreshCw size={12} className={loadingStatus ? 'animate-spin' : ''} />Status
+            <button onClick={loadStatus} className="flex items-center gap-1 bg-white/10 hover:bg-white/20 rounded-lg px-2.5 py-1.5 text-xs transition-colors">
+              <RefreshCw size={11} className={loadingStatus ? 'animate-spin' : ''} />
             </button>
-            <Link href="/" className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 text-xs transition-colors">
-              <LayoutDashboard size={12} />Website
+            <Link href="/" className="bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-xs transition-colors">
+              ← Website
             </Link>
           </div>
+        </div>
+        {/* Tabs */}
+        <div className="max-w-3xl mx-auto px-4 flex gap-1 pb-2">
+          <button
+            onClick={() => setTab('content')}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+              tab === 'content' ? 'bg-white text-violet-700' : 'text-violet-200 hover:bg-white/10'
+            }`}
+          >
+            <Sparkles size={12} />Content
+          </button>
+          <button
+            onClick={() => setTab('monitoring')}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+              tab === 'monitoring' ? 'bg-white text-violet-700' : 'text-violet-200 hover:bg-white/10'
+            }`}
+          >
+            <Activity size={12} />Monitoring
+          </button>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
-            <h2 className="font-bold text-gray-900 text-sm">System-Status</h2>
-            {status && (
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${status.requiredReady ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                {status.totalConfigured}/{status.totalIntegrations} verbunden
-              </span>
-            )}
-          </div>
-          {loadingStatus && <div className="flex items-center gap-2 text-gray-400 py-6 justify-center text-sm"><Loader2 className="animate-spin" size={16} /> Lade...</div>}
-          {status && (
-            <div className="divide-y divide-gray-50">
-              {Object.entries(status.integrations).map(([key, integration]) => (
-                <div key={key} className="flex items-center justify-between px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    {integration.configured ? <CheckCircle2 size={18} className="text-green-500 shrink-0" /> : <XCircle size={18} className="text-gray-300 shrink-0" />}
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{integration.name}</p>
-                      <p className="text-xs text-gray-400">{integration.purpose}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {integration.required && <span className="text-[10px] font-bold uppercase bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded">Pflicht</span>}
-                    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${integration.configured ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
-                      {integration.configured ? 'OK' : 'Fehlt'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-50">
-            <h2 className="font-bold text-gray-900 text-sm">Content erstellen</h2>
-            <p className="text-xs text-gray-400 mt-0.5">KI generiert den Inhalt — du siehst Vorschau & entscheidest</p>
-          </div>
-          <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {(Object.keys(LABELS) as GenType[]).map((type) => {
-              const isLoading = generating === type;
-              const icons: Record<GenType, React.ReactNode> = {
-                market: <FileText size={20} />, newsletter: <Mail size={20} />,
-                'video-youtube': <Video size={20} />, 'video-shorts': <Video size={20} />, social: <Share2 size={20} />,
-              };
-              return (
-                <button key={type} onClick={() => generate(type)} disabled={generating !== null}
-                  className={`rounded-xl border p-4 flex flex-col items-center gap-2 text-center transition-all active:scale-95 ${
-                    isLoading ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-200 hover:border-violet-300 hover:shadow-sm disabled:opacity-40 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  <div className={isLoading ? 'text-violet-600' : 'text-gray-400'}>
-                    {isLoading ? <Loader2 size={20} className="animate-spin" /> : icons[type]}
-                  </div>
-                  <span className="text-xs font-semibold text-gray-800 leading-tight">{LABELS[type]}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {generating && (
-            <div className="mx-4 mb-4 bg-violet-50 rounded-xl p-4 border border-violet-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Loader2 size={14} className="animate-spin text-violet-600" />
-                  <span className="text-sm font-semibold text-violet-800">{LABELS[generating]} wird erstellt…</span>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-violet-500"><Clock size={11} />{elapsed}s</div>
-              </div>
-              <div className="space-y-2">
-                {STEPS[generating].map((step, i) => (
-                  <div key={step} className="flex items-center gap-2">
-                    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${i < currentStep ? 'bg-green-500' : i === currentStep ? 'bg-violet-600' : 'bg-gray-200'}`}>
-                      {i < currentStep ? <Check size={9} className="text-white" /> : i === currentStep ? <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> : null}
-                    </div>
-                    <span className={`text-xs ${i < currentStep ? 'text-green-700 line-through' : i === currentStep ? 'text-violet-800 font-medium' : 'text-gray-400'}`}>{step}</span>
-                  </div>
-                ))}
-              </div>
-              {elapsed > 20 && <p className="text-xs text-violet-500 mt-3 text-center">KI denkt intensiv nach — bitte warten…</p>}
-            </div>
-          )}
-
-          {error && <div className="mx-4 mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">{error}</div>}
-        </section>
-
-        {output && (
-          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-violet-600" />
-                <span className="font-bold text-gray-900 text-sm">{LABELS[output.type]}</span>
-                <span className="text-xs text-gray-400 flex items-center gap-1"><Clock size={10} /> {timeAgo(output.savedAt)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={copyOutput} className="flex items-center gap-1 text-xs text-gray-500 hover:text-violet-600 px-2 py-1 rounded-lg hover:bg-violet-50">
-                  {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}{copied ? 'Kopiert' : 'Kopieren'}
-                </button>
-                <button onClick={clearOutput} className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50">
-                  <Trash2 size={12} /> Löschen
-                </button>
-              </div>
-            </div>
-
-            {(output.type === 'market' || output.type === 'newsletter') && (
-              <div className="mx-4 mt-3 mb-3 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
-                <Globe size={15} className="text-violet-600 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-violet-800">Marktbericht veröffentlichen</p>
-                  <p className="text-[10px] text-violet-500">Aktualisiert die öffentliche Seite sofort</p>
-                </div>
-                {published ? (
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1.5 rounded-lg"><Check size={11} /> Live!</span>
-                    <Link href="/marktbericht" target="_blank" className="text-xs text-violet-600 underline">Ansehen →</Link>
-                  </div>
-                ) : (
-                  <button onClick={publish} disabled={publishing} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white text-xs font-bold px-3 py-1.5 rounded-lg shrink-0">
-                    {publishing ? <Loader2 size={12} className="animate-spin" /> : <Globe size={12} />}
-                    {publishing ? 'Läuft…' : 'Veröffentlichen'}
-                  </button>
+        {tab === 'monitoring' ? (
+          <MonitoringPanel />
+        ) : (
+          <>
+            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
+                <h2 className="font-bold text-gray-900 text-sm">System-Status</h2>
+                {status && (
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${status.requiredReady ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {status.totalConfigured}/{status.totalIntegrations} verbunden
+                  </span>
                 )}
               </div>
+              {loadingStatus && <div className="flex items-center gap-2 text-gray-400 py-6 justify-center text-sm"><Loader2 className="animate-spin" size={16} /> Lade...</div>}
+              {status && (
+                <div className="divide-y divide-gray-50">
+                  {Object.entries(status.integrations).map(([key, integration]) => (
+                    <div key={key} className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        {integration.configured ? <CheckCircle2 size={18} className="text-green-500 shrink-0" /> : <XCircle size={18} className="text-gray-300 shrink-0" />}
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{integration.name}</p>
+                          <p className="text-xs text-gray-400">{integration.purpose}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {integration.required && <span className="text-[10px] font-bold uppercase bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded">Pflicht</span>}
+                        <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${integration.configured ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
+                          {integration.configured ? 'OK' : 'Fehlt'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-50">
+                <h2 className="font-bold text-gray-900 text-sm">Content erstellen</h2>
+                <p className="text-xs text-gray-400 mt-0.5">KI generiert den Inhalt — du siehst Vorschau & entscheidest</p>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {(Object.keys(LABELS) as GenType[]).map((type) => {
+                  const isLoading = generating === type;
+                  const icons: Record<GenType, React.ReactNode> = {
+                    market: <FileText size={20} />, newsletter: <Mail size={20} />,
+                    'video-youtube': <Video size={20} />, 'video-shorts': <Video size={20} />, social: <Share2 size={20} />,
+                  };
+                  return (
+                    <button key={type} onClick={() => generate(type)} disabled={generating !== null}
+                      className={`rounded-xl border p-4 flex flex-col items-center gap-2 text-center transition-all active:scale-95 ${
+                        isLoading ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-200 hover:border-violet-300 hover:shadow-sm disabled:opacity-40 disabled:cursor-not-allowed'
+                      }`}
+                    >
+                      <div className={isLoading ? 'text-violet-600' : 'text-gray-400'}>
+                        {isLoading ? <Loader2 size={20} className="animate-spin" /> : icons[type]}
+                      </div>
+                      <span className="text-xs font-semibold text-gray-800 leading-tight">{LABELS[type]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {generating && (
+                <div className="mx-4 mb-4 bg-violet-50 rounded-xl p-4 border border-violet-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin text-violet-600" />
+                      <span className="text-sm font-semibold text-violet-800">{LABELS[generating]} wird erstellt…</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-violet-500"><Clock size={11} />{elapsed}s</div>
+                  </div>
+                  <div className="space-y-2">
+                    {STEPS[generating].map((step, i) => (
+                      <div key={step} className="flex items-center gap-2">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${i < currentStep ? 'bg-green-500' : i === currentStep ? 'bg-violet-600' : 'bg-gray-200'}`}>
+                          {i < currentStep ? <Check size={9} className="text-white" /> : i === currentStep ? <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> : null}
+                        </div>
+                        <span className={`text-xs ${i < currentStep ? 'text-green-700 line-through' : i === currentStep ? 'text-violet-800 font-medium' : 'text-gray-400'}`}>{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {elapsed > 20 && <p className="text-xs text-violet-500 mt-3 text-center">KI denkt intensiv nach — bitte warten…</p>}
+                </div>
+              )}
+
+              {error && <div className="mx-4 mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">{error}</div>}
+            </section>
+
+            {output && (
+              <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={15} className="text-violet-600" />
+                    <span className="font-bold text-gray-900 text-sm">{LABELS[output.type]}</span>
+                    <span className="text-xs text-gray-400 flex items-center gap-1"><Clock size={10} /> {timeAgo(output.savedAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={copyOutput} className="flex items-center gap-1 text-xs text-gray-500 hover:text-violet-600 px-2 py-1 rounded-lg hover:bg-violet-50">
+                      {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}{copied ? 'Kopiert' : 'Kopieren'}
+                    </button>
+                    <button onClick={clearOutput} className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50">
+                      <Trash2 size={12} /> Löschen
+                    </button>
+                  </div>
+                </div>
+
+                {(output.type === 'market' || output.type === 'newsletter') && (
+                  <div className="mx-4 mt-3 mb-3 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3">
+                    <Globe size={15} className="text-violet-600 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-violet-800">Marktbericht veröffentlichen</p>
+                      <p className="text-[10px] text-violet-500">Aktualisiert die öffentliche Seite sofort</p>
+                    </div>
+                    {published ? (
+                      <div className="flex items-center gap-2">
+                        <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1.5 rounded-lg"><Check size={11} /> Live!</span>
+                        <Link href="/marktbericht" target="_blank" className="text-xs text-violet-600 underline">Ansehen →</Link>
+                      </div>
+                    ) : (
+                      <button onClick={publish} disabled={publishing} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white text-xs font-bold px-3 py-1.5 rounded-lg shrink-0">
+                        {publishing ? <Loader2 size={12} className="animate-spin" /> : <Globe size={12} />}
+                        {publishing ? 'Läuft…' : 'Veröffentlichen'}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="p-4"><OutputView type={output.type} content={output.content} /></div>
+              </section>
             )}
 
-            <div className="p-4"><OutputView type={output.type} content={output.content} /></div>
-          </section>
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { href: 'https://dev.pokemontcg.io/', label: 'Pokémon API', sub: 'Key verwalten' },
+                { href: 'https://console.anthropic.com/', label: 'Claude API', sub: 'Guthaben prüfen' },
+                { href: 'https://beehiiv.com/', label: 'Beehiiv', sub: 'Newsletter-Platform' },
+              ].map((link) => (
+                <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="bg-white rounded-xl border border-gray-100 p-3 hover:border-violet-300 transition-colors flex items-center gap-3 shadow-sm">
+                  <ExternalLink size={15} className="text-violet-500 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm">{link.label}</p>
+                    <p className="text-xs text-gray-400">{link.sub}</p>
+                  </div>
+                </a>
+              ))}
+            </section>
+          </>
         )}
-
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { href: 'https://dev.pokemontcg.io/', label: 'Pokémon API', sub: 'Key verwalten' },
-            { href: 'https://console.anthropic.com/', label: 'Claude API', sub: 'Guthaben prüfen' },
-            { href: 'https://beehiiv.com/', label: 'Beehiiv', sub: 'Newsletter-Platform' },
-          ].map((link) => (
-            <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="bg-white rounded-xl border border-gray-100 p-3 hover:border-violet-300 transition-colors flex items-center gap-3 shadow-sm">
-              <ExternalLink size={15} className="text-violet-500 shrink-0" />
-              <div>
-                <p className="font-semibold text-gray-900 text-sm">{link.label}</p>
-                <p className="text-xs text-gray-400">{link.sub}</p>
-              </div>
-            </a>
-          ))}
-        </section>
       </div>
     </div>
   );

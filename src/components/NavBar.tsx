@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, LayoutDashboard, Search, Activity } from 'lucide-react';
+import { Zap, LayoutDashboard, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Lang } from '@/lib/i18n';
@@ -71,15 +71,8 @@ export function NavBar() {
           </button>
 
           <Link
-            href="/monitoring"
-            title="System-Monitoring"
-            className="flex items-center gap-1 text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2 py-1.5 ml-1"
-          >
-            <Activity size={13} />
-          </Link>
-          <Link
             href="/studio"
-            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ml-1"
           >
             <LayoutDashboard size={13} />
             Studio
