@@ -204,6 +204,8 @@ export default async function Home() {
             <a href="/datenschutz" className="text-gray-400 transition-colors hover:text-violet-600">
               {t(lang, 'footer_datenschutz')}
             </a>
+            <span className="text-gray-200">|</span>
+            <span className="text-gray-300 font-mono">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
           </div>
         </footer>
       </main>
