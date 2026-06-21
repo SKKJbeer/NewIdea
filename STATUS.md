@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v0.4.0` · **Stand:** 20. Juni 2026 · **Branch:** `main`
+**Version:** `v0.5.0` · **Stand:** 21. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -16,6 +16,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v0.2.0 | 20.06.2026 | Impressum, Datenschutz, Karten-Detailseiten, Preis-Chart |
 | v0.3.0 | 20.06.2026 | Mobile-Optimierung, Studio-Überarbeitung (localStorage, Timer, Fortschritt) |
 | v0.4.0 | 20.06.2026 | Marktbericht, Blog, täglicher Cron, Artikel-Generator, Newsletter-Template |
+| v0.4.x | 20.06.2026 | Echte Cardmarket-Preise (EUR), deutsche Namen (839), Supabase-Preisverlauf, Startseiten-Redesign, MoverList-Komponente |
+| v0.5.0 | 21.06.2026 | i18n DE/EN, Autocomplete-Suche, Loading-Skeleton, SEO (JSON-LD, Sitemap, robots.txt), Version im Footer |
 
 ---
 
@@ -106,4 +108,4 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-*Zuletzt aktualisiert: v0.4.0 — 20. Juni 2026*
+*Zuletzt aktualisiert: v0.5.0 — 21. Juni 2026*
