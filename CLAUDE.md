@@ -191,6 +191,37 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 
 **Überall immer:** `rel="noopener noreferrer sponsored"` + `* Affiliate-Link`-Hinweis darunter (Pflicht per Gesetz).
 
+### Zubehör-Links — `<AccessoryLink>` Komponente (PENDING — sobald Links bereit)
+
+**REGEL:** Wenn in Artikeln oder Guides Zubehör erwähnt wird (Toploader, Sammelalbum/Binder, Sleeves, Aufbewahrungsboxen etc.), MUSS dieses Wort mit einem Affiliate-Link verknüpft sein.
+
+**Komponente:** `src/components/AccessoryLink.tsx`
+
+```tsx
+import { AccessoryLink } from '@/components/AccessoryLink';
+
+// Im Artikeltext:
+<AccessoryLink type="toploader">Toploader</AccessoryLink>
+<AccessoryLink type="binder">Sammelalbum</AccessoryLink>
+<AccessoryLink type="sleeve">Sleeves</AccessoryLink>
+<AccessoryLink type="storage">Aufbewahrungsbox</AccessoryLink>
+```
+
+**Verfügbare Typen:**
+| Typ | Produkt | Fallback-Link |
+|---|---|---|
+| `toploader` | Toploader / Hartplastikhüllen | Amazon-Suche "pokemon karten toploader" |
+| `binder` | Sammelalbum / Binder / Ringbuch | Amazon-Suche "pokemon sammelalbum karten binder" |
+| `sleeve` | Kartenhüllen / Sleeves | Dragon Shield Webseite |
+| `booster` | Booster-Packs (Set-spezifisch) | Amazon-Suche mit Set-Name |
+| `storage` | Aufbewahrungsboxen / Kartenboxen | Amazon-Suche "pokemon karten aufbewahrungsbox" |
+
+**Aktueller Stand:** Fallback-Links (generische Amazon/Dragon Shield-Suche) aktiv. Sobald eigene Affiliate-Links vorhanden:
+1. Env-Vars in Vercel setzen (siehe unten)
+2. Die `AccessoryLink`-Komponente nutzt sie automatisch — kein Code-Update nötig
+
+**Texterwähnungen in Artikel-Content (static-articles.ts und fallbackArticle):** Sobald Affiliate-Links ready sind, Textstellen mit `<AccessoryLink>` wrappen — aktuell ist content reiner Text (kein JSX). Für KI-generierten Content: Prompt in `buildPrompt()` updaten, damit Claude AccessoryLink-Tags in den Text einbaut.
+
 ---
 
 ## Architektur-Entscheidungen
@@ -237,6 +268,10 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `NEXT_PUBLIC_AMAZON_URL` | ⭐ Eigener Amazon-Affiliate-Link (Booster) | **Alle Boosterpack-Bilder + Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ⭐ Eigener Cardmarket-Affiliate-Link | **Alle Cardmarket-Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Trade Republic-Link sichtbar |
+| `NEXT_PUBLIC_TOPLOADER_AFFILIATE_URL` | ⭐ Amazon-Affiliate für Toploader | `<AccessoryLink type="toploader">` nutzt diesen Link |
+| `NEXT_PUBLIC_BINDER_AFFILIATE_URL` | ⭐ Amazon-Affiliate für Sammelalbum/Binder | `<AccessoryLink type="binder">` nutzt diesen Link |
+| `NEXT_PUBLIC_SLEEVE_AFFILIATE_URL` | ⭐ Affiliate für Sleeves/Kartenhüllen | `<AccessoryLink type="sleeve">` nutzt diesen Link (Dragon Shield / Amazon) |
+| `NEXT_PUBLIC_STORAGE_AFFILIATE_URL` | Amazon-Affiliate für Aufbewahrungsboxen | `<AccessoryLink type="storage">` nutzt diesen Link |
 
 **⭐ = Hat direkten Einfluss auf Monetisierung** — sobald gesetzt, sofort alle betroffenen Stellen updaten (siehe UI-Design-Regeln → Boosterpack-Links).
 

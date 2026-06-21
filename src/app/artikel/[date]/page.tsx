@@ -12,6 +12,37 @@ import type { Metadata } from 'next';
 
 export const revalidate = 86400;
 
+function ArticleContent({ content }: { content: string }) {
+  const blocks = content.split(/\n\n+/).filter((s) => s.trim());
+  return (
+    <div className="space-y-3">
+      {blocks.map((block, i) => {
+        const lines = block.split('\n').filter((s) => s.trim());
+        const isList =
+          lines.length > 1 &&
+          lines.every((l) => /^[-•*]\s/.test(l.trim()) || /^\d+\.\s/.test(l.trim()));
+        if (isList) {
+          return (
+            <ul key={i} className="space-y-2">
+              {lines.map((line, j) => (
+                <li key={j} className="flex items-start gap-2.5 text-sm text-gray-700 leading-relaxed">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
+                  <span>{line.replace(/^[-•*]\s*|\d+\.\s*/, '')}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        return (
+          <p key={i} className="text-sm text-gray-700 leading-relaxed">
+            {block}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 const COLOR: Record<string, { badge: string; header: string; accent: string }> = {
   violet:  { badge: 'bg-violet-100 text-violet-700',   header: 'from-violet-800 to-indigo-900',  accent: 'bg-violet-600' },
   blue:    { badge: 'bg-blue-100 text-blue-700',       header: 'from-blue-800 to-blue-950',      accent: 'bg-blue-600' },
@@ -90,8 +121,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
         ) : article ? (
           <>
             {/* Intro */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-              <p className="text-gray-700 text-base leading-relaxed font-medium">{article.intro}</p>
+            <section className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden`}>
+              <div className={`h-1 ${c.accent}`} />
+              <div className="p-5 sm:p-6">
+                <p className="text-gray-700 text-base leading-relaxed">{article.intro}</p>
+              </div>
             </section>
 
             {/* Card gallery + price chart */}
@@ -117,35 +151,42 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
             {/* Sections */}
             {article.sections.map((section, i) => (
               <section key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-                <h2 className="text-base font-black text-gray-900 mb-3">{section.heading}</h2>
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{section.content}</p>
-                {section.highlight && (
-                  <div className="mt-4 flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
-                    {section.highlight.imageUrl && (
-                      <Image
-                        src={section.highlight.imageUrl}
-                        alt={section.highlight.name}
-                        width={60}
-                        height={80}
-                        className="object-contain rounded-lg shrink-0"
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-gray-900 line-clamp-1">{section.highlight.name}</p>
-                      <p className="text-xs text-gray-500 line-clamp-1">{section.highlight.set}</p>
-                      {section.highlight.setCode && (
-                        <BoosterPackImage
-                          setCode={section.highlight.setCode}
-                          setName={section.highlight.set}
-                          className="h-8 mt-1 object-contain"
+                <div className="flex items-start gap-3 mb-4">
+                  <span className={`flex-shrink-0 w-6 h-6 ${c.accent} rounded-full text-white text-[10px] font-black flex items-center justify-center mt-0.5`}>
+                    {i + 1}
+                  </span>
+                  <h2 className="text-base font-black text-gray-900 leading-snug">{section.heading}</h2>
+                </div>
+                <div className="pl-9">
+                  <ArticleContent content={section.content} />
+                  {section.highlight && (
+                    <div className="mt-4 flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                      {section.highlight.imageUrl && (
+                        <Image
+                          src={section.highlight.imageUrl}
+                          alt={section.highlight.name}
+                          width={60}
+                          height={80}
+                          className="object-contain rounded-lg shrink-0"
                         />
                       )}
-                      {section.highlight.price > 0 && (
-                        <p className="text-sm font-bold text-violet-700 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
-                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-900 line-clamp-1">{section.highlight.name}</p>
+                        <p className="text-xs text-gray-500 line-clamp-1">{section.highlight.set}</p>
+                        {section.highlight.setCode && (
+                          <BoosterPackImage
+                            setCode={section.highlight.setCode}
+                            setName={section.highlight.set}
+                            className="h-8 mt-1 object-contain"
+                          />
+                        )}
+                        {section.highlight.price > 0 && (
+                          <p className="text-sm font-bold text-violet-700 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </section>
             ))}
 

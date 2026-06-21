@@ -7,9 +7,10 @@ interface MoverListProps {
   cards: PokemonCard[];
   title: string;
   variant: 'gainer' | 'loser';
+  period?: string;
 }
 
-export function MoverList({ cards, title, variant }: MoverListProps) {
+export function MoverList({ cards, title, variant, period }: MoverListProps) {
   const isGainer = variant === 'gainer';
 
   return (
@@ -21,6 +22,11 @@ export function MoverList({ cards, title, variant }: MoverListProps) {
           {isGainer ? <TrendingUp size={15} /> : <TrendingDown size={15} />}
         </span>
         <h2 className="text-sm font-bold text-gray-900">{title}</h2>
+        {period && (
+          <span className="ml-auto text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+            {period}
+          </span>
+        )}
       </div>
 
       <ol className="divide-y divide-gray-50">

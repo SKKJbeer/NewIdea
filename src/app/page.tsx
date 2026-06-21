@@ -101,8 +101,8 @@ export default async function Home() {
               <h2 className="text-xl font-black text-gray-900">Gewinner &amp; Verlierer (30 Tage)</h2>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {gainers.length > 0 && <MoverList cards={gainers} title="Top 10 Gewinner" variant="gainer" />}
-              {losers.length > 0 && <MoverList cards={losers} title="Top 10 Verlierer" variant="loser" />}
+              {gainers.length > 0 && <MoverList cards={gainers} title="Top 10 Gewinner" variant="gainer" period="30 Tage" />}
+              {losers.length > 0 && <MoverList cards={losers} title="Top 10 Verlierer" variant="loser" period="30 Tage" />}
             </div>
           </section>
         )}
