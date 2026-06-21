@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { generateArticle, DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -46,7 +48,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
 
   const now = new Date();
   const daysDiff = Math.floor((now.getTime() - d.getTime()) / 86400000);
-  if (daysDiff > 30 || daysDiff < 0) notFound();
+  if (daysDiff < 0) notFound();
 
   const type = DAY_TYPE[d.getDay()];
   const meta = ARTICLE_META[type];
@@ -117,6 +119,33 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
               <section key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
                 <h2 className="text-base font-black text-gray-900 mb-3">{section.heading}</h2>
                 <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{section.content}</p>
+                {section.highlight && (
+                  <div className="mt-4 flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                    {section.highlight.imageUrl && (
+                      <Image
+                        src={section.highlight.imageUrl}
+                        alt={section.highlight.name}
+                        width={60}
+                        height={80}
+                        className="object-contain rounded-lg shrink-0"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-900 line-clamp-1">{section.highlight.name}</p>
+                      <p className="text-xs text-gray-500 line-clamp-1">{section.highlight.set}</p>
+                      {section.highlight.setCode && (
+                        <BoosterPackImage
+                          setCode={section.highlight.setCode}
+                          setName={section.highlight.set}
+                          className="h-8 mt-1 object-contain"
+                        />
+                      )}
+                      {section.highlight.price > 0 && (
+                        <p className="text-sm font-bold text-violet-700 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </section>
             ))}
 

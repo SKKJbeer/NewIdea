@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
+import { loadArticle, saveArticle } from './article-storage';
 import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
@@ -19,7 +20,7 @@ export interface Article {
   title: string;
   intro: string;
   featuredCards?: FeaturedCard[];
-  sections: Array<{ heading: string; content: string }>;
+  sections: Array<{ heading: string; content: string; highlight?: FeaturedCard }>;
   keyPoints: string[];
   tags: string[];
   readingTimeMin: number;
@@ -76,12 +77,47 @@ const JSON_SCHEMA = `{
     {"name": "Weiterer Kartenname"}
   ],
   "sections": [
-    {"heading": "Konkrete Aussage als Überschrift (keine Fragen)", "content": "3-4 lockere, konkrete Sätze mit Zahlen"},
+    {"heading": "Konkrete Aussage als Überschrift (keine Fragen)", "content": "3-4 lockere, konkrete Sätze mit Zahlen", "cardRef": "Optionaler englischer Kartenname für Bild in dieser Sektion"},
     {"heading": "Zweite Abschnittsaussage", "content": "..."},
     {"heading": "Dritte Abschnittsaussage", "content": "..."}
   ],
   "keyPoints": ["Takeaway 1 — kurz und merkbar", "Takeaway 2", "Takeaway 3"],
   "tags": ["pokémon karten", "tcg", "investment", "weiteres keyword"]
+}`;
+
+// Spezielles Schema für den Wochenrückblick — reichhaltiger, unterhaltsamer
+const RUECKBLICK_SCHEMA = `{
+  "title": "Wochenrückblick [KW X]: Lustiger, einprägsamer Titel mit Pokémon-Bezug",
+  "intro": "2-3 humorvolle Sätze die die Woche zusammenfassen — wie ein Freund der dir davon erzählt",
+  "featuredCards": [
+    {"name": "Die Karte der Woche — exakter englischer Name"},
+    {"name": "Weiterer Highlight"},
+    {"name": "Ein Verlierer oder Überraschung"}
+  ],
+  "sections": [
+    {
+      "heading": "🌍 Was in der Pokémon-Welt passiert ist",
+      "content": "Anime-News, Spiel-Ankündigungen, Turniere, Social-Media-Momente — alles was die Community bewegt hat. Locker erzählt, als wärst du dabei gewesen.",
+      "cardRef": "Passende Karte zum Thema"
+    },
+    {
+      "heading": "📈 Die Karte der Woche: [Name eintragen]",
+      "content": "Eine Karte die diese Woche besonders aufgefallen ist — Preisbewegung, Grund, lustige Analogie warum sie gestiegen oder gefallen ist. Pokémon kurz beschreiben für Neulinge.",
+      "cardRef": "Diese Karte"
+    },
+    {
+      "heading": "😅 Der Fehler der Woche — damit du ihn nicht machst",
+      "content": "Ein typischer Anfänger- oder Fortgeschrittenen-Fehler der diese Woche im Markt sichtbar wurde. Humorvoll erklärt, aber mit echtem Lernwert.",
+      "cardRef": "Optionale Beispielkarte"
+    },
+    {
+      "heading": "🔮 Meine Prognose für nächste Woche",
+      "content": "1-2 konkrete Einschätzungen — ehrlich über Unsicherheiten. Eine Karte oder ein Trend auf dem Radar.",
+      "cardRef": "Karte die du im Auge behältst"
+    }
+  ],
+  "keyPoints": ["Das wichtigste Takeaway der Woche", "Was du tun oder lassen solltest", "Die Überraschung der Woche"],
+  "tags": ["wochenrückblick", "pokemon tcg", "pokémon news", "investment woche"]
 }`;
 
 // Vollwertige Evergreen-Artikel als Fallback — im Marco-Persona-Stil.
@@ -271,7 +307,11 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
 }
 
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {
-  const persona = `Du bist Marco, Pokémon-TCG-Experte mit 15+ Jahren Erfahrung. Du hast die Base-Set-Ära live miterlebt, auf Turnieren gespielt und Tausende Karten bewertet. Du schreibst für einen deutschen Blog — locker, konkret und leicht unterhaltsam. Wichtig: Einfache Sprache, Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze echte Zahlen und Karten-Namen. Kein Finanz-Bullshit, klare Meinung. Antworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
+  const isRueckblick = type === 'rueckblick';
+
+  const persona = isRueckblick
+    ? `Du bist Marco, Pokémon-Besessener seit 1998 und Marktbeobachter mit 15+ Jahren Erfahrung. Du schreibst einen Wochenrückblick für deinen deutschen Blog — so als würdest du einem guten Freund beim Bier erzählen was diese Woche im Pokémon-TCG los war. Locker, ehrlich, manchmal selbstironisch. Darf gerne Humor haben, aber immer mit echten Zahlen und konkreter Meinung. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Blabla, klare Aussagen. Antworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
+    : `Du bist Marco, Pokémon-TCG-Experte mit 15+ Jahren Erfahrung. Du hast die Base-Set-Ära live miterlebt, auf Turnieren gespielt und Tausende Karten bewertet. Du schreibst für einen deutschen Blog — locker, konkret und leicht unterhaltsam. Wichtig: Einfache Sprache, Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze echte Zahlen und Karten-Namen. Kein Finanz-Bullshit, klare Meinung. Antworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
 
   const contexts: Record<ArticleType, string> = {
     markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit einer überraschenden Preisveränderung. Analysiere Trends, nenne Gewinner und Verlierer. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,
@@ -280,7 +320,7 @@ function buildPrompt(type: ArticleType, cards: string, dateLabel: string): strin
     set:        `Analysiere ein aktuell interessantes Pokémon-TCG-Set. Welche Chase-Cards lohnen sich? Sealed oder Einzelkarten? Stand: ${dateLabel}. Die Top-Karten des Sets in featuredCards eintragen.\n\nKarten (mit Set-Info):\n${cards}`,
     ausblick:   `Gib einen konkreten Ausblick: Was kaufen, was meiden, worauf achten — für das Wochenende ab ${dateLabel}. Empfohlene Karten in featuredCards.\n\nAktuelle Daten:\n${cards}`,
     guide:      `Schreibe einen unterhaltsamen Guide — praktisch für Einsteiger, trotzdem interessant für Fortgeschrittene. Mit echten Karten-Beispielen. Stand: ${dateLabel}. Beispielkarten in featuredCards.\n\nKontext:\n${cards}`,
-    rueckblick: `Wochenrückblick ${dateLabel}: Was lief gut, was schlecht, was lernen wir daraus? Locker und ehrlich. Die Karten der Woche in featuredCards.\n\nWochendaten:\n${cards}`,
+    rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Erzähl was diese Woche in der Pokémon-Welt passiert ist — Markt, Community, Turniere, Anime-News. Welche Karte hat überrascht? Welcher Fehler war lehrreich? Und was kommt nächste Woche? Locker erzählt, mit echten Zahlen. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
   };
 
   return `${persona}\n\n${contexts[type]}`;
@@ -334,10 +374,41 @@ function matchFeaturedCards(
   return matched.filter((c) => c.imageUrl);
 }
 
+function matchSectionHighlights(
+  sections: Array<{ heading: string; content: string; cardRef?: string }>,
+  trendingCards: PokemonCard[],
+): Article['sections'] {
+  return sections.map((s) => {
+    if (!s.cardRef) return { heading: s.heading, content: s.content };
+    const lower = s.cardRef.toLowerCase();
+    const found = trendingCards.find(
+      (c) => c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase()),
+    );
+    if (!found || !found.imageUrl) return { heading: s.heading, content: s.content };
+    return {
+      heading: s.heading,
+      content: s.content,
+      highlight: {
+        name: found.name,
+        imageUrl: found.imageUrl,
+        price: found.prices.market || found.prices.holofoil?.market || 0,
+        trend: found.trendPercent || 0,
+        rarity: found.rarity,
+        set: found.set,
+        setCode: found.setCode,
+      },
+    };
+  });
+}
+
 export async function generateArticle(type: ArticleType, date: string): Promise<Article> {
   const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
+
+  // Supabase cache — already generated articles are served immediately.
+  const cached = await loadArticle(date);
+  if (cached) return cached;
 
   let trendingCards: PokemonCard[] = [];
   let cardSummary = 'Keine aktuellen Daten verfügbar';
@@ -372,7 +443,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     title: string;
     intro: string;
     featuredCards?: Array<{ name: string }>;
-    sections: Array<{ heading: string; content: string }>;
+    sections: Array<{ heading: string; content: string; cardRef?: string }>;
     keyPoints: string[];
     tags: string[];
   }
@@ -396,16 +467,19 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     }
 
     const wordCount = [data.intro, ...(data.sections || []).map((s) => s.content)].join(' ').split(' ').length;
-    return {
+    const article: Article = {
       title: data.title,
       intro: data.intro || '',
       featuredCards: matchFeaturedCards(data.featuredCards || [], trendingCards),
-      sections: data.sections || [],
+      sections: matchSectionHighlights(data.sections || [], trendingCards),
       keyPoints: data.keyPoints || [],
       tags: data.tags || [],
       readingTimeMin: Math.max(1, Math.ceil(wordCount / 200)),
       generatedAt: new Date().toISOString(),
     };
+    // Persist so future requests are instant and the article is available historically.
+    await saveArticle(date, type, article).catch(() => {});
+    return article;
   } catch {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
     fallback.featuredCards = matchFeaturedCards([], trendingCards);
