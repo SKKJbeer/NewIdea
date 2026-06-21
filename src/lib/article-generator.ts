@@ -406,10 +406,21 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
-  // Supabase cache — already generated articles are served immediately.
+  // 1. Static articles — no network calls, instant response.
+  if (STATIC_ARTICLES[date]) {
+    const staticArticle = STATIC_ARTICLES[date];
+    return {
+      ...staticArticle,
+      featuredCards: staticArticle.featuredCards?.length ? staticArticle.featuredCards : [],
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  // 2. Supabase cache — one fast DB read, previously generated articles.
   const cached = await loadArticle(date);
   if (cached) return cached;
 
+  // 3. Fetch live market data only when we actually need to generate.
   let trendingCards: PokemonCard[] = [];
   let cardSummary = 'Keine aktuellen Daten verfügbar';
   try {
@@ -419,18 +430,6 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
       .join('\n');
   } catch {}
-
-  // Statisch vorgeschriebene Artikel haben immer Vorrang (garantierter Content).
-  if (STATIC_ARTICLES[date]) {
-    const staticArticle = STATIC_ARTICLES[date];
-    return {
-      ...staticArticle,
-      featuredCards: staticArticle.featuredCards?.length
-        ? staticArticle.featuredCards
-        : matchFeaturedCards([], trendingCards),
-      generatedAt: new Date().toISOString(),
-    };
-  }
 
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {

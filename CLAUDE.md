@@ -64,6 +64,40 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 
 ---
 
+## Content-Wahrheitspflicht (PFLICHT — kein erfundener Inhalt!)
+
+**REGEL:** Alle Inhalte auf der Plattform — Artikel, Wochenrückblicke, Guides, Karten-Beschreibungen — dürfen **ausschließlich wahre, überprüfbare Informationen** enthalten. Nichts erfinden.
+
+### Was nie erfunden werden darf
+
+| Kategorie | Beispiel für VERBOTENEN Inhalt |
+|---|---|
+| Preise & Trends | "Charizard ex stieg diese Woche um 40 %" — ohne echte Daten |
+| Events & Turniere | Spezifische Turnierergebnisse, Teilnehmer, Orte |
+| Pokémon-News | Konkrete Ankündigungen der Pokémon Company ohne Quelle |
+| Personen | Zitate, Aktionen oder Aussagen von echten Personen |
+| Set-Daten | Druckraten, Erscheinungsdaten, Karten-IDs |
+
+### Was erlaubt ist
+
+- **Meinungen & Einschätzungen** von Marco: "Ich glaube diese Karte steigt" — klar als persönliche Meinung markiert
+- **Allgemeine Marktprinzipien**: "Hype-Spikes normalisieren sich meist nach 4–8 Wochen" — belegbares Muster
+- **Echte Karten & Sets**: Nur Namen und Set-Codes aus der echten TCG-Datenbank verwenden
+- **Echte Preise**: Nur Werte aus der TCG API oder Cardmarket (über API geliefert)
+
+### Review-Pflicht vor jedem Content-Commit
+
+Vor jedem Commit der Artikel-Inhalte (static-articles.ts, Fallback-Artikel, etc.) prüfen:
+
+- [ ] Alle genannten Pokémon-Karten existieren wirklich (Name + Set korrekt?)
+- [ ] Alle genannten Preise basieren auf echten Daten oder sind explizit als Beispiel markiert
+- [ ] Alle genannten Events/Turniere/Ankündigungen sind real oder klar als hypothetisch kenntlich
+- [ ] Kein Satz behauptet eine Tatsache die ich nicht belegen kann
+
+**Bei KI-generierten Artikeln (Marco-Persona):** Die KI darf Meinungen äußern und Trends erklären, aber niemals konkrete Zahlen, Daten oder Events erfinden. Das `buildPrompt()` in `article-generator.ts` enthält deshalb den Hinweis "Nutze echte Zahlen und Karten-Namen".
+
+---
+
 ## UI-Design-Regeln (PFLICHT — immer einhalten!)
 
 ### Boosterpack-Bild überall dort wo Karten erwähnt werden
