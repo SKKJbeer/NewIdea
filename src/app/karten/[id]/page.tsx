@@ -95,14 +95,6 @@ export default async function CardDetailPage({ params }: Props) {
         seller: { '@type': 'Organization', name: 'Cardmarket' },
       },
     }),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: score,
-      bestRating: 100,
-      worstRating: 0,
-      ratingCount: 1,
-      description: scoreLabel,
-    },
   };
 
   return (

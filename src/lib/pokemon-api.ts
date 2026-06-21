@@ -3,7 +3,6 @@ import { PokemonCard, CardPrices } from '@/types';
 import { germanToEnglishName, englishToGermanName } from './pokemon-names-de';
 
 const TCG_API_BASE = 'https://api.pokemontcg.io/v2';
-const CARDMARKET_BASE = 'https://api.cardmarket.com/ws/v2.0';
 
 // Only send the API key header if a key is actually configured.
 // An empty X-Api-Key header causes the API to return 403; no header = free-tier access.
@@ -12,14 +11,22 @@ function tcgHeaders(): Record<string, string> {
   return key ? { 'X-Api-Key': key } : {};
 }
 
+// Deterministisch per ISO-Kalenderwoche — gleiche Woche, gleiche Karten, cachebar.
+function weeklySetIndex(count: number): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const week = Math.floor((now.getTime() - start.getTime()) / (7 * 86400000));
+  return week % count;
+}
+
 export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
-  const sets = ['sv8', 'sv7', 'sv6', 'sv5', 'sv4'];
-  const randomSet = sets[Math.floor(Math.random() * sets.length)];
+  const sets = ['sv8', 'sv7', 'sv6', 'sv5', 'sv4', 'sv3pt5'];
+  const selectedSet = sets[weeklySetIndex(sets.length)];
 
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: { ...tcgHeaders() },
     params: {
-      q: `set.id:${randomSet} (rarity:"Rare Holo" OR rarity:"Rare Ultra" OR rarity:"Special Illustration Rare")`,
+      q: `set.id:${selectedSet} (rarity:"Rare Holo" OR rarity:"Rare Ultra" OR rarity:"Special Illustration Rare")`,
       pageSize: limit,
     },
     timeout: 8000,
