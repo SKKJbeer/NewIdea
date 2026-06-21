@@ -6,7 +6,9 @@ import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
-import { Zap, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Zap, ArrowRight, BookOpen } from 'lucide-react';
+import { GUIDES } from '@/lib/guides';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -134,6 +136,26 @@ export default async function Home() {
                 </div>
               </a>
             ))}
+          </div>
+
+          {/* Guides teaser */}
+          <div className="mt-4 border-t border-gray-100 pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <BookOpen size={13} className="text-violet-500" />
+                <p className="text-xs font-bold text-gray-600">Experten-Guides</p>
+              </div>
+              <Link href="/guides" className="text-xs text-violet-600 hover:text-violet-800 font-semibold">Alle →</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {GUIDES.slice(0, 2).map((guide) => (
+                <Link key={guide.slug} href={`/guides/${guide.slug}`}
+                  className="flex items-center gap-2.5 rounded-xl border border-gray-100 hover:border-violet-200 bg-white p-3 transition-all group">
+                  <span className="text-lg shrink-0">{guide.emoji}</span>
+                  <p className="text-xs font-semibold text-gray-800 group-hover:text-violet-700 leading-snug line-clamp-2">{guide.title}</p>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
-import { Calendar, Clock, ChevronRight, Zap } from 'lucide-react';
+import { GUIDES } from '@/lib/guides';
+import { Calendar, Clock, ChevronRight, Zap, BookOpen } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -96,7 +97,38 @@ export default function ArtikelListPage() {
           </Link>
         ))}
 
-        <p className="text-center text-xs text-gray-400 pt-4">
+        {/* Guides Section */}
+        <div className="pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <BookOpen size={15} className="text-violet-600" />
+              <p className="text-sm font-bold text-gray-900">Experten-Guides</p>
+            </div>
+            <Link href="/guides" className="text-xs font-semibold text-violet-600 hover:text-violet-800">
+              Alle Guides →
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {GUIDES.map((guide) => (
+              <Link
+                key={guide.slug}
+                href={`/guides/${guide.slug}`}
+                className="flex items-center gap-3 bg-white border border-gray-100 hover:border-violet-200 hover:shadow-sm rounded-2xl p-3.5 transition-all group"
+              >
+                <span className="text-xl shrink-0">{guide.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-gray-900 group-hover:text-violet-700 leading-snug line-clamp-1">{guide.title}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                    <Clock size={9} /> {guide.readingTimeMin} Min
+                  </p>
+                </div>
+                <ChevronRight size={13} className="text-gray-300 group-hover:text-violet-500 shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-400 pt-2">
           Alle Inhalte werden automatisch von KI generiert und stellen keine Finanzberatung dar.
         </p>
       </main>
