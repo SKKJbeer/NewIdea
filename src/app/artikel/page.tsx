@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { DAY_TYPE, ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES } from '@/lib/article-generator';
+import { listSavedArticleMeta } from '@/lib/article-storage';
 import { GUIDES } from '@/lib/guides';
 import { Calendar, Clock, ChevronRight, Zap, BookOpen } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -34,9 +35,13 @@ function getLast14Days() {
   });
 }
 
-export default function ArtikelListPage() {
+export default async function ArtikelListPage() {
   const articles = getLast14Days();
   const today = articles[0];
+
+  // Real titles from Supabase — gracefully empty if not yet generated or table missing
+  const savedMeta = await listSavedArticleMeta().catch(() => [] as Awaited<ReturnType<typeof listSavedArticleMeta>>);
+  const titleByDate = new Map(savedMeta.map((m) => [m.date, m.title]));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,7 +74,9 @@ export default function ArtikelListPage() {
                 <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/20 text-white">{today.meta.category}</span>
                 <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-yellow-400 text-yellow-900">Heute neu</span>
               </div>
-              <h2 className="text-base font-black group-hover:opacity-90 leading-snug">{ARTICLE_PREVIEW_TITLES[today.type]}</h2>
+              <h2 className="text-base font-black group-hover:opacity-90 leading-snug">
+                {titleByDate.get(today.date) || ARTICLE_PREVIEW_TITLES[today.type]}
+              </h2>
               <p className="text-violet-200/80 text-xs mt-1 leading-snug">{ARTICLE_PREVIEW_SUBTITLES[today.type]}</p>
               <p className="text-violet-300 text-[10px] mt-1.5 flex items-center gap-1"><Calendar size={9} /> {today.dateLabel}</p>
             </div>
@@ -90,7 +97,9 @@ export default function ArtikelListPage() {
                   <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${COLOR_BADGE[meta.color]}`}>{meta.category}</span>
                   <span className="text-xs text-gray-400 flex items-center gap-1"><Clock size={10} /> ~3 Min</span>
                 </div>
-                <h2 className="text-sm font-bold text-gray-900 group-hover:text-violet-700 leading-snug">{ARTICLE_PREVIEW_TITLES[type]}</h2>
+                <h2 className="text-sm font-bold text-gray-900 group-hover:text-violet-700 leading-snug">
+                  {titleByDate.get(date) || ARTICLE_PREVIEW_TITLES[type]}
+                </h2>
                 <p className="text-[11px] text-gray-400 mt-0.5 leading-snug line-clamp-1">{ARTICLE_PREVIEW_SUBTITLES[type]}</p>
                 <p className="text-[10px] text-gray-300 mt-0.5 flex items-center gap-1"><Calendar size={9} /> {dateLabel}</p>
               </div>
