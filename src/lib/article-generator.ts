@@ -11,6 +11,7 @@ export interface FeaturedCard {
   trend: number;
   rarity: string;
   set: string;
+  setCode: string;
 }
 
 export interface Article {
@@ -284,6 +285,7 @@ function matchFeaturedCards(
         trend: found.trendPercent || 0,
         rarity: found.rarity,
         set: found.set,
+        setCode: found.setCode,
       });
     }
   }
@@ -301,6 +303,7 @@ function matchFeaturedCards(
         trend: c.trendPercent || 0,
         rarity: c.rarity,
         set: c.set,
+        setCode: c.setCode,
       });
     }
   }

@@ -47,6 +47,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
         <div className="flex gap-3 overflow-x-auto pb-1 snap-x">
           {cards.map((card) => (
             <div key={card.name} className="flex-none w-28 snap-start text-center">
+              {/* Card image */}
               <div className="relative w-28 h-[154px] rounded-lg overflow-hidden bg-gray-50 border border-gray-100 mb-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -57,7 +58,16 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
                 />
               </div>
               <p className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2">{card.name}</p>
-              <p className="text-[10px] text-gray-400 truncate">{card.set}</p>
+              {/* Set logo — shows which booster/set the card comes from */}
+              {card.setCode && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`https://images.pokemontcg.io/${card.setCode}/logo.png`}
+                  alt={card.set}
+                  className="h-4 mx-auto mt-1 object-contain opacity-60"
+                  loading="lazy"
+                />
+              )}
               <div className="flex items-center justify-center gap-1 mt-0.5">
                 {card.price > 0 && (
                   <span className="text-[10px] font-bold text-gray-700">{card.price.toFixed(2)}€</span>

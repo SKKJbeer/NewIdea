@@ -98,15 +98,26 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 {section.cards.map((card) => (
                   <div key={card.name} className="border border-gray-100 rounded-xl p-3 bg-gray-50 flex items-start gap-3">
                     {card.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.name}
-                        width={56}
-                        height={78}
-                        className="w-14 shrink-0 rounded-md object-contain"
-                        loading="lazy"
-                      />
+                      <div className="flex-none text-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={card.imageUrl}
+                          alt={card.name}
+                          width={56}
+                          height={78}
+                          className="w-14 rounded-md object-contain"
+                          loading="lazy"
+                        />
+                        {card.setId && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={`https://images.pokemontcg.io/${card.setId}/logo.png`}
+                            alt="Set"
+                            className="w-14 mt-1 object-contain opacity-55"
+                            loading="lazy"
+                          />
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xl shrink-0 mt-1">🃏</span>
                     )}
