@@ -64,6 +64,36 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 
 ---
 
+## UI-Design-Regeln (PFLICHT — immer einhalten!)
+
+### Boosterpack-Bild überall dort wo Karten erwähnt werden
+
+**REGEL:** Jedes Mal wenn eine Pokémon-Karte in der UI angezeigt oder erwähnt wird, MUSS das zugehörige Boosterpack-Produktbild (wie man es im Laden sieht) ebenfalls angezeigt werden — damit Nutzer sofort erkennen, aus welchem Set die Karte stammt und wo sie sie kaufen können.
+
+**Umsetzung:** Immer die `<BoosterPackImage>` Komponente aus `@/components/BoosterPackImage` verwenden:
+```tsx
+import { BoosterPackImage } from '@/components/BoosterPackImage';
+
+<BoosterPackImage
+  setCode={card.setCode}   // z.B. "sv3pt5"
+  setName={card.set}       // z.B. "Pokémon 151"
+  className="h-24 ..."     // Größe je nach Kontext anpassen
+/>
+```
+
+**Größenrichtlinien:**
+| Kontext | Klasse | Beispiel |
+|---|---|---|
+| Karten-Detailseite | `h-24 w-auto drop-shadow-md` | Groß, rechts neben Kartenname |
+| Kartenraster (CardGrid) | `h-5 w-auto` | Klein, inline neben Set-Name |
+| Artikel/Guides | `h-14 object-contain drop-shadow-sm` | Mittel, unter Kartenbild |
+
+**Fallback:** Wenn das Boosterpack-Bild nicht lädt (ältere Sets), fällt die Komponente automatisch auf das Set-Logo zurück — kein manueller Fallback nötig.
+
+**WICHTIG:** Bei neuen Seiten/Komponenten die Karten zeigen → sofort `BoosterPackImage` einbauen. Kein Set-Name als reiner Text ohne Bild daneben!
+
+---
+
 ## Architektur-Entscheidungen
 
 | Entscheidung | Details |
@@ -74,6 +104,7 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 | Autocomplete | `/api/search/suggestions?q=` — debounce 320 ms im SearchBox-Client |
 | SEO | JSON-LD auf Karten-Detailseiten (Product+Offer), ItemList auf Suchergebnissen |
 | Supabase | Graceful: App läuft auch ohne Konfiguration (client gibt `null` zurück) |
+| Boosterpack-Bild | Überall wo Karten erscheinen → `<BoosterPackImage>` Pflicht (siehe UI-Design-Regeln) |
 
 ---
 
