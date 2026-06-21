@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 
 // Reports which integrations are configured (env vars present).
 // Used by the control dashboard to show connection status.
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isStudioAuthedFromRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const integrations = {
     pokemon: {
       name: 'Pokémon TCG API',

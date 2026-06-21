@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import fs from 'fs';
 import path from 'path';
 
@@ -77,7 +78,11 @@ function envVal(key: string, fallback = '') {
   return process.env[key] || fallback;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isStudioAuthedFromRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const siteUrl = envVal('NEXT_PUBLIC_SITE_URL');
   const cardmarketUrl = envVal('NEXT_PUBLIC_CARDMARKET_URL');
   const tradeRepublicUrl = envVal('NEXT_PUBLIC_TRADE_REPUBLIC_URL');

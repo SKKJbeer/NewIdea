@@ -51,7 +51,6 @@ const LABELS: Record<GenType, string> = {
 };
 
 const STORAGE_KEY = 'studio_last_output';
-const SESSION_KEY = 'studio_ok';
 
 function PasswordGate({ onAuth }: { onAuth: () => void }) {
   const [pw, setPw] = useState('');
@@ -69,7 +68,6 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
         body: JSON.stringify({ password: pw }),
       });
       if (res.ok) {
-        sessionStorage.setItem(SESSION_KEY, '1');
         onAuth();
       } else {
         setError('Falsches Passwort');
@@ -137,8 +135,13 @@ export default function StudioPage() {
   const stepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === '1') setAuthed(true);
-    setAuthChecked(true);
+    // Check auth via server (cookie-based) — sessionStorage is fallback for UX speed
+    fetch('/api/studio-auth')
+      .then((r) => {
+        if (r.ok) setAuthed(true);
+        setAuthChecked(true);
+      })
+      .catch(() => setAuthChecked(true));
     loadStatus();
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -258,6 +261,16 @@ export default function StudioPage() {
             <Link href="/" className="bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-xs transition-colors">
               ← Website
             </Link>
+            <button
+              onClick={async () => {
+                await fetch('/api/studio-auth', { method: 'DELETE' });
+                setAuthed(false);
+              }}
+              className="bg-white/10 hover:bg-white/20 rounded-lg px-2.5 py-1.5 text-xs transition-colors"
+              title="Abmelden"
+            >
+              <Lock size={11} />
+            </button>
           </div>
         </div>
         {/* Tabs */}
