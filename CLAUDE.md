@@ -91,6 +91,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `SUPABASE_URL` | ✅ **Gesetzt** | Supabase Projekt-URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ **Gesetzt** | Supabase Schreibrecht (service role) |
 | `NEXT_PUBLIC_SITE_URL` | ✅ **Gesetzt** | Canonical URLs + Cron-Warmup |
+| `STUDIO_PASSWORD` | ✅ **Gesetzt** | Passwort-Schutz für /studio und /monitoring |
 
 **Folge:** Der tägliche Cron (08:00 UTC) speichert echte Preisschnappschüsse in Supabase. Daten werden bereits gesammelt.
 
@@ -112,6 +113,30 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 Der Supabase-Service-Role-Key wurde in einer früheren Chat-Session versehentlich
 offengelegt. Der Nutzer wurde gebeten, ihn zu **rotieren** (Supabase Dashboard →
 Settings → API → regenerate service_role key). Neuen Wert danach in Vercel aktualisieren.
+
+---
+
+## Sicherheitsarchitektur (Studio / Monitoring)
+
+**WICHTIG:** Der Nutzer hat alle relevanten Passwörter und Keys bereits gesetzt. Nie wieder fragen ob sie gesetzt sind.
+
+| Bereich | Schutz |
+|---|---|
+| `/studio` | Client-seitiger Auth-Gate → POST `/api/studio-auth` → HttpOnly-Cookie |
+| `/monitoring` | Eigene Seite, gleicher Auth-Gate wie /studio |
+| `/api/monitoring` | Server-seitig: prüft `studio_session`-Cookie → 401 wenn fehlt |
+| `/api/status` | Server-seitig: prüft `studio_session`-Cookie → 401 wenn fehlt |
+| `/api/generate` | Kein Auth — wird nur intern aus Studio aufgerufen |
+| `/api/cron` + `/api/cron/daily` | Geschützt via `Authorization: Bearer CRON_SECRET` |
+
+**Cookie-Details:**
+- Name: `studio_session`
+- Wert: SHA-256 von `"pokemarket:studio:" + STUDIO_PASSWORD`
+- Flags: `HttpOnly`, `Secure` (Prod), `SameSite=Strict`
+- Laufzeit: 7 Tage
+- Logout: DELETE `/api/studio-auth` löscht Cookie
+
+**Niemals** `sessionStorage` oder `localStorage` für Auth-State nutzen — das ist in Devtools umgehbar.
 
 ---
 
@@ -149,3 +174,4 @@ Settings → API → regenerate service_role key). Neuen Wert danach in Vercel a
 | v0.9.3 | 21.06.2026 | Booster-Set-Logo unter allen Karten (Artikel + Guides), Skill-Datei erweitert | — |
 | v0.9.4 | 21.06.2026 | Studio/Monitoring: Skills & Workflows-Sektion (auto-liest .claude/commands/) | `6d3bb95` |
 | v0.9.5 | 21.06.2026 | Booster-Pack-Artwork (assets.pokemon.com CDN + Fallback), Blog-Listing mit echten Titeln | `0a5888c` |
+| v0.9.6 | 21.06.2026 | Server-Auth via HttpOnly-Cookie, /api/monitoring + /api/status geschützt, /monitoring eigene Seite | `c72c0b0` |

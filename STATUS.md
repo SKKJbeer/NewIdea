@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v0.9.5` · **Stand:** 21. Juni 2026 · **Branch:** `main`
+**Version:** `v0.9.6` · **Stand:** 21. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -19,8 +19,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Tagesartikel `/artikel/[date]` | ✅ Fertig | 7 Typen, ISR 24h, KI-generiert + Marco-Fallback |
 | Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO |
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
-| Content Studio `/studio` | ✅ Fertig | sessionStorage-Auth, Generierung, Timer, Veröffentlichen |
-| Monitoring `/monitoring` | ✅ Fertig | API-Keys, Affiliates, Rechtliches, Features, Skills, Workflows |
+| Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth, Generierung, Timer, Veröffentlichen, Logout |
+| Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt, API-Keys/Features/Skills/Workflows |
 | Impressum & Datenschutz | ⚠️ Platzhalter | Eckige Klammern noch ersetzen! |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | CRON_SECRET ✅ gesetzt |
 | Täglicher Cron (08:00 UTC) | ✅ Aktiv | Speichert Preis-Snapshots in Supabase |
@@ -44,6 +44,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | `SUPABASE_URL` | ✅ Gesetzt |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ Gesetzt (rotieren falls noch nicht gemacht!) |
 | `NEXT_PUBLIC_SITE_URL` | ✅ Gesetzt |
+| `STUDIO_PASSWORD` | ✅ Gesetzt |
 | `BEEHIIV_API_KEY` | ❌ Fehlt |
 | `BEEHIIV_PUBLICATION_ID` | ❌ Fehlt |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ❌ Eigener Affiliate-Link fehlt |
@@ -85,4 +86,4 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-*Zuletzt aktualisiert: v0.9.5 — 21. Juni 2026*
+*Zuletzt aktualisiert: v0.9.6 — 21. Juni 2026*
