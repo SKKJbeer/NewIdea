@@ -262,10 +262,20 @@ export default async function Home() {
           <AffiliateBar />
         </section>
 
-        <footer className="space-y-3 border-t border-gray-200 pt-6">
-          <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-gray-400">
-            PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben (Cardmarket, EUR) ohne Gewähr.{' '}
-            <span className="text-gray-300">•</span> Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision.
+        <footer className="space-y-4 border-t border-gray-200 pt-6">
+          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1">
+            <p className="text-xs font-bold text-amber-800">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
+            <p className="text-[11px] text-amber-700 leading-relaxed">
+              Pokémon und alle zugehörigen Namen sind Marken von Nintendo, Creatures Inc. und GAME FREAK.
+              Diese Seite steht in keiner Verbindung zu diesen Unternehmen.
+            </p>
+            <p className="text-[11px] text-amber-700">
+              Alle Inhalte dienen ausschließlich der Information — <strong>keine Anlageberatung</strong>.
+              Preisangaben (Cardmarket, EUR) ohne Gewähr.
+            </p>
+          </div>
+          <p className="text-center text-[11px] text-gray-400">
+            Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision.
           </p>
           <div className="flex justify-center gap-5 text-xs">
             <a href="/impressum" className="text-gray-400 transition-colors hover:text-violet-600">Impressum</a>

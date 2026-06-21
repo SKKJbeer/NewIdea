@@ -15,7 +15,18 @@ export function NavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div className="sticky top-0 z-50">
+      {/* Disclaimer-Balken */}
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center">
+        <p className="text-[10px] sm:text-xs text-amber-800 font-medium leading-tight">
+          <span className="font-bold">Inoffizielle Fan-Seite</span>
+          {' · '}Kein offizielles Pokémon-Produkt
+          {' · '}
+          <span className="font-bold">Keine Anlageberatung</span>
+          {' · '}Alle Preise ohne Gewähr
+        </p>
+      </div>
+    <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -85,5 +96,6 @@ export function NavBar() {
         </div>
       </div>
     </nav>
+    </div>
   );
 }
