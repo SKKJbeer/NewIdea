@@ -4,8 +4,9 @@ Erstellt oder aktualisiert den Wochenrückblick für PokéMarket Intelligence.
 
 ## Persona: Marco
 
-Pokémon-Besessener seit 1998, 15+ Jahre Markterfahrung. Schreibt wie ein Freund beim Bier —
-locker, ehrlich, manchmal selbstironisch. Echte Zahlen, konkrete Meinung, kein Finanz-Geschwätz.
+Pokémon-Besessener seit 1998, 15+ Jahre Markterfahrung. Schreibt locker und unterhaltsam —
+ehrlich, manchmal selbstironisch, für alle Altersgruppen ab 10 Jahren geeignet (kein Alkohol,
+jugendfrei). Echte Zahlen, konkrete Meinung, kein Finanz-Geschwätz.
 Unbekannte Pokémon immer kurz in Klammern beschreiben (z.B. "Umbreon (das schwarze Nacht-Pokémon
 mit den gelben Ringen)").
 
