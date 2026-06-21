@@ -80,7 +80,7 @@ Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
 
 ### Was erlaubt ist
 
-- **Meinungen & Einschätzungen** von Marco: "Ich glaube diese Karte steigt" — klar als persönliche Meinung markiert
+- **Marktbeobachtungen**: Sachliche Einschätzungen ohne persönliche Kaufempfehlungen
 - **Allgemeine Marktprinzipien**: "Hype-Spikes normalisieren sich meist nach 4–8 Wochen" — belegbares Muster
 - **Echte Karten & Sets**: Nur Namen und Set-Codes aus der echten TCG-Datenbank verwenden
 - **Echte Preise**: Nur Werte aus der TCG API oder Cardmarket (über API geliefert)
@@ -114,7 +114,29 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, Fallback-Artikel, etc.
 - [ ] Kein Satz behauptet eine Tatsache die ich nicht belegen kann
 - [ ] `sources`-Array enthält mindestens eine direkte Quellenangabe
 
-**Bei KI-generierten Artikeln (Marco-Persona):** Die KI darf Meinungen äußern und Trends erklären, aber niemals konkrete Zahlen, Daten oder Events erfinden. Das `buildPrompt()` in `article-generator.ts` enthält deshalb den Hinweis "Nutze echte Zahlen und Karten-Namen".
+**Tonalität:** Alle Artikel sind sachliche Marktanalysen ohne Persona-Namen ("Marco" wurde entfernt) und ohne persönliche Kaufempfehlungen. Nur Marktbeobachtungen, Preisanalyse und faktische Einschätzungen. Keine "Ich empfehle", "Pflichtkauf", "kaufenswert" etc.
+
+---
+
+## Content-Tonalität (PFLICHT — keine Kaufempfehlungen, kein Persona-Name!)
+
+**REGEL:** Alle Inhalte sind sachliche, neutrale Marktanalysen und -berichte.
+
+| Was verboten ist | Beispiele |
+|---|---|
+| Kaufempfehlungen | "kaufenswert", "Pflichtkauf", "sollte jetzt kaufen", "unter X € empfehlenswert" |
+| Persönliche Ratschläge | "Ich empfehle", "Meine klare Meinung: kaufen", "würde ich kaufen" |
+| Persona-Name | "Marco" oder irgendein Name — es gibt keinen Erzähler mit Namen |
+| Erste Person Singular | "Ich habe", "Ich empfehle", "Meine Meinung", "Ich werde" |
+
+| Was erlaubt ist | Beispiele |
+|---|---|
+| Preisbeobachtungen | "Die Karte notiert bei 130 €", "Der Markt hat diesen Preis als fair akzeptiert" |
+| Historische Muster | "Sets nach Produktionsende steigen historisch", "4–8 Wochen nach Release ist der Tiefpunkt" |
+| Faktische Analyse | "Angebotsmenge sinkt", "Nachfrage von Sammlern steigt", "Druckrate bei 1:120" |
+| Neutrale Prognosen | "Das Angebotsniveau verdient Beobachtung", "Historisch folgte danach X" |
+
+**Begründung:** Das ist eine Analyse- und Informationsplattform — keine Finanzberatung, keine Influencer-Empfehlungen. Nutzer sollen sich selbst ein Bild machen können.
 
 ---
 

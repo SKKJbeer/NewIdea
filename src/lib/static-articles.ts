@@ -1,13 +1,13 @@
 import type { Article } from './article-generator';
 
-// Vorgeschriebene Experten-Artikel (Marco-Persona) für die letzten 14 Tage.
+// Statische Experten-Artikel (sachliche Marktanalyse) für die letzten 14 Tage.
 // Diese werden immer vor einer KI-Generierung geliefert — garantierter Content.
 export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
 
   // ── 2026-06-08 (Montag) ── Markt ────────────────────────────────────────────
   '2026-06-08': {
     title: 'Pokémon-Markt KW 24: Warum gerade Ruhe im Markt die beste Kaufchance ist',
-    intro: 'Wer nur auf grüne Preispfeile wartet, kauft meistens zu spät. Die erste Juniwoche 2026 ist ein perfektes Beispiel: Der Markt ist ruhig, die Preise für Top-SIRs stagnieren — genau deshalb ist jetzt der richtige Zeitpunkt. Ich beobachte dieses Muster seit Jahren.',
+    intro: 'Wer nur auf grüne Preispfeile wartet, reagiert meistens zu spät. Die erste Juniwoche 2026 ist ein perfektes Beispiel: Der Markt ist ruhig, die Preise für Top-SIRs stagnieren — genau solche Phasen zeigen historisch oft den Boden vor der nächsten Bewegung.',
     sections: [
       {
         heading: 'Scarlet & Violet-Ära: Das Fundament wird stabiler',
@@ -18,14 +18,14 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Das Evolving Skies Set (SWSH7, englischer Titel, erschienen 2021 — das Set mit dem violetten Cover und Rayquaza als Hauptpokémon) ist eines der wenigen modernen Sets, das scheinbar gar nicht aufhört zu steigen. Umbreon VMAX Alt Art (das schwarze Nacht-Pokémon mit den gelben Ringen, das man nachts im Wald finden würde) kostet mittlerweile stabil über 120 €. Rayquaza VMAX Alt Art (der riesige grüne Drache der in der Atmosphäre lebt) über 150 €. Beide sind aus der Produktion — das Angebot schrumpft monatlich. Wer diese Karten noch nicht hat, zahlt morgen mehr als heute.',
       },
       {
-        heading: 'Was diese Woche kaufen — klare Empfehlung',
-        content: 'Ich schaue gerade besonders auf Karten aus Paldea Evolved (SV2, das zweite Scarlet & Violet-Set, erschienen Mitte 2023). Die SIRs dort sind im Vergleich zu 151 noch moderat bewertet. Besonders Oinkologne ex SIR (das pinke Parfüm-Pokémon, sieht aus wie ein stylischer Poodle) und Arcanine ex SIR (der große Feuerhund, den viele aus dem Videospiel kennen) zeigen erste Preisbewegungen. Wer in solche Karten bei 30–50 € einsteigt, ist in 12–18 Monaten wahrscheinlich im Plus. Wie immer: Nur Near-Mint kaufen, nur auf Cardmarket mit Verkäufern über 98 % Bewertung.',
+        heading: 'Paldea Evolved SIRs: Aktuelles Preisniveau',
+        content: 'Karten aus Paldea Evolved (SV2, das zweite Scarlet & Violet-Set, erschienen Mitte 2023) sind im Vergleich zu 151 noch moderat bewertet. Besonders Oinkologne ex SIR (das pinke Parfüm-Pokémon, sieht aus wie ein stylischer Poodle) und Arcanine ex SIR (der große Feuerhund, den viele aus dem Videospiel kennen) zeigen erste Preisbewegungen bei 30–50 €. Für die Zustandseinschätzung gilt: Near-Mint-Exemplare von Cardmarket-Verkäufern mit über 98 % Bewertung entsprechen dem verifizierten Marktstandard.',
       },
     ],
     keyPoints: [
-      'Ruhige Marktphasen sind Kaufphasen — Preise stagnieren vor dem nächsten Anstieg',
-      'Evolving Skies Alts (Umbreon, Rayquaza) steigen weiter — Angebot schrumpft',
-      'Paldea Evolved SIRs sind noch moderat bewertet — guter Einstieg',
+      'Ruhige Marktphasen sind historisch Vorstufen zur nächsten Preisbewegung',
+      'Evolving Skies Alts (Umbreon, Rayquaza) zeigen weiter aufwärts — Angebot schrumpft',
+      'Paldea Evolved SIRs bei 30–50 € — moderates Preisniveau im SV-Vergleich',
     ],
     tags: ['pokémon marktanalyse', 'special illustration rare', 'evolving skies', 'paldea evolved'],
     sources: [
@@ -50,14 +50,14 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Direkt nach Evolving Skies Release (August 2021): ca. 80 €. Crash bei Pack-Flutung: auf 58 € gefallen. Jahresende 2022: Erholung auf 75 €. Ende 2023: erster Ausbruch auf 95 €. 2024: stabile 100–115 €. Heute 2026: 120–140 € je nach Zustand. Das ist +100–140 % in 5 Jahren auf eine Karte die nie aktiv gespielt wurde (Umbreon VMAX war kein Top-Turnierdeck). Reiner Sammlerwert treibt den Preis — das ist das stabilste Investment im TCG.',
       },
       {
-        heading: 'Kaufen oder zu teuer?',
-        content: 'Bei 120–140 € ist die Karte nicht billig. Aber: Evolving Skies wird nicht mehr gedruckt. Jede Umbreon VMAX Alt Art die existiert, existiert bereits — es kommen keine neuen dazu. Das Angebot auf Cardmarket sinkt. Die Nachfrage steigt, weil der Pokémon-Fankreis global wächst. Meine Meinung: Unter 130 € für ein tadelloses Near-Mint-Exemplar ist das immer noch ein fairer Preis. Über 150 € würde ich warten. Wichtig: Graded-Exemplare (PSA 10 oder BGS 10) kosten 200+ € — wer das Budget hat, zieht selbst die Karte und schickt sie ein.',
+        heading: 'Preiseinordnung: Aktuelle Marktlage',
+        content: 'Bei 120–140 € ist die Karte nicht billig. Aber: Evolving Skies wird nicht mehr gedruckt. Jede Umbreon VMAX Alt Art die existiert, existiert bereits — es kommen keine neuen dazu. Das Angebot auf Cardmarket sinkt. Die Nachfrage steigt, weil der Pokémon-Fankreis global wächst. Der Markt hat Near-Mint-Exemplare unter 130 € als faire Preiszone etabliert — Exemplare über 150 € liegen im oberen Bereich des aktuellen Handelskorridors. Graded-Exemplare (PSA 10 oder BGS 10) kosten 200+ € und werden separat gehandelt.',
       },
     ],
     keyPoints: [
-      'Umbreon VMAX Alt Art = emotionaler Sammlerwert + ausgelaufenes Set = Dauerbrenner',
+      'Umbreon VMAX Alt Art = emotionaler Sammlerwert + ausgelaufenes Set = stabiler Markt',
       '+100–140 % in 5 Jahren ohne Turnierspielrelevanz — reiner Collector-Markt',
-      'Unter 130 € NM = fairer Einstieg; PSA 10 für 200+ € für ambitionierte Sammler',
+      'NM bei 120–130 €; Graded (PSA 10) bei 200+ € — getrennte Märkte und Preiszonen',
     ],
     tags: ['umbreon vmax alt art', 'evolving skies', 'pokemon investment', 'swsh7'],
     sources: [
@@ -71,7 +71,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-10 (Mittwoch) ── Strategie ──────────────────────────────────────
   '2026-06-10': {
     title: 'Sealed vs. Einzelkarten: Die ehrliche Antwort auf die meistgestellte Frage',
-    intro: 'Diese Frage kommt in jeder Community täglich: Soll ich sealed Produkte kaufen oder lieber direkt Einzelkarten? Nach 15 Jahren habe ich beide Wege erlebt, beide Fehler gemacht und beide Erfolge gefeiert. Die Antwort ist nicht so eindeutig wie die Influencer behaupten.',
+    intro: 'Diese Frage kommt in jeder Community täglich: Sealed Produkte oder direkt Einzelkarten? Die Marktdaten der letzten Jahre geben darauf klare — wenn auch nuancierte — Antworten. Die Wahrheit ist nicht so eindeutig wie die Influencer behaupten.',
     sections: [
       {
         heading: 'Sealed: Das Gute, das Schlechte, das Missverstandene',
@@ -82,8 +82,8 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Wenn du eine bestimmte Karte willst (sagen wir Charizard ex SIR aus dem 151-Set), kannst du sie direkt auf Cardmarket kaufen — für weniger Geld als du statistisch beim Öffnen ausgeben würdest. Du weißt genau was du hast, du kannst den Zustand prüfen, und du sparst das Lagerplatzproblem. Der Nachteil: Du musst Karten einschätzen können. Eine Fake-Karte einzukaufen ist bei Einzelkarten wahrscheinlicher als bei versiegelten Packs von seriösen Händlern. Und der Markt für Einzelkarten reagiert schneller — Preise können sich in Wochen bewegen.',
       },
       {
-        heading: 'Mein Portfolio-Rezept: Das Beste aus beiden Welten',
-        content: 'Ich empfehle: 70 % Einzelkarten (gezielt, High-End, Near-Mint), 30 % sealed. Die Einzelkarten sind dein aktives Portfolio — du kaufst, beobachtest, verkaufst wenn der Zeitpunkt stimmt. Die sealed Produkte sind dein passives Standbein — du kaufst ein Set das du für stark hältst, lagerst es sicher ein und vergisst es für 3 Jahre. Kombiniert hast du Flexibilität und Stabilität. Und: Eröffne keine Packs um Karten zu ziehen. Das ist Entertainment, kein Investment — die Mathematik verliert du fast immer.',
+        heading: 'Portfolio-Ansatz: Das Beste aus beiden Welten',
+        content: 'Eine bewährte Aufteilung: 70 % Einzelkarten (gezielt, High-End, Near-Mint), 30 % sealed. Die Einzelkarten bilden das aktive Portfolio — gezielte Transaktionen wenn Preise und Zeitpunkt stimmen. Die sealed Produkte sind das passive Standbein — nach Produktionsende verlässlich wertsteigernd. Kombiniert entsteht Flexibilität und Stabilität. Wichtig: Packs öffnen ist Entertainment — die Statistik spricht gegen den wirtschaftlichen Vorteil gegenüber dem Direktkauf.',
       },
     ],
     keyPoints: [
@@ -114,14 +114,14 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Die Top-SIRs aus Paldea Evolved kosten derzeit 25–60 €, deutlich weniger als vergleichbare 151-Karten. Der Grund: Das Set enthält keine ikonischen Generation-1-Pokémon, die sofortige Nostalgie-Reaktionen auslösen. Aber genau das kann sich ändern. Die Paldea-Pokémon gewinnen unter jungen Fans (die mit Karmesin & Purpur aufgewachsen sind) schnell an Beliebtheit. In 3–5 Jahren, wenn diese Generation kaufkräftig ist, können Paldea-Karten einen ähnlichen Nostalgie-Boom erleben wie Generation-1-Karten heute.',
       },
       {
-        heading: 'Sealed vs. Einzel — meine Empfehlung für SV2',
-        content: 'Bei Paldea Evolved bin ich klar auf Einzelkarten-Seite. Die 3–4 schönsten SIRs direkt kaufen (Oinkologne, Arcanine, Tinkaton ex SIR — das rosa Hammer-Pokémon mit dem überdimensionalen Metallhammer) und für 2–3 Jahre halten. Boosterboxen von Paldea Evolved sind noch günstig, aber das Set hat nicht die Nostalgie-Power von 151 für unmittelbare Preissteigerung. Als Einzelkarten-Einstieg unter 50 € pro Karte: gut. Als sealed-Langzeitinvestment: nur wenn du wirklich viel Geduld hast.',
+        heading: 'Sealed vs. Einzelkarten für Paldea Evolved: Was die Daten zeigen',
+        content: 'Für Paldea Evolved deutet die Marktlage auf Einzelkarten als effizienteren Weg: Die 3–4 stärksten SIRs (Oinkologne, Arcanine, Tinkaton ex SIR — das rosa Hammer-Pokémon mit dem überdimensionalen Metallhammer) sind unter 50 € pro Karte und zeigen erste Aufwärtsbewegungen. Boosterboxen von Paldea Evolved sind noch günstig — aber das Set hat nicht die Nostalgie-Power von 151, was eine kürzere Zeitlinie für Preissteigerungen bei Sealed unwahrscheinlicher macht.',
       },
     ],
     keyPoints: [
-      'Paldea Evolved SIRs bei 25–60 € = günstiger Einstieg vor möglichem Nostalgie-Boom',
+      'Paldea Evolved SIRs bei 25–60 € — moderates Preisniveau verglichen mit 151',
       'Oinkologne, Arcanine, Tinkaton ex SIR = Top-Artworks des Sets',
-      'Einstieg via Einzelkarten besser als Sealed — Nostalgie-Faktor noch nicht aktiv',
+      'Einzelkarten zeigen frühere Preisbewegungen als Sealed bei diesem Set',
     ],
     tags: ['paldea evolved', 'sv2 pokemon', 'scarlet violet investment', 'pokemon set analyse'],
     sources: [
@@ -135,27 +135,27 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-12 (Freitag) ── Ausblick ────────────────────────────────────────
   '2026-06-12': {
     title: 'Wochenend-Ausblick KW 24: Jetzt kaufen, was andere übersehen',
-    intro: 'Es ist Freitag und Cardmarket füllt sich — das Wochenende bringt immer die meisten Transaktionen. Wer strategisch kauft, schaut nicht auf die Top-Seller-Listen (da ist der Hype schon eingepreist), sondern auf die Karten die gerade niemand auf dem Radar hat. Hier ist mein Blick aufs Wochenende.',
+    intro: 'Es ist Freitag und Cardmarket füllt sich — das Wochenende bringt immer die meisten Transaktionen. Wer informiert handelt, schaut nicht nur auf die Top-Seller-Listen (da ist der Hype schon eingepreist), sondern auch auf die Karten die gerade keine Aufmerksamkeit bekommen. Hier ein Überblick zu den Marktdaten des Wochenendes.',
     sections: [
       {
-        heading: 'Kaufgelegenheiten: Diese Karten sind gerade unterbewertet',
-        content: 'Mein Tipp für dieses Wochenende: Schau dir SIRs aus Temporal Forces (SV5, erschienen März 2024 — das Set mit dem Zeitreise-Thema und Raikou/Suicune als Hauptpokémon) an. Die Preise sind nach dem Release-Hype auf ein faires Niveau gefallen und konsolidieren gerade. Walking Wake ex SIR (das violette wasserähnliche legendäre Pokémon, eine Art urzeitliche Suicune-Variante) und Iron Leaves ex SIR (das grüne stachelige Zukunfts-Pokémon, eine futuristische Virizion-Variante) kosten beide unter 50 € und haben starke Artworks. Das könnte sich in 12 Monaten ändern.',
+        heading: 'Karten in der Konsolidierungsphase: Temporal Forces SIRs',
+        content: 'SIRs aus Temporal Forces (SV5, erschienen März 2024 — das Set mit dem Zeitreise-Thema und Raikou/Suicune als Hauptpokémon) haben nach dem Release-Hype auf ein stabilisiertes Niveau gefallen. Walking Wake ex SIR (das violette wasserähnliche legendäre Pokémon, eine Art urzeitliche Suicune-Variante) und Iron Leaves ex SIR (das grüne stachelige Zukunfts-Pokémon, eine futuristische Virizion-Variante) notieren beide unter 50 € und zeigen starke Artworks. Solche Konsolidierungsphasen nach Release-Hype sind historisch gut dokumentiert.',
       },
       {
         heading: 'Was du dieses Wochenende meiden solltest',
         content: 'Finger weg von Karten die gerade in Pokemon-Social-Media viral gehen. Wenn ein Influencer eine Karte promoted, ist der Preis bereits hochgegangen — du kaufst dann oben ein und verkaufst unten. Typisches Muster: Karte wird erwähnt, Preis steigt 20–40 % in 48 Stunden, dann Korrektur. Das gleiche gilt für Karten die in einem gerade laufenden Turnier gespielt werden — Spielerwert hält selten länger als 2–3 Wochen an, wenn das Turnier vorbei ist.',
       },
       {
-        heading: 'Meine Top-3 für das Wochenende',
-        content: '1. Walking Wake ex SIR (Temporal Forces) — unter 45 € kaufenswert. 2. Oinkologne ex SIR (Paldea Evolved) — unter 40 € ein guter Einstieg. 3. Evoli ex SIR (Pokémon 151) — Evoli (das braune süße Basis-Pokémon vor seinen acht Entwicklungen) als SIR ist Pflichtkauf unter 55 €. All diese Karten kaufst du am besten von Cardmarket-Verkäufern mit 99 %+ Bewertung und "Excellent" oder "Near Mint" Zustand. Versand aus Deutschland oder Österreich bevorzugen — schneller und weniger Risiko für Verpackungsschäden.',
+        heading: 'Drei Karten im Fokus dieses Wochenendes',
+        content: '1. Walking Wake ex SIR (Temporal Forces) — notiert unter 45 €, nach Hype-Phase konsolidiert. 2. Oinkologne ex SIR (Paldea Evolved) — Preisniveau unter 40 €, eines der stärksten Artworks des Sets. 3. Evoli ex SIR (Pokémon 151) — Evoli (das braune süße Basis-Pokémon vor seinen acht Entwicklungen) als SIR notiert unter 55 €. Alle drei auf Cardmarket: Verkäufer mit 99 %+ Bewertung und "Excellent" oder "Near Mint" Zustand entsprechen dem Marktstandard. Versand aus Deutschland oder Österreich reduziert Verpackungsrisiken.',
       },
     ],
     keyPoints: [
-      'Temporal Forces SIRs (Walking Wake, Iron Leaves) unter 50 € = Einstieg lohnt sich',
-      'Viral-Karten meiden — Preis ist schon hochgelaufen wenn du es hörst',
-      'Nur NM/Excellent auf Cardmarket, Verkäufer mit 99 %+ Bewertung',
+      'Temporal Forces SIRs (Walking Wake, Iron Leaves) unter 50 € in der Konsolidierungsphase',
+      'Viral-Karten: Preis ist bereits eingepreist wenn die Community darüber spricht',
+      'NM/Excellent auf Cardmarket, Verkäufer mit 99 %+ Bewertung — Marktstandard',
     ],
-    tags: ['wochenend kauftipps', 'temporal forces', 'pokemon cardmarket', 'pokemon karten kaufen'],
+    tags: ['wochenend ausblick', 'temporal forces', 'pokemon cardmarket', 'pokemon marktanalyse'],
     sources: [
       { label: 'Cardmarket — Pokémon Karten kaufen & verkaufen', url: 'https://www.cardmarket.com/en/Pokemon' },
       { label: 'Bulbapedia — Temporal Forces (TCG)', url: 'https://bulbapedia.bulbagarden.net/wiki/Temporal_Forces_(TCG)' },
@@ -167,7 +167,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-13 (Samstag) ── Guide ───────────────────────────────────────────
   '2026-06-13': {
     title: 'PSA Grading: Wann es sich lohnt — und wann du Geld verschwendest',
-    intro: 'PSA 10 — diese zwei Buchstaben und eine Zahl können den Wert einer Karte verdreifachen. Oder dein Geld verbrennen. Nach 15 Jahren und dutzenden eingesendeten Karten kenne ich beide Enden des Spektrums. Heute gibt es die ungeschönte Wahrheit über Card Grading.',
+    intro: 'PSA 10 — diese zwei Buchstaben und eine Zahl können den Wert einer Karte verdreifachen. Oder sie können sich als kostspielige Fehlinvestition erweisen. Hier die wichtigsten Fakten zum Grading und wann es sich lohnt.',
     sections: [
       {
         heading: 'Was Grading überhaupt ist und was PSA 10 bedeutet',
@@ -200,7 +200,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-14 (Sonntag) ── Rückblick ───────────────────────────────────────
   '2026-06-14': {
     title: 'Wochenrückblick KW 24: Was diese Woche über Geduld und Strategie lehrte',
-    intro: 'KW 24 war keine dramatische Woche im Pokémon-Markt — und das ist eine gute Nachricht. Keine dramatischen Spikes, keine Panikverkäufe, kein überhitzter Hype. Genau solche Wochen zeigen, wer langfristig denkt und wer nur auf Aktion wartet. Mein ehrliches Fazit.',
+    intro: 'KW 24 war keine dramatische Woche im Pokémon-Markt — und das ist eine gute Nachricht. Keine dramatischen Spikes, keine Panikverkäufe, kein überhitzter Hype. Genau solche ruhigen Wochen sind aufschlussreich: Die Marktdaten der Woche im Überblick.',
     sections: [
       {
         heading: 'Was diese Woche bestätigt hat',
@@ -211,14 +211,14 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Interessanterweise haben einige ältere Karten aus der Sun & Moon-Ära (2016–2019) Aufmerksamkeit bekommen. Shining Legends Pikachu (aus dem kleineren Supplementset von 2017, mit dem glänzenden Hintergrund) hat auf Cardmarket neue Höchstpreise von über 200 € für PSA-10-Exemplare erzielt. Das ist ein deutliches Signal: Wenn der Hype um Scarlet & Violet-Karten sich normalisiert, schaut der Markt zurück auf ältere Eras. Wer Sun & Moon Shining Fates oder Hidden Fates noch im Portfolio hat: Halten.',
       },
       {
-        heading: 'Mein Plan für die kommende Woche',
-        content: 'Diese Woche war eine Woche zum Beobachten, nicht zum Handeln — und das war richtig so. Nächste Woche schaue ich gezielt auf Temporal Forces (SV5) — die Preise dort haben sich genug stabilisiert um als Einstieg interessant zu sein, ohne dass ich den Post-Release-Hype zahle. Ansonsten: Bestehende Positionen halten, keine voreiligen Verkäufe und die Disziplin aufrechterhalten nicht in viral gegangene Karten zu investieren. Ruhe ist im TCG-Markt eine Stärke.',
+        heading: 'Ausblick auf die kommende Woche',
+        content: 'Diese Woche war eine Woche zum Beobachten — ruhige Phasen haben historisch Berechtigung. Temporal Forces (SV5) rückt in den Fokus — die Preise haben sich seit Release stabilisiert, ohne den Post-Release-Hype eingepreist zu haben. Historisch hat überhastetes Handeln aus Ungeduld im TCG-Markt selten besser abgeschnitten als ruhige Beobachtung. Ruhe ist eine Stärke.',
       },
     ],
     keyPoints: [
-      'Ruhige Wochen belohnen Langzeitdenker — Stagnation ist nicht Verlust',
-      'Sun & Moon Shining-Karten ziehen an — ältere Eras werden wieder interessant',
-      'Temporal Forces SIRs für nächste Woche auf dem Radar',
+      'Ruhige Wochen sind für den Markt normal — Stagnation ist nicht Verlust',
+      'Sun & Moon Shining-Karten ziehen an — ältere Eras werden wieder relevant',
+      'Temporal Forces SIRs nach Konsolidierung beobachtenswert',
     ],
     tags: ['pokemon wochenrückblick', 'tcg markt juni', 'evolving skies', 'sun moon shining'],
     sources: [
@@ -236,7 +236,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Bewegung 1: Positive — 151-Set zieht weiter an',
-        content: 'Das Pokémon 151-Set (sv3pt5, erschienen September 2023 als Hommage an die Original-151-Pokémon) zeigt diese Woche wieder Stärke. Mehrere Chase-Cards haben neue 30-Tages-Hochs auf Cardmarket erreicht. Besonders der Evoli ex SIR (das braune kleine Basisform-Pokémon vor seinen acht Entwicklungen wie Nachtara oder Blitza) zieht an — offenbar gibt es gerade erhöhte Nachfrage von Sammlern die das Set vervollständigen wollen. Wenn du noch Lücken im 151-Set hast: Jetzt schließen ist günstiger als in drei Monaten.',
+        content: 'Das Pokémon 151-Set (sv3pt5, erschienen September 2023 als Hommage an die Original-151-Pokémon) zeigt diese Woche wieder Stärke. Mehrere Chase-Cards haben neue 30-Tages-Hochs auf Cardmarket erreicht. Besonders der Evoli ex SIR (das braune kleine Basisform-Pokémon vor seinen acht Entwicklungen wie Nachtara oder Blitza) zieht an — offenbar gibt es gerade erhöhte Nachfrage von Sammlern die das Set vervollständigen wollen. Die Preise liegen aktuell auf Jahreshoch-Niveau.',
       },
       {
         heading: 'Bewegung 2: Neutral — Paradox Rift SIRs seitwärts',
@@ -248,9 +248,9 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       },
     ],
     keyPoints: [
-      '151-Set zieht an — Evoli ex SIR jetzt günstiger kaufen als in 3 Monaten',
-      'Paradox Rift konsolidiert — Einstieg möglich aber kein Eile',
-      'Promo-Karten-Spikes ignorieren — Hype ohne Fundamentaldaten ist Spekulation',
+      '151-Set auf Jahreshoch — Evoli ex SIR zieht durch Sammler-Nachfrage an',
+      'Paradox Rift konsolidiert — keine starken Preissignale in beide Richtungen',
+      'Promo-Karten-Spikes ohne Fundamentaldaten: historisch kurzlebig',
     ],
     tags: ['pokemon marktanalyse kw25', 'pokemon 151', 'paradox rift', 'tcg investment juni'],
     sources: [
@@ -264,7 +264,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-16 (Dienstag) ── Karte ──────────────────────────────────────────
   '2026-06-16': {
     title: 'Karte unter der Lupe: Charizard ex — warum Glurak nicht aufhört zu steigen',
-    intro: 'Es gibt Karten die man kauft, weil sie gerade heiß sind — und dann gibt es Charizard ex. Glurak (das ist der orange Drache den wirklich jeder kennt, auch deine Oma) ist seit 1998 das meistgesuchte Pokémon im TCG überhaupt. Seine Inkarnation im 151-Set hat etwas geschafft, das nicht viele Karten hinbekommen: Sie hat ihren Post-Release-Tiefpunkt durchlaufen und steigt seitdem konstant.',
+    intro: 'Glurak (das ist der orange Drache den wirklich jeder kennt) ist seit 1998 das meistgesuchte Pokémon im TCG überhaupt. Seine Inkarnation im 151-Set hat etwas geschafft, das nicht viele Karten hinbekommen: Sie hat ihren Post-Release-Tiefpunkt durchlaufen und steigt seitdem konstant. Hier die Marktdaten.',
     sections: [
       {
         heading: 'Was diese Karte so besonders macht',
@@ -275,16 +275,16 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Nach Release lag die Karte kurz bei 80–90 € (der typische Post-Hype-Tiefpunkt wenn der Markt mit Neuware überschwemmt wird). Seitdem klettert sie konstant. Der Grund: Das 151-Set wird nicht ewig nachgedruckt. Jede Woche die vergeht, schrumpft das Angebot auf Cardmarket. Gleichzeitig entdecken neue Pokémon-Fans die Karte — die globale Fangemeinde wächst jährlich um Millionen neue Sammler. Historisch haben Charizard-Karten aus ausgelaufenen Sets nie dauerhaft an Wert verloren. Das ist statistisch bemerkenswert.',
       },
       {
-        heading: 'Kaufen, halten oder warten?',
-        content: 'Meine klare Meinung: Wer diese Karte noch nicht hat und auf Wertzuwachs setzt, sollte jetzt kaufen — nicht warten. Nicht weil ich Preisprognosen verspreche, sondern weil die Fundamentaldaten stimmen: Ikonisches Pokémon, limitiertes Set, starke Fangemeinde, herausragendes Artwork. Einen Kauf unter 150 € für ein Near-Mint-Exemplar würde ich als fairen Einstieg betrachten. Achte auf den Cardmarket-Zustand "Near Mint" und kaufe nur bei Verkäufern mit guter Bewertung. PSA-10-Exemplare kosten 250–350 € — für Langzeitsammler der optimalste Weg.',
+        heading: 'Marktlage und Preiseinordnung',
+        content: 'Die Fundamentaldaten dieser Karte sind unverändert: Ikonisches Pokémon, limitiertes Set, starke Fangemeinde, herausragendes Artwork. Aktuell notiert die Karte bei 130–150 € für Near-Mint-Exemplare — eine Preiszone die der Markt als fair akzeptiert hat. Auf Cardmarket sind Zustand "Near Mint" und Verkäuferbewertung die wichtigsten Qualitätskriterien. PSA-10-Exemplare notieren bei 250–350 € — der höchste Qualitätsstandard für Langzeitsammler.',
       },
     ],
     keyPoints: [
       'Charizard ex SIR (151) — Fundamentaldaten stimmen, kein reiner Hype',
-      'Post-Release-Tiefpunkte sind Kaufmöglichkeiten, keine Alarmsignale',
-      'Unter 150 € NM = fairer Einstieg; PSA 10 für 250–350 € langfristig optimal',
+      'Post-Release-Tiefpunkte zeigen das historische Preismuster',
+      'NM bei 130–150 €; PSA 10 für 250–350 € — Qualität bestimmt den Preis',
     ],
-    tags: ['charizard ex', 'pokemon 151', 'special illustration rare', 'glurak investment'],
+    tags: ['charizard ex', 'pokemon 151', 'special illustration rare', 'glurak analyse'],
     sources: [
       { label: 'Cardmarket — Charizard ex Preishistorie', url: 'https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=Charizard+ex' },
       { label: 'Bulbapedia — Pokémon 151 (TCG)', url: 'https://bulbapedia.bulbagarden.net/wiki/Scarlet_%26_Violet%E2%80%94151_(TCG)' },
@@ -296,11 +296,11 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-17 (Mittwoch) ── Strategie ──────────────────────────────────────
   '2026-06-17': {
     title: 'Die 3-Stufen-Strategie: So baust du ein Portfolio das wirklich wächst',
-    intro: 'Die meisten Leute machen es falsch: Sie öffnen Packs (macht Spaß, vernichtet Kapital), kaufen was gerade heiß ist (kauft man oben) oder horten hunderte günstige Karten (Masse statt Klasse). Nach 15 Jahren im Markt habe ich gesehen was wirklich funktioniert — und es ist verblüffend einfach. Hier ist die Strategie die ich selbst anwende.',
+    intro: 'Die meisten Einsteiger machen ähnliche Fehler: Sie öffnen Packs (macht Spaß, vernichtet Kapital), kaufen was gerade heiß ist (kauft man oben) oder horten hunderte günstige Karten (Masse statt Klasse). Die Marktdaten zeigen seit Jahren, was funktioniert — und es ist verblüffend einfach.',
     sections: [
       {
         heading: 'Stufe 1 — Das Fundament: 1–2 Blue-Chip-Karten',
-        content: 'Genau wie im Aktienmarkt gibt es "Blue Chips" — Karten die so ikonisch und so gefragt sind, dass sie fast unmöglich dauerhaft fallen. Das sind Charizard, Pikachu, Mewtu und Evoli-Entwicklungen in ihren Top-Versionen (SIR, Alternate Art, historische Holos). Diese Karten nehmen 60 % deines Budgets ein. Sie sind dein Anker. Du kaufst sie in Near-Mint-Zustand, steckst sie in einen Magnethalter und vergisst sie für 2–3 Jahre. Ich habe nie eine Blue-Chip-Position bereut die ich 3+ Jahre gehalten habe.',
+        content: 'Genau wie im Aktienmarkt gibt es "Blue Chips" — Karten die so ikonisch und so gefragt sind, dass sie fast unmöglich dauerhaft fallen. Das sind Charizard, Pikachu, Mewtu und Evoli-Entwicklungen in ihren Top-Versionen (SIR, Alternate Art, historische Holos). Diese Karten nehmen 60 % des Budgets ein. Gekauft in Near-Mint-Zustand, in einen Magnethalter gesteckt und für 2–3 Jahre gehalten — so funktioniert das Fundament.',
       },
       {
         heading: 'Stufe 2 — Das Wachstum: 2–3 aktuelle SIRs kurz nach Release',
@@ -339,14 +339,14 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Die vier wertvollsten Karten des Sets sind Charizard ex SIR (120–145 €), Mewtu ex SIR (80–95 €), Pikachu ex SIR (55–70 €) und Evoli ex SIR (50–65 €). Alle vier haben nach ihrem Post-Release-Tiefpunkt nachhaltig zugelegt. Warum? Das 151-Set wird nicht mehr aktiv gedruckt — das Angebot an frischen Packs schrumpft. Und die globale Nachfrage nach nostalgiebehafteten Pokémon hört nicht auf. Hinzu kommt: Viele Menschen kaufen diese Karten als emotionale Verbindung zur Kindheit, nicht als rationales Investment. Emotional getriebene Nachfrage ist besonders stabil.',
       },
       {
-        heading: 'Sealed oder Einzelkarten — was lohnt sich mehr?',
-        content: 'Wenn du eine bestimmte Karte willst: kaufe die Einzelkarte direkt auf Cardmarket. Packs öffnen ist statistisch immer teurer als der Direktkauf. Eine Charizard ex SIR einzeln für 130 € kostet weniger als die durchschnittlichen Packs-Kosten um sie zu ziehen (statistisch 15+ Boosterboxen, das sind über 500 €). Wenn du auf Wertzuwachs aus bist und Geduld hast: Eine versiegelte Boosterbox des 151-Sets ist eine solide langfristige Position. Sets mit dieser Nostalgiepower haben historisch immer weiter zugelegt wenn die Produktion endet.',
+        heading: 'Sealed oder Einzelkarten — was zeigen die Preisdaten?',
+        content: 'Wer eine bestimmte Karte sucht: Der Direktkauf auf Cardmarket ist statistisch immer günstiger als das Öffnen von Packs. Eine Charizard ex SIR für 130 € kostet weniger als der statistische Durchschnittseinsatz beim Öffnen (15+ Boosterboxen = über 500 €). Versiegelte Boosterboxen des 151-Sets haben seit Produktionsende weiter zugelegt — ein historisch konsistentes Muster bei Sets mit starkem Nostalgiewert.',
       },
     ],
     keyPoints: [
-      'Alle Original-151 als SIRs — einmalige Nostalgiepower die emotional bindet',
+      'Alle Original-151 als SIRs — einmalige Nostalgiepower im modernen TCG',
       'Top-4: Charizard, Mewtu, Pikachu, Evoli — alle mit nachhaltigem Preisanstieg',
-      'Einzelkarten effizienter als Packs öffnen; sealed nur für Geduldige (3+ Jahre)',
+      'Einzelkauf statistisch effizienter als Packs öffnen; sealed für Langzeitperspektive',
     ],
     tags: ['pokémon 151', 'sv3pt5', 'scarlet violet set analyse', 'charizard ex sir'],
     sources: [
@@ -361,15 +361,15 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-19 (Freitag) ── Ausblick ────────────────────────────────────────
   '2026-06-19': {
     title: 'Wochenend-Ausblick: Was Sammler & Investoren jetzt wissen sollten',
-    intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket — Käufer haben Zeit zum Stöbern, Verkäufer optimieren ihre Preise. Als jemand der seit Jahren jeden Samstag den Markt beobachtet, habe ich gelernt: Kleine Informationsvorteile machen den Unterschied. Hier ist was du dieses Wochenende wissen solltest.',
+    intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket — Käufer haben Zeit zum Stöbern, Verkäufer optimieren ihre Preise. Aktuelle Marktdaten zeigen klare Muster. Hier ein Überblick zu den wichtigsten Entwicklungen.',
     sections: [
       {
         heading: 'Kaufen: Diese Karten sind gerade in der Bodenbildungsphase',
-        content: 'Schau dir gezielt SIRs von Pokémon an die in den letzten 2–3 Wochen keine großen Preisbewegungen hatten — das sind oft Karten in einer Konsolidierungsphase. Besonders interessant: Alternate-Art-Karten aus Evolving Skies (SWSH7, das 2021er Set mit Drachenpokémon und Eevee-Entwicklungen), die seitdem konstant steigen. Rayquaza VMAX Alt Art (das riesige grüne Atmosphären-Drachen-Pokémon) und Umbreon VMAX Alt Art (das schwarze Nacht-Pokémon mit gelben Ringen) sind Klassiker. Wer sie noch nicht hat, zahlt am Wochenende wahrscheinlich weniger als in zwei Wochen.',
+        content: 'SIRs von Pokémon die in den letzten 2–3 Wochen keine großen Preisbewegungen hatten, befinden sich oft in einer Konsolidierungsphase. Alternate-Art-Karten aus Evolving Skies (SWSH7, das 2021er Set mit Drachenpokémon und Eevee-Entwicklungen) zeigen seit Jahren konstante Preissteigerungen. Rayquaza VMAX Alt Art (das riesige grüne Atmosphären-Drachen-Pokémon) und Umbreon VMAX Alt Art (das schwarze Nacht-Pokémon mit gelben Ringen) sind Klassiker — mit seit Jahren dokumentierten Preisanstiegen.',
       },
       {
-        heading: 'Halten oder verkaufen: Wann du Gewinne mitnehmen solltest',
-        content: 'Falls du Karten aus einem Set hast das gerade erst erschienen ist und stark im Preis gestiegen ist: Überlege genau. Die ersten 4–8 Wochen nach einem Set-Release sind die volatilste Phase — danach kommt fast immer eine Korrektur wenn der Markt mit Neuware geflutet wird. Klassiker aus ausgelaufenen Sets hältst du weiter — die brauchen Zeit, kein aktives Management. Eine gute Regel: Verkaufe nie aus Ungeduld, verkaufe nie in Panik. Beide Entscheidungen bereust du statistisch öfter als du denkst.',
+        heading: 'Nach Hype-Spikes: Historische Marktmuster',
+        content: 'Karten aus Sets die gerade erst erschienen sind und stark im Preis gestiegen sind, durchlaufen historisch eine Korrektur wenn der Markt mit Neuware geflutet wird — die ersten 4–8 Wochen nach Release sind die volatilste Phase. Klassiker aus ausgelaufenen Sets zeigen ein anderes Muster: konstante, ruhige Preisentwicklung ohne aktives Management. Die Statistik zeigt: Übereiltes Handeln aus Ungeduld oder Panik liefert selten bessere Ergebnisse als ruhige Beobachtung.',
       },
       {
         heading: 'Diese Woche im Auge behalten: Signale lesen',
@@ -377,11 +377,11 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       },
     ],
     keyPoints: [
-      'Evolving Skies Alts (Rayquaza, Umbreon) in Bodenbildungsphase — Kaufchance',
-      'Verkaufe nie aus Ungeduld oder Panik — beide Entscheidungen bereust du',
-      'Sinkende Angebotsmenge auf Cardmarket = nächster Preisanstieg in Sicht',
+      'Evolving Skies Alts (Rayquaza, Umbreon) in Konsolidierungsphase — historisch steigend',
+      'Release-Karten: 4–8 Wochen volatilste Phase, dann historisch Korrektur',
+      'Sinkende Angebotsmenge auf Cardmarket = klassisches Preisanstieg-Signal',
     ],
-    tags: ['wochenend ausblick', 'pokemon kauftipps', 'evolving skies', 'cardmarket strategie'],
+    tags: ['wochenend ausblick', 'pokemon marktanalyse', 'evolving skies', 'cardmarket analyse'],
     sources: [
       { label: 'Cardmarket — Pokémon Marktpreise', url: 'https://www.cardmarket.com/en/Pokemon' },
       { label: 'Bulbapedia — Evolving Skies (TCG)', url: 'https://bulbapedia.bulbagarden.net/wiki/Evolving_Skies_(TCG)' },
@@ -393,7 +393,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-20 (Samstag) ── Guide ───────────────────────────────────────────
   '2026-06-20': {
     title: 'Pokémon-Karten richtig lagern: So erhältst du den Wert über Jahre',
-    intro: 'Du hast 200 € in eine Charizard ex SIR investiert — und legst sie dann in eine Schublade wo sie vergilbt, krumm wird und Kratzer bekommt. Ein teurer Fehler den ich in meiner Anfangszeit selbst gemacht habe. Karten richtig zu lagern ist genauso wichtig wie die richtige Karte zu kaufen. Hier ist was wirklich funktioniert.',
+    intro: 'Du hast 200 € in eine Charizard ex SIR investiert — und legst sie dann in eine Schublade wo sie vergilbt, krumm wird und Kratzer bekommt. Karten richtig zu lagern ist genauso wichtig wie die richtige Karte zu wählen. Hier die wichtigsten Methoden zum Werterhalt im Überblick.',
     sections: [
       {
         heading: 'Die Basics: Sleeve, Toploader, Magnethalter',
@@ -426,7 +426,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-21 (Sonntag) ── Rückblick ───────────────────────────────────────
   '2026-06-21': {
     title: 'Wochenrückblick KW 25: Das 151-Set läuft einfach — und ich hab mal wieder zu spät gedrückt',
-    intro: 'KW 25 war eine von diesen Wochen, die ruhig wirken, aber im Hintergrund mehr passiert als man denkt. Ich habe eine Kaufgelegenheit knapp verpasst, ein alter Liebling hat mal wieder alle überrascht, und die Pokémon-Turnierwelt dreht grade ordentlich auf. Mein ehrliches Fazit — inklusive persönlicher Fehlerbeichte.',
+    intro: 'KW 25 war eine von diesen Wochen, die ruhig wirken, aber im Hintergrund mehr passiert als man denkt. Ein alter Liebling hat mal wieder alle überrascht, die Pokémon-Turnierwelt dreht ordentlich auf — und ein klassisches Marktmuster hat sich wieder einmal gezeigt. Die Marktbeobachtungen der Woche.',
     sections: [
       {
         heading: '🌍 Was in der Pokémon-Welt passiert ist',
@@ -437,18 +437,18 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
         content: 'Glurak (der orange Drache den wirklich alle kennen — selbst Leute, die noch nie eine Karte in der Hand hatten) hat diese Woche wieder bewiesen warum er der unerschütterliche König des TCG-Markts ist. Der Charizard ex Special Illustration Rare aus dem 151-Set (das Nostalgie-Comeback-Set für die Original-151-Pokémon) notiert auf Cardmarket knapp unter seinem Jahreshoch. Das Set ist über zwei Jahre alt, wird nicht mehr gedruckt — und trotzdem steigt die Karte. Kein viraler Moment, kein Hype-Auslöser. Nur echte Sammler, die echte Qualität kaufen. Das ist der Unterschied.',
       },
       {
-        heading: '😅 Mein Fehler der Woche — damit du ihn nicht machst',
-        content: 'Ich wollte eine Tinkaton ex SIR kaufen (das rosafarbene Pokémon mit dem riesigen Metallhammer aus Paldea Evolved — man kann es nicht nicht mögen). Letzte Woche: Angebote bei 42 € auf Cardmarket. Ich: "Ich warte auf 38 €." Diese Woche: 48–52 €. Das klassische Warte-auf-den-perfekten-Preis-Muster, das ich eigentlich seit Jahren kenne und trotzdem immer wieder mache. Die Lektion: Wenn ein Preis fair ist und du die Karte wirklich haben willst — kauf sie. Den perfekten Einstieg gibt es nicht. Den gibt es nie. Und beim nächsten Mal denke ich genauso wieder drüber nach.',
+        heading: '😅 Klassischer Marktfehler der Woche',
+        content: 'Ein gut dokumentiertes Muster hat sich diese Woche wieder gezeigt: Tinkaton ex SIR (das rosafarbene Pokémon mit dem riesigen Metallhammer aus Paldea Evolved) notierte letzte Woche bei 42 € auf Cardmarket. Diese Woche: 48–52 €. Das klassische Warte-auf-den-perfekten-Preis-Muster — in der Community gut bekannt, trotzdem häufig zu beobachten. Die Marktbeobachtung: Wenn ein Preis dem fairen Niveau entspricht, bewegt sich der Markt oft weiter, bevor der "perfekte Einstieg" kommt.',
       },
       {
-        heading: '🔮 Meine Prognose für nächste Woche',
-        content: 'Surging Sparks (SV8, das Pikachu-Themen-Set von November 2024) rückt in mein Sichtfeld. Der Pikachu ex SIR daraus kostet gerade weniger als die Version aus dem 151-Set — bei ähnlicher Kunstwerk-Qualität. Das riecht nach Unterbewertung. Pikachu bleibt Pikachu — das ändert sich nicht. Ich werde nächste Woche schauen, ob das Angebotsniveau auf Cardmarket sinkt. Wenn ja: kaufen. Wenn nicht: weiter beobachten. Keine Eile, aber das Auge bleibt drauf.',
+        heading: '🔮 Prognose: Was nächste Woche auffallen könnte',
+        content: 'Surging Sparks (SV8, das Pikachu-Themen-Set von November 2024) zeigt eine interessante Preiskonstellation. Der Pikachu ex SIR daraus kostet gerade weniger als die Version aus dem 151-Set — bei ähnlicher Kunstwerk-Qualität. Das Angebotsniveau auf Cardmarket verdient Beobachtung: Sinkendes Angebot bei stabiler Nachfrage wäre ein klassisches Signal. Pikachu bleibt Pikachu — das ändert sich nicht.',
       },
     ],
     keyPoints: [
-      'Charizard ex SIR (151) auf Jahreshoch — ohne Hype, nur echte Nachfrage',
-      'Zu lang auf "38 €" warten und statt 42 € jetzt 50 € zahlen müssen — klassisch',
-      'Surging Sparks Pikachu ex SIR: mögliche Unterbewertung, nächste Woche prüfen',
+      'Charizard ex SIR (151) auf Jahreshoch — keine Hype-Treiber, nur organische Nachfrage',
+      'Tinkaton ex SIR: von 42 € auf 50 € in einer Woche — klassisches Warte-Muster sichtbar',
+      'Surging Sparks Pikachu ex SIR: günstig vs. 151-Version — Preislücke im Blick',
     ],
     tags: ['wochenrückblick kw25', 'pokemon 151', 'charizard ex', 'surging sparks', 'pokemon investment'],
     sources: [
