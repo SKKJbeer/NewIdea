@@ -1,90 +1,89 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap, LayoutDashboard, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import type { Lang } from '@/lib/i18n';
+import { usePathname } from 'next/navigation';
+import { Zap, Search, BookOpen, BarChart2, Newspaper } from 'lucide-react';
+
+const NAV_LINKS = [
+  { href: '/suche',        label: 'Suche',       icon: Search    },
+  { href: '/marktbericht', label: 'Markt',        icon: BarChart2 },
+  { href: '/artikel',      label: 'Blog',         icon: Newspaper },
+  { href: '/guides',       label: 'Guides',       icon: BookOpen  },
+];
 
 export function NavBar() {
-  const router = useRouter();
-  const [lang, setLang] = useState<Lang>('de');
-
-  useEffect(() => {
-    const match = document.cookie.match(/(?:^|; )lang=(de|en)/);
-    if (match?.[1] === 'en') setLang('en');
-  }, []);
-
-  function toggleLang() {
-    const next = lang === 'de' ? 'en' : 'de';
-    document.cookie = `lang=${next};path=/;max-age=31536000;SameSite=Lax`;
-    setLang(next);
-    router.refresh();
-  }
+  const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-lg flex items-center justify-center">
-            <Zap size={14} className="text-yellow-300 fill-yellow-300" />
+    <>
+      {/* Top bar — logo only on mobile, full nav on desktop */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-7 h-7 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-lg flex items-center justify-center">
+              <Zap size={14} className="text-yellow-300 fill-yellow-300" />
+            </div>
+            <span className="font-black text-gray-900 text-sm">
+              Pokémon<span className="text-violet-600">Market</span>
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="hidden sm:flex items-center gap-1">
+            {NAV_LINKS.map(({ href, label }) => {
+              const active = pathname === href || pathname.startsWith(href + '/');
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`text-sm font-semibold px-3 py-2 rounded-lg transition-colors ${
+                    active
+                      ? 'text-violet-700 bg-violet-50'
+                      : 'text-gray-600 hover:text-violet-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </div>
-          <span className="font-black text-gray-900 text-sm">
-            Pokémon<span className="text-violet-600">Market</span>
-          </span>
-        </Link>
 
-        <div className="flex items-center gap-1">
-          <Link
-            href="/suche"
-            className="flex items-center gap-1 text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5"
-          >
-            <Search size={13} />
-            <span className="hidden sm:inline">{lang === 'de' ? 'Suche' : 'Search'}</span>
-          </Link>
-          <Link
-            href="/marktbericht"
-            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
-          >
-            {lang === 'de' ? 'Marktbericht' : 'Market Report'}
-          </Link>
-          <Link
-            href="/artikel"
-            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/guides"
-            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
-          >
-            Guides
-          </Link>
-          <a
-            href="#newsletter"
-            className="text-xs font-semibold text-gray-600 hover:text-violet-600 transition-colors px-2.5 py-1.5 hidden sm:block"
-          >
-            Newsletter
-          </a>
-
-          {/* Language toggle */}
-          <button
-            onClick={toggleLang}
-            title={lang === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
-            className="text-xs font-bold text-gray-500 hover:text-violet-600 transition-colors px-2 py-1.5 border border-gray-200 rounded-lg hover:border-violet-300 ml-1"
-          >
-            {lang === 'de' ? 'EN' : 'DE'}
-          </button>
-
+          {/* Desktop Studio link — subtle */}
           <Link
             href="/studio"
-            className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ml-1"
+            className="hidden sm:block text-xs font-semibold text-gray-400 hover:text-violet-600 transition-colors px-2 py-1.5"
           >
-            <LayoutDashboard size={13} />
-            Studio
+            Studio ⚙
           </Link>
         </div>
+      </nav>
+
+      {/* Mobile bottom tab bar */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-[0_-1px_6px_rgba(0,0,0,0.06)]">
+        <div className="flex items-stretch h-16">
+          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || pathname.startsWith(href + '/');
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors ${
+                  active ? 'text-violet-600' : 'text-gray-400'
+                }`}
+              >
+                <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
+                <span className={`text-[10px] font-semibold ${active ? 'text-violet-600' : 'text-gray-400'}`}>
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
-    </nav>
+
+      {/* Spacer so content doesn't hide behind bottom tab bar on mobile */}
+      <div className="sm:hidden h-16" />
+    </>
   );
 }
