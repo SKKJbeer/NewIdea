@@ -5,18 +5,24 @@ import { germanToEnglishName, englishToGermanName } from './pokemon-names-de';
 const TCG_API_BASE = 'https://api.pokemontcg.io/v2';
 const CARDMARKET_BASE = 'https://api.cardmarket.com/ws/v2.0';
 
+// Only send the API key header if a key is actually configured.
+// An empty X-Api-Key header causes the API to return 403; no header = free-tier access.
+function tcgHeaders(): Record<string, string> {
+  const key = process.env.POKEMON_TCG_API_KEY;
+  return key ? { 'X-Api-Key': key } : {};
+}
+
 export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
   const sets = ['sv8', 'sv7', 'sv6', 'sv5', 'sv4'];
   const randomSet = sets[Math.floor(Math.random() * sets.length)];
 
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
-    headers: {
-      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
-    },
+    headers: { ...tcgHeaders() },
     params: {
       q: `set.id:${randomSet} (rarity:"Rare Holo" OR rarity:"Rare Ultra" OR rarity:"Special Illustration Rare")`,
       pageSize: limit,
     },
+    timeout: 8000,
   });
 
   const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
@@ -30,7 +36,7 @@ export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
 export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: {
-      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
+      ...tcgHeaders(),
     },
     params: {
       q: `set.id:${setCode}`,
@@ -47,22 +53,32 @@ export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
 }
 
 export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
-  const response = await axios.get(`${TCG_API_BASE}/cards`, {
-    headers: {
-      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
-    },
-    params: {
-      q: '(rarity:"Special Illustration Rare" OR rarity:"Hyper Rare")',
-      pageSize: limit,
-    },
-  });
+  const queries = [
+    '(rarity:"Special Illustration Rare" OR rarity:"Hyper Rare")',
+    'rarity:"Rare Holo EX"',
+    'set.id:sv8',
+  ];
 
-  const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
-  return cards.sort((a, b) => {
-    const pa = a.prices.market || a.prices.holofoil?.market || 0;
-    const pb = b.prices.market || b.prices.holofoil?.market || 0;
-    return pb - pa;
-  });
+  for (const q of queries) {
+    try {
+      const response = await axios.get(`${TCG_API_BASE}/cards`, {
+        headers: { ...tcgHeaders() },
+        params: { q, pageSize: limit },
+        timeout: 8000,
+      });
+      const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
+      if (cards.length > 0) {
+        return cards.sort((a, b) => {
+          const pa = a.prices.market || a.prices.holofoil?.market || 0;
+          const pb = b.prices.market || b.prices.holofoil?.market || 0;
+          return pb - pa;
+        });
+      }
+    } catch {
+      // Try next query
+    }
+  }
+  return [];
 }
 
 export async function searchCards(query: string, limit = 30): Promise<PokemonCard[]> {
@@ -77,7 +93,7 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   const escaped = translated.replace(/"/g, '');
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: {
-      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
+      ...tcgHeaders(),
     },
     params: {
       q: `name:"*${escaped}*"`,
@@ -99,7 +115,7 @@ export async function fetchCardById(id: string): Promise<PokemonCard | null> {
   try {
     const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {
       headers: {
-        'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
+        ...tcgHeaders(),
       },
     });
     return mapApiCardToCard(response.data.data);
@@ -111,7 +127,7 @@ export async function fetchCardById(id: string): Promise<PokemonCard | null> {
 export async function fetchRecentSets(): Promise<Array<{ id: string; name: string; releaseDate: string }>> {
   const response = await axios.get(`${TCG_API_BASE}/sets`, {
     headers: {
-      'X-Api-Key': process.env.POKEMON_TCG_API_KEY || '',
+      ...tcgHeaders(),
     },
     params: {
       orderBy: '-releaseDate',

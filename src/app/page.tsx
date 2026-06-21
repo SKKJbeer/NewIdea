@@ -41,6 +41,7 @@ export default async function Home() {
 
   try {
     cards = await fetchTopValueCards(50);
+    if (cards.length === 0) error = true;
   } catch {
     error = true;
   }
@@ -83,7 +84,9 @@ export default async function Home() {
             <span className="text-xl">⚠️</span>
             <div>
               <p className="font-semibold">Kartendaten momentan nicht verfügbar</p>
-              <p className="mt-1 text-xs text-amber-600">Bitte später erneut versuchen.</p>
+              <p className="mt-1 text-xs text-amber-600">
+                TCG-API nicht erreichbar — bitte <code className="font-mono">POKEMON_TCG_API_KEY</code> in Vercel prüfen oder kurz warten.
+              </p>
             </div>
           </div>
         )}
