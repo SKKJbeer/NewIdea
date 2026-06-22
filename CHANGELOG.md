@@ -7,6 +7,28 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.0] — 2026-06-22 · Portfolio Premium-UI: Clean-Look, Segmented Control, Badges
+
+### Neu
+- Segmented-Control-Pills für Zeitraum (1D/1W/1M/3M/1Y) — iOS-Stil mit weißem aktiven Pill auf grauem Track
+- Sprach-Badge `[EN]` als kleines, dezentes Chip-Element in der Positions-Liste (kein Emoji + Freitext mehr)
+- Karten-Thumbnails mit `rounded-md overflow-hidden`-Container — einheitliches Seitenverhältnis
+
+### Geändert
+- Farbpalette: Violett vollständig entfernt — einheitliches Farbkonzept: Grau-900 als primäre Akzentfarbe, Grün/Rot nur für finanzielle Daten
+- Chart: Y-Achsen-Labels entfernt (shortEur max/min) — cleaner, moderner Look ohne ablenkende Overlay-Texte
+- Chart: Linienstärke auf 2px reduziert, Gradient-Opacity auf 0.18 — subtiler, professioneller
+- Hero-Bereich: Mehr vertikales Breathing-Room für den Haupt-Portfoliowert (46px Schrift, mehr mb)
+- P&L-Zeile: Ohne TrendingUp/Down-Icon — reine Zahlen wie bei Trade Republic
+- `+ Karte`-Button → `+ Position` als dunkles Pill (`bg-gray-900 rounded-full`)
+- Positionen-Beschriftung: `1× · 64,76 € · 22.06.26` als kompakte, lesbare Metadaten-Zeile
+- Alle Formular-Labels: `uppercase tracking-wider` für einheitliches Premium-Formular-Styling
+- Focus-States: `focus:border-gray-900 focus:ring-1 focus:ring-gray-200` statt Violett
+- Modal-Karten-Preview: `bg-gray-50` statt `bg-violet-50`
+- LangPicker-Aktiv-State: `bg-gray-900 text-white border-gray-900` statt Violett
+
+---
+
 ## [2.3.0] — 2026-06-22 · Chart-Redesign (Custom SVG), Mobile-Modal-Fix, Portfolio-Tests
 
 ### Neu

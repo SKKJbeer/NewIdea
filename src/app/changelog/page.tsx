@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.0',
+    date: '22. Juni 2026',
+    label: 'Portfolio Premium-UI: Clean-Look, Segmented Control, Badges',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Segmented-Control für Zeitraum-Auswahl (iOS-Pill-Stil)' },
+      { type: 'new',     text: 'Sprach-Badge [EN/DE/JP/KR] als kleiner Chip — kein Emoji-Freitext mehr' },
+      { type: 'changed', text: 'Violett komplett entfernt — Grau-900 als einzige Akzentfarbe' },
+      { type: 'changed', text: 'Chart: Y-Achsen-Labels entfernt für cleanen Look' },
+      { type: 'changed', text: 'P&L-Zeile ohne Icons — reine Zahlen, Trade Republic-Stil' },
+      { type: 'changed', text: '+ Karte → + Position als dunkles Pill-Button' },
+    ],
+  },
+  {
     version: '2.3.0',
     date: '22. Juni 2026',
     label: 'Chart-Redesign (Custom SVG), Mobile-Modal-Fix, Portfolio-Tests',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Custom SVG Chart — kein Recharts, cubic-bezier, Gradient, Mouse+Touch-Crosshair' },
       { type: 'new',     text: 'src/lib/portfolio.ts — pure Business-Logic, vollständig testbar' },
