@@ -103,6 +103,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.1.3 | Portfolio: Edit-Modal, Chart-Fix (purchaseDate), Y-Achse, 5 Zeitbereiche |
 | v2.1.4 | Lückenlose Release-Dokumentation (CHANGELOG.md, /changelog-Seite, CLAUDE.md) |
 | v2.1.5 | Portfolio NavBar überall + Suche 20 Ergebnisse statt 6 |
+| v2.1.6 | Bugfix: Versionsnummer im Footer (falsche env var) |
 | fix | Vercel `buildCommand: next build` — behebt Deployment-Blockade seit v1.9.0 |
 
 ---

@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.1.6] — 2026-06-22 · Bugfix: Versionsnummer im Footer
+
+### Behoben
+- Footer zeigte keine Version — `NEXT_PUBLIC_APP_VERSION` (nicht gesetzt) ersetzt durch `npm_package_version` (von npm beim Build automatisch gesetzt)
+
+---
+
 ## [2.1.5] — 2026-06-22 · Portfolio: NavBar + Suche 20 Ergebnisse
 
 ### Neu

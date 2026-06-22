@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.1.6',
+    date: '22. Juni 2026',
+    label: 'Bugfix: Versionsnummer im Footer',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Footer zeigte keine Version — NEXT_PUBLIC_APP_VERSION (nicht gesetzt) durch npm_package_version ersetzt' },
+    ],
+  },
+  {
     version: '2.1.5',
     date: '22. Juni 2026',
     label: 'Portfolio: NavBar + Suche 20 Ergebnisse',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'NavBar im Portfolio auf allen Zuständen — Nutzer nicht mehr eingeschlossen' },
       { type: 'new',   text: 'Suche im Karte-hinzufügen-Modal: bis zu 20 Ergebnisse (vorher 6)' },
