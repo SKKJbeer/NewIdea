@@ -71,6 +71,7 @@ export default function PortfolioPage() {
   const [liveData, setLiveData] = useState<Record<string, LiveCard>>({});
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [showReset, setShowReset] = useState(false);
   const [timeRange, setTimeRange] = useState<'1W' | '1M'>('1M');
 
   // Load portfolio from localStorage after mount
@@ -105,6 +106,11 @@ export default function PortfolioPage() {
 
   function removeHolding(cardId: string) {
     saveHoldings(holdings.filter((h) => h.cardId !== cardId));
+  }
+
+  function resetPortfolio() {
+    saveHoldings([]);
+    setShowReset(false);
   }
 
   function adjustQty(cardId: string, delta: number) {
@@ -177,6 +183,13 @@ export default function PortfolioPage() {
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Mein Portfolio</p>
             <div className="flex items-center gap-2">
               {loading && <Loader2 size={13} className="animate-spin text-gray-300" />}
+              <button
+                onClick={() => setShowReset(true)}
+                className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                title="Portfolio zurücksetzen"
+              >
+                <Trash2 size={14} />
+              </button>
               <button
                 onClick={() => setShowAdd(true)}
                 className="flex items-center gap-1 text-xs font-bold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-lg transition-colors"
@@ -403,6 +416,36 @@ export default function PortfolioPage() {
 
       {showAdd && (
         <AddCardModal holdings={holdings} onAdd={saveHoldings} onClose={() => setShowAdd(false)} />
+      )}
+
+      {showReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowReset(false)} />
+          <div className="relative bg-white w-full max-w-sm rounded-3xl shadow-2xl z-10 p-6 text-center">
+            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={24} className="text-red-500" />
+            </div>
+            <h2 className="text-lg font-black text-gray-900 mb-2">Portfolio zurücksetzen?</h2>
+            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+              Alle {holdings.length} Position{holdings.length !== 1 ? 'en werden' : ' wird'} unwiderruflich gelöscht.
+              Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowReset(false)}
+                className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={resetPortfolio}
+                className="flex-1 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors"
+              >
+                Alles löschen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
