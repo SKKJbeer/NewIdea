@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.2.0',
+    date: '22. Juni 2026',
+    label: 'Sprachspezifische Preise: EN / DE / JP / KR',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Cardmarket OAuth 1.0 API-Client — echte Preise für EN, DE, JP, KR' },
+      { type: 'new',     text: 'Sprachauswahl beim Hinzufügen/Bearbeiten (🇬🇧 🇩🇪 🇯🇵 🇰🇷)' },
+      { type: 'new',     text: 'Sprach-Flag-Badge auf jedem Karten-Bild in der Holdings-Liste' },
+      { type: 'changed', text: '/api/portfolio/prices: neues Format { cards: [{id, language, name}] }' },
+      { type: 'changed', text: 'Bestandsdaten in localStorage auf language: EN normalisiert (rückwärtskompatibel)' },
+    ],
+  },
+  {
     version: '2.1.7',
     date: '22. Juni 2026',
     label: 'Portfolio-Chart: sofortige Anzeige, keine Animation',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Chart-Animation deaktiviert — reagiert sofort statt 1–2 Sek. Verzögerung bei jedem Update' },
       { type: 'fixed', text: 'Chart zeigt sofort Kaufpreis-Fallback bevor die API antwortet — kein leerer Zustand mehr' },

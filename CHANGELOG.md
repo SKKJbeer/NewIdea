@@ -7,6 +7,23 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.2.0] — 2026-06-22 · Sprachspezifische Preise: EN / DE / JP / KR
+
+### Neu
+- Cardmarket OAuth 1.0 API-Client (`src/lib/cardmarket-api.ts`) — liefert sprachspezifische Marktpreise (Median EX+) für EN, DE, JP, KR
+- Sprachauswahl beim Hinzufügen und Bearbeiten jeder Karte (4 Flaggen-Buttons: 🇬🇧 EN · 🇩🇪 DE · 🇯🇵 JP · 🇰🇷 KR)
+- Sprach-Flag-Badge auf jedem Karten-Bild in der Holdings-Liste
+- Sprachname in der Karten-Infozeile (z.B. „3× · à 45,00 € · 15.06.26 · Japanisch")
+- `/api/portfolio/prices` akzeptiert jetzt `{ cards: [{id, language, name}] }` — ruft bei EN Cardmarket EUR (wie bisher), bei DE/JP/KR echten Cardmarket-Preis für diese Sprache
+- Graceful Fallback: ohne `CARDMARKET_*` Env-Variablen weiter Cardmarket EUR für EN-Karten
+- Bestehende localStorage-Daten werden auf `language: 'EN'` normalisiert (rückwärtskompatibel)
+
+### Geändert
+- `PortfolioHolding` Interface: neues Pflichtfeld `language: CardLanguage`
+- Portfolio Price API: Legacy `{ cardIds }` Format weiterhin unterstützt (rückwärtskompatibel)
+
+---
+
 ## [2.1.7] — 2026-06-22 · Portfolio-Chart: sofortige Anzeige, keine Animation
 
 ### Behoben

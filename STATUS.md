@@ -53,6 +53,10 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | ❌ Eigener Affiliate-Link fehlt |
 | `INSTAGRAM_ACCESS_TOKEN` | ❌ Fehlt — für Reels-Auto-Publish |
 | `INSTAGRAM_BUSINESS_ACCOUNT_ID` | ❌ Fehlt — für Reels-Auto-Publish |
+| `CARDMARKET_APP_TOKEN` | ❌ Fehlt — für sprachspezifische Preise (DE/JP/KR) |
+| `CARDMARKET_APP_SECRET` | ❌ Fehlt — Cardmarket OAuth 1.0 |
+| `CARDMARKET_USER_TOKEN` | ❌ Fehlt — Cardmarket OAuth 1.0 |
+| `CARDMARKET_USER_SECRET` | ❌ Fehlt — Cardmarket OAuth 1.0 |
 
 ---
 
@@ -104,9 +108,10 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.1.4 | Lückenlose Release-Dokumentation (CHANGELOG.md, /changelog-Seite, CLAUDE.md) |
 | v2.1.5 | Portfolio NavBar überall + Suche 20 Ergebnisse statt 6 |
 | v2.1.6 | Bugfix: Versionsnummer im Footer (falsche env var) |
+| v2.2.0 | Sprachspezifische Preise EN/DE/JP/KR via Cardmarket OAuth API |
 | v2.1.7 | Portfolio-Chart: sofortige Anzeige + Animation deaktiviert |
 | fix | Vercel `buildCommand: next build` — behebt Deployment-Blockade seit v1.9.0 |
 
 ---
 
-*Zuletzt aktualisiert: v2.1.0 — 22. Juni 2026*
+*Zuletzt aktualisiert: v2.2.0 — 22. Juni 2026*

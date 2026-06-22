@@ -290,6 +290,10 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `ELEVENLABS_API_KEY` | KI-Stimme für Videos | Video-Cron aktiv |
 | `YOUTUBE_ACCESS_TOKEN` | Videos automatisch hochladen | Video-Cron aktiv |
 | `BUFFER_ACCESS_TOKEN` | Social-Media-Posts planen | Social-Cron aktiv |
+| `CARDMARKET_APP_TOKEN` | ⭐ Cardmarket OAuth App-Token | Sprachspezifische Preise (DE/JP/KR) im Portfolio |
+| `CARDMARKET_APP_SECRET` | Cardmarket OAuth App-Secret | HMAC-SHA1-Signierung aller API-Requests |
+| `CARDMARKET_USER_TOKEN` | Cardmarket OAuth User-Token | Vom eigenen Cardmarket-Account: API → Anwendungen |
+| `CARDMARKET_USER_SECRET` | Cardmarket OAuth User-Secret | Alle 4 nötig — fehlt eine, Fallback auf EN-Preis |
 | `NEXT_PUBLIC_AMAZON_URL` | ⭐ Eigener Amazon-Affiliate-Link (Booster) | **Alle Boosterpack-Bilder + Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ⭐ Eigener Cardmarket-Affiliate-Link | **Alle Cardmarket-Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Trade Republic-Link sichtbar |

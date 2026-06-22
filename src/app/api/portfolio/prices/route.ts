@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 import { fetchCardById } from '@/lib/pokemon-api';
+import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
 import { PriceDataPoint } from '@/types';
 
 export const maxDuration = 30;
+
+interface CardRequest {
+  id: string;
+  language: CardLanguage;
+  name: string;
+}
 
 interface LiveCardData {
   price: number;
@@ -11,27 +18,74 @@ interface LiveCardData {
   set: string;
   setCode: string;
   imageUrl: string;
+  priceLanguage: CardLanguage;
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({})) as { cardIds?: unknown };
-  const cardIds = Array.isArray(body.cardIds) ? (body.cardIds as string[]).slice(0, 50) : [];
-  if (cardIds.length === 0) return NextResponse.json({});
+  const body = (await request.json().catch(() => ({}))) as {
+    cards?: unknown[];
+    cardIds?: unknown[];
+  };
 
-  const results = await Promise.allSettled(cardIds.map((id) => fetchCardById(id)));
+  let cards: CardRequest[];
+
+  if (Array.isArray(body.cards)) {
+    cards = (body.cards as Array<Record<string, unknown>>)
+      .filter((c) => typeof c.id === 'string')
+      .map((c) => ({
+        id: c.id as string,
+        language: ((c.language as string) || 'EN') as CardLanguage,
+        name: (c.name as string) || '',
+      }))
+      .slice(0, 50);
+  } else if (Array.isArray(body.cardIds)) {
+    // Legacy format — treat all as English
+    cards = (body.cardIds as string[])
+      .filter((id) => typeof id === 'string')
+      .map((id) => ({ id, language: 'EN' as CardLanguage, name: '' }))
+      .slice(0, 50);
+  } else {
+    return NextResponse.json({});
+  }
+
+  if (cards.length === 0) return NextResponse.json({});
+
+  const results = await Promise.allSettled(
+    cards.map(async (c) => {
+      const card = await fetchCardById(c.id);
+      if (!card) return null;
+
+      let price = card.prices.market || card.prices.holofoil?.market || 0;
+      let priceLanguage: CardLanguage = 'EN';
+
+      if (c.language !== 'EN') {
+        const langPrice = await fetchCMLanguagePrice(c.name || card.name, c.language);
+        if (langPrice !== null) {
+          price = langPrice;
+          priceLanguage = c.language;
+        }
+        // If CM not configured or no result, fall back to English Cardmarket price
+      }
+
+      return {
+        id: c.id,
+        data: {
+          price,
+          priceHistory: card.priceHistory ?? [],
+          name: card.name,
+          set: card.set,
+          setCode: card.setCode,
+          imageUrl: card.imageUrl,
+          priceLanguage,
+        } satisfies LiveCardData,
+      };
+    }),
+  );
 
   const data: Record<string, LiveCardData> = {};
-  results.forEach((result, i) => {
+  results.forEach((result) => {
     if (result.status === 'fulfilled' && result.value) {
-      const card = result.value;
-      data[cardIds[i]] = {
-        price: card.prices.market || card.prices.holofoil?.market || 0,
-        priceHistory: card.priceHistory ?? [],
-        name: card.name,
-        set: card.set,
-        setCode: card.setCode,
-        imageUrl: card.imageUrl,
-      };
+      data[result.value.id] = result.value.data;
     }
   });
 
