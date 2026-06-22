@@ -1,16 +1,21 @@
 import { Suspense } from 'react';
-import { fetchTrendingCards } from '@/lib/pokemon-api';
-import { generateMarketSummary } from '@/lib/ai-generator';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { NavBar } from '@/components/NavBar';
 import { Calendar, Zap, Shield, TrendingUp, Brain } from 'lucide-react';
+import { loadLatestMarketReport } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
 
-export const revalidate = 604800;
+// Revalidate hourly so new Monday reports show up without a full redeploy
+export const revalidate = 3600;
 
-function getWeekInfo() {
+function getWeekInfo(weekStart?: string, weekNumber?: number) {
+  if (weekStart && weekNumber) {
+    const d = new Date(weekStart + 'T12:00:00');
+    const dateStr = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+    return { week: weekNumber, dateStr };
+  }
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 1);
   const week = Math.ceil(((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7);
@@ -19,36 +24,22 @@ function getWeekInfo() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { week } = getWeekInfo();
+  const report = await loadLatestMarketReport().catch(() => null);
+  const { week } = getWeekInfo(report?.weekStart, report?.weekNumber);
   return {
     title: `Marktanalyse KW ${week} — PokéMarket Intelligence`,
-    description: 'Wöchentliche KI-Marktanalyse für Pokémon-Karten-Investoren.',
+    description: 'Wöchentliche KI-Marktanalyse für Pokémon-Karten-Sammler und Investoren.',
   };
 }
 
 export default async function MarktberichtPage() {
-  const { week, dateStr } = getWeekInfo();
+  const report = await loadLatestMarketReport().catch(() => null);
+  const { week, dateStr } = getWeekInfo(report?.weekStart, report?.weekNumber);
 
-  let cards: Awaited<ReturnType<typeof fetchTrendingCards>> = [];
-  let weeklyReport = '';
-  let topGainers: typeof cards = [];
-  let topValue: typeof cards = [];
-  let error = false;
-
-  try {
-    cards = await fetchTrendingCards(20);
-    const sorted = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0));
-    const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
-    weeklyReport = summary.weeklyReport;
-    topGainers = sorted.slice(0, 6);
-    topValue = [...cards].sort((a, b) => {
-      const pa = a.prices.market || a.prices.holofoil?.market || 0;
-      const pb = b.prices.market || b.prices.holofoil?.market || 0;
-      return pb - pa;
-    }).slice(0, 6);
-  } catch {
-    error = true;
-  }
+  const weeklyReport = report?.reportText ?? '';
+  const topGainers = report?.topGainers ?? [];
+  const topValue = report?.topValue ?? [];
+  const hasContent = !!report;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -75,7 +66,20 @@ export default async function MarktberichtPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 pb-16 space-y-10 -mt-6">
-        {weeklyReport ? (
+        {!hasContent && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800 text-sm flex items-start gap-3">
+            <span className="text-xl">📅</span>
+            <div>
+              <p className="font-semibold">Erster Bericht noch ausstehend</p>
+              <p className="text-xs mt-1 text-amber-600">
+                Der erste Wochenbericht wird automatisch jeden Montag um 07:00 Uhr UTC generiert.
+                Du kannst ihn auch manuell über das <a href="/studio" className="underline">Studio</a> anstoßen.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {weeklyReport && (
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-5 py-4 border-b border-violet-100 flex items-center gap-3">
               <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shrink-0">
@@ -90,23 +94,13 @@ export default async function MarktberichtPage() {
               <p className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{weeklyReport}</p>
             </div>
           </section>
-        ) : null}
-
-        {error && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-amber-800 text-sm flex items-start gap-3">
-            <span className="text-xl">⚠️</span>
-            <div>
-              <p className="font-semibold">Marktdaten gerade nicht verfügbar</p>
-              <p className="text-xs mt-1 text-amber-600">Pokémon TCG API-Key prüfen oder später erneut versuchen.</p>
-            </div>
-          </div>
         )}
 
-        {cards.length > 0 && (
+        {hasContent && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Karten analysiert', value: `${cards.length}`, icon: '🃏' },
               { label: 'Top Gewinner', value: `${topGainers.length}`, icon: '📈' },
+              { label: 'Wertvollste Karten', value: `${topValue.length}`, icon: '💎' },
               { label: 'KI-Bericht', value: 'Live', icon: '🤖' },
             ].map((stat) => (
               <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4 text-center shadow-sm">
@@ -140,11 +134,13 @@ export default async function MarktberichtPage() {
         </section>
 
         <footer className="border-t border-gray-200 pt-6 space-y-3">
-          <p className="text-xs text-gray-400 text-center max-w-xl mx-auto leading-relaxed">
-            PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr.{' '}
-            <span className="text-gray-300">•</span>{' '}
-            Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision.
-          </p>
+          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1">
+            <p className="text-[11px] font-semibold text-amber-800">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
+            <p className="text-[10px] text-amber-700 leading-relaxed">
+              Alle Inhalte dienen ausschließlich der Information — <strong>keine Anlageberatung</strong>.
+              Preisangaben (Cardmarket, EUR) ohne Gewähr.
+            </p>
+          </div>
           <div className="flex justify-center gap-5 text-xs">
             <a href="/impressum" className="text-gray-400 hover:text-violet-600 transition-colors">Impressum</a>
             <span className="text-gray-200">|</span>
