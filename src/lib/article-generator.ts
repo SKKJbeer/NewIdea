@@ -410,6 +410,16 @@ function matchSectionHighlights(
   });
 }
 
+/** Read-only: static fallback → Supabase. Returns null if not yet generated. Never calls Claude. */
+export async function readArticle(date: string): Promise<Article | null> {
+  if (STATIC_ARTICLES[date]) {
+    const s = STATIC_ARTICLES[date];
+    return { ...s, featuredCards: s.featuredCards?.length ? s.featuredCards : [], generatedAt: new Date().toISOString() };
+  }
+  return loadArticle(date);
+}
+
+/** Generate + persist. For cron jobs only — never call from a user-facing page. */
 export async function generateArticle(type: ArticleType, date: string): Promise<Article> {
   const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
