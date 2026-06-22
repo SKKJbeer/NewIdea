@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Zap, CheckCircle2, XCircle, Loader2, FileText, Mail,
   Video, Share2, RefreshCw, Sparkles, ExternalLink,
-  Clock, Copy, Check, Trash2, Globe, Lock, Activity,
+  Clock, Copy, Check, Trash2, Globe, Lock, Activity, Film,
 } from 'lucide-react';
 import Link from 'next/link';
 import { publishMarktbericht } from '@/app/actions';
 import { MonitoringPanel } from '@/components/MonitoringPanel';
+import { ReelsStudio } from '@/components/ReelsStudio';
 
 interface Integration {
   name: string;
@@ -26,7 +27,7 @@ interface StatusResponse {
 }
 
 type GenType = 'market' | 'newsletter' | 'video-youtube' | 'video-shorts' | 'social';
-type Tab = 'content' | 'monitoring';
+type Tab = 'content' | 'monitoring' | 'reels';
 
 interface SavedOutput {
   type: GenType;
@@ -291,12 +292,22 @@ export default function StudioPage() {
           >
             <Activity size={12} />Monitoring
           </button>
+          <button
+            onClick={() => setTab('reels')}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+              tab === 'reels' ? 'bg-white text-violet-700' : 'text-violet-200 hover:bg-white/10'
+            }`}
+          >
+            <Film size={12} />Reels
+          </button>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {tab === 'monitoring' ? (
           <MonitoringPanel />
+        ) : tab === 'reels' ? (
+          <ReelsStudio />
         ) : (
           <>
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
