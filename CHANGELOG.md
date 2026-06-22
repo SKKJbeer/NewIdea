@@ -7,6 +7,28 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.3.0] — 2026-06-22 · Chart-Redesign (Custom SVG), Mobile-Modal-Fix, Portfolio-Tests
+
+### Neu
+- Custom SVG Chart (`src/components/PortfolioChart.tsx`) — kein Recharts, cubic-bezier-Linie, Gradient-Fill, Dot am letzten Punkt, Mouse+Touch-Crosshair, Tooltip-Flip
+- `src/lib/portfolio.ts` — alle Portfolio-Business-Logic als pure Functions (kein React, keine Server-Deps, vollständig testbar)
+- 59 Vitest-Tests (`src/__tests__/portfolio.test.ts`) — `normalizeHolding`, `livePriceOf`, `computePnl`, `computeChartData` (inkl. injizierbares `today`), `filterByRange`, `formatEur`, `shortEur`, `setCodeFromId`
+- Portfolio-Modal: `dvh`-Viewport-Einheit für Keyboard-bewusste Modal-Höhe auf Mobile (`min(85dvh, calc(100vh - 32px))`)
+- Suchfeld im Modal: `type="search"`, `enterKeyHint="search"`, `autoComplete="off"`, `autoCorrect="off"`, `spellCheck={false}`
+- Touch-Targets für Suchergebnis-Buttons: `minHeight: 56px` (>44px Apple-HIG)
+
+### Geändert
+- Recharts vollständig entfernt — Performance und Bundle-Größe verbessert
+- `overscroll-contain` auf Modal-Scroll-Bereichen — verhindert Scroll-Kette auf iOS
+- Preisfeld: `inputMode="decimal"` — zeigt Nummern-Tastatur auf Mobile
+- `active:`-Tailwind-States für haptisches Feedback auf Touch
+
+### Behoben
+- Mobile: Modal wurde vom Keyboard überdeckt (dvh-Fix)
+- Mobile: Suchfeld zeigte keine korrekten Ergebnisse durch fehlende Input-Attribute
+
+---
+
 ## [2.2.0] — 2026-06-22 · Sprachspezifische Preise: EN / DE / JP / KR
 
 ### Neu

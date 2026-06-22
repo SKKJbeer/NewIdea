@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.3.0',
+    date: '22. Juni 2026',
+    label: 'Chart-Redesign (Custom SVG), Mobile-Modal-Fix, Portfolio-Tests',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Custom SVG Chart — kein Recharts, cubic-bezier, Gradient, Mouse+Touch-Crosshair' },
+      { type: 'new',     text: 'src/lib/portfolio.ts — pure Business-Logic, vollständig testbar' },
+      { type: 'new',     text: '59 Vitest-Tests für alle Portfolio-Kernfunktionen' },
+      { type: 'new',     text: 'Mobile Modal: dvh-Viewport für Keyboard-bewusste Höhe' },
+      { type: 'fixed',   text: 'Mobile: Modal wurde vom Keyboard überdeckt' },
+      { type: 'fixed',   text: 'Mobile: Suchfeld-Attribute für korrekte Darstellung' },
+      { type: 'changed', text: 'Recharts entfernt — schnelleres Rendering, kleinerer Bundle' },
+    ],
+  },
+  {
     version: '2.2.0',
     date: '22. Juni 2026',
     label: 'Sprachspezifische Preise: EN / DE / JP / KR',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Cardmarket OAuth 1.0 API-Client — echte Preise für EN, DE, JP, KR' },
       { type: 'new',     text: 'Sprachauswahl beim Hinzufügen/Bearbeiten (🇬🇧 🇩🇪 🇯🇵 🇰🇷)' },

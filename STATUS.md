@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.1.0` · **Stand:** 22. Juni 2026 · **Branch:** `main`
+**Version:** `v2.3.0` · **Stand:** 22. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -21,7 +21,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
 | Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth, 3 Tabs: Content / Monitoring / Reels |
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
-| **Portfolio `/portfolio`** | ✅ **Neu** | Finance-App-Style Tracker: localStorage, Recharts-Chart, Live-Preise, P&L |
+| **Portfolio `/portfolio`** | ✅ Fertig | Finance-App-Style Tracker: localStorage, Custom SVG Chart, Live-Preise, P&L, EN/DE/JP/KR |
 | **Reels Studio** | ✅ **Neu** | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
 | Impressum & Datenschutz | ⚠️ Platzhalter | Eckige Klammern noch ersetzen! |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | CRON_SECRET ✅ gesetzt |
