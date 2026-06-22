@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   if (q.length < 2) return NextResponse.json([]);
 
   try {
-    const cards = await searchCards(q, 6);
+    const cards = await searchCards(q, 20);
     const suggestions = cards.map((c) => ({
       id: c.id,
       name: c.name,

@@ -11,10 +11,33 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.1.5',
+    date: '22. Juni 2026',
+    label: 'Portfolio: NavBar + Suche 20 Ergebnisse',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'NavBar im Portfolio auf allen Zuständen — Nutzer nicht mehr eingeschlossen' },
+      { type: 'new',   text: 'Suche im Karte-hinzufügen-Modal: bis zu 20 Ergebnisse (vorher 6)' },
+      { type: 'new',   text: 'Ergebniszähler „X Karten gefunden" über der scrollbaren Liste (max-h-72)' },
+      { type: 'fixed', text: '/api/search/suggestions: searchCards(q, 6) → searchCards(q, 20)' },
+    ],
+  },
+  {
+    version: '2.1.4',
+    date: '22. Juni 2026',
+    label: 'Lückenlose Release-Dokumentation',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'CHANGELOG.md: vollständige Historie v0.1.0 → v2.1.3' },
+      { type: 'new',     text: '/changelog-Seite: alle 20 Versionen mit fixed-Badge (Wrench-Icon, orange)' },
+      { type: 'new',     text: 'CLAUDE.md: Release-Notes-Pflicht — 3 Dateien müssen synchron sein' },
+    ],
+  },
+  {
     version: '2.1.3',
     date: '22. Juni 2026',
     label: 'Portfolio: Edit-Modal, Chart-Fix, Y-Achse, Zeitbereiche',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Karten-Edit via Klick auf die Zeile — öffnet EditCardModal (Anzahl, Kaufpreis, Kaufdatum; "Karte entfernen" im Modal)' },
       { type: 'changed', text: 'Inline-Qty-Controls entfernt; Zeile zeigt kompakt "3× · à 45,00 € · 15.06.26"' },

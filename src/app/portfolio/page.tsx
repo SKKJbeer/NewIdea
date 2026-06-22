@@ -9,6 +9,7 @@ import {
   BarChart3, Search, X, Check,
 } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
+import { NavBar } from '@/components/NavBar';
 
 interface PortfolioHolding {
   cardId: string;
@@ -165,16 +166,19 @@ export default function PortfolioPage() {
   // ── Empty state ──
   if (holdings.length === 0 && !showAdd) {
     return (
-      <EmptyState onAdd={() => setShowAdd(true)}>
+      <div className="min-h-screen bg-white">
+        <NavBar />
+        <EmptyState onAdd={() => setShowAdd(true)} />
         {showAdd && (
           <AddCardModal holdings={holdings} onAdd={saveHoldings} onClose={() => setShowAdd(false)} />
         )}
-      </EmptyState>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
+      <NavBar />
 
       {/* ── Hero: total value + chart ── */}
       <div className="bg-gray-50 border-b border-gray-100">
@@ -449,9 +453,9 @@ export default function PortfolioPage() {
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
-function EmptyState({ onAdd, children }: { onAdd: () => void; children?: React.ReactNode }) {
+function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">
         <div className="w-20 h-20 bg-gradient-to-br from-violet-50 to-indigo-100 rounded-3xl flex items-center justify-center mb-5 shadow-sm">
           <BarChart3 size={32} className="text-violet-500" />
@@ -472,7 +476,6 @@ function EmptyState({ onAdd, children }: { onAdd: () => void; children?: React.R
           <Plus size={17} /> Erste Karte hinzufügen
         </button>
       </div>
-      {children}
     </div>
   );
 }
@@ -590,7 +593,11 @@ function AddCardModal({
 
           {/* Suggestions */}
           {!selected && suggestions.length > 0 && (
-            <div className="space-y-0.5 -mx-1">
+            <div className="-mx-1">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-4 mb-1.5">
+                {suggestions.length} Karte{suggestions.length !== 1 ? 'n' : ''} gefunden
+              </p>
+              <div className="space-y-0.5 max-h-72 overflow-y-auto">
               {suggestions.map((s) => (
                 <button
                   key={s.id}
@@ -619,6 +626,7 @@ function AddCardModal({
                   </div>
                 </button>
               ))}
+              </div>
             </div>
           )}
 

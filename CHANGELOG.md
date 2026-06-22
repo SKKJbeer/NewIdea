@@ -7,6 +7,28 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.1.5] — 2026-06-22 · Portfolio: NavBar + Suche 20 Ergebnisse
+
+### Neu
+- NavBar im Portfolio auf allen Zuständen (Empty-State + Hauptseite) — Nutzer nicht mehr eingeschlossen
+- Suche im Karte-hinzufügen-Modal zeigt jetzt bis zu 20 Ergebnisse (vorher 6)
+- Ergebniszähler „X Karten gefunden" über der Liste
+- Suggestions-Liste scrollbar (max-h-72) — alle Ergebnisse erreichbar ohne Modal zu vergrößern
+
+### Behoben
+- `searchCards(q, 6)` in `/api/search/suggestions` → `searchCards(q, 20)`
+
+---
+
+## [2.1.4] — 2026-06-22 · Lückenlose Release-Dokumentation
+
+### Neu
+- `CHANGELOG.md`: vollständige Historie v0.1.0 → v2.1.3
+- `/changelog`-Seite: alle 20 Versionen mit `fixed`-Badge (Wrench-Icon, orange)
+- `CLAUDE.md`: Release-Notes-Pflicht als eigener Abschnitt — 3 Dateien müssen synchron sein
+
+---
+
 ## [2.1.3] — 2026-06-22 · Portfolio: Edit-Modal, Chart-Fix, Y-Achse, Zeitbereiche
 
 ### Neu
