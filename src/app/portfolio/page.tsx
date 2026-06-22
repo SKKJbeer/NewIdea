@@ -18,6 +18,7 @@ interface PortfolioHolding {
   imageUrl: string;
   quantity: number;
   purchasePrice: number;
+  purchaseDate: string;
   addedAt: string;
 }
 
@@ -350,6 +351,11 @@ export default function PortfolioPage() {
                         à {formatEur(h.purchasePrice)}
                       </span>
                     </div>
+                    {h.purchaseDate && (
+                      <p className="text-[10px] text-gray-300 mt-1">
+                        Gekauft: {new Date(h.purchaseDate + 'T00:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                      </p>
+                    )}
                   </div>
 
                   {/* Value + P&L */}
@@ -449,6 +455,7 @@ function AddCardModal({
   const [selected, setSelected]     = useState<Suggestion | null>(null);
   const [qty, setQty]               = useState(1);
   const [purchasePrice, setPurchasePrice] = useState('');
+  const [purchaseDate, setPurchaseDate]   = useState(() => new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     if (query.length < 2) { setSuggestions([]); return; }
@@ -470,6 +477,7 @@ function AddCardModal({
     setSelected(s);
     setPurchasePrice(s.price > 0 ? s.price.toFixed(2) : '');
     setQty(1);
+    setPurchaseDate(new Date().toISOString().split('T')[0]);
     setSuggestions([]);
     setQuery('');
   }
@@ -485,6 +493,7 @@ function AddCardModal({
       imageUrl: selected.imageUrl,
       quantity: qty,
       purchasePrice: parseFloat(purchasePrice) || selected.price || 0,
+      purchaseDate: purchaseDate || new Date().toISOString().split('T')[0],
       addedAt: new Date().toISOString().split('T')[0],
     };
     const existing = holdings.find((h) => h.cardId === selected.id);
@@ -657,6 +666,18 @@ function AddCardModal({
                     className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400"
                   />
                 </div>
+              </div>
+
+              {/* Purchase date */}
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-2">Kaufdatum</label>
+                <input
+                  type="date"
+                  value={purchaseDate}
+                  max={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => setPurchaseDate(e.target.value)}
+                  className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400 text-gray-700"
+                />
               </div>
 
               {/* Total */}
