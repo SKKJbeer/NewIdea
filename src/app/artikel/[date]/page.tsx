@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
-import { generateArticle, DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
+import { readArticle, DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
@@ -86,13 +86,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const c = COLOR[meta.color];
   const dateLabel = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  let article = null;
-  let error = false;
-  try {
-    article = await generateArticle(type, date);
-  } catch {
-    error = true;
-  }
+  const article = await readArticle(date);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,12 +107,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pb-16 -mt-4 space-y-5">
-        {error ? (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800">
-            <p className="font-semibold">⚠️ Artikel konnte nicht generiert werden</p>
-            <p className="text-sm mt-1 text-amber-600">Bitte ANTHROPIC_API_KEY in Vercel prüfen.</p>
+        {!article ? (
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
+            <p className="text-gray-500 font-semibold">Artikel noch nicht verfügbar</p>
+            <p className="text-gray-400 text-sm mt-1">Dieser Artikel wird täglich um 08:00 Uhr automatisch erstellt.</p>
           </div>
-        ) : article ? (
+        ) : (
           <>
             {/* Intro */}
             <section className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden`}>
@@ -221,7 +215,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
               </section>
             )}
           </>
-        ) : null}
+        )}
 
         <div className="flex justify-between items-center pt-2">
           <Link href="/artikel" className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold">
