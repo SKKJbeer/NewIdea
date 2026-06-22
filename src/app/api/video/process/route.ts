@@ -13,22 +13,31 @@ export const maxDuration = 300;
 
 if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
 
-function processVideo(inputPath: string, outputPath: string, clipDuration: number): Promise<void> {
+function processVideo(inputPath: string, outputPath: string, clipDuration: number, startTime?: number): Promise<void> {
   return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      // Seek from end of file — last N seconds without needing total duration
-      .inputOptions([`-sseof -${clipDuration}`])
+    const cmd = ffmpeg(inputPath);
+
+    if (startTime !== undefined && startTime >= 0) {
+      // Pre-input seek to specific position (fast; frame-accurate enough for social content)
+      cmd.inputOptions([`-ss ${startTime}`]);
+    } else {
+      // Seek from end — cuts last N seconds without needing total duration
+      cmd.inputOptions([`-sseof -${clipDuration}`]);
+    }
+
+    cmd
       .videoFilters([
-        // Crop center to 9:16 portrait
         'crop=ih*9/16:ih:(iw-ih*9/16)/2:0',
         'scale=1080:1920:flags=lanczos',
-        // Branding text at bottom center
         "drawtext=text='PokéMarket Intel':fontsize=38:x=(w-text_w)/2:y=h-70:fontcolor=white:shadowcolor=black@0.8:shadowx=2:shadowy=2",
       ])
       .videoCodec('libx264')
       .audioCodec('aac')
       .audioBitrate('128k')
-      .outputOptions(['-crf 23', '-preset fast', '-movflags +faststart', '-pix_fmt yuv420p'])
+      .outputOptions([
+        ...(startTime !== undefined ? [`-t ${clipDuration}`] : []),
+        '-crf 23', '-preset fast', '-movflags +faststart', '-pix_fmt yuv420p',
+      ])
       .on('end', () => resolve())
       .on('error', (err) => reject(err))
       .save(outputPath);
@@ -43,7 +52,7 @@ export async function POST(request: Request) {
   const sb = getSupabase();
   if (!sb) return NextResponse.json({ error: 'Supabase nicht konfiguriert' }, { status: 503 });
 
-  const { path, clipDuration = 30, description = '' } = await request.json().catch(() => ({}));
+  const { path, clipDuration = 30, description = '', startTime } = await request.json().catch(() => ({}));
   if (!path) return NextResponse.json({ error: 'path fehlt' }, { status: 400 });
 
   const uid = randomUUID();
@@ -58,7 +67,7 @@ export async function POST(request: Request) {
     await writeFile(inputPath, Buffer.from(await dl.arrayBuffer()));
 
     // Cut + crop + brand
-    await processVideo(inputPath, outputPath, clipDuration);
+    await processVideo(inputPath, outputPath, clipDuration, typeof startTime === 'number' ? startTime : undefined);
 
     // Upload processed Reel
     const outputBuffer = await readFile(outputPath);
