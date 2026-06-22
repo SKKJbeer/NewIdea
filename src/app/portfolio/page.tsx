@@ -42,6 +42,7 @@ interface Suggestion {
 }
 
 const STORAGE_KEY = 'portfolio_v1';
+const RANGE_DAYS: Record<'1D' | '1W' | '1M' | '3M' | '1Y', number> = { '1D': 2, '1W': 7, '1M': 30, '3M': 90, '1Y': 365 };
 
 function formatEur(n: number) {
   return new Intl.NumberFormat('de-DE', {
@@ -132,18 +133,30 @@ export default function PortfolioPage() {
   const isUp       = totalPnL >= 0;
   const lineColor  = isUp ? '#16a34a' : '#dc2626';
 
-  // ── Chart data (aggregate price history across all holdings) ──
+  // ── Chart data ──
+  // Shows purchase price as flat baseline immediately (before API responds),
+  // then switches to live price history once liveData is populated.
   const allChartData = useMemo(() => {
     if (holdings.length === 0) return [];
 
     const dateMap = new Map<string, number>();
+    const today = new Date().toISOString().split('T')[0];
+
     holdings.forEach((h) => {
       const hist = liveData[h.cardId]?.priceHistory ?? [];
-      hist.forEach(({ date, price }) => {
-        // Only count from the purchase date onwards — before that the card wasn't owned
-        if (h.purchaseDate && date < h.purchaseDate) return;
-        dateMap.set(date, (dateMap.get(date) ?? 0) + price * h.quantity);
-      });
+      if (hist.length > 0) {
+        hist.forEach(({ date, price }) => {
+          if (h.purchaseDate && date < h.purchaseDate) return;
+          dateMap.set(date, (dateMap.get(date) ?? 0) + price * h.quantity);
+        });
+      } else {
+        // Fallback: flat line at purchase price so chart is visible immediately
+        const from = h.purchaseDate || today;
+        dateMap.set(from, (dateMap.get(from) ?? 0) + h.purchasePrice * h.quantity);
+        if (from !== today) {
+          dateMap.set(today, (dateMap.get(today) ?? 0) + h.purchasePrice * h.quantity);
+        }
+      }
     });
 
     if (dateMap.size === 0) return [];
@@ -152,8 +165,6 @@ export default function PortfolioPage() {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, value]) => ({ date, value: Math.round(value * 100) / 100 }));
   }, [holdings, liveData]);
-
-  const RANGE_DAYS: Record<typeof timeRange, number> = { '1D': 2, '1W': 7, '1M': 30, '3M': 90, '1Y': 365 };
 
   const chartData = useMemo(
     () => allChartData.slice(-RANGE_DAYS[timeRange]),
@@ -277,18 +288,12 @@ export default function PortfolioPage() {
                     fill="url(#portGrad)"
                     dot={false}
                     activeDot={{ r: 4, fill: lineColor, strokeWidth: 0 }}
-                    isAnimationActive
+                    isAnimationActive={false}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          ) : (
-            loading && holdings.length > 0 ? (
-              <div className="h-32 flex items-center justify-center mb-4">
-                <Loader2 size={18} className="animate-spin text-gray-300" />
-              </div>
-            ) : null
-          )}
+          ) : null}
 
           {/* Time-range pills */}
           <div className="flex gap-1">

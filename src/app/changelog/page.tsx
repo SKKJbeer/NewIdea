@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.1.7',
+    date: '22. Juni 2026',
+    label: 'Portfolio-Chart: sofortige Anzeige, keine Animation',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Chart-Animation deaktiviert — reagiert sofort statt 1–2 Sek. Verzögerung bei jedem Update' },
+      { type: 'fixed', text: 'Chart zeigt sofort Kaufpreis-Fallback bevor die API antwortet — kein leerer Zustand mehr' },
+      { type: 'changed', text: 'RANGE_DAYS als Modul-Konstante (nicht bei jedem Render neu erzeugt)' },
+    ],
+  },
+  {
     version: '2.1.6',
     date: '22. Juni 2026',
     label: 'Bugfix: Versionsnummer im Footer',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Footer zeigte keine Version — NEXT_PUBLIC_APP_VERSION (nicht gesetzt) durch npm_package_version ersetzt' },
     ],

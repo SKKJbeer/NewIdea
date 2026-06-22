@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.1.7] — 2026-06-22 · Portfolio-Chart: sofortige Anzeige, keine Animation
+
+### Behoben
+- Chart-Animation deaktiviert (`isAnimationActive={false}`) — reagiert jetzt sofort statt 1–2 Sek. Verzögerung bei jedem Update
+- Chart zeigt sofort eine flache Linie (Kaufpreis-Fallback) bevor die API antwortet — kein leerer Zustand mehr
+- `RANGE_DAYS` aus der Render-Funktion verschoben (Modul-Konstante) — kein unnötiges Neu-Erstellen bei jedem Render
+
+---
+
 ## [2.1.6] — 2026-06-22 · Bugfix: Versionsnummer im Footer
 
 ### Behoben
