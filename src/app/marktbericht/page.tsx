@@ -1,31 +1,23 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { NavBar } from '@/components/NavBar';
-import { Calendar, Zap, Shield, TrendingUp, Brain } from 'lucide-react';
-import { loadLatestMarketReport } from '@/lib/market-report-storage';
+import { Calendar, Zap, Shield, TrendingUp, Brain, ChevronLeft, Archive } from 'lucide-react';
+import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
 
-// Revalidate hourly so new Monday reports show up without a full redeploy
 export const revalidate = 3600;
 
-function getWeekInfo(weekStart?: string, weekNumber?: number) {
-  if (weekStart && weekNumber) {
-    const d = new Date(weekStart + 'T12:00:00');
-    const dateStr = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
-    return { week: weekNumber, dateStr };
-  }
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  const week = Math.ceil(((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7);
-  const dateStr = now.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
-  return { week, dateStr };
+function formatWeekDate(weekStart: string) {
+  const d = new Date(weekStart + 'T12:00:00');
+  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const report = await loadLatestMarketReport().catch(() => null);
-  const { week } = getWeekInfo(report?.weekStart, report?.weekNumber);
+  const week = report?.weekNumber ?? '—';
   return {
     title: `Marktanalyse KW ${week} — PokéMarket Intelligence`,
     description: 'Wöchentliche KI-Marktanalyse für Pokémon-Karten-Sammler und Investoren.',
@@ -33,13 +25,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MarktberichtPage() {
-  const report = await loadLatestMarketReport().catch(() => null);
-  const { week, dateStr } = getWeekInfo(report?.weekStart, report?.weekNumber);
+  const [report, allMeta] = await Promise.all([
+    loadLatestMarketReport().catch(() => null),
+    listMarketReportMeta().catch(() => []),
+  ]);
 
-  const weeklyReport = report?.reportText ?? '';
-  const topGainers = report?.topGainers ?? [];
-  const topValue = report?.topValue ?? [];
   const hasContent = !!report;
+  const previousReports = allMeta.slice(1); // everything except the latest
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,7 +41,7 @@ export default async function MarktberichtPage() {
         <div className="max-w-4xl mx-auto px-4 pt-10 pb-16 sm:py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 text-violet-200 text-xs mb-5">
             <Calendar size={12} />
-            KW {week} · {dateStr}
+            {report ? `KW ${report.weekNumber} · ${formatWeekDate(report.weekStart)}` : 'Wöchentlich aktualisiert'}
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 leading-tight">
             Wöchentliche<br /><span className="text-yellow-300">Marktanalyse</span>
@@ -65,7 +57,7 @@ export default async function MarktberichtPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 pb-16 space-y-10 -mt-6">
+      <main className="max-w-4xl mx-auto px-4 pb-16 space-y-8 -mt-6">
         {!hasContent && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800 text-sm flex items-start gap-3">
             <span className="text-xl">📅</span>
@@ -73,13 +65,14 @@ export default async function MarktberichtPage() {
               <p className="font-semibold">Erster Bericht noch ausstehend</p>
               <p className="text-xs mt-1 text-amber-600">
                 Der erste Wochenbericht wird automatisch jeden Montag um 07:00 Uhr UTC generiert.
-                Du kannst ihn auch manuell über das <a href="/studio" className="underline">Studio</a> anstoßen.
+                Du kannst ihn auch manuell über das{' '}
+                <a href="/studio" className="underline">Studio</a> anstoßen.
               </p>
             </div>
           </div>
         )}
 
-        {weeklyReport && (
+        {report?.reportText && (
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-5 py-4 border-b border-violet-100 flex items-center gap-3">
               <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shrink-0">
@@ -91,16 +84,16 @@ export default async function MarktberichtPage() {
               </div>
             </div>
             <div className="p-5 sm:p-6">
-              <p className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{weeklyReport}</p>
+              <p className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
             </div>
           </section>
         )}
 
-        {hasContent && (
+        {report && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Top Gewinner', value: `${topGainers.length}`, icon: '📈' },
-              { label: 'Wertvollste Karten', value: `${topValue.length}`, icon: '💎' },
+              { label: 'Top Gewinner', value: `${report.topGainers.length}`, icon: '📈' },
+              { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: '💎' },
               { label: 'KI-Bericht', value: 'Live', icon: '🤖' },
             ].map((stat) => (
               <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4 text-center shadow-sm">
@@ -112,11 +105,48 @@ export default async function MarktberichtPage() {
           </div>
         )}
 
-        {topGainers.length > 0 && (
-          <div className="space-y-10">
-            <CardGrid cards={topGainers} title="🚀 Top Investment-Karten" />
-            {topValue.length > 0 && <CardGrid cards={topValue} title="💎 Höchste Kartenwerte" />}
+        {report && report.topGainers.length > 0 && (
+          <div className="space-y-8">
+            <CardGrid cards={report.topGainers} title="🚀 Top Investment-Karten" />
+            {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="💎 Höchste Kartenwerte" />}
           </div>
+        )}
+
+        {/* Archiv-Navigation */}
+        {previousReports.length > 0 && (
+          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Archive size={15} className="text-violet-500" />
+                <p className="text-sm font-bold text-gray-900">Frühere Berichte</p>
+              </div>
+              <Link href="/marktbericht/archiv" className="text-xs font-semibold text-violet-600 hover:text-violet-800">
+                Alle anzeigen →
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {previousReports.slice(0, 4).map((meta) => (
+                <Link
+                  key={meta.weekStart}
+                  href={`/marktbericht/${meta.weekStart}`}
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-violet-50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center shrink-0">
+                      <Calendar size={13} className="text-violet-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 group-hover:text-violet-700">
+                        KW {meta.weekNumber}
+                      </p>
+                      <p className="text-xs text-gray-400">{formatWeekDate(meta.weekStart)}</p>
+                    </div>
+                  </div>
+                  <ChevronLeft size={15} className="text-gray-300 group-hover:text-violet-500 rotate-180" />
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
 
         <section>
