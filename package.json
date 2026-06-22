@@ -1,10 +1,12 @@
 {
   "name": "pokemarketapp",
-  "version": "1.8.3",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "vitest run && next build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "start": "next start",
     "lint": "eslint",
     "video:preview": "remotion studio remotion/src/index.ts",
@@ -38,6 +40,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.9"
   }
 }
