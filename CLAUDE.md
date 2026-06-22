@@ -23,21 +23,31 @@ git push origin HEAD:main
 
 **Ohne Schritt 2 passiert kein Vercel-Deployment.**
 
-### Deploy-Checkliste
+### Deploy-Checkliste (PFLICHT — jeder Schritt, jedes Mal!)
 
-Vor jedem Commit + Push diese Liste abhaken:
+> **WICHTIG:** Vercel überspringt vitest (buildCommand = `next build`). Deshalb
+> MÜSSEN Tests lokal laufen — sie sind die letzte Sicherheitslinie vor Production!
 
-- [ ] **Version in `package.json` erhöht** (patch x.x.+1 oder minor x.+1.0)
+**Vor dem Commit:**
+
+- [ ] **`npm test` lokal ausführen** — alle Tests müssen grün sein (kein Skip!)
+      `npm test` → alle Suites bestanden, 0 Failures
 - [ ] **`npm run build` lokal grün** — kein TypeScript-Fehler, alle Seiten gebaut
+      (beinhaltet nochmals `npm test` + `next build` — beide müssen 0 Fehler haben)
+- [ ] **Version in `package.json` erhöht** (patch x.x.+1 oder minor x.+1.0)
 - [ ] **Git-Commit mit aussagekräftiger Nachricht** (was & warum, nicht nur was)
-- [ ] **Beide Branches gepusht:**
+
+**Nach dem Commit:**
+
+- [ ] **Beide Branches gepusht (PFLICHT — beide oder keiner):**
   - `git push -u origin claude/direct-push-main-lxluxu`
   - `git push origin HEAD:main`
 - [ ] **GitHub Main-Branch verifiziert** — neueste SHA stimmt mit lokalem HEAD überein
-  (per `git log --oneline -1` vs. GitHub MCP `list_commits sha:main`)
+  → `git log --oneline -1` mit GitHub MCP `list_commits sha:main` abgleichen
 - [ ] **Vercel-Deployment abwarten** — ca. 1–2 Minuten nach Push auf main
-- [ ] **Version auf der Live-Seite prüfen** — Footer zeigt `vX.Y.Z`
-- [ ] **STATUS.md aktualisieren** — neue Version eintragen
+- [ ] **Live-Seite verifizieren** — Footer zeigt `vX.Y.Z` (neue Version sichtbar?)
+      Falls alte Version: Vercel Build-Log prüfen, ob der Deploy überhaupt gestartet hat
+- [ ] **STATUS.md aktualisieren** — neue Version + Highlights eintragen
 
 ### Versionierungsschema
 
@@ -318,6 +328,8 @@ Settings → API → regenerate service_role key). Neuen Wert danach in Vercel a
 7. **Manuelles `<head>` in layout.tsx verboten** → Next.js injiziert CSS-Links in den Head. Ein zweites `<head>` in `layout.tsx` verhindert das → kein CSS. Niemals `<head>` in `layout.tsx` schreiben; stattdessen `metadata`-Export verwenden.
 8. **`cookies()` macht Seiten voll-dynamisch (kein ISR-Cache)** → `cookies()` oder `headers()` in einem Server-Component macht die ganze Seite zu `ƒ Dynamic` — kein CDN-Cache, jeder Request trifft den Server. Für die Homepage wurde `getLang()` (das `cookies()` nutzt) entfernt → Seite ist wieder `○ Static` mit ISR. Sprachumschaltung nur in Client-Komponenten (NavBar) per Cookie, nicht im Server-Rendering.
 9. **Externe Bilder** → `<img>` für externe URLs (pokemontcg.io) direkt nutzen, oder `next/image` mit `remotePatterns` in `next.config.ts` konfigurieren. Nicht konfigurierte Domains crashen den Build.
+10. **Vercel überspringt vitest** → `vercel.json` hat `"buildCommand": "next build"` (ohne vitest). Das war nötig weil vitest in Vercels Build-Umgebung fehlschlug (Supabase/Anthropic-Init). **Lokaler Build (`npm run build`) führt beide Schritte durch.** Tests müssen deshalb IMMER lokal grün sein vor dem Push — Vercel prüft sie nicht!
+11. **Deployment scheinbar erfolgreich, aber alte Version live** → Vercel zeigt manchmal keinen Fehler, hat aber den Build gecancelt oder die Seite aus Cache bedient. Nach jedem Push: Footer auf der Live-Seite prüfen. Wenn noch alte Version → Vercel Build-Log kontrollieren.
 
 ---
 
