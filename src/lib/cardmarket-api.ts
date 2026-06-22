@@ -103,18 +103,11 @@ export async function fetchCMLanguagePrice(
     if (!res.ok) return null;
 
     const data = (await res.json()) as { article?: Array<{ price: number }> };
-    const prices = (data.article ?? [])
-      .slice(0, 10)
-      .map((a) => a.price)
-      .sort((a, b) => a - b);
+    const prices = (data.article ?? []).map((a) => a.price).sort((a, b) => a - b);
 
     if (prices.length === 0) return null;
 
-    const mid = Math.floor(prices.length / 2);
-    const median =
-      prices.length % 2 === 0 ? (prices[mid - 1] + prices[mid]) / 2 : prices[mid];
-
-    return Math.round(median * 100) / 100;
+    return Math.round(prices[0] * 100) / 100;
   } catch {
     return null;
   }
