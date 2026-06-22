@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v0.9.6` · **Stand:** 21. Juni 2026 · **Branch:** `main`
+**Version:** `v2.1.0` · **Stand:** 22. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (v0.9.5)
+## Was gebaut ist (v2.1.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -19,8 +19,10 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Tagesartikel `/artikel/[date]` | ✅ Fertig | 7 Typen, ISR 24h, KI-generiert + Marco-Fallback |
 | Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO |
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
-| Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth, Generierung, Timer, Veröffentlichen, Logout |
-| Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt, API-Keys/Features/Skills/Workflows |
+| Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth, 3 Tabs: Content / Monitoring / Reels |
+| Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
+| **Portfolio `/portfolio`** | ✅ **Neu** | Finance-App-Style Tracker: localStorage, Recharts-Chart, Live-Preise, P&L |
+| **Reels Studio** | ✅ **Neu** | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
 | Impressum & Datenschutz | ⚠️ Platzhalter | Eckige Klammern noch ersetzen! |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | CRON_SECRET ✅ gesetzt |
 | Täglicher Cron (08:00 UTC) | ✅ Aktiv | Speichert Preis-Snapshots in Supabase |
@@ -28,7 +30,6 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | i18n DE/EN | ✅ Fertig | Cookie-basiert, NavBar-Umschalter |
 | SEO | ✅ Fertig | JSON-LD, Sitemap, robots.txt, OpenGraph |
 | Newsletter-System (Beehiiv) | ⏸ Bereit | Code fertig — `BEEHIIV_API_KEY` noch nicht gesetzt |
-| Video-Pipeline (Remotion) | ⏸ Bereit | Code fertig — `ELEVENLABS_API_KEY` noch nicht gesetzt |
 | Social-Media (Buffer) | ⏸ Bereit | Code fertig — `BUFFER_ACCESS_TOKEN` noch nicht gesetzt |
 | Affiliate-Links | ⚠️ Standard-URLs | Eigene Links in Vercel noch nicht eingetragen |
 
@@ -50,6 +51,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | `NEXT_PUBLIC_CARDMARKET_URL` | ❌ Eigener Affiliate-Link fehlt |
 | `NEXT_PUBLIC_AMAZON_URL` | ❌ Eigener Affiliate-Link fehlt |
 | `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | ❌ Eigener Affiliate-Link fehlt |
+| `INSTAGRAM_ACCESS_TOKEN` | ❌ Fehlt — für Reels-Auto-Publish |
+| `INSTAGRAM_BUSINESS_ACCOUNT_ID` | ❌ Fehlt — für Reels-Auto-Publish |
 
 ---
 
@@ -86,4 +89,17 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-*Zuletzt aktualisiert: v0.9.6 — 21. Juni 2026*
+---
+
+## Versions-Log (22. Juni 2026)
+
+| Version | Highlights |
+|---|---|
+| v2.0.0 | Instagram Reels Pipeline (FFmpeg + Studio Reels-Tab) |
+| v2.0.1 | Reels: lokales Video-Preview + benutzerdefinierter Cut-Zeitpunkt |
+| v2.1.0 | Portfolio-Tracker (Finance-App-Style, localStorage, Live-Preise, Chart) |
+| fix | Vercel `buildCommand: next build` — behebt Deployment-Blockade seit v1.9.0 |
+
+---
+
+*Zuletzt aktualisiert: v2.1.0 — 22. Juni 2026*
