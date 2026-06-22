@@ -282,7 +282,7 @@ export default async function Home() {
             <span className="text-gray-200">|</span>
             <a href="/datenschutz" className="text-gray-400 transition-colors hover:text-violet-600">Datenschutz</a>
             <span className="text-gray-200">|</span>
-            <span className="text-gray-300 font-mono">v{process.env.npm_package_version}</span>
+            <span className="text-gray-300 font-mono">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
           </div>
         </footer>
       </main>

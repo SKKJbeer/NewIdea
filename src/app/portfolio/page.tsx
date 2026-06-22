@@ -467,6 +467,9 @@ export default function PortfolioPage() {
         <p className="text-[10px] text-gray-300 text-center mt-6 leading-relaxed">
           Daten werden lokal in deinem Browser gespeichert · Keine Anlageberatung · Preise ohne Gewähr
         </p>
+        <p className="text-[10px] text-gray-200 text-center mt-1 font-mono">
+          v{process.env.NEXT_PUBLIC_APP_VERSION}
+        </p>
       </div>
 
       {showAdd && (
