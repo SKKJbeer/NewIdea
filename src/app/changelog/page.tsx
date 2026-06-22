@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.1',
+    date: '22. Juni 2026',
+    label: 'BUGFIX: Mobile Suche — Nested Scroll, Sticky Search, Touch-Targets',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Nested-Scroll entfernt — Vorschlagsliste scrollt jetzt im Modal-Body (iOS-kompatibel)' },
+      { type: 'fixed',   text: 'Suchfeld sticky im Modal — bleibt sichtbar beim Scrollen der Ergebnisse' },
+      { type: 'fixed',   text: 'Preis-Spalte min-width — wird bei langen Kartennamen nicht mehr gequetscht' },
+      { type: 'fixed',   text: 'Kartennamen 2-zeilig (statt hard-truncate) für bessere Lesbarkeit auf Mobile' },
+      { type: 'fixed',   text: 'WebkitOverflowScrolling: touch für iOS-Momentum-Scroll im Modal' },
+    ],
+  },
+  {
     version: '2.4.0',
     date: '22. Juni 2026',
     label: 'Portfolio Premium-UI: Clean-Look, Segmented Control, Badges',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Segmented-Control für Zeitraum-Auswahl (iOS-Pill-Stil)' },
       { type: 'new',     text: 'Sprach-Badge [EN/DE/JP/KR] als kleiner Chip — kein Emoji-Freitext mehr' },

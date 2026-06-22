@@ -51,6 +51,9 @@ git push origin HEAD:main
 - [ ] **`/changelog`-Seite aktualisieren** — `RELEASES`-Array in `src/app/changelog/page.tsx` ergänzen,
       `isLatest: true` auf neue Version, `isLatest: false` auf bisherige neueste Version setzen
 - [ ] **STATUS.md aktualisieren** — neue Version + Highlights eintragen
+- [ ] **Pflicht-Kommunikation im Chat (IMMER am Ende der Deploy-Antwort):**
+  - **Changelog-Summary:** 3–5 Stichpunkte was neu/geändert/behoben ist
+  - **Deployment-Bestätigung:** GitHub-SHA bestätigen (`git log --oneline -1` ↔ MCP `list_commits sha:main`), dann explizit sagen: "Vercel-Deployment läuft — bitte Footer auf `vX.Y.Z` prüfen in ~1–2 Min."
 
 ### Versionierungsschema
 

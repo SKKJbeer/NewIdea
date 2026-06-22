@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.1] — 2026-06-22 · BUGFIX: Mobile Suche — Nested Scroll entfernt, Sticky Search, bessere Touch-Targets
+
+### Behoben
+- Mobile: Nested-Scroll-Problem entfernt — Vorschlagsliste hatte eigenes `overflow-y-auto` innerhalb des Modal-Scrolls → führte auf iOS zu Scrollsperren und ruckeligem Verhalten
+- Mobile: `-mx-1` negative Margin auf Vorschlagsliste entfernt → verhinderte horizontales Clipping auf schmalen Screens
+- Modal-Body: `overflow-x-hidden` + `WebkitOverflowScrolling: touch` für iOS-Momentum-Scroll
+- Suchfeld jetzt `sticky top-0` im Modal → bleibt beim Scrollen der Ergebnisse sichtbar
+- Vorschlag-Buttons: `min-height: 60px`, `rounded-md` Thumbnail-Container, `px-3` Innenabstand
+- Preis-Spalte: `min-w-[56px]` damit sie bei langen Kartennamen nicht gequetscht wird
+- Kartennamen in Vorschlägen: 2-zeilig (max) statt hard truncate — voller Name lesbar auf Mobile
+- Formularfelder bei ausgewählter Karte: eigener `px-5 pt-2 pb-5`-Block nach dem Scroll-Bereich
+
+### Neu
+- Leerstand-States mit erklärendem Untertext ("Versuche einen anderen Suchbegriff")
+- CLAUDE.md: Pflicht-Kommunikation nach Deploy (Changelog-Summary + GitHub-SHA-Bestätigung) fest verankert
+
+---
+
 ## [2.4.0] — 2026-06-22 · Portfolio Premium-UI: Clean-Look, Segmented Control, Badges
 
 ### Neu

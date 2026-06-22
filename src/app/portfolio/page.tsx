@@ -476,61 +476,72 @@ function AddCardModal({
           </button>
         </div>
 
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4">
+        {/* Scrollable body — single scroll context, no nested overflow */}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={{ WebkitOverflowScrolling: 'touch' } as any}
+        >
 
-          {/* Search */}
+          {/* Search input — sticky so it stays visible while scrolling results */}
           {!selected && (
-            <div className="relative">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input
-                type="search"
-                autoFocus
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                enterKeyHint="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Kartenname — z.B. Charizard oder Glurak"
-                className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
-              />
-              {searching
-                ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
-                : query.length > 0
-                  ? <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 p-1">
-                      <X size={13} />
-                    </button>
-                  : null
-              }
+            <div className="sticky top-0 bg-white px-5 pt-5 pb-3 z-10">
+              <div className="relative">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <input
+                  type="search"
+                  autoFocus
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  enterKeyHint="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Kartenname — z.B. Charizard oder Glurak"
+                  className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
+                />
+                {searching
+                  ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+                  : query.length > 0
+                    ? <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 p-1 rounded-full">
+                        <X size={13} />
+                      </button>
+                    : null
+                }
+              </div>
             </div>
           )}
 
-          {/* Suggestions */}
+          {/* Suggestions — no inner scroll, modal body scrolls */}
           {!selected && suggestions.length > 0 && (
-            <div className="-mx-1">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-4 mb-1.5">
+            <div className="px-5 pb-2">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-2">
                 {suggestions.length} Karte{suggestions.length !== 1 ? 'n' : ''} gefunden
               </p>
-              <div className="space-y-0.5 max-h-64 overflow-y-auto overscroll-contain">
+              <div className="space-y-0.5">
                 {suggestions.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => selectCard(s)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors text-left group"
-                    style={{ minHeight: 56 }}
+                    className="w-full flex items-center gap-3 py-3 px-3 rounded-xl bg-white active:bg-gray-100 transition-colors text-left"
+                    style={{ minHeight: 60 }}
                   >
-                    <div className="shrink-0 w-9 h-12 rounded overflow-hidden bg-gray-100">
+                    {/* Card thumbnail */}
+                    <div className="shrink-0 w-10 h-[52px] rounded-md overflow-hidden bg-gray-100">
                       {s.imageUrl
                         ? <img src={s.imageUrl} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
                         : <div className="w-full h-full" />
                       }
                     </div>
+                    {/* Name + set */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{s.nameDe || s.name}</p>
-                      <p className="text-xs text-gray-400 truncate">{s.set}</p>
+                      <p className="text-sm font-semibold text-gray-900 leading-snug" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {s.nameDe || s.name}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{s.set}</p>
                     </div>
-                    <div className="shrink-0 text-right pl-2">
+                    {/* Price */}
+                    <div className="shrink-0 text-right pl-3 min-w-[56px]">
                       {s.price > 0
                         ? <p className="text-sm font-bold text-gray-900 tabular-nums">{formatEur(s.price)}</p>
                         : <p className="text-xs text-gray-300">–</p>
@@ -539,20 +550,27 @@ function AddCardModal({
                   </button>
                 ))}
               </div>
+              {/* Bottom breathing room */}
+              <div className="h-4" />
             </div>
           )}
 
           {/* Empty states */}
           {!selected && query.length >= 2 && !searching && suggestions.length === 0 && (
-            <p className="text-center text-sm text-gray-400 py-6">Keine Karten gefunden</p>
+            <div className="px-5 py-8 text-center">
+              <p className="text-sm text-gray-400">Keine Karten gefunden</p>
+              <p className="text-xs text-gray-300 mt-1">Versuche einen anderen Suchbegriff</p>
+            </div>
           )}
           {!selected && query.length < 2 && (
-            <p className="text-center text-xs text-gray-400 py-4">Mind. 2 Zeichen eingeben</p>
+            <div className="px-5 pt-2 pb-8 text-center">
+              <p className="text-xs text-gray-400">Mind. 2 Zeichen eingeben</p>
+            </div>
           )}
 
-          {/* Selected card */}
+          {/* Selected card — form inside normal padding */}
           {selected && (
-            <div className="space-y-4">
+            <div className="px-5 pt-2 pb-5 space-y-4">
               {/* Card preview */}
               <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
                 <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-gray-100">
@@ -706,7 +724,11 @@ function EditCardModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4">
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-5 space-y-4"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={{ WebkitOverflowScrolling: 'touch' } as any}
+        >
           {/* Card preview */}
           <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
             <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-gray-100">
