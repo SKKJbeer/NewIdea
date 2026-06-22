@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import {
-  AreaChart, Area, XAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, Plus, Trash2, Loader2,
-  BarChart3, Search, X, Check, RefreshCw,
+  BarChart3, Search, X, Check,
 } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 
@@ -72,7 +72,8 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showReset, setShowReset] = useState(false);
-  const [timeRange, setTimeRange] = useState<'1W' | '1M'>('1M');
+  const [editTarget, setEditTarget] = useState<PortfolioHolding | null>(null);
+  const [timeRange, setTimeRange] = useState<'1D' | '1W' | '1M' | '3M' | '1Y'>('1M');
 
   // Load portfolio from localStorage after mount
   useEffect(() => {
@@ -113,12 +114,9 @@ export default function PortfolioPage() {
     setShowReset(false);
   }
 
-  function adjustQty(cardId: string, delta: number) {
-    saveHoldings(
-      holdings.map((h) =>
-        h.cardId === cardId ? { ...h, quantity: Math.max(1, h.quantity + delta) } : h
-      )
-    );
+  function saveEdit(updated: PortfolioHolding) {
+    saveHoldings(holdings.map((h) => h.cardId === updated.cardId ? updated : h));
+    setEditTarget(null);
   }
 
   function livePrice(cardId: string, fallback: number) {
@@ -141,6 +139,8 @@ export default function PortfolioPage() {
     holdings.forEach((h) => {
       const hist = liveData[h.cardId]?.priceHistory ?? [];
       hist.forEach(({ date, price }) => {
+        // Only count from the purchase date onwards — before that the card wasn't owned
+        if (h.purchaseDate && date < h.purchaseDate) return;
         dateMap.set(date, (dateMap.get(date) ?? 0) + price * h.quantity);
       });
     });
@@ -152,8 +152,10 @@ export default function PortfolioPage() {
       .map(([date, value]) => ({ date, value: Math.round(value * 100) / 100 }));
   }, [holdings, liveData]);
 
+  const RANGE_DAYS: Record<typeof timeRange, number> = { '1D': 2, '1W': 7, '1M': 30, '3M': 90, '1Y': 365 };
+
   const chartData = useMemo(
-    () => (timeRange === '1W' ? allChartData.slice(-7) : allChartData),
+    () => allChartData.slice(-RANGE_DAYS[timeRange]),
     [allChartData, timeRange]
   );
 
@@ -221,16 +223,25 @@ export default function PortfolioPage() {
           </p>
 
           {/* Chart */}
-          {chartData.length >= 3 ? (
+          {chartData.length >= 2 ? (
             <div className="mb-4 -mx-1">
-              <ResponsiveContainer width="100%" height={150}>
-                <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+              <ResponsiveContainer width="100%" height={160}>
+                <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="portGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%"  stopColor={lineColor} stopOpacity={0.18} />
                       <stop offset="95%" stopColor={lineColor} stopOpacity={0} />
                     </linearGradient>
                   </defs>
+                  <YAxis
+                    tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : `${v.toFixed(0)}€`}
+                    tick={{ fontSize: 9, fill: '#9ca3af' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={42}
+                    tickCount={4}
+                    domain={['auto', 'auto']}
+                  />
                   <XAxis
                     dataKey="date"
                     tickFormatter={formatShortDate}
@@ -276,23 +287,21 @@ export default function PortfolioPage() {
           )}
 
           {/* Time-range pills */}
-          {chartData.length >= 3 && (
-            <div className="flex gap-1">
-              {(['1W', '1M'] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setTimeRange(r)}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
-                    timeRange === r
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-1">
+            {(['1D', '1W', '1M', '3M', '1Y'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setTimeRange(r)}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                  timeRange === r
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -321,54 +330,32 @@ export default function PortfolioPage() {
               const sc    = h.setCode || setCodeFromId(h.cardId);
 
               return (
-                <div key={h.cardId} className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/70 transition-colors group">
-
+                <div
+                  key={h.cardId}
+                  className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/70 transition-colors group cursor-pointer"
+                  onClick={() => setEditTarget(h)}
+                >
                   {/* Card image */}
-                  <div className="shrink-0 relative">
+                  <div className="shrink-0">
                     <img
                       src={h.imageUrl}
                       alt={h.cardName}
                       className="h-16 w-12 object-contain rounded"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   </div>
 
-                  {/* Name + set + qty controls */}
+                  {/* Name + set + info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-900 truncate">{h.cardName}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5 mb-2">
+                    <div className="flex items-center gap-1.5 mt-0.5">
                       <BoosterPackImage setCode={sc} setName={h.setName} className="h-4 w-auto" />
                       <span className="text-xs text-gray-400">{h.setName}</span>
                     </div>
-
-                    {/* Quantity control */}
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => adjustQty(h.cardId, -1)}
-                        className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 transition-colors leading-none"
-                      >
-                        −
-                      </button>
-                      <span className="text-xs font-semibold text-gray-700 min-w-[24px] text-center tabular-nums">
-                        {h.quantity}×
-                      </span>
-                      <button
-                        onClick={() => adjustQty(h.cardId, +1)}
-                        className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 transition-colors leading-none"
-                      >
-                        +
-                      </button>
-                      <span className="text-[10px] text-gray-300 ml-1">
-                        à {formatEur(h.purchasePrice)}
-                      </span>
-                    </div>
-                    {h.purchaseDate && (
-                      <p className="text-[10px] text-gray-300 mt-1">
-                        Gekauft: {new Date(h.purchaseDate + 'T00:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}
-                      </p>
-                    )}
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      {h.quantity}× · à {formatEur(h.purchasePrice)}
+                      {h.purchaseDate ? ` · ${new Date(h.purchaseDate + 'T00:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}` : ''}
+                    </p>
                   </div>
 
                   {/* Value + P&L */}
@@ -382,9 +369,9 @@ export default function PortfolioPage() {
                     </p>
                   </div>
 
-                  {/* Delete */}
+                  {/* Delete — stopPropagation so it doesn't open the edit modal */}
                   <button
-                    onClick={() => removeHolding(h.cardId)}
+                    onClick={(e) => { e.stopPropagation(); removeHolding(h.cardId); }}
                     className="p-1.5 rounded-lg text-gray-200 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                     title="Entfernen"
                   >
@@ -416,6 +403,15 @@ export default function PortfolioPage() {
 
       {showAdd && (
         <AddCardModal holdings={holdings} onAdd={saveHoldings} onClose={() => setShowAdd(false)} />
+      )}
+
+      {editTarget && (
+        <EditCardModal
+          holding={editTarget}
+          onSave={saveEdit}
+          onRemove={(id) => { removeHolding(id); setEditTarget(null); }}
+          onClose={() => setEditTarget(null)}
+        />
       )}
 
       {showReset && (
@@ -749,6 +745,149 @@ function AddCardModal({
               </p>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Edit card modal ──────────────────────────────────────────────────────────
+
+function EditCardModal({
+  holding,
+  onSave,
+  onRemove,
+  onClose,
+}: {
+  holding: PortfolioHolding;
+  onSave: (updated: PortfolioHolding) => void;
+  onRemove: (cardId: string) => void;
+  onClose: () => void;
+}) {
+  const [qty, setQty]                   = useState(holding.quantity);
+  const [purchasePrice, setPurchasePrice] = useState(holding.purchasePrice.toFixed(2));
+  const [purchaseDate, setPurchaseDate]   = useState(holding.purchaseDate || '');
+
+  const sc = holding.setCode || setCodeFromId(holding.cardId);
+  const total = parseFloat(purchasePrice) * qty;
+
+  function save() {
+    onSave({
+      ...holding,
+      quantity: qty,
+      purchasePrice: parseFloat(purchasePrice) || holding.purchasePrice,
+      purchaseDate: purchaseDate || holding.purchaseDate,
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 max-h-[92vh] flex flex-col">
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="w-10 h-1 bg-gray-200 rounded-full" />
+        </div>
+
+        <div className="flex items-center justify-between px-5 pt-4 pb-4 border-b border-gray-100">
+          <h2 className="font-black text-gray-900 text-base">Position bearbeiten</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Card preview */}
+          <div className="flex items-center gap-3 p-4 bg-violet-50 rounded-2xl">
+            <img
+              src={holding.imageUrl}
+              alt={holding.cardName}
+              className="h-20 w-14 object-contain rounded-lg shrink-0 shadow-sm"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-gray-900 leading-tight">{holding.cardName}</p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <BoosterPackImage setCode={sc} setName={holding.setName} className="h-5 w-auto" />
+                <p className="text-xs text-gray-500">{holding.setName}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quantity */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 block mb-2">Anzahl</label>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors text-base"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                min={1}
+                value={qty}
+                onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
+                className="flex-1 text-center text-sm font-bold border border-gray-200 rounded-xl py-2 focus:outline-none focus:border-violet-400"
+              />
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors text-base"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Purchase price */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 block mb-2">Kaufpreis/Stk (€)</label>
+            <input
+              type="number"
+              min={0}
+              step={0.01}
+              value={purchasePrice}
+              onChange={(e) => setPurchasePrice(e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400"
+            />
+          </div>
+
+          {/* Purchase date */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 block mb-2">Kaufdatum</label>
+            <input
+              type="date"
+              value={purchaseDate}
+              max={new Date().toISOString().split('T')[0]}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400 text-gray-700"
+            />
+          </div>
+
+          {/* Total */}
+          {!isNaN(total) && total > 0 && (
+            <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+              <span className="text-xs text-gray-500 font-semibold">Gesamteinstand</span>
+              <span className="text-base font-black text-gray-900 tabular-nums">{formatEur(total)}</span>
+            </div>
+          )}
+
+          {/* Save */}
+          <button
+            onClick={save}
+            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-colors"
+          >
+            <Check size={16} /> Speichern
+          </button>
+
+          {/* Remove */}
+          <button
+            onClick={() => onRemove(holding.cardId)}
+            className="w-full py-3 text-red-500 hover:text-red-600 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+          >
+            <Trash2 size={14} /> Karte entfernen
+          </button>
         </div>
       </div>
     </div>
