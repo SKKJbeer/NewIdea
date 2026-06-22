@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
-import { ArrowLeft, GitMerge, Plus, RefreshCw } from 'lucide-react';
+import { ArrowLeft, GitMerge, Plus, RefreshCw, Wrench } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -11,10 +11,206 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.1.3',
+    date: '22. Juni 2026',
+    label: 'Portfolio: Edit-Modal, Chart-Fix, Y-Achse, Zeitbereiche',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Karten-Edit via Klick auf die Zeile — öffnet EditCardModal (Anzahl, Kaufpreis, Kaufdatum; "Karte entfernen" im Modal)' },
+      { type: 'changed', text: 'Inline-Qty-Controls entfernt; Zeile zeigt kompakt "3× · à 45,00 € · 15.06.26"' },
+      { type: 'fixed',   text: 'Chart startete 30 Tage in der Vergangenheit — jetzt zählt Preishistorie erst ab purchaseDate' },
+      { type: 'new',     text: 'Y-Achse mit €-Werten im Gesamtchart (auto-skaliert, 4 Ticks)' },
+      { type: 'new',     text: '5 Zeitbereiche: 1D · 1W · 1M · 3M · 1Y (immer sichtbar)' },
+    ],
+  },
+  {
+    version: '2.1.2',
+    date: '22. Juni 2026',
+    label: 'Portfolio: Reset-Button mit Bestätigungs-Dialog',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Trash-Icon neben Add-Button öffnet Confirmation-Modal vor dem Löschen' },
+      { type: 'new',     text: 'Modal zeigt Anzahl der Positionen und warnt vor unwiderruflichem Löschen' },
+      { type: 'new',     text: '"Alles löschen" leert localStorage + State; Klick auf Backdrop schließt ohne Aktion' },
+    ],
+  },
+  {
+    version: '2.1.1',
+    date: '22. Juni 2026',
+    label: 'Portfolio: Kaufdatum',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Pflichtfeld "Kaufdatum" im Karte-hinzufügen-Modal (default: heute, max: heute)' },
+      { type: 'new',     text: 'Kaufdatum wird als purchaseDate in PortfolioHolding gespeichert und in der Liste angezeigt' },
+    ],
+  },
+  {
+    version: '2.1.0',
+    date: '22. Juni 2026',
+    label: 'Portfolio-Tracker (Finance-App-Style)',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: '/portfolio — localStorage-basierter Karten-Portfolio-Tracker' },
+      { type: 'new',     text: 'Finance-App-UI: großer Gesamtwert, grün/rot P&L, Recharts AreaChart mit dynamischem Gradient' },
+      { type: 'new',     text: 'Zeitraumauswahl 1W / 1M — Chart aggregiert Cardmarket-Preishistorie aller Positionen' },
+      { type: 'new',     text: 'Karte-hinzufügen-Modal: Suche (debounced 320ms), Quantity + Kaufpreis, Gesamteinstand-Vorschau' },
+      { type: 'new',     text: '/api/portfolio/prices — Batch-Preisabruf (TCG API, 5min Cache)' },
+      { type: 'new',     text: 'NavBar: "Portfolio" Link (Desktop + Mobile) mit BarChart3-Icon' },
+    ],
+  },
+  {
+    version: '2.0.1',
+    date: '22. Juni 2026',
+    label: 'Reels: Video-Preview + Custom Cut-Position',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Lokales Video-Preview sofort nach Auswahl (object URL, kein Upload nötig)' },
+      { type: 'new',     text: 'Trim-Schritt: vollständige Wiedergabe des Originalvideos zum Scrubben' },
+      { type: 'new',     text: '"Aktuelle Position übernehmen" — Button liest playback-Zeit aus → befüllt Start-Zeitfeld' },
+      { type: 'new',     text: 'FFmpeg: Pre-Input-Seek + -t duration bei gesetztem startTime; Fallback auf -sseof' },
+    ],
+  },
+  {
+    version: '2.0.0',
+    date: '22. Juni 2026',
+    label: 'Instagram Reels Pipeline',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: '/api/video/upload-url — signierte Supabase Upload-URL (umgeht Vercel-Body-Limit)' },
+      { type: 'new',     text: '/api/video/process — FFmpeg: letzte N Sekunden, 9:16-Crop, Branding, Caption via Claude Haiku' },
+      { type: 'new',     text: '/api/video/publish-instagram — 3-Schritt Meta Graph API (Container → Poll → Publish)' },
+      { type: 'new',     text: 'ReelsStudio: Upload → Preview → Trim → Process → Vorschau + Caption → Instagram' },
+      { type: 'new',     text: 'Studio: neuer Tab "Reels" mit ReelsStudio-Komponente' },
+    ],
+  },
+  {
+    version: '0.9.6',
+    date: '21. Juni 2026',
+    label: 'Server-Auth via HttpOnly-Cookie',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: '/api/studio-auth — POST setzt HttpOnly-Cookie (SHA-256 von STUDIO_PASSWORD)' },
+      { type: 'new',     text: '/api/monitoring + /api/status — prüfen studio_session-Cookie, 401 wenn fehlt' },
+      { type: 'new',     text: '/monitoring — eigene Seite mit gleichem Auth-Gate wie /studio' },
+      { type: 'changed', text: 'Logout: DELETE /api/studio-auth löscht Cookie (7 Tage Laufzeit)' },
+    ],
+  },
+  {
+    version: '0.9.5',
+    date: '21. Juni 2026',
+    label: 'Booster-Pack-Artwork + Blog-Listing',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'BoosterPackImage: Produktbilder von assets.pokemon.com CDN mit Fallback auf Set-Logo' },
+      { type: 'new',     text: 'Blog-Listing zeigt echte Artikel-Titel (nicht mehr generisch)' },
+    ],
+  },
+  {
+    version: '0.9.4',
+    date: '21. Juni 2026',
+    label: 'Studio: Skills & Workflows-Sektion',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Monitoring-Seite: Skills & Workflows-Tab liest automatisch .claude/commands/' },
+    ],
+  },
+  {
+    version: '0.9.3',
+    date: '21. Juni 2026',
+    label: 'Booster-Set-Logo unter allen Karten',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Booster-Pack-Logo unter Karten in Artikeln und Guides (BoosterPackImage-Pflicht umgesetzt)' },
+    ],
+  },
+  {
+    version: '0.9.2',
+    date: '21. Juni 2026',
+    label: 'ArticleCardGallery + Guide-Kartenbilder',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'ArticleCardGallery: Recharts-Preischart in Artikel-Karten-Sektionen' },
+      { type: 'fixed',   text: 'Guide-Karten zeigen echte Bilder statt 🃏-Emoji-Placeholder' },
+    ],
+  },
+  {
+    version: '0.9.1',
+    date: '21. Juni 2026',
+    label: 'NavBar-Hotfix',
+    isLatest: false,
+    changes: [
+      { type: 'fixed',   text: 'Bottom-Tab-Bar entfernt (zerstörte Layout auf Mobil) — zurück zur Single-Top-Bar' },
+    ],
+  },
+  {
+    version: '0.9.0',
+    date: '21. Juni 2026',
+    label: 'NavBar-Redesign + Blog-Fallback-Artikel',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'Fallback-Artikel mit echtem Marktanalyse-Inhalt (kein Marco-Persona-Name)' },
+      { type: 'changed', text: 'NavBar-Redesign (anschließend in 0.9.1 revertiert)' },
+    ],
+  },
+  {
+    version: '0.8.0',
+    date: '21. Juni 2026',
+    label: 'Artikel-Bilder + Booster-Set-Logos in Guides',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'FeaturedCards-Komponente: echte Karten-Thumbnails in Artikeln' },
+      { type: 'new',     text: 'ArticleGallery: Bild-Galeriesektion in Artikeln' },
+      { type: 'new',     text: 'Booster-Set-Logos in Guide-Karten' },
+    ],
+  },
+  {
+    version: '0.5.3',
+    date: '21. Juni 2026',
+    label: 'CSS-Fix + Homepage Static/ISR',
+    isLatest: false,
+    changes: [
+      { type: 'fixed',   text: 'CSS-Verlust: <head>-Tag aus layout.tsx entfernt (Next.js injiziert CSS selbst)' },
+      { type: 'fixed',   text: 'Homepage wieder ○ Static / ISR — cookies() aus Server-Component entfernt' },
+      { type: 'changed', text: 'Alle externen Bilder via next/image mit remotePatterns konfiguriert' },
+    ],
+  },
+  {
+    version: '0.5.2',
+    date: '21. Juni 2026',
+    label: 'BUGFIX: Style-Verlust durch JSON-Import',
+    isLatest: false,
+    changes: [
+      { type: 'fixed',   text: 'import x from "./package.json" crashte Vercels Turbopack-Build → kein CSS. Fix: process.env.npm_package_version' },
+    ],
+  },
+  {
+    version: '0.5.1',
+    date: '21. Juni 2026',
+    label: 'Dokumentation',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'CLAUDE.md erstellt — dauerhaftes Arbeitsgedächtnis für Claude Code' },
+      { type: 'new',     text: 'STATUS.md aktualisiert' },
+    ],
+  },
+  {
+    version: '0.5.0',
+    date: '21. Juni 2026',
+    label: 'i18n, Autocomplete, SEO',
+    isLatest: false,
+    changes: [
+      { type: 'new',     text: 'i18n DE/EN via lang-Cookie — NavBar-Umschalter' },
+      { type: 'new',     text: 'Suche-Autocomplete: /api/search/suggestions mit debounce 320ms' },
+      { type: 'new',     text: 'Loading-Skeleton auf Suchergebnisseite' },
+      { type: 'new',     text: 'SEO: JSON-LD (Product+Offer, ItemList), Sitemap, robots.txt, OpenGraph' },
+      { type: 'new',     text: 'Version im Footer (aus npm_package_version)' },
+    ],
+  },
+  {
     version: '0.4.0',
     date: '20. Juni 2026',
     label: 'Marktbericht & Blog',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: '/marktbericht — Wöchentliche KI-Marktanalyse (ISR 7 Tage)' },
       { type: 'new', text: '/artikel — Blog-Index der letzten 14 Tage mit Featured-Card' },
@@ -76,8 +272,9 @@ const RELEASES = [
 ];
 
 const TYPE_STYLE = {
-  new:     { icon: Plus,       color: 'text-green-600', bg: 'bg-green-50',  label: 'Neu' },
-  changed: { icon: RefreshCw,  color: 'text-blue-600',  bg: 'bg-blue-50',   label: 'Geändert' },
+  new:     { icon: Plus,       color: 'text-green-600',  bg: 'bg-green-50',  label: 'Neu' },
+  changed: { icon: RefreshCw,  color: 'text-blue-600',   bg: 'bg-blue-50',   label: 'Geändert' },
+  fixed:   { icon: Wrench,     color: 'text-orange-600', bg: 'bg-orange-50', label: 'Behoben' },
 };
 
 export default function ChangelogPage() {

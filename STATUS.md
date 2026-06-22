@@ -98,6 +98,9 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.0.0 | Instagram Reels Pipeline (FFmpeg + Studio Reels-Tab) |
 | v2.0.1 | Reels: lokales Video-Preview + benutzerdefinierter Cut-Zeitpunkt |
 | v2.1.0 | Portfolio-Tracker (Finance-App-Style, localStorage, Live-Preise, Chart) |
+| v2.1.1 | Portfolio: Kaufdatum beim Hinzufügen |
+| v2.1.2 | Portfolio: Reset-Button mit Bestätigungs-Dialog |
+| v2.1.3 | Portfolio: Edit-Modal, Chart-Fix (purchaseDate), Y-Achse, 5 Zeitbereiche |
 | fix | Vercel `buildCommand: next build` — behebt Deployment-Blockade seit v1.9.0 |
 
 ---

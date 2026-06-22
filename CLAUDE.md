@@ -47,6 +47,9 @@ git push origin HEAD:main
 - [ ] **Vercel-Deployment abwarten** — ca. 1–2 Minuten nach Push auf main
 - [ ] **Live-Seite verifizieren** — Footer zeigt `vX.Y.Z` (neue Version sichtbar?)
       Falls alte Version: Vercel Build-Log prüfen, ob der Deploy überhaupt gestartet hat
+- [ ] **`CHANGELOG.md` aktualisieren** — neue Version mit Neu/Geändert/Behoben-Einträgen ganz oben eintragen
+- [ ] **`/changelog`-Seite aktualisieren** — `RELEASES`-Array in `src/app/changelog/page.tsx` ergänzen,
+      `isLatest: true` auf neue Version, `isLatest: false` auf bisherige neueste Version setzen
 - [ ] **STATUS.md aktualisieren** — neue Version + Highlights eintragen
 
 ### Versionierungsschema
@@ -58,6 +61,18 @@ git push origin HEAD:main
 | Major `+1.0.0` | Kompletter Umbau | 0.9.0 → 1.0.0 |
 
 Die Version wird **immer** im Deploy-Commit-Titel genannt: `v0.6.0 — ...`
+
+### Release-Notes-Pflicht (IMMER bei jedem Deploy!)
+
+Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
+
+| Datei | Was eintragen |
+|---|---|
+| `CHANGELOG.md` | Neue Version ganz oben, Einträge als `### Neu / Geändert / Behoben` |
+| `src/app/changelog/page.tsx` | Neues Objekt in `RELEASES[]` oben, `isLatest: true` auf neue, bisherige auf `false` |
+| `STATUS.md` | Versions-Log-Tabelle ergänzen + "Was gebaut ist"-Tabelle aktualisieren |
+
+**Warum:** Die `/changelog`-Seite ist öffentlich sichtbar — veraltete Release-Notes beschädigen die Glaubwürdigkeit der Plattform. Lückenlose Dokumentation ist Teil der Produktqualität.
 
 ---
 
