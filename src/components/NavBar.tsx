@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Search } from 'lucide-react';
+import { Zap, Search, BarChart3 } from 'lucide-react';
 
 const NAV_LINKS = [
   { href: '/suche',        label: 'Suche'       },
   { href: '/marktbericht', label: 'Marktbericht' },
   { href: '/artikel',      label: 'Blog'         },
   { href: '/guides',       label: 'Guides'       },
+  { href: '/portfolio',    label: 'Portfolio'    },
 ];
 
 export function NavBar() {
@@ -50,7 +51,7 @@ export function NavBar() {
               <Search size={18} />
             </Link>
 
-            {/* Blog + Guides text on mobile */}
+            {/* Blog + Guides + Portfolio text on mobile */}
             <Link
               href="/artikel"
               className={`sm:hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
@@ -66,6 +67,14 @@ export function NavBar() {
               }`}
             >
               Guides
+            </Link>
+            <Link
+              href="/portfolio"
+              className={`sm:hidden flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
+                pathname.startsWith('/portfolio') ? 'text-violet-700 bg-violet-50' : 'text-gray-600 hover:text-violet-600'
+              }`}
+            >
+              <BarChart3 size={12} />Portfolio
             </Link>
 
             {/* Desktop: all links */}
