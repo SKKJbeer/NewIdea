@@ -1,6 +1,6 @@
 import { NavBar } from '@/components/NavBar';
-import { CardGrid } from '@/components/CardGrid';
 import { SearchBox } from '@/components/SearchBox';
+import { SearchResultsLang } from '@/components/SearchResultsLang';
 import { searchCards } from '@/lib/pokemon-api';
 import { Search, SearchX } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -104,12 +104,7 @@ export default async function SearchPage({
             <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
           </div>
         ) : (
-          <>
-            <p className="text-sm text-gray-500 mb-5">
-              <span className="font-semibold text-gray-900">{results.length}</span> Treffer für „<span className="font-semibold text-gray-900">{query}</span>"
-            </p>
-            <CardGrid cards={results} />
-          </>
+          <SearchResultsLang cards={results} query={query} />
         )}
       </main>
 

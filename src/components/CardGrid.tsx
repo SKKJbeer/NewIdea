@@ -10,9 +10,11 @@ interface CardGridProps {
   cards: PokemonCard[];
   title?: string;
   compact?: boolean;
+  priceOverrides?: Record<string, number>;
+  priceLanguage?: string;
 }
 
-export function CardGrid({ cards, title, compact = false }: CardGridProps) {
+export function CardGrid({ cards, title, compact = false, priceOverrides = {}, priceLanguage = 'EN' }: CardGridProps) {
   return (
     <section>
       {title && <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>}
@@ -21,15 +23,15 @@ export function CardGrid({ cards, title, compact = false }: CardGridProps) {
         : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
       }>
         {cards.map((card) => (
-          <CardItem key={card.id} card={card} compact={compact} />
+          <CardItem key={card.id} card={card} compact={compact} priceOverride={priceOverrides[card.id]} priceLanguage={priceLanguage} />
         ))}
       </div>
     </section>
   );
 }
 
-function CardItem({ card, compact }: { card: PokemonCard; compact?: boolean }) {
-  const price = card.prices.market || card.prices.holofoil?.market || 0;
+function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card: PokemonCard; compact?: boolean; priceOverride?: number; priceLanguage?: string }) {
+  const price = priceOverride ?? (card.prices.market || card.prices.holofoil?.market || 0);
   const trend = card.trendPercent || 0;
   const isPositive = trend >= 0;
   const score = card.investmentScore || 0;
@@ -55,6 +57,7 @@ function CardItem({ card, compact }: { card: PokemonCard; compact?: boolean }) {
             <p className="text-[10px] font-semibold text-gray-800 leading-tight line-clamp-1">{card.name}</p>
             <p className="text-[10px] font-bold text-gray-600 tabular-nums">
               {price > 0 ? `${price.toFixed(0)} €` : '—'}
+              {priceLanguage !== 'EN' && <span className="ml-1 text-[9px] text-violet-500">{priceLanguage}</span>}
             </p>
           </div>
         </div>
@@ -101,9 +104,14 @@ function CardItem({ card, compact }: { card: PokemonCard; compact?: boolean }) {
           </div>
 
           <div className="flex items-center justify-between mt-2">
-            <span className="text-base font-bold text-gray-900">
-              {price > 0 ? `${price.toFixed(2)} €` : 'N/A'}
-            </span>
+            <div>
+              <span className="text-base font-bold text-gray-900">
+                {price > 0 ? `${price.toFixed(2)} €` : 'N/A'}
+              </span>
+              {priceLanguage !== 'EN' && (
+                <span className="ml-1.5 text-[10px] font-bold text-violet-500">{priceLanguage}</span>
+              )}
+            </div>
             <span className={`flex items-center gap-0.5 text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
               {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
               {Math.abs(trend).toFixed(1)}%

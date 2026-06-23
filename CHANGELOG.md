@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.5.1] — 2026-06-23 · Sprachauswahl für Kartenpreise (Suche + Karten-Detail)
+
+### Neu
+- **Sprachauswahl EN/DE/JP/KR** in der Suche (`/suche`) — Sprachpicker erscheint bei Suchergebnissen, bei Umschaltung werden Cardmarket-Preise für die gewählte Kartensprache geladen
+- **Sprachauswahl EN/DE/JP/KR** auf der Karten-Detailseite (`/karten/[id]`) — Picker über dem Preis, Preis wird live per API aktualisiert
+- **Preisbeschriftung DE/JP/KR** im Kartengitter — kleines Sprach-Badge neben dem Preis wenn nicht EN
+- **Fallback-Hinweis** wenn Cardmarket OAuth nicht konfiguriert ist — erklärt welche Env-Vars fehlen
+- **Erfolgshinweis** wenn sprachspezifische Preise geladen wurden
+
+### Infrastruktur (bereits vorhanden, jetzt sichtbar genutzt)
+- `cardmarket-api.ts` → `fetchCMLanguagePrice(cardName, language)` — Cardmarket OAuth 1.0
+- `/api/portfolio/prices` → POST-Endpoint mit `{id, language, name}` pro Karte, liefert `priceLanguage` zurück
+- `CardLanguage` type in `portfolio.ts` — `'EN' | 'DE' | 'JP' | 'KR'`
+
+---
+
 ## [2.5.0] — 2026-06-23 · Startseite Redesign: Bloomberg/TradingView-Style Dark Mode
 
 ### Neu

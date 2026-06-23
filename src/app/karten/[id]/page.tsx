@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
-import { ArrowLeft, TrendingUp, TrendingDown, Star, ShoppingCart, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
+import { CardLangPrice } from '@/components/CardLangPrice';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -48,7 +49,6 @@ export default async function CardDetailPage({ params }: Props) {
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
   const trend = card.trendPercent || 0;
-  const isPositive = trend >= 0;
   const score = calculateInvestmentScore(card);
 
   after(async () => {
@@ -156,21 +156,15 @@ export default async function CardDetailPage({ params }: Props) {
                 <p className="text-sm font-semibold text-violet-600 mt-0.5">🇩🇪 {card.nameDe}</p>
               )}
               <p className="text-sm text-gray-500 mt-1">{card.rarity}</p>
-              <div className="flex items-end gap-4 mt-4">
-                <div>
-                  <p className="text-xs text-gray-400">
-                    Marktpreis{card.priceSource === 'cardmarket' ? ' (Cardmarket)' : ''}
-                  </p>
-                  <p className="text-3xl font-black text-gray-900">
-                    {price > 0 ? `${price.toFixed(2)} €` : 'N/A'}
-                  </p>
-                </div>
-                {realData && (
-                  <div className={`flex items-center gap-1 text-sm font-semibold pb-1 ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
-                    {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                    {isPositive ? '+' : ''}{trend.toFixed(1)}% (30d)
-                  </div>
-                )}
+              <div className="mt-4">
+                <CardLangPrice
+                  cardId={card.id}
+                  cardName={card.name}
+                  defaultPrice={price}
+                  trendPercent={trend}
+                  realData={realData}
+                  priceSource={card.priceSource}
+                />
               </div>
             </div>
 

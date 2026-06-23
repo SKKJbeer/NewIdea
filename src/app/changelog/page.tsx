@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.5.1',
+    date: '23. Juni 2026',
+    label: 'Sprachauswahl EN/DE/JP/KR für Kartenpreise in Suche + Detail',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Sprachauswahl EN/DE/JP/KR in der Suche — Cardmarket-Preise für die gewählte Kartensprache werden live geladen' },
+      { type: 'new',     text: 'Sprachauswahl auf der Karten-Detailseite — Preis wechselt live beim Klick' },
+      { type: 'new',     text: 'Sprach-Badge neben dem Preis im Kartengitter (DE/JP/KR sichtbar markiert)' },
+      { type: 'new',     text: 'Fallback-Hinweis wenn Cardmarket OAuth nicht konfiguriert ist' },
+    ],
+  },
+  {
     version: '2.5.0',
     date: '23. Juni 2026',
     label: 'Startseite Redesign: Bloomberg/TradingView Dark Mode',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Komplett neues Homepage-Design im Bloomberg Terminal / TradingView / CoinMarketCap Stil' },
       { type: 'new',     text: 'Dark Mode als Standard — schwarz-anthrazit Hintergrund auf der Startseite' },
