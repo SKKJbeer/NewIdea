@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { fetchTrendingCards, fetchTopValueCards } from '@/lib/pokemon-api';
 import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { generateArticle, DAY_TYPE } from '@/lib/article-generator';
+import { generateArticle, getArticleType, PUBLISH_DAYS } from '@/lib/article-generator';
 
 // Called daily at 08:00 to pre-warm today's article so first visitors don't wait
 export async function GET(request: Request) {
@@ -36,16 +36,21 @@ export async function GET(request: Request) {
     results.priceSnapshots = 'skipped (Supabase nicht konfiguriert)';
   }
 
-  try {
-    const dayOfWeek = new Date().getDay();
-    const type = DAY_TYPE[dayOfWeek];
-    const article = await generateArticle(type, today);
-    results.articleGenerated = true;
-    results.articleTitle = article.title;
-    console.log(`✅ Daily article generated and persisted: ${article.title}`);
-  } catch (err) {
-    results.articleError = String(err);
-    console.error('Failed to generate daily article:', err);
+  const dayOfWeek = new Date().getDay();
+  if (PUBLISH_DAYS.has(dayOfWeek)) {
+    const type = getArticleType(today)!;
+    try {
+      const article = await generateArticle(type, today);
+      results.articleGenerated = true;
+      results.articleTitle = article.title;
+      console.log(`✅ Article generated (${type}): ${article.title}`);
+    } catch (err) {
+      results.articleError = String(err);
+      console.error('Failed to generate article:', err);
+    }
+  } else {
+    results.articleGenerated = false;
+    results.articleSkipped = `Kein Publish-Day (Wochentag ${dayOfWeek}) — nur Sonntag (0) und Donnerstag (4)`;
   }
 
   // Revalidate the listing page so it shows today's article fresh

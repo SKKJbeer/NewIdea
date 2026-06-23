@@ -1,13 +1,12 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
-import { NewsletterSignup } from '@/components/NewsletterSignup';
-import { readArticle, DAY_TYPE, ARTICLE_META } from '@/lib/article-generator';
+import { readArticle, getArticleType, ARTICLE_META } from '@/lib/article-generator';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
+
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
@@ -63,7 +62,8 @@ export async function generateMetadata({ params }: { params: Promise<{ date: str
   const { date } = await params;
   const d = parseDate(date);
   if (!d) return { title: 'Artikel nicht gefunden' };
-  const type = DAY_TYPE[d.getDay()];
+  const type = getArticleType(date);
+  if (!type) return { title: 'Artikel nicht gefunden' };
   const meta = ARTICLE_META[type];
   const dateLabel = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
   return {
@@ -81,7 +81,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const daysDiff = Math.floor((now.getTime() - d.getTime()) / 86400000);
   if (daysDiff < 0) notFound();
 
-  const type = DAY_TYPE[d.getDay()];
+  // Only Sunday (Wochenrückblick) and Thursday (rotating) are valid article days
+  const type = getArticleType(date);
+  if (!type) notFound();
   const meta = ARTICLE_META[type];
   const c = COLOR[meta.color];
   const dateLabel = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -223,14 +225,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           </Link>
           <Link href="/marktbericht" className="text-sm text-violet-600 hover:text-violet-800 font-semibold">Marktbericht →</Link>
         </div>
-
-        <section id="newsletter">
-          <div className="text-center mb-4">
-            <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-1">Newsletter</p>
-            <h2 className="text-lg font-black text-gray-900">Jeden Montag per E-Mail</h2>
-          </div>
-          <Suspense><NewsletterSignup /></Suspense>
-        </section>
 
         <footer className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1 pb-4">
           <p className="text-[11px] font-semibold text-amber-800">Inoffizielle Fan-Seite · Keine Anlageberatung</p>

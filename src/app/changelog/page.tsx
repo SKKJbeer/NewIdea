@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.5',
+    date: '23. Juni 2026',
+    label: 'Blog: nur Sonntags + Donnerstags — 404-Fix, Newsletter entfernt',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Blog erscheint nur noch sonntags (Wochenrückblick) und donnerstags (rotierender Artikel)' },
+      { type: 'changed', text: '"Heute neu"-Badge erscheint nur noch wenn heute wirklich ein Publish-Day ist' },
+      { type: 'changed', text: 'Cron generiert Artikel nur an So/Do — andere Tage werden übersprungen' },
+      { type: 'fixed',   text: '/artikel/[date] gibt 404 für Nicht-Publish-Tage — kein Zombie-State mehr' },
+      { type: 'fixed',   text: 'Newsletter aus Artikel-Detailseite entfernt' },
+    ],
+  },
+  {
     version: '2.4.4',
     date: '23. Juni 2026',
     label: 'Startseite: Error-Box entfernt, Newsletter deaktiviert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Gelbe Error-Box "Kartendaten nicht verfügbar" dauerhaft entfernt — bei API-Ausfall zeigt die Seite einfach weniger, keine Fehlermeldung' },
       { type: 'fixed',   text: 'Graceful Degradation: error-State entfernt, Karten-Sektionen sind ohnehin schon cards.length > 0 bedingt' },

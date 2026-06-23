@@ -92,6 +92,30 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 
 ---
 
+## Blog-Veröffentlichungsplan (PFLICHT — nie ändern ohne explizite Freigabe!)
+
+**Artikel erscheinen NUR an diesen zwei Wochentagen:**
+
+| Tag | Inhalt | Code |
+|---|---|---|
+| **Sonntag** | Wochenrückblick | `rueckblick` |
+| **Donnerstag** | Rotierender Artikel (Markt / Karte im Fokus / Strategie / Set-Analyse / Ausblick / Guide) | rotating |
+
+**Was das bedeutet:**
+- Der Daily-Cron generiert Artikel NUR an Sonntag (0) und Donnerstag (4)
+- Die Blog-Listing-Seite `/artikel` zeigt AUSSCHLIESSLICH So/Do-Einträge — keine anderen Wochentage
+- `/artikel/[date]` gibt 404 zurück wenn der Datums-Wochentag nicht So oder Do ist
+- Der Tages-Badge "Heute neu" erscheint nur wenn heute ein So oder Do ist
+- NIEMALS auf tägliche Artikel umstellen — der Nutzer will gezielten, hochwertigen Content
+
+**Code-Verankert in:**
+- `src/lib/article-generator.ts` → `PUBLISH_DAYS = new Set([0, 4])` und `getArticleType(dateStr)`
+- `src/app/artikel/page.tsx` → `getPublishDates()` filtert nur So/Do
+- `src/app/artikel/[date]/page.tsx` → `if (!type) notFound()`
+- `src/app/api/cron/daily/route.ts` → nur wenn `PUBLISH_DAYS.has(dayOfWeek)`
+
+---
+
 ## Content-Wahrheitspflicht (PFLICHT — kein erfundener Inhalt!)
 
 **REGEL:** Alle Inhalte auf der Plattform — Artikel, Wochenrückblicke, Guides, Karten-Beschreibungen — dürfen **ausschließlich wahre, überprüfbare Informationen** enthalten. Nichts erfinden.

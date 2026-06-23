@@ -50,6 +50,7 @@ export const ARTICLE_PREVIEW_SUBTITLES: Record<ArticleType, string> = {
   rueckblick: 'Was lief, was fiel auf, was zeigen die Daten — sachlich analysiert.',
 };
 
+// Legacy — kept for backwards compatibility with existing article pages/Supabase entries
 export const DAY_TYPE: Record<number, ArticleType> = {
   0: 'rueckblick',
   1: 'markt',
@@ -59,6 +60,26 @@ export const DAY_TYPE: Record<number, ArticleType> = {
   5: 'ausblick',
   6: 'guide',
 };
+
+// ── Publish schedule: only Sunday (Wochenrückblick) + Thursday (rotating) ────
+export const PUBLISH_DAYS = new Set([0, 4]); // 0 = Sunday, 4 = Thursday
+
+const THURSDAY_ROTATION: ArticleType[] = ['markt', 'karte', 'strategie', 'set', 'ausblick', 'guide'];
+
+/**
+ * Returns the article type for a given ISO date string, or null if that date
+ * is not a scheduled publish day (only Sunday and Thursday are published).
+ */
+export function getArticleType(dateStr: string): ArticleType | null {
+  const d = new Date(dateStr + 'T12:00:00');
+  const dow = d.getDay();
+  if (dow === 0) return 'rueckblick';
+  if (dow === 4) {
+    const weeksSinceEpoch = Math.floor(d.getTime() / (7 * 24 * 3600 * 1000));
+    return THURSDAY_ROTATION[weeksSinceEpoch % THURSDAY_ROTATION.length];
+  }
+  return null;
+}
 
 export const ARTICLE_META: Record<ArticleType, { label: string; category: string; emoji: string; color: string }> = {
   markt:      { label: 'Wöchentliche Marktanalyse',  category: 'Markt',      emoji: '📊', color: 'violet'  },

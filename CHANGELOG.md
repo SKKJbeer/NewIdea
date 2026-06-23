@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.5] — 2026-06-23 · Blog: Nur Sonntags + Donnerstags, 404-Fix, Newsletter entfernt
+
+### Geändert
+- **Blog-Veröffentlichungsplan:** Artikel erscheinen nur noch an Sonntag (Wochenrückblick) und Donnerstag (rotierender Artikel: Markt / Karte im Fokus / Strategie / Set-Analyse / Ausblick / Guide)
+- **Blog-Listing `/artikel`:** Zeigt nur noch So/Do-Einträge — kein täglicher Content mehr
+- **Blog-Header:** Text geändert von "Täglich neuer KI-Content" auf "Sonntags + Donnerstags"
+- **"Heute neu"-Badge:** Erscheint nur noch wenn heute tatsächlich ein Publish-Day (So/Do) ist
+- **Cron:** Artikel werden nur noch an So/Do generiert — an anderen Tagen übersprungen
+
+### Behoben
+- **404-Fix:** `/artikel/[date]` gibt jetzt echten 404 wenn Datum kein Sonntag oder Donnerstag ist — kein "Artikel nicht verfügbar"-Zombie-State mehr
+- **Newsletter entfernt** aus der Artikel-Detailseite (war noch vorhanden, jetzt weg)
+
+### Verankert
+- `CLAUDE.md` enthält jetzt die Pflicht-Regel: Blog nur So/Do — nie ohne explizite Freigabe ändern
+
+---
+
 ## [2.4.4] — 2026-06-23 · Startseite: Error-Box entfernt, Newsletter deaktiviert
 
 ### Behoben
