@@ -1,8 +1,6 @@
-import { Suspense } from 'react';
 import { fetchTopValueCards } from '@/lib/pokemon-api';
 import { CardGrid } from '@/components/CardGrid';
 import { MoverList } from '@/components/MoverList';
-import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
@@ -39,13 +37,11 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   let cards: Awaited<ReturnType<typeof fetchTopValueCards>> = [];
-  let error = false;
 
   try {
     cards = await fetchTopValueCards(50);
-    if (cards.length === 0) error = true;
   } catch {
-    error = true;
+    // API-Ausfall: Seite wird ohne Kartendata gezeigt — kein sichtbarer Fehler
   }
 
   const withTrend = cards.filter((c) => typeof c.trendPercent === 'number');
@@ -78,20 +74,9 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto max-w-5xl space-y-8 px-4 pt-6 pb-16">
-        {error && (
-          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            <span className="text-xl">⚠️</span>
-            <div>
-              <p className="font-semibold">Kartendaten momentan nicht verfügbar</p>
-              <p className="mt-1 text-xs text-amber-600">
-                TCG-API nicht erreichbar — bitte <code className="font-mono">POKEMON_TCG_API_KEY</code> in Vercel prüfen oder kurz warten.
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Market Stats — 4 boxes */}
-        {!error && cards.length > 0 && (() => {
+        {cards.length > 0 && (() => {
           const bestGainer = gainers[0];
           const worstLoser = losers[0];
           const topCard = topValue[0];
@@ -230,13 +215,6 @@ export default async function Home() {
               ))}
             </div>
           </div>
-        </section>
-
-        {/* Newsletter */}
-        <section id="newsletter" aria-label="Newsletter">
-          <Suspense>
-            <NewsletterSignup />
-          </Suspense>
         </section>
 
         {/* Top cards — compact, secondary */}

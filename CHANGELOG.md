@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.4] — 2026-06-23 · Startseite: Error-Box entfernt, Newsletter deaktiviert
+
+### Behoben
+- **Error-Box dauerhaft entfernt:** Die gelbe "Kartendaten nicht verfügbar"-Box wird nie mehr angezeigt — bei API-Ausfall zeigt die Startseite einfach weniger (kein Karten-Bereich), aber läuft weiter
+- **Graceful Degradation:** Alle Karten-Sektionen waren schon bedingt (`cards.length > 0`) — der `error`-State war unnötig und irreführend (der API-Key ist gesetzt; die Box erschien bei Timeouts/Rate-Limiting)
+
+### Entfernt
+- **Newsletter-Sektion** auf der Startseite ausgeblendet — `NewsletterSignup` und `Suspense`-Import entfernt (Funktion ist vorbereitet, aber noch nicht aktiviert)
+
+---
+
 ## [2.4.3] — 2026-06-23 · BUGFIX: iOS-Zoom unterdrückt, Mobile-Layout kompakter
 
 ### Behoben

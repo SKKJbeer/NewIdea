@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.4',
+    date: '23. Juni 2026',
+    label: 'Startseite: Error-Box entfernt, Newsletter deaktiviert',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Gelbe Error-Box "Kartendaten nicht verfügbar" dauerhaft entfernt — bei API-Ausfall zeigt die Seite einfach weniger, keine Fehlermeldung' },
+      { type: 'fixed',   text: 'Graceful Degradation: error-State entfernt, Karten-Sektionen sind ohnehin schon cards.length > 0 bedingt' },
+      { type: 'changed', text: 'Newsletter-Sektion auf der Startseite ausgeblendet (Funktion vorhanden, aber noch nicht aktiv)' },
+    ],
+  },
+  {
     version: '2.4.3',
     date: '23. Juni 2026',
     label: 'BUGFIX: iOS-Zoom unterdrückt — font-size 16px auf allen Inputs',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'iOS-Zoom-Bug: alle Inputs in Modals haben jetzt font-size 16px — Safari zoomt nicht mehr automatisch rein beim Antippen' },
       { type: 'fixed',   text: 'Delete-Button auf Mobile versteckt (hidden sm:block) — war unsichtbar aber 30px breit und hat Holdings-Zeile gequetscht' },
