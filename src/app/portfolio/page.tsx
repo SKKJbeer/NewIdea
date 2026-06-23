@@ -456,122 +456,122 @@ function AddCardModal({
   const total = purchasePrice && qty > 0 ? parseFloat(purchasePrice) * qty : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+    /*
+     * Mobile: Vollbild-Overlay (kein Bottom-Sheet). Die iOS-Tastatur verkleinert
+     * den sichtbaren Bereich — ein Bottom-Sheet mit dvh/vh würde über die Oberkante
+     * hinausschießen und den Header verdecken. Vollbild ist stabiler.
+     * Desktop (sm:): zentrierter Dialog mit abgerundeten Ecken.
+     */
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center">
+      {/* Backdrop — sichtbar hinter zentriertem Dialog auf Desktop */}
+      <div className="absolute inset-0 bg-black/50 sm:backdrop-blur-sm" onClick={onClose} />
 
-      <div
-        className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 flex flex-col"
-        style={{ maxHeight: 'min(85dvh, calc(100vh - 32px))' }}
-      >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1 sm:hidden" aria-hidden>
-          <div className="w-10 h-1 bg-gray-200 rounded-full" />
-        </div>
+      {/* Modal-Karte */}
+      <div className="absolute inset-0 flex flex-col bg-white z-10
+                      sm:static sm:w-full sm:max-w-md sm:rounded-3xl sm:shadow-2xl sm:max-h-[85vh] sm:overflow-hidden">
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-100 shrink-0">
+        {/* ── Header (immer sichtbar, nicht scrollbar) ── */}
+        <div
+          className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 shrink-0"
+          style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}
+        >
           <h2 className="font-black text-gray-900 text-base">Karte hinzufügen</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 transition-colors rounded-full hover:bg-gray-100">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             <X size={18} />
           </button>
         </div>
 
-        {/* Scrollable body — single scroll context, no nested overflow */}
-        <div
-          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          style={{ WebkitOverflowScrolling: 'touch' } as any}
-        >
-
-          {/* Search input — sticky so it stays visible while scrolling results */}
-          {!selected && (
-            <div className="sticky top-0 bg-white px-5 pt-5 pb-3 z-10">
-              <div className="relative">
-                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                <input
-                  type="search"
-                  autoFocus
-                  autoComplete="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  enterKeyHint="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Kartenname — z.B. Charizard oder Glurak"
-                  className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
-                />
-                {searching
-                  ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
-                  : query.length > 0
-                    ? <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 p-1 rounded-full">
-                        <X size={13} />
-                      </button>
-                    : null
-                }
-              </div>
+        {/* ── Suchfeld (fest zwischen Header und Ergebnissen, nie scrollbar) ── */}
+        {!selected && (
+          <div className="shrink-0 px-5 py-3 bg-white border-b border-gray-50">
+            <div className="relative">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="search"
+                autoFocus
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                enterKeyHint="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Kartenname — z. B. Charizard"
+                className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
+              />
+              {searching
+                ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+                : query.length > 0
+                  ? <button onClick={() => setQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-gray-300 hover:text-gray-600 rounded-full">
+                      <X size={13} />
+                    </button>
+                  : null
+              }
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Suggestions — no inner scroll, modal body scrolls */}
+        {/* ── Scrollbarer Bereich (einziger Scroll-Context) ── */}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+        >
+          {/* Suchergebnisse */}
           {!selected && suggestions.length > 0 && (
-            <div className="px-5 pb-2">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-2">
+            <>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-5 pt-4 pb-1">
                 {suggestions.length} Karte{suggestions.length !== 1 ? 'n' : ''} gefunden
               </p>
-              <div className="space-y-0.5">
-                {suggestions.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => selectCard(s)}
-                    className="w-full flex items-center gap-3 py-3 px-3 rounded-xl bg-white active:bg-gray-100 transition-colors text-left"
-                    style={{ minHeight: 60 }}
-                  >
-                    {/* Card thumbnail */}
-                    <div className="shrink-0 w-10 h-[52px] rounded-md overflow-hidden bg-gray-100">
-                      {s.imageUrl
-                        ? <img src={s.imageUrl} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
-                        : <div className="w-full h-full" />
-                      }
-                    </div>
-                    {/* Name + set */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 leading-snug" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {s.nameDe || s.name}
-                      </p>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{s.set}</p>
-                    </div>
-                    {/* Price */}
-                    <div className="shrink-0 text-right pl-3 min-w-[56px]">
-                      {s.price > 0
-                        ? <p className="text-sm font-bold text-gray-900 tabular-nums">{formatEur(s.price)}</p>
-                        : <p className="text-xs text-gray-300">–</p>
-                      }
-                    </div>
-                  </button>
-                ))}
-              </div>
-              {/* Bottom breathing room */}
-              <div className="h-4" />
-            </div>
+              {suggestions.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => selectCard(s)}
+                  className="w-full flex items-center gap-3 px-5 py-3 active:bg-gray-50 transition-colors text-left border-b border-gray-50 last:border-0"
+                  style={{ minHeight: 64 }}
+                >
+                  <div className="shrink-0 w-10 h-14 rounded-md overflow-hidden bg-gray-100">
+                    {s.imageUrl
+                      ? <img src={s.imageUrl} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
+                      : <div className="w-full h-full" />
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2">
+                      {s.nameDe || s.name}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate mt-0.5">{s.set}</p>
+                  </div>
+                  {s.price > 0 && (
+                    <p className="shrink-0 text-sm font-bold text-gray-900 tabular-nums">
+                      {formatEur(s.price)}
+                    </p>
+                  )}
+                </button>
+              ))}
+              <div style={{ height: 'max(24px, env(safe-area-inset-bottom))' }} />
+            </>
           )}
 
-          {/* Empty states */}
+          {/* Leer-Zustände */}
           {!selected && query.length >= 2 && !searching && suggestions.length === 0 && (
-            <div className="px-5 py-8 text-center">
-              <p className="text-sm text-gray-400">Keine Karten gefunden</p>
-              <p className="text-xs text-gray-300 mt-1">Versuche einen anderen Suchbegriff</p>
+            <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+              <p className="text-sm font-semibold text-gray-600">Keine Ergebnisse</p>
+              <p className="text-xs text-gray-400 mt-1">Versuche einen anderen Suchbegriff</p>
             </div>
           )}
           {!selected && query.length < 2 && (
-            <div className="px-5 pt-2 pb-8 text-center">
-              <p className="text-xs text-gray-400">Mind. 2 Zeichen eingeben</p>
+            <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+              <Search size={36} className="text-gray-100 mb-3" />
+              <p className="text-sm text-gray-400">Mind. 2 Zeichen eingeben</p>
             </div>
           )}
 
-          {/* Selected card — form inside normal padding */}
+          {/* Formular nach Karten-Auswahl */}
           {selected && (
-            <div className="px-5 pt-2 pb-5 space-y-4">
-              {/* Card preview */}
+            <div className="px-5 py-5 space-y-4">
+              {/* Karten-Vorschau */}
               <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
                 <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-gray-100">
                   {selected.imageUrl
@@ -591,62 +591,43 @@ function AddCardModal({
                     </p>
                   )}
                 </div>
-                <button onClick={() => setSelected(null)} className="shrink-0 self-start text-gray-300 hover:text-gray-500 p-1 transition-colors">
+                <button onClick={() => setSelected(null)} className="shrink-0 self-start p-1 text-gray-300 hover:text-gray-600 transition-colors">
                   <X size={16} />
                 </button>
               </div>
 
-              {/* Language */}
               <LangPicker value={language} onChange={setLanguage} />
 
-              {/* Qty + price */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Anzahl</label>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setQty((q) => Math.max(1, q - 1))}
-                      className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors"
-                    >
-                      −
-                    </button>
-                    <input
-                      type="number" min={1} value={qty}
+                    <button onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors">−</button>
+                    <input type="number" min={1} value={qty}
                       onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="flex-1 text-center text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
-                    />
-                    <button
-                      onClick={() => setQty((q) => q + 1)}
-                      className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors"
-                    >
-                      +
-                    </button>
+                      className="flex-1 text-center text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
+                    <button onClick={() => setQty((q) => q + 1)}
+                      className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors">+</button>
                   </div>
                 </div>
-
                 <div>
                   <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Kaufpreis/Stk (€)</label>
-                  <input
-                    type="number" min={0} step={0.01} value={purchasePrice}
+                  <input type="number" min={0} step={0.01} value={purchasePrice}
                     onChange={(e) => setPurchasePrice(e.target.value)}
                     placeholder="0,00" inputMode="decimal"
-                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
-                  />
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
                 </div>
               </div>
 
-              {/* Date */}
               <div>
                 <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Kaufdatum</label>
-                <input
-                  type="date" value={purchaseDate}
+                <input type="date" value={purchaseDate}
                   max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setPurchaseDate(e.target.value)}
-                  className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700"
-                />
+                  className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700" />
               </div>
 
-              {/* Total */}
               {total !== null && !isNaN(total) && (
                 <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
                   <span className="text-xs text-gray-500 font-semibold">Gesamteinstand</span>
@@ -666,6 +647,7 @@ function AddCardModal({
               <p className="text-[10px] text-gray-300 text-center">
                 Kaufpreis wird für die Gewinn/Verlust-Berechnung verwendet
               </p>
+              <div style={{ height: 'max(24px, env(safe-area-inset-bottom))' }} />
             </div>
           )}
         </div>
@@ -706,28 +688,27 @@ function EditCardModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center">
+      <div className="absolute inset-0 bg-black/50 sm:backdrop-blur-sm" onClick={onClose} />
 
-      <div
-        className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl z-10 flex flex-col"
-        style={{ maxHeight: 'min(85dvh, calc(100vh - 32px))' }}
-      >
-        <div className="flex justify-center pt-3 pb-1 sm:hidden" aria-hidden>
-          <div className="w-10 h-1 bg-gray-200 rounded-full" />
-        </div>
+      <div className="absolute inset-0 flex flex-col bg-white z-10
+                      sm:static sm:w-full sm:max-w-md sm:rounded-3xl sm:shadow-2xl sm:max-h-[85vh] sm:overflow-hidden">
 
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-100 shrink-0">
+        {/* Header — shrink-0, safe-area-aware */}
+        <div
+          className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 shrink-0"
+          style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}
+        >
           <h2 className="font-black text-gray-900 text-base">Position bearbeiten</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors">
+          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
             <X size={18} />
           </button>
         </div>
 
+        {/* Single scroll context */}
         <div
-          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-5 space-y-4"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          style={{ WebkitOverflowScrolling: 'touch' } as any}
+          className="flex-1 overflow-y-auto overflow-x-hidden p-5 space-y-4"
+          style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
         >
           {/* Card preview */}
           <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
@@ -816,6 +797,7 @@ function EditCardModal({
           >
             <Trash2 size={14} /> Karte entfernen
           </button>
+          <div style={{ height: 'max(24px, env(safe-area-inset-bottom))' }} />
         </div>
       </div>
     </div>

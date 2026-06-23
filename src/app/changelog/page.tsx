@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.2',
+    date: '23. Juni 2026',
+    label: 'BUGFIX: Mobile Modals Vollbild-Overlay — kein dvh, safe-area, Header immer sichtbar',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'AddCardModal + EditCardModal: Vollbild-Overlay statt Bottom-Sheet — Header fliegt nicht mehr aus dem Viewport wenn Tastatur öffnet' },
+      { type: 'fixed',   text: 'EditCardModal: gleiche iOS-sichere Architektur wie AddCardModal (absolute inset-0, sm:static rounded-3xl)' },
+      { type: 'fixed',   text: 'Header: env(safe-area-inset-top) für Notch / Dynamic Island' },
+      { type: 'fixed',   text: 'Safe-area-bottom Spacer in beiden Modals (kein Inhalt hinter Home Indicator)' },
+      { type: 'changed', text: 'Drag-Handle-Pill entfernt — passt nicht zu Vollbild-Overlay-Konzept' },
+    ],
+  },
+  {
     version: '2.4.1',
     date: '22. Juni 2026',
     label: 'BUGFIX: Mobile Suche — Nested Scroll, Sticky Search, Touch-Targets',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Nested-Scroll entfernt — Vorschlagsliste scrollt jetzt im Modal-Body (iOS-kompatibel)' },
       { type: 'fixed',   text: 'Suchfeld sticky im Modal — bleibt sichtbar beim Scrollen der Ergebnisse' },

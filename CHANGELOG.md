@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.2] — 2026-06-23 · BUGFIX: Mobile Modals vollständig — Vollbild-Overlay, safe-area, kein dvh mehr
+
+### Behoben
+- **AddCardModal + EditCardModal:** Bottom-Sheet-Architektur durch Vollbild-Overlay ersetzt — kein `dvh`/`vh` mehr, kein Header der bei offener Tastatur aus dem Viewport fliegt
+- **EditCardModal:** Gleiche mobile Architektur wie AddCardModal — `absolute inset-0 flex flex-col`, Desktop `sm:static sm:rounded-3xl`
+- **Header:** `env(safe-area-inset-top)` via `paddingTop: 'max(1.25rem, ...)'` für iPhone Notch / Dynamic Island
+- **Drag-Handle entfernt:** Kein Wisch-Indikator mehr, der bei Vollbild-Overlay keinen Sinn ergibt
+- **Safe-area-bottom:** `max(24px, env(safe-area-inset-bottom))` Spacer am Ende beider Modals
+
+---
+
 ## [2.4.1] — 2026-06-22 · BUGFIX: Mobile Suche — Nested Scroll entfernt, Sticky Search, bessere Touch-Targets
 
 ### Behoben
