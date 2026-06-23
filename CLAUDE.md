@@ -137,6 +137,97 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 - **Echte Karten & Sets**: Nur Namen und Set-Codes aus der echten TCG-Datenbank verwenden
 - **Echte Preise**: Nur Werte aus der TCG API oder Cardmarket (über API geliefert)
 
+---
+
+### ⛔ ABSOLUT VERBOTEN in `static-articles.ts` und `article-generator.ts` (fallbackArticle)
+
+Diese Regeln wurden nach konkreten Verstößen eingeführt. Sie gelten ohne Ausnahme:
+
+#### 1. Keine spezifischen Preiszahlen im Fließtext
+
+**VERBOTEN:**
+```
+"notiert bei 120–140 €"
+"nach Release bei 80–90 €"
+"PSA-10-Exemplare bei 250–350 €"
+"kostet mittlerweile stabil über 120 €"
+```
+
+**ERLAUBT:**
+```
+"Aktuelle Preise direkt auf Cardmarket prüfen"
+"notiert auf einem stabilen Niveau"
+"Das Preismuster zeigt langfristig aufwärts"
+"erzielen ein Vielfaches gegenüber beschädigten Exemplaren"
+```
+
+**Warum:** Hardcodierte Preise veralten sofort nach dem Commit. Werden sie nicht als veraltet erkennbar gemacht, sehen Nutzer 6 Monate alte Zahlen als aktuelle Marktdaten. Einzige Ausnahme: das `price:`-Feld in `highlight`-Objekten — die sind durch den `isStatic`-Disclaimer auf der Seite gedeckt.
+
+#### 2. Keine erfundenen historischen Preistrajektorien
+
+**VERBOTEN:**
+```
+"2021: 80€ → 2022: 58€ → 2023: 75€ → heute: 120–140€"
+"ist seit 2021 von 5€ auf über 1.000€ gestiegen"
+```
+
+**ERLAUBT:**
+```
+"Das Muster dieser Karte zeigt langfristig steigendes Preisniveau — ausgelaufenes Set, schrumpfendes Angebot"
+"Historisch haben Karten dieses Typs nach Set-Abschluss zugelegt"
+```
+
+**Warum:** Konkrete Jahrespreise für vergangene Jahre sind erfunden, wenn sie nicht aus echten Datenbankeinträgen (Cardmarket-Historie, Supabase-Snapshots) stammen.
+
+#### 3. Keine Illustratoren-Attributionen ohne Quellennachweis
+
+**VERBOTEN:**
+```
+"Illustriert von Mitsuhiro Arita"
+"Dieselbe Künstlerin wie beim Base Set Charizard"
+```
+
+**ERLAUBT:**
+```
+"Ein Artwork das weit über TCG-Standard liegt"
+"Herausragende Illustrationsqualität"
+```
+
+**Nachweis-Quelle:** Bulbapedia-Kartenseite (z.B. `https://bulbapedia.bulbagarden.net/wiki/Umbreon_VMAX_(Evolving_Skies_215)`) — nur wenn dort explizit der Illustrator genannt ist, darf es in den Text.
+
+#### 4. Keine unverifizierten spezifischen Auction/Markt-Events
+
+**VERBOTEN:**
+```
+"Hat auf Cardmarket neue Höchstpreise von über 200€ für PSA-10-Exemplare erzielt"
+"Diese Woche auf 75€ gestiegen"
+```
+
+**ERLAUBT:**
+```
+"Zeigt zunehmende Sammlernachfrage"
+"Rückt wieder in den Blickpunkt"
+```
+
+#### 5. `isStatic: true` MUSS auf jedem statischen/Fallback-Artikel gesetzt sein
+
+- `readArticle()` bei `STATIC_ARTICLES`-Treffer → `isStatic: true` ✅ (bereits implementiert)
+- `generateArticle()` bei `STATIC_ARTICLES`-Treffer → `isStatic: true` ✅ (bereits implementiert)
+- `fallbackArticle()` Rückgabe → `isStatic: true` ✅ (bereits implementiert)
+- **Niemals** `isStatic` auf `false` setzen oder weglassen bei diesen Pfaden
+
+**Warum:** Der Archiv-Disclaimer auf der Seite ist der einzige Schutz vor veralteten Preisangaben. Fällt er weg, sehen Nutzer möglicherweise 12 Monate alte Zahlen als aktuelle Marktdaten.
+
+#### 6. Keine Erste-Person-Singular-Stimme in statischen Artikeln
+
+**VERBOTEN:** `"Ich erkläre heute"` · `"Für mich ist das"` · `"Ich nenne den Namen nicht"` · `"ich hab zu spät gedrückt"`
+
+**ERLAUBT:** Impersonale Marktanalyse · `"Der Markt zeigt"` · `"Die Daten bestätigen"` · `"Marktbeobachtung:"` · `"Historisch hat sich gezeigt"`
+
+**Warum:** CLAUDE.md-Regel seit v0.9.x — es gibt keinen Erzähler mit Namen, keine Persona, keine erste Person Singular.
+
+---
+
 ### Quellen-Pflicht (IMMER!)
 
 **Jeder Artikel und Beitrag MUSS direkte Quellenlinks enthalten.** Das `Article`-Interface hat ein `sources`-Feld:
@@ -158,15 +249,19 @@ Gute Quellen je nach Artikeltyp:
 
 ### Review-Pflicht vor jedem Content-Commit
 
-Vor jedem Commit der Artikel-Inhalte (static-articles.ts, Fallback-Artikel, etc.) prüfen:
+Vor jedem Commit der Artikel-Inhalte (static-articles.ts, article-generator.ts, guides.ts) prüfen:
 
+- [ ] **Keine spezifischen Preiszahlen im Fließtext** (siehe Regel 1 oben) — "120–140 €" im Text = STOP
+- [ ] **Keine erfundenen Preistrajektorien** (siehe Regel 2) — Jahr-für-Jahr-Kurven ohne echte Daten = STOP
+- [ ] **Keine Illustratoren-Attributionen ohne Bulbapedia-Nachweis** (siehe Regel 3) = STOP
+- [ ] **Keine spezifischen Auktions-/Markt-Events ohne Beleg** (siehe Regel 4) = STOP
+- [ ] **`isStatic: true` gesetzt** bei static/fallback Pfaden (siehe Regel 5) = PFLICHT
+- [ ] **Keine Erste Person Singular** (siehe Regel 6) = STOP
 - [ ] Alle genannten Pokémon-Karten existieren wirklich (Name + Set korrekt?)
-- [ ] Alle genannten Preise basieren auf echten Daten oder sind explizit als Beispiel markiert
 - [ ] Alle genannten Events/Turniere/Ankündigungen sind real oder klar als hypothetisch kenntlich
-- [ ] Kein Satz behauptet eine Tatsache die ich nicht belegen kann
 - [ ] `sources`-Array enthält mindestens eine direkte Quellenangabe
 
-**Tonalität:** Alle Artikel sind sachliche Marktanalysen ohne Persona-Namen ("Marco" wurde entfernt) und ohne persönliche Kaufempfehlungen. Nur Marktbeobachtungen, Preisanalyse und faktische Einschätzungen. Keine "Ich empfehle", "Pflichtkauf", "kaufenswert" etc.
+**Tonalität:** Alle Artikel sind sachliche Marktanalysen ohne Persona-Namen und ohne persönliche Kaufempfehlungen. Nur Marktbeobachtungen, Preisanalyse und faktische Einschätzungen. Keine "Ich empfehle", "Pflichtkauf", "kaufenswert" etc.
 
 ---
 

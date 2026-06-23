@@ -46,7 +46,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Was diese Karte so außergewöhnlich macht',
-        content: 'Umbreon (Nachtara auf Deutsch — das schwarze Nacht-Pokémon, eine der acht Evoli-Entwicklungen) ist seit der Johto-Region aus Gold & Silber (1999) eine der emotionalsten Karten im TCG. Die VMAX Alt Art Version aus Evolving Skies zeigt Umbreon in einer nachtblauen Mondlandschaft mit einem schlafenden Trainer — ein Artwork das weit über TCG-Standard liegt. Die Karte wurde von Illustrator Mitsuhiro Arita gezeichnet, dem gleichen Künstler der das berühmte Base Set Charizard gemacht hat. Das ist kein Zufall: Solche Karten sammeln Menschen emotional.',
+        content: 'Umbreon (Nachtara auf Deutsch — das schwarze Nacht-Pokémon, eine der acht Evoli-Entwicklungen) ist seit der Johto-Region aus Gold & Silber (1999) einer der emotionalsten Pokémon im TCG. Die VMAX Alt Art Version aus Evolving Skies zeigt Umbreon in einer nachtblauen Mondlandschaft mit einem schlafenden Trainer — ein Artwork das weit über TCG-Standard liegt und Evolving Skies zu einem der meistdiskutierten Sets der SWSH-Ära gemacht hat. Solche vollflächigen Illustrationen mit ikonischen Pokémon sammeln Menschen emotional — das ist eines der stabilsten Prinzipien im TCG-Sammlermarkt.',
         highlight: { name: 'Umbreon VMAX Alt Art', set: 'Evolving Skies', setCode: 'swsh7', imageUrl: '', price: 130, trend: 0, rarity: 'Rare Alt' },
       },
       {

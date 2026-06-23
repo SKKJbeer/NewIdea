@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.5.3',
+    date: '23. Juni 2026',
+    label: 'Datenintegrität: Guides + Fallback-Preise + CLAUDE.md-Absicherung',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'guides.ts: erfundene historische Preiszahlen durch qualitative Formulierungen ersetzt' },
+      { type: 'changed', text: 'article-generator.ts fallbackArticle: alle hardcodierten Preiszahlen aus Fließtext entfernt' },
+      { type: 'changed', text: 'static-articles.ts: unverifizierten Illustratoren-Attribution entfernt' },
+      { type: 'changed', text: 'CLAUDE.md: 6 absolute Verbote mit Begründung, Beispielen und Commit-Checkliste verankert' },
+    ],
+  },
+  {
     version: '2.5.2',
     date: '23. Juni 2026',
     label: 'Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Archiv-Disclaimer Banner auf statischen Artikeln — "Preisangaben können veraltet sein · Cardmarket prüfen"' },
       { type: 'new',     text: 'isStatic-Flag auf Article-Interface — kennzeichnet Archiv- und Fallback-Artikel' },

@@ -191,17 +191,17 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
         },
         {
           heading: 'Preisentwicklung: Wo kommen wir her, wo gehen wir hin',
-          content: 'Nach Release lag die Karte kurz bei 80–90 € (der typische Post-Hype-Tiefpunkt wenn der Markt mit Neuware überschwemmt wird). Seitdem klettert sie konstant nach oben. Der Grund: Das 151-Set wird nicht ewig gedruckt. Jede Woche, die vergeht, wird das Angebot auf Cardmarket kleiner. Gleichzeitig entdecken neue Pokémon-Fans die Karte — die globale Fangemeinde wächst. Historisch gesehen haben Charizard-Karten aus ausgelaufenen Sets nie dauerhaft an Wert verloren.',
+          content: 'Das typische Muster: Nach Release notiert die Karte zunächst günstiger wenn der Markt mit Neuware geflutet wird — der Post-Hype-Tiefpunkt. Seitdem klettert sie konstant nach oben. Der Grund: Das 151-Set wird nicht ewig gedruckt. Jede Woche, die vergeht, wird das Angebot auf Cardmarket kleiner. Gleichzeitig entdecken neue Pokémon-Fans die Karte — die globale Fangemeinde wächst. Historisch gesehen haben Charizard-Karten aus ausgelaufenen Sets nie dauerhaft an Wert verloren.',
         },
         {
           heading: 'Marktlage und Preiseinordnung',
-          content: 'Die Fundamentaldaten dieser Karte sind klar: Ikonisches Pokémon, limitiertes Set, starke Fangemeinde, herausragendes Artwork. Aktuell notiert die Karte bei 120–150 € für Near-Mint-Exemplare — eine Preiszone die der Markt als fair akzeptiert hat. Auf Cardmarket sind Zustand "Near Mint" und Verkäuferbewertung die wichtigsten Qualitätskriterien. PSA-10-Exemplare notieren bei 250–350 € — der höchste Qualitätsstandard für Langzeitsammler.',
+          content: 'Die Fundamentaldaten dieser Karte sind klar: Ikonisches Pokémon, limitiertes Set, starke Fangemeinde, herausragendes Artwork. Aktuelle Marktpreise für Near-Mint-Exemplare direkt auf Cardmarket prüfen — die Preissuche auf dieser Seite zeigt den tagesaktuellen Stand. Auf Cardmarket sind Zustand "Near Mint" und Verkäuferbewertung die wichtigsten Qualitätskriterien. Gradierte Exemplare (PSA 10, BGS 10) werden auf einem separaten Markt gehandelt und erzielen deutlich höhere Preise.',
         },
       ],
       keyPoints: [
         'Charizard ex SIR (151) — Fundamentaldaten stimmen, kein reiner Hype',
         'Post-Release-Tiefpunkte zeigen das historische Preismuster',
-        'NM-Exemplare bei 120–150 €; PSA 10 für 250–350 € — Qualität bestimmt den Preis',
+        'Qualität bestimmt den Preis — NM deutlich mehr wert als Karten mit Kratzern',
       ],
       tags: ['charizard ex', 'pokemon 151', 'special illustration rare', 'karte im fokus'],
     },

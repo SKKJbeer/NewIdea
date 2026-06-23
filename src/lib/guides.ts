@@ -30,7 +30,7 @@ export const GUIDES: Guide[] = [
     color: 'violet',
     headerGradient: 'from-violet-800 to-indigo-900',
     readingTimeMin: 6,
-    intro: 'Stell dir vor, du hättest 2003 für 5 € eine Charizard-Karte aus dem Base-Set gekauft. Heute würde sie — in gutem Zustand — über 1.000 € wert sein. Kein schlechtes Geschäft, oder? Pokémon-Karten sind heute mehr als nur Nostalgie: Sie sind eine ernsthafte Anlageklasse mit nachgewiesenem Wertzuwachs. Aber nicht jede Karte steigt im Wert. Dieser Guide zeigt dir, wie du die richtigen Karten findest.',
+    intro: 'Pokémon-Karten aus den frühen Jahren des TCG, die damals wenige Euro kosteten, erzielen heute je nach Zustand ein Vielfaches davon auf Cardmarket und eBay — ein dokumentiertes Muster das sich bei Karten beliebter Pokémon aus ausgelaufenen Sets immer wieder zeigt. Pokémon-Karten sind heute mehr als nur Nostalgie: Sie sind eine ernsthafte Anlageklasse mit nachgewiesenem Wertzuwachs. Aber nicht jede Karte steigt im Wert. Dieser Guide zeigt dir, wie du die richtigen Karten findest.',
     sections: [
       {
         heading: '🤔 Warum steigen Pokémon-Karten im Wert?',
@@ -39,7 +39,7 @@ export const GUIDES: Guide[] = [
       },
       {
         heading: '🎯 Was macht eine Karte wertvoll?',
-        content: 'Es gibt genau drei Faktoren, die zusammenkommen müssen: Beliebtheit des Pokémon (Charizard, Pikachu, Mewtu und Eevee schlagen alles andere), Seltenheit der Karte (Special Illustration Rares und Hyper Rares sind die wertvollsten modernen Karten) und natürlich der Zustand. Ein Charizard ex Special Illustration Rare in perfektem Zustand kann über 300 € erzielen — dieselbe Karte mit einem Kratzer vielleicht nur 80 €.',
+        content: 'Es gibt genau drei Faktoren, die zusammenkommen müssen: Beliebtheit des Pokémon (Charizard, Pikachu, Mewtu und Eevee schlagen alles andere), Seltenheit der Karte (Special Illustration Rares und Hyper Rares sind die wertvollsten modernen Karten) und natürlich der Zustand. Karten in Near-Mint-Qualität erzielen auf Cardmarket ein Vielfaches gegenüber der gleichen Karte mit sichtbaren Kratzern — der Zustandsunterschied kann mehr als die Hälfte des Werts ausmachen. Aktuelle Preise direkt auf Cardmarket prüfen.',
         cards: [
           { name: 'Charizard ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Ikonisches Pokémon + höchste Seltenheitsstufe = dauerhaft gefragt', imageUrl: 'https://images.pokemontcg.io/sv3pt5/201.png', setId: 'sv3pt5' },
           { name: 'Pikachu ex (151 Set)', rarity: 'Special Illustration Rare', why: 'Das Maskottchen der Serie — wird nie an Beliebtheit verlieren', imageUrl: 'https://images.pokemontcg.io/sv3pt5/205.png', setId: 'sv3pt5' },

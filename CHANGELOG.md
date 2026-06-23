@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.5.3] — 2026-06-23 · Datenintegrität: Guides + Fallback-Preise + CLAUDE.md-Absicherung
+
+### Geändert
+- **`guides.ts`**: Erfundene "2003 für 5€ → 1.000€"-Behauptung durch qualitative Formulierung ersetzt
+- **`guides.ts`**: Spezifische "300€ / 80€"-Preisangabe durch qualitative Beschreibung ersetzt
+- **`article-generator.ts` fallbackArticle**: Hardcodierte "80–90€", "120–150€", "250–350€" aus Fließtext entfernt
+- **`static-articles.ts`**: Unverifizierten Illustratoren-Attribution (Mitsuhiro Arita für Umbreon VMAX) entfernt
+- **`CLAUDE.md`**: 6 neue absolute Verbote in "Content-Wahrheitspflicht" verankert — mit Begründung, Beispielen, Checkliste
+
+---
+
 ## [2.5.2] — 2026-06-23 · Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung
 
 ### Neu
