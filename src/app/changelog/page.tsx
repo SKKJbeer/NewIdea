@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.4.3',
+    date: '23. Juni 2026',
+    label: 'BUGFIX: iOS-Zoom unterdrückt — font-size 16px auf allen Inputs',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'iOS-Zoom-Bug: alle Inputs in Modals haben jetzt font-size 16px — Safari zoomt nicht mehr automatisch rein beim Antippen' },
+      { type: 'fixed',   text: 'Delete-Button auf Mobile versteckt (hidden sm:block) — war unsichtbar aber 30px breit und hat Holdings-Zeile gequetscht' },
+      { type: 'fixed',   text: 'Metadaten-Zeile (Anzahl · Kaufpreis · Datum) mit truncate abgesichert — kein Überlauf bei langen Werten' },
+    ],
+  },
+  {
     version: '2.4.2',
     date: '23. Juni 2026',
     label: 'BUGFIX: Mobile Modals Vollbild-Overlay — kein dvh, safe-area, Header immer sichtbar',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'AddCardModal + EditCardModal: Vollbild-Overlay statt Bottom-Sheet — Header fliegt nicht mehr aus dem Viewport wenn Tastatur öffnet' },
       { type: 'fixed',   text: 'EditCardModal: gleiche iOS-sichere Architektur wie AddCardModal (absolute inset-0, sm:static rounded-3xl)' },

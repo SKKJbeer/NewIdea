@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.4.2` · **Stand:** 23. Juni 2026 · **Branch:** `main`
+**Version:** `v2.4.3` · **Stand:** 23. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -112,6 +112,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.1.7 | Portfolio-Chart: sofortige Anzeige + Animation deaktiviert |
 | fix | Vercel `buildCommand: next build` — behebt Deployment-Blockade seit v1.9.0 |
 | v2.4.2 | Mobile Modals: Vollbild-Overlay, safe-area-inset-top, kein dvh mehr |
+| v2.4.3 | iOS-Zoom-Bug behoben (font-size 16px), Delete-Button auf Mobile versteckt |
 
 ---
 

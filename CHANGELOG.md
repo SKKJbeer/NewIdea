@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.4.3] — 2026-06-23 · BUGFIX: iOS-Zoom unterdrückt, Mobile-Layout kompakter
+
+### Behoben
+- **iOS-Zoom-Bug behoben:** Alle `<input>`-Felder in beiden Modals jetzt `font-size: 16px` auf Mobile — iOS Safari zoomt nicht mehr automatisch rein wenn ein Textfeld angetippt wird
+- **Delete-Button auf Mobile versteckt:** `hidden sm:block` — war `opacity-0 shrink-0`, also unsichtbar aber trotzdem ~30px breit → hat die Holdings-Zeile gequetscht
+- **Metadaten-Zeile mit `truncate`** gesichert — bei langen Kaufpreisen + Datum kein Überlauf mehr
+
+---
+
 ## [2.4.2] — 2026-06-23 · BUGFIX: Mobile Modals vollständig — Vollbild-Overlay, safe-area, kein dvh mehr
 
 ### Behoben

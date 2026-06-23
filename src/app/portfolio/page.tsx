@@ -255,7 +255,7 @@ export default function PortfolioPage() {
                         {lang}
                       </span>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5 tabular-nums">
+                    <p className="text-[10px] text-gray-400 mt-0.5 tabular-nums truncate">
                       {h.quantity}× · {formatEur(h.purchasePrice)}
                       {h.purchaseDate
                         ? ` · ${new Date(h.purchaseDate + 'T00:00:00').toLocaleDateString('de-DE', {
@@ -278,10 +278,10 @@ export default function PortfolioPage() {
                     </p>
                   </div>
 
-                  {/* Delete — hover only */}
+                  {/* Delete — nur Desktop (Hover). Mobile: via Edit-Modal löschen */}
                   <button
                     onClick={(e) => { e.stopPropagation(); removeHolding(h.cardId); }}
-                    className="p-1.5 rounded-full text-gray-200 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                    className="p-1.5 rounded-full text-gray-200 hover:text-red-500 hover:bg-red-50 transition-colors hidden sm:block opacity-0 group-hover:opacity-100 shrink-0"
                     title="Entfernen"
                   >
                     <Trash2 size={13} />
@@ -499,7 +499,7 @@ function AddCardModal({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kartenname — z. B. Charizard"
-                className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
+                className="w-full pl-10 pr-10 py-3 text-[16px] sm:text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 transition-all"
               />
               {searching
                 ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
@@ -606,7 +606,7 @@ function AddCardModal({
                       className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors">−</button>
                     <input type="number" min={1} value={qty}
                       onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="flex-1 text-center text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
+                      className="flex-1 text-center text-[16px] sm:text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
                     <button onClick={() => setQty((q) => q + 1)}
                       className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 active:bg-gray-300 flex items-center justify-center font-bold text-gray-700 text-lg transition-colors">+</button>
                   </div>
@@ -616,7 +616,7 @@ function AddCardModal({
                   <input type="number" min={0} step={0.01} value={purchasePrice}
                     onChange={(e) => setPurchasePrice(e.target.value)}
                     placeholder="0,00" inputMode="decimal"
-                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
+                    className="w-full text-[16px] sm:text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200" />
                 </div>
               </div>
 
@@ -625,7 +625,7 @@ function AddCardModal({
                 <input type="date" value={purchaseDate}
                   max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setPurchaseDate(e.target.value)}
-                  className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700" />
+                  className="w-full text-[16px] sm:text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700" />
               </div>
 
               {total !== null && !isNaN(total) && (
@@ -746,7 +746,7 @@ function EditCardModal({
               <input
                 type="number" min={1} value={qty}
                 onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
-                className="flex-1 text-center text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
+                className="flex-1 text-center text-[16px] sm:text-sm font-bold border border-gray-200 rounded-xl py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
               />
               <button
                 onClick={() => setQty((q) => q + 1)}
@@ -763,7 +763,7 @@ function EditCardModal({
               type="number" min={0} step={0.01} value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
               inputMode="decimal"
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
+              className="w-full text-[16px] sm:text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200"
             />
           </div>
 
@@ -773,7 +773,7 @@ function EditCardModal({
               type="date" value={purchaseDate}
               max={new Date().toISOString().split('T')[0]}
               onChange={(e) => setPurchaseDate(e.target.value)}
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700"
+              className="w-full text-[16px] sm:text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-200 text-gray-700"
             />
           </div>
 
