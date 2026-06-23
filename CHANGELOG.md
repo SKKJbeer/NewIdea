@@ -7,6 +7,31 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.5.0] — 2026-06-23 · Startseite Redesign: Bloomberg/TradingView-Style Dark Mode
+
+### Neu
+- **Komplett neues Homepage-Design** im Bloomberg Terminal / TradingView / CoinMarketCap Stil
+- **Dark Mode als Standard** (`bg-[#0a0a0f]`/`#13131e`) — schwarz-anthrazit Hintergrund auf der Startseite
+- **Hero-Bereich** neu: "Pokémon Kartenmarkt in Echtzeit" Headline mit violettem Akzent + Search-Bar
+- **Ticker Strip** — horizontaler Scroll mit echten Echtzeit-Preisen und Trends aller Top-Mover
+- **4 KPI-Karten:** PMI (gewichteter Marktindex), Marktbreite (% im Plus), Marktstimmung (Bullish/Neutral/Bearish), Fear & Greed Index (0-100)
+- **Fear & Greed Meter** — visueller Gradient-Balken aus echten Breadth- und Momentum-Daten
+- **Inline SVG Sparklines** — serverseitig gerenderte Mini-Charts (grün/rot) in Gewinner/Verlierer-Listen
+- **Top Gewinner & Verlierer** — zwei Spalten mit Kartenbild, Sparkline, Preis, 30T-Trend
+- **Trending Karten Tabelle** — CoinMarketCap-Stil: Rang, Bild, Name, Set, Seltenheit, Preis, 30T%
+- **Investor Insights** — 4 automatisch generierte Datenpunkte aus echten API-Daten (kein erfundener Content)
+- **Top Sets Tabelle** — aggregiert nach Set-Code: Ø Preis, Ø Trend, Anzahl Karten
+- **Alle Metriken aus echten Cardmarket-Daten** — PMI, Breadth, F&G sind abgeleitet, nicht erfunden
+
+### Geändert
+- Startseite vollständig neugestaltet — alle früheren Sektionen ersetzt durch neues Dark-Mode-Design
+- Blog-Teaser aktualisiert auf korrekten Publish-Plan (Sonntags/Donnerstags statt täglich)
+- Guides-Teaser zeigt jetzt alle 4 Guides (vorher 2)
+- Footer-Farben angepasst für Dark Mode (amber-Disclaimer mit reduzierter Opazität)
+- Changelog-Link im Footer ergänzt
+
+---
+
 ## [2.4.5] — 2026-06-23 · Blog: Nur Sonntags + Donnerstags, 404-Fix, Newsletter entfernt
 
 ### Geändert

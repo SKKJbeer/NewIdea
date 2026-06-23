@@ -11,10 +11,28 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.5.0',
+    date: '23. Juni 2026',
+    label: 'Startseite Redesign: Bloomberg/TradingView Dark Mode',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Komplett neues Homepage-Design im Bloomberg Terminal / TradingView / CoinMarketCap Stil' },
+      { type: 'new',     text: 'Dark Mode als Standard — schwarz-anthrazit Hintergrund auf der Startseite' },
+      { type: 'new',     text: 'Ticker Strip mit echten Echtzeit-Preisen und Trends aller Top-Mover (horizontaler Scroll)' },
+      { type: 'new',     text: '4 KPI-Karten: PMI (gewichteter Marktindex), Marktbreite, Marktstimmung, Fear & Greed Index' },
+      { type: 'new',     text: 'Fear & Greed Meter — visueller Gradient-Balken aus echten Breadth- und Momentum-Daten' },
+      { type: 'new',     text: 'Inline SVG Sparklines — serverseitig gerenderte Mini-Charts in Gewinner/Verlierer-Listen' },
+      { type: 'new',     text: 'Trending Karten Tabelle (CoinMarketCap-Stil): Rang, Bild, Name, Preis, 30T%' },
+      { type: 'new',     text: 'Investor Insights — automatisch generierte Datenpunkte aus echten API-Daten' },
+      { type: 'new',     text: 'Top Sets Tabelle — aggregiert nach Set: Ø Preis, Ø Trend, Anzahl Karten' },
+      { type: 'changed', text: 'Blog-Teaser aktualisiert auf korrekten Publish-Plan (So/Do statt täglich)' },
+    ],
+  },
+  {
     version: '2.4.5',
     date: '23. Juni 2026',
     label: 'Blog: nur Sonntags + Donnerstags — 404-Fix, Newsletter entfernt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Blog erscheint nur noch sonntags (Wochenrückblick) und donnerstags (rotierender Artikel)' },
       { type: 'changed', text: '"Heute neu"-Badge erscheint nur noch wenn heute wirklich ein Publish-Day ist' },
