@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.5.4',
+    date: '23. Juni 2026',
+    label: 'Newsletter global deaktiviert',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Newsletter-Formular von Guides, Marktbericht und Wochenberichten entfernt' },
+      { type: 'changed', text: 'Ungenutzte Imports (NewsletterSignup, Suspense) aus betroffenen Seiten bereinigt' },
+    ],
+  },
+  {
     version: '2.5.3',
     date: '23. Juni 2026',
     label: 'Datenintegrität: Guides + Fallback-Preise + CLAUDE.md-Absicherung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'guides.ts: erfundene historische Preiszahlen durch qualitative Formulierungen ersetzt' },
       { type: 'changed', text: 'article-generator.ts fallbackArticle: alle hardcodierten Preiszahlen aus Fließtext entfernt' },

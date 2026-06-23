@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.5.4] — 2026-06-23 · Newsletter global deaktiviert
+
+### Entfernt
+- **Newsletter-Anmeldeformular** komplett von allen Nutzer-sichtbaren Seiten entfernt
+- `src/app/guides/[slug]/page.tsx`: `<section id="newsletter">` mit `<NewsletterSignup />` entfernt
+- `src/app/marktbericht/page.tsx`: Newsletter-Sektion entfernt
+- `src/app/marktbericht/[week]/page.tsx`: Newsletter-Sektion entfernt
+- Entsprechende `import`-Zeilen (`NewsletterSignup`, ungenutzter `Suspense`) bereinigt
+
+---
+
 ## [2.5.3] — 2026-06-23 · Datenintegrität: Guides + Fallback-Preise + CLAUDE.md-Absicherung
 
 ### Geändert

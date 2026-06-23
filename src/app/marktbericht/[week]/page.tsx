@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
-import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap } from 'lucide-react';
 import { loadMarketReportByWeek, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
@@ -151,14 +149,6 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
             </Link>
           )}
         </div>
-
-        <section id="newsletter">
-          <div className="text-center mb-4">
-            <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-1">Newsletter</p>
-            <h2 className="text-xl font-black text-gray-900">Jeden Montag direkt ins Postfach</h2>
-          </div>
-          <Suspense><NewsletterSignup /></Suspense>
-        </section>
 
         <footer className="border-t border-gray-200 pt-5 space-y-3">
           <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1">

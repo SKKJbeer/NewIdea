@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
-import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { getGuide, GUIDES } from '@/lib/guides';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -167,13 +165,6 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           <Link href="/artikel" className="text-sm text-violet-600 hover:text-violet-800 font-semibold">Blog →</Link>
         </div>
 
-        <section id="newsletter">
-          <div className="text-center mb-4">
-            <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-1">Newsletter</p>
-            <h2 className="text-lg font-black text-gray-900">Jeden Montag per E-Mail</h2>
-          </div>
-          <Suspense><NewsletterSignup /></Suspense>
-        </section>
       </main>
     </div>
   );

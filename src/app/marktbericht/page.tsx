@@ -1,8 +1,6 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
-import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { NavBar } from '@/components/NavBar';
 import { Calendar, Zap, Shield, TrendingUp, Brain, ChevronLeft, Archive } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
@@ -152,15 +150,6 @@ export default async function MarktberichtPage() {
         <section>
           <p className="text-xs text-gray-400 mb-2 flex items-center gap-1"><Shield size={10} />Partner & Affiliate-Links</p>
           <AffiliateBar />
-        </section>
-
-        <section id="newsletter">
-          <div className="text-center mb-4">
-            <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-1">Newsletter</p>
-            <h2 className="text-xl font-black text-gray-900">Jeden Montag direkt ins Postfach</h2>
-            <p className="text-gray-500 text-sm mt-1">Die komplette Marktanalyse als E-Mail — kostenlos.</p>
-          </div>
-          <Suspense><NewsletterSignup /></Suspense>
         </section>
 
         <footer className="border-t border-gray-200 pt-6 space-y-3">

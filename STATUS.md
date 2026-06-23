@@ -119,7 +119,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.5.1 | Sprachauswahl EN/DE/JP/KR für Kartenpreise in Suche + Karten-Detail |
 | v2.5.2 | Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung, erfundene Daten entfernt |
 | v2.5.3 | Guides + Fallback-Preise bereinigt, CLAUDE.md-Regeln permanent verankert |
+| v2.5.4 | Newsletter-Formular global von allen Seiten entfernt (Guides, Marktbericht, Wochenberichte) |
 
 ---
 
-*Zuletzt aktualisiert: v2.5.3 — 23. Juni 2026*
+*Zuletzt aktualisiert: v2.5.4 — 23. Juni 2026*
