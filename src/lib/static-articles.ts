@@ -42,7 +42,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-09 (Dienstag) ── Karte ──────────────────────────────────────────
   '2026-06-09': {
     title: 'Umbreon VMAX Alt Art: Die Karte die jeden Marktcrash überlebt hat',
-    intro: 'Manche Karten sind Zykliker — sie steigen, fallen, erholen sich. Und dann gibt es Umbreon VMAX Alt Art. Seit dem Tief von ca. 60 € im Jahr 2022 hat diese Karte jeden Rückgang ignoriert und jeden Anstieg mitgemacht. Ich erkläre heute warum das kein Glück ist, sondern Struktur.',
+    intro: 'Manche Karten sind Zykliker — sie steigen, fallen, erholen sich. Und dann gibt es Umbreon VMAX Alt Art. Diese Karte zeigt seit ihrem Post-Release-Tief ein konsistentes Muster: jeden Rückgang ignoriert, jeden Anstieg mitgemacht. Warum das kein Zufall ist, sondern Struktur — zeigen die Marktmuster der vergangenen Jahre.',
     sections: [
       {
         heading: 'Was diese Karte so außergewöhnlich macht',
@@ -51,7 +51,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       },
       {
         heading: 'Preisentwicklung 2021–2026: Lehrbuch für Langzeitinvestoren',
-        content: 'Direkt nach Evolving Skies Release (August 2021): ca. 80 €. Crash bei Pack-Flutung: auf 58 € gefallen. Jahresende 2022: Erholung auf 75 €. Ende 2023: erster Ausbruch auf 95 €. 2024: stabile 100–115 €. Heute 2026: 120–140 € je nach Zustand. Das ist +100–140 % in 5 Jahren auf eine Karte die nie aktiv gespielt wurde (Umbreon VMAX war kein Top-Turnierdeck). Reiner Sammlerwert treibt den Preis — das ist das stabilste Investment im TCG.',
+        content: 'Evolving Skies Alts zeigen ein dokumentiertes Muster: Direkt nach Release notierten sie deutlich günstiger, als der Markt mit frischen Packs geflutet wurde — ein temporärer Preisrückgang der sich bei jedem neuen Set wiederholt. Seitdem zeigen Umbreon VMAX und die anderen Alt Arts aus diesem Set langfristig eine steigende Tendenz. Umbreon VMAX war nie ein Top-Turnierdeck — der Preis wird ausschließlich durch Sammlernachfrage getrieben, nicht durch kompetitiven Spielwert. Reiner Sammlerwert ist historisch einer der stabilsten Wertfaktoren im TCG — unabhängig von Metagame-Verschiebungen. Aktuelle Preise immer direkt auf Cardmarket prüfen.',
         highlight: { name: 'Umbreon VMAX Alt Art', set: 'Evolving Skies', setCode: 'swsh7', imageUrl: '', price: 130, trend: 0, rarity: 'Rare Alt' },
       },
       {
@@ -62,7 +62,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     ],
     keyPoints: [
       'Umbreon VMAX Alt Art = emotionaler Sammlerwert + ausgelaufenes Set = stabiler Markt',
-      '+100–140 % in 5 Jahren ohne Turnierspielrelevanz — reiner Collector-Markt',
+      'Keine Turnierspielrelevanz — reiner Collector-Markt, historisch einer der stabilsten Wertfaktoren',
       'NM bei 120–130 €; Graded (PSA 10) bei 200+ € — getrennte Märkte und Preiszonen',
     ],
     tags: ['umbreon vmax alt art', 'evolving skies', 'pokemon investment', 'swsh7'],
@@ -111,7 +111,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-11 (Donnerstag) ── Set ──────────────────────────────────────────
   '2026-06-11': {
     title: 'Paldea Evolved im Check: Das unterschätzte Set mit großem Potenzial',
-    intro: 'Während alle über Pokémon 151 reden, hat Paldea Evolved (SV2, erschienen Juni 2023) still und leise seine Post-Release-Talsohle durchlaufen. Für mich ist das gerade eines der interessantesten Sets um einzusteigen — und hier ist die Begründung dafür.',
+    intro: 'Während alle über Pokémon 151 reden, hat Paldea Evolved (SV2, erschienen Juni 2023) still und leise seine Post-Release-Talsohle durchlaufen. Das macht dieses Set gerade zu einem der interessantesten beobachtenswerten Segmente im TCG-Markt — mit klarer Datenbegründung.',
     sections: [
       {
         heading: 'Was Paldea Evolved ist und warum es Aufmerksamkeit verdient',
@@ -145,7 +145,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
 
   // ── 2026-06-12 (Freitag) ── Ausblick ────────────────────────────────────────
   '2026-06-12': {
-    title: 'Wochenend-Ausblick KW 24: Jetzt kaufen, was andere übersehen',
+    title: 'Wochenend-Ausblick KW 24: Was Sammler dieses Wochenende im Blick haben sollten',
     intro: 'Es ist Freitag und Cardmarket füllt sich — das Wochenende bringt immer die meisten Transaktionen. Wer informiert handelt, schaut nicht nur auf die Top-Seller-Listen (da ist der Hype schon eingepreist), sondern auch auf die Karten die gerade keine Aufmerksamkeit bekommen. Hier ein Überblick zu den Marktdaten des Wochenendes.',
     sections: [
       {
@@ -218,12 +218,12 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Was diese Woche bestätigt hat',
-        content: 'Die These aus meiner letzten Marktanalyse hat sich gehalten: SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art notiert weiter bei 120–135 €, Charizard ex SIR hält 125–145 €. Das ist kein Raketenanstieg — aber das Ziel ist nicht Raketenanstieg, sondern stabiler Wertzuwachs ohne Schlaflosigkeit. Wer diese Positionen gehalten hat, hat diese Woche wieder etwas gewonnen: Zeit die für sich arbeitet.',
+        content: 'Die Marktdaten der Vorwoche haben sich bestätigt: SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihr Preisniveau stabil. Das ist kein Raketenanstieg — aber stabiler Wertzuwachs ohne Volatilität ist historisch das Markenzeichen dieser Kartenklasse. Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität.',
         highlight: { name: 'Umbreon VMAX Alt Art', set: 'Evolving Skies', setCode: 'swsh7', imageUrl: '', price: 125, trend: 0, rarity: 'Rare Alt' },
       },
       {
-        heading: 'Was mich diese Woche überrascht hat',
-        content: 'Interessanterweise haben einige ältere Karten aus der Sun & Moon-Ära (2016–2019) Aufmerksamkeit bekommen. Shining Legends Pikachu (aus dem kleineren Supplementset von 2017, mit dem glänzenden Hintergrund) hat auf Cardmarket neue Höchstpreise von über 200 € für PSA-10-Exemplare erzielt. Das ist ein deutliches Signal: Wenn der Hype um Scarlet & Violet-Karten sich normalisiert, schaut der Markt zurück auf ältere Eras. Wer Sun & Moon Shining Fates oder Hidden Fates noch im Portfolio hat: Halten.',
+        heading: 'Was diese Woche auffiel',
+        content: 'Ältere Karten aus der Sun & Moon-Ära (2016–2019) rücken wieder in den Blickpunkt. Shining Legends-Karten (das kleinere Supplementset von 2017, erkennbar am glänzenden Hintergrund der Pokémon-Abbildungen) zeigen zunehmende Sammlernachfrage. Ein konsistentes Marktmuster: Wenn der Hype um aktuelle Sets sich normalisiert, schaut der Markt zurück auf ältere Eras — Sun & Moon Shining Fates und Hidden Fates werden dabei besonders beobachtet.',
         highlight: { name: 'Shining Pikachu', set: 'Shining Legends', setCode: 'sm3pt5', imageUrl: '', price: 150, trend: 0, rarity: 'Shiny' },
       },
       {
@@ -249,7 +249,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
   // ── 2026-06-15 (Montag) ── Markt ────────────────────────────────────────────
   '2026-06-15': {
     title: 'Pokémon-Markt KW 25: Drei Bewegungen die du diese Woche kennen solltest',
-    intro: 'Der Start in eine neue Handelswoche zeigt immer, was das Wochenende gebracht hat. KW 25 beginnt mit drei klaren Bewegungen im Markt — eine positiv, eine neutral, eine die aufpassen lässt. Lass mich das auseinandernehmen.',
+    intro: 'Der Start in eine neue Handelswoche zeigt immer, was das Wochenende gebracht hat. KW 25 beginnt mit drei klaren Bewegungen im Markt — eine positiv, eine neutral, eine die aufmerksam macht. Die Marktdaten der Woche im Überblick.',
     sections: [
       {
         heading: 'Bewegung 1: Positive — 151-Set zieht weiter an',
@@ -258,12 +258,12 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       },
       {
         heading: 'Bewegung 2: Neutral — Paradox Rift SIRs seitwärts',
-        content: 'Paradox Rift (SV4, November 2023 — das Set mit den Paradox-Pokémon, urzeitliche und futuristische Varianten bekannter Pokémon) zeigt kaum Bewegung. Die SIRs dort (Ancient Roar SIRs und Future Flash SIRs) notieren stabil, weder aufwärts noch abwärts. Das ist eine Konsolidierungsphase. Meine Einschätzung: Paradox Rift hat starke Artworks, aber die Pokémon (Brute Bonnet, Sandy Shocks, Iron Hands etc.) sind für die Mehrheit der Sammler noch unbekannte Generation-9-Neuheiten. Der Nostalgie-Faktor fehlt — noch.',
+        content: 'Paradox Rift (SV4, November 2023 — das Set mit den Paradox-Pokémon, urzeitliche und futuristische Varianten bekannter Pokémon) zeigt kaum Bewegung. Die SIRs dort (Ancient Roar SIRs und Future Flash SIRs) notieren stabil, weder aufwärts noch abwärts. Das ist eine Konsolidierungsphase. Marktbeobachtung: Paradox Rift hat starke Artworks, aber die Pokémon (Brute Bonnet, Sandy Shocks, Iron Hands etc.) sind für die Mehrheit der Sammler noch unbekannte Generation-9-Neuheiten. Der Nostalgie-Faktor fehlt — noch.',
         highlight: { name: 'Iron Hands ex SIR', set: 'Paradox Rift', setCode: 'sv4', imageUrl: '', price: 30, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: 'Bewegung 3: Aufpassen — Hype-Karte ohne Fundament',
-        content: 'Eine Karte aus einem brandneuen Promotional-Set hat in den letzten Tagen auf Social Media für Aufsehen gesorgt — der Preis sprang von 30 € auf 75 € in 48 Stunden. Ich nenne den Namen bewusst nicht, weil das genau die Karte ist die du gerade NICHT kaufen solltest. Promotional-Karten ohne festes Set, ohne Druckraten-Information und ohne nachgewiesene Sammler-Basis sind Spekulationsobjekte. Die Hälfte dieser Spikes korrigiert sich innerhalb von zwei Wochen. Warte ab.',
+        content: 'Eine Karte aus einem Promotional-Set hat in den letzten Tagen auf Social Media für Aufsehen gesorgt — der Preis sprang innerhalb von 48 Stunden stark an. Der konkrete Kartenname bleibt hier bewusst unerwähnt — solche viral gegangenen Karten sind das Paradebeispiel für das, was man gerade NICHT kaufen sollte. Promotional-Karten ohne festes Set, ohne Druckraten-Information und ohne nachgewiesene Sammler-Basis sind Spekulationsobjekte. Historisch korrigiert sich die Hälfte dieser Spikes innerhalb von zwei Wochen.',
       },
     ],
     keyPoints: [
@@ -391,7 +391,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket — Käufer haben Zeit zum Stöbern, Verkäufer optimieren ihre Preise. Aktuelle Marktdaten zeigen klare Muster. Hier ein Überblick zu den wichtigsten Entwicklungen.',
     sections: [
       {
-        heading: 'Kaufen: Diese Karten sind gerade in der Bodenbildungsphase',
+        heading: 'Bodenbildungsphase: Diese Karten zeigen ruhige Preisentwicklung',
         content: 'SIRs von Pokémon die in den letzten 2–3 Wochen keine großen Preisbewegungen hatten, befinden sich oft in einer Konsolidierungsphase. Alternate-Art-Karten aus Evolving Skies (SWSH7, das 2021er Set mit Drachenpokémon und Eevee-Entwicklungen) zeigen seit Jahren konstante Preissteigerungen. Rayquaza VMAX Alt Art (das riesige grüne Atmosphären-Drachen-Pokémon) und Umbreon VMAX Alt Art (das schwarze Nacht-Pokémon mit gelben Ringen) sind Klassiker — mit seit Jahren dokumentierten Preisanstiegen.',
         highlight: { name: 'Rayquaza VMAX Alt Art', set: 'Evolving Skies', setCode: 'swsh7', imageUrl: '', price: 150, trend: 0, rarity: 'Rare Alt' },
       },
@@ -454,7 +454,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
 
   // ── 2026-06-21 (Sonntag) ── Rückblick ───────────────────────────────────────
   '2026-06-21': {
-    title: 'Wochenrückblick KW 25: Das 151-Set läuft einfach — und ich hab mal wieder zu spät gedrückt',
+    title: 'Wochenrückblick KW 25: Das 151-Set läuft einfach — und ein klassisches Marktmuster bestätigt sich',
     intro: 'KW 25 war eine von diesen Wochen, die ruhig wirken, aber im Hintergrund mehr passiert als man denkt. Ein alter Liebling hat mal wieder alle überrascht, die Pokémon-Turnierwelt dreht ordentlich auf — und ein klassisches Marktmuster hat sich wieder einmal gezeigt. Die Marktbeobachtungen der Woche.',
     sections: [
       {

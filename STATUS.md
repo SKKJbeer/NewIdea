@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.5.1` · **Stand:** 23. Juni 2026 · **Branch:** `main`
+**Version:** `v2.5.2` · **Stand:** 23. Juni 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -117,7 +117,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.4.5 | Blog: nur So/Do, 404 für andere Tage, Newsletter aus Artikelseite entfernt |
 | v2.5.0 | Startseite Redesign: Bloomberg/TradingView Dark Mode, PMI, Fear & Greed, Sparklines, Ticker |
 | v2.5.1 | Sprachauswahl EN/DE/JP/KR für Kartenpreise in Suche + Karten-Detail |
+| v2.5.2 | Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung, erfundene Daten entfernt |
 
 ---
 
-*Zuletzt aktualisiert: v2.5.1 — 23. Juni 2026*
+*Zuletzt aktualisiert: v2.5.2 — 23. Juni 2026*

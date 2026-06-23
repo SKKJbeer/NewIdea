@@ -116,6 +116,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           </div>
         ) : (
           <>
+            {article.isStatic && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
+                <span className="text-amber-500 text-sm mt-0.5 shrink-0">⚠</span>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  <strong>Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
+                  <a href="https://www.cardmarket.com/en/Pokemon" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-900">Cardmarket</a>{' '}
+                  prüfen.
+                </p>
+              </div>
+            )}
+
             {/* Intro */}
             <section className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden`}>
               <div className={`h-1 ${c.accent}`} />

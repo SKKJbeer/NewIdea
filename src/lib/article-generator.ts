@@ -26,6 +26,7 @@ export interface Article {
   sources?: Array<{ label: string; url: string }>;
   readingTimeMin: number;
   generatedAt: string;
+  isStatic?: boolean;
 }
 
 // Static preview titles shown in the blog listing (without date params)
@@ -306,7 +307,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
       sections: [
         {
           heading: 'Was diese Woche bestätigt hat',
-          content: 'Die Datenlage aus den letzten Wochen bestätigt sich: SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art notiert weiter bei 120–135 €, Charizard ex SIR hält 125–145 €. Kein dramatischer Anstieg — aber Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität. Speziell Umbreon VMAX Alt Art (das schwarze Nacht-Pokémon mit Mond-Motiv) zog diese Woche nochmal an.',
+          content: 'Die Datenlage bestätigt sich: SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihr Preisniveau stabil. Kein dramatischer Anstieg — aber Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise immer direkt auf Cardmarket prüfen.',
         },
         {
           heading: 'Was diese Woche als Lehrstück diente',
@@ -333,6 +334,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
     title: a.title || meta.label,
     readingTimeMin: Math.max(3, Math.ceil(wordCount / 200)),
     generatedAt: new Date().toISOString(),
+    isStatic: true,
   };
 }
 
@@ -435,7 +437,7 @@ function matchSectionHighlights(
 export async function readArticle(date: string): Promise<Article | null> {
   if (STATIC_ARTICLES[date]) {
     const s = STATIC_ARTICLES[date];
-    return { ...s, featuredCards: s.featuredCards?.length ? s.featuredCards : [], generatedAt: new Date().toISOString() };
+    return { ...s, featuredCards: s.featuredCards?.length ? s.featuredCards : [], generatedAt: new Date().toISOString(), isStatic: true };
   }
   return loadArticle(date);
 }
@@ -453,6 +455,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       ...staticArticle,
       featuredCards: staticArticle.featuredCards?.length ? staticArticle.featuredCards : [],
       generatedAt: new Date().toISOString(),
+      isStatic: true,
     };
   }
 

@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.5.2] — 2026-06-23 · Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung
+
+### Neu
+- **Archiv-Disclaimer Banner** auf allen statischen/Fallback-Artikeln — gelber Hinweis "Archiv-Beitrag: Preisangaben können veraltet sein"
+- **`isStatic` Flag** auf `Article`-Interface — kennzeichnet statische und Fallback-Artikel für UI-Differenzierung
+
+### Geändert
+- **Persona-Bereinigung** in allen statischen Artikeln — alle "Ich"-Formulierungen entfernt (CLAUDE.md-Regel: kein Persona-Name, keine Ich-Perspektive)
+- **Erfundene Preistrajektorie entfernt** — Umbreon VMAX Alt Art Artikel (2026-06-09): spezifisch erfundene Zahlenreihe 80→58→75→95→100-115→120-140€ durch qualitative Beschreibung ersetzt
+- **Unverifizierten Anspruch entfernt** — Shining Pikachu "neue Höchstpreise über 200€ für PSA-10" war unbelegt → durch allgemeine Marktbeobachtung ersetzt
+- **Kaufempfehlungs-Titel bereinigt** — "Jetzt kaufen, was andere übersehen" → neutrale Formulierung
+- **"Ich nenne den Namen nicht"** → neutrale Formulierung ohne Persona
+- **Fallback-Artikel** (ohne API-Key) ebenfalls als `isStatic: true` markiert + Preis-Hardcodes entfernt
+
+---
+
 ## [2.5.1] — 2026-06-23 · Sprachauswahl für Kartenpreise (Suche + Karten-Detail)
 
 ### Neu
