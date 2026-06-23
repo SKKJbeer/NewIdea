@@ -24,8 +24,8 @@ function ArticleContent({ content }: { content: string }) {
           return (
             <ul key={i} className="space-y-2">
               {lines.map((line, j) => (
-                <li key={j} className="flex items-start gap-2.5 text-sm text-gray-700 leading-relaxed">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
+                <li key={j} className="flex items-start gap-2.5 text-sm text-slate-400 leading-relaxed">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-violet-500 shrink-0" />
                   <span>{line.replace(/^[-•*]\s*|\d+\.\s*/, '')}</span>
                 </li>
               ))}
@@ -33,7 +33,7 @@ function ArticleContent({ content }: { content: string }) {
           );
         }
         return (
-          <p key={i} className="text-sm text-gray-700 leading-relaxed">
+          <p key={i} className="text-sm text-slate-400 leading-relaxed">
             {block}
           </p>
         );
@@ -42,14 +42,14 @@ function ArticleContent({ content }: { content: string }) {
   );
 }
 
-const COLOR: Record<string, { badge: string; header: string; accent: string }> = {
-  violet:  { badge: 'bg-violet-100 text-violet-700',   header: 'from-violet-800 to-indigo-900',  accent: 'bg-violet-600' },
-  blue:    { badge: 'bg-blue-100 text-blue-700',       header: 'from-blue-800 to-blue-950',      accent: 'bg-blue-600' },
-  emerald: { badge: 'bg-emerald-100 text-emerald-700', header: 'from-emerald-800 to-green-950',  accent: 'bg-emerald-600' },
-  amber:   { badge: 'bg-amber-100 text-amber-700',     header: 'from-amber-700 to-orange-900',   accent: 'bg-amber-500' },
-  rose:    { badge: 'bg-rose-100 text-rose-700',       header: 'from-rose-800 to-pink-950',      accent: 'bg-rose-600' },
-  indigo:  { badge: 'bg-indigo-100 text-indigo-700',   header: 'from-indigo-800 to-indigo-950',  accent: 'bg-indigo-600' },
-  gray:    { badge: 'bg-gray-100 text-gray-600',       header: 'from-gray-700 to-gray-900',      accent: 'bg-gray-600' },
+const ACCENT_COLOR: Record<string, string> = {
+  violet:  'bg-violet-600',
+  blue:    'bg-blue-600',
+  emerald: 'bg-emerald-600',
+  amber:   'bg-amber-500',
+  rose:    'bg-rose-600',
+  indigo:  'bg-indigo-600',
+  gray:    'bg-slate-600',
 };
 
 function parseDate(dateStr: string): Date | null {
@@ -81,57 +81,56 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const daysDiff = Math.floor((now.getTime() - d.getTime()) / 86400000);
   if (daysDiff < 0) notFound();
 
-  // Only Sunday (Wochenrückblick) and Thursday (rotating) are valid article days
   const type = getArticleType(date);
   if (!type) notFound();
   const meta = ARTICLE_META[type];
-  const c = COLOR[meta.color];
+  const accent = ACCENT_COLOR[meta.color] ?? 'bg-violet-600';
   const dateLabel = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   const article = await readArticle(date);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className={`bg-gradient-to-br ${c.header} text-white`}>
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 pt-8 pb-12 sm:py-14">
-          <Link href="/artikel" className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs mb-5 transition-colors">
+          <Link href="/artikel" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
             <ArrowLeft size={12} /> Alle Artikel
           </Link>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-white/15 text-white">{meta.emoji} {meta.category}</span>
-            <span className="text-xs text-white/60 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
-            {article && <span className="text-xs text-white/60 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
+            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">{meta.emoji} {meta.category}</span>
+            <span className="text-xs text-slate-600 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
+            {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black leading-tight">{article?.title || meta.label}</h1>
+          <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">{article?.title || meta.label}</h1>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pb-16 -mt-4 space-y-5">
         {!article ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-            <p className="text-gray-500 font-semibold">Artikel noch nicht verfügbar</p>
-            <p className="text-gray-400 text-sm mt-1">Dieser Artikel wird täglich um 08:00 Uhr automatisch erstellt.</p>
+          <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-8 text-center">
+            <p className="text-slate-400 font-semibold">Artikel noch nicht verfügbar</p>
+            <p className="text-slate-600 text-sm mt-1">Dieser Artikel wird täglich um 08:00 Uhr automatisch erstellt.</p>
           </div>
         ) : (
           <>
             {article.isStatic && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
-                <span className="text-amber-500 text-sm mt-0.5 shrink-0">⚠</span>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  <strong>Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
-                  <a href="https://www.cardmarket.com/en/Pokemon" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-900">Cardmarket</a>{' '}
+              <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2.5">
+                <span className="text-amber-400 text-sm mt-0.5 shrink-0">⚠</span>
+                <p className="text-xs text-amber-400/80 leading-relaxed">
+                  <strong className="text-amber-400">Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
+                  <a href="https://www.cardmarket.com/en/Pokemon" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-300">Cardmarket</a>{' '}
                   prüfen.
                 </p>
               </div>
             )}
 
             {/* Intro */}
-            <section className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden`}>
-              <div className={`h-1 ${c.accent}`} />
+            <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+              <div className={`h-1 ${accent}`} />
               <div className="p-5 sm:p-6">
-                <p className="text-gray-700 text-base leading-relaxed">{article.intro}</p>
+                <p className="text-slate-300 text-base leading-relaxed">{article.intro}</p>
               </div>
             </section>
 
@@ -142,12 +141,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
 
             {/* Key points */}
             {article.keyPoints.length > 0 && (
-              <section className="bg-violet-50 rounded-2xl border border-violet-100 p-5">
-                <p className="text-[10px] font-bold text-violet-600 uppercase tracking-widest mb-3">Das Wichtigste auf einen Blick</p>
+              <section className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5">
+                <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-3">Das Wichtigste auf einen Blick</p>
                 <ul className="space-y-2.5">
                   {article.keyPoints.map((point, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-violet-900">
-                      <span className={`w-5 h-5 ${c.accent} rounded-full text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5`}>{i + 1}</span>
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-slate-300">
+                      <span className={`w-5 h-5 ${accent} rounded-full text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5`}>{i + 1}</span>
                       {point}
                     </li>
                   ))}
@@ -157,17 +156,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
 
             {/* Sections */}
             {article.sections.map((section, i) => (
-              <section key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+              <section key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6">
                 <div className="flex items-start gap-3 mb-4">
-                  <span className={`flex-shrink-0 w-6 h-6 ${c.accent} rounded-full text-white text-[10px] font-black flex items-center justify-center mt-0.5`}>
+                  <span className={`flex-shrink-0 w-6 h-6 ${accent} rounded-full text-white text-[10px] font-black flex items-center justify-center mt-0.5`}>
                     {i + 1}
                   </span>
-                  <h2 className="text-base font-black text-gray-900 leading-snug">{section.heading}</h2>
+                  <h2 className="text-base font-black text-slate-200 leading-snug">{section.heading}</h2>
                 </div>
                 <div className="pl-9">
                   <ArticleContent content={section.content} />
                   {section.highlight && (
-                    <div className="mt-4 flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                    <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-3">
                       {section.highlight.imageUrl && (
                         <Image
                           src={section.highlight.imageUrl}
@@ -178,8 +177,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                         />
                       )}
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-900 line-clamp-1">{section.highlight.name}</p>
-                        <p className="text-xs text-gray-500 line-clamp-1">{section.highlight.set}</p>
+                        <p className="text-sm font-bold text-slate-200 line-clamp-1">{section.highlight.name}</p>
+                        <p className="text-xs text-slate-600 line-clamp-1">{section.highlight.set}</p>
                         {section.highlight.setCode && (
                           <BoosterPackImage
                             setCode={section.highlight.setCode}
@@ -188,7 +187,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                           />
                         )}
                         {section.highlight.price > 0 && (
-                          <p className="text-sm font-bold text-violet-700 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
+                          <p className="text-sm font-bold text-violet-400 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
                         )}
                       </div>
                     </div>
@@ -200,17 +199,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
             {/* Tags */}
             {article.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 items-center pt-1">
-                <Tag size={12} className="text-gray-400" />
+                <Tag size={12} className="text-slate-700" />
                 {article.tags.map((tag) => (
-                  <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{tag}</span>
+                  <span key={tag} className="text-xs bg-[#13131e] border border-[#2a2a3a] text-slate-500 px-2.5 py-1 rounded-full">{tag}</span>
                 ))}
               </div>
             )}
 
             {/* Sources */}
             {article.sources && article.sources.length > 0 && (
-              <section className="bg-gray-50 rounded-2xl border border-gray-100 p-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Quellen</p>
+              <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
+                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Quellen</p>
                 <ul className="space-y-1">
                   {article.sources.map((src, i) => (
                     <li key={i} className="text-xs">
@@ -218,7 +217,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                         href={src.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-violet-600 hover:text-violet-800 hover:underline"
+                        className="text-violet-400 hover:text-violet-300 hover:underline"
                       >
                         {src.label}
                       </a>
@@ -231,15 +230,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
         )}
 
         <div className="flex justify-between items-center pt-2">
-          <Link href="/artikel" className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold">
+          <Link href="/artikel" className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold">
             <ArrowLeft size={14} /> Alle Artikel
           </Link>
-          <Link href="/marktbericht" className="text-sm text-violet-600 hover:text-violet-800 font-semibold">Marktbericht →</Link>
+          <Link href="/marktbericht" className="text-sm text-violet-400 hover:text-violet-300 font-semibold">Marktbericht →</Link>
         </div>
 
-        <footer className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1 pb-4">
-          <p className="text-[11px] font-semibold text-amber-800">Inoffizielle Fan-Seite · Keine Anlageberatung</p>
-          <p className="text-[10px] text-amber-700 leading-relaxed">
+        <footer className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">
+          <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite · Keine Anlageberatung</p>
+          <p className="text-[10px] text-amber-400/60 leading-relaxed">
             Inhalte werden automatisch von KI generiert und dienen ausschließlich der Information.
             Pokémon ist eine Marke von Nintendo / Creatures / GAME FREAK — keine Verbindung zu diesen Unternehmen.
           </p>

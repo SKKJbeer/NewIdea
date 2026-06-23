@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.6.0',
+    date: '23. Juni 2026',
+    label: 'Einheitliches Dark Mode Design auf allen Seiten',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Bloomberg/TradingView-Design-System auf alle Seiten und Komponenten ausgerollt' },
+      { type: 'changed', text: 'NavBar: dunkle Variante mit Disclaimer-Bar und Violet-Akzenten' },
+      { type: 'changed', text: 'CardGrid, ArticleCardGallery, CardLangPrice, SearchResultsLang: vollständig dunkel' },
+      { type: 'changed', text: 'Alle Seiten (Suche, Artikel, Guides, Marktbericht, Karten-Detail): einheitliche Dark-Palette' },
+      { type: 'new',     text: 'NavBar auf Karten-Detailseite ergänzt (fehlte vorher)' },
+      { type: 'changed', text: 'CLAUDE.md: Design-Token-Tabelle, Code-Patterns und Verbotsliste dauerhaft verankert' },
+    ],
+  },
+  {
     version: '2.5.4',
     date: '23. Juni 2026',
     label: 'Newsletter global deaktiviert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Newsletter-Formular von Guides, Marktbericht und Wochenberichten entfernt' },
       { type: 'changed', text: 'Ungenutzte Imports (NewsletterSignup, Suspense) aus betroffenen Seiten bereinigt' },

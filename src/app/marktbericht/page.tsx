@@ -29,25 +29,25 @@ export default async function MarktberichtPage() {
   ]);
 
   const hasContent = !!report;
-  const previousReports = allMeta.slice(1); // everything except the latest
+  const previousReports = allMeta.slice(1);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="bg-gradient-to-br from-violet-800 via-indigo-800 to-indigo-950 text-white">
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-4xl mx-auto px-4 pt-10 pb-16 sm:py-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 text-violet-200 text-xs mb-5">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1.5 text-violet-400 text-xs">
             <Calendar size={12} />
             {report ? `KW ${report.weekNumber} · ${formatWeekDate(report.weekStart)}` : 'Wöchentlich aktualisiert'}
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 leading-tight">
-            Wöchentliche<br /><span className="text-yellow-300">Marktanalyse</span>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 leading-tight text-white">
+            Wöchentliche<br /><span className="text-violet-400">Marktanalyse</span>
           </h1>
-          <p className="text-violet-200 text-sm sm:text-base max-w-md mx-auto mb-6">
+          <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-6">
             KI-gestützte Investment-Analyse für Pokémon-Karten-Sammler und Investoren.
           </p>
-          <div className="flex justify-center gap-6 text-violet-300 text-xs">
+          <div className="flex justify-center gap-6 text-slate-600 text-xs">
             <div className="flex items-center gap-1.5"><Brain size={12} />KI-Analyse</div>
             <div className="flex items-center gap-1.5"><TrendingUp size={12} />Echtzeit-Preise</div>
             <div className="flex items-center gap-1.5"><Zap size={12} />Wöchentlich neu</div>
@@ -57,32 +57,32 @@ export default async function MarktberichtPage() {
 
       <main className="max-w-4xl mx-auto px-4 pb-16 space-y-8 -mt-6">
         {!hasContent && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800 text-sm flex items-start gap-3">
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 flex items-start gap-3">
             <span className="text-xl">📅</span>
             <div>
               <p className="font-semibold">Erster Bericht noch ausstehend</p>
-              <p className="text-xs mt-1 text-amber-600">
+              <p className="text-xs mt-1 text-amber-400/60">
                 Der erste Wochenbericht wird automatisch jeden Montag um 07:00 Uhr UTC generiert.
                 Du kannst ihn auch manuell über das{' '}
-                <a href="/studio" className="underline">Studio</a> anstoßen.
+                <a href="/studio" className="underline hover:text-amber-300">Studio</a> anstoßen.
               </p>
             </div>
           </div>
         )}
 
         {report?.reportText && (
-          <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-5 py-4 border-b border-violet-100 flex items-center gap-3">
+          <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+            <div className="bg-[#1a1a28] px-5 py-4 border-b border-[#1e1e30] flex items-center gap-3">
               <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shrink-0">
                 <Zap size={15} className="text-yellow-300 fill-yellow-300" />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">KI-Marktbericht</p>
-                <h2 className="text-sm font-black text-gray-900">Diese Woche im Überblick</h2>
+                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">KI-Marktbericht</p>
+                <h2 className="text-sm font-black text-slate-200">Diese Woche im Überblick</h2>
               </div>
             </div>
             <div className="p-5 sm:p-6">
-              <p className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
+              <p className="text-slate-400 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
             </div>
           </section>
         )}
@@ -94,10 +94,10 @@ export default async function MarktberichtPage() {
               { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: '💎' },
               { label: 'KI-Bericht', value: 'Live', icon: '🤖' },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4 text-center shadow-sm">
+              <div key={stat.label} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-3 sm:p-4 text-center">
                 <div className="text-xl mb-1">{stat.icon}</div>
-                <p className="text-lg sm:text-2xl font-black text-violet-700">{stat.value}</p>
-                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</p>
+                <p className="text-lg sm:text-2xl font-black text-violet-400">{stat.value}</p>
+                <p className="text-[10px] sm:text-xs text-slate-600 mt-0.5 leading-tight">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -110,37 +110,36 @@ export default async function MarktberichtPage() {
           </div>
         )}
 
-        {/* Archiv-Navigation */}
         {previousReports.length > 0 && (
-          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#1e1e30] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Archive size={15} className="text-violet-500" />
-                <p className="text-sm font-bold text-gray-900">Frühere Berichte</p>
+                <Archive size={15} className="text-violet-400" />
+                <p className="text-sm font-bold text-slate-200">Frühere Berichte</p>
               </div>
-              <Link href="/marktbericht/archiv" className="text-xs font-semibold text-violet-600 hover:text-violet-800">
+              <Link href="/marktbericht/archiv" className="text-xs font-semibold text-violet-400 hover:text-violet-300">
                 Alle anzeigen →
               </Link>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-[#1e1e30]">
               {previousReports.slice(0, 4).map((meta) => (
                 <Link
                   key={meta.weekStart}
                   href={`/marktbericht/${meta.weekStart}`}
-                  className="flex items-center justify-between px-5 py-3.5 hover:bg-violet-50 transition-colors group"
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-[#1a1a28] transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center shrink-0">
-                      <Calendar size={13} className="text-violet-600" />
+                    <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center shrink-0">
+                      <Calendar size={13} className="text-violet-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-violet-700">
+                      <p className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">
                         KW {meta.weekNumber}
                       </p>
-                      <p className="text-xs text-gray-400">{formatWeekDate(meta.weekStart)}</p>
+                      <p className="text-xs text-slate-600">{formatWeekDate(meta.weekStart)}</p>
                     </div>
                   </div>
-                  <ChevronLeft size={15} className="text-gray-300 group-hover:text-violet-500 rotate-180" />
+                  <ChevronLeft size={15} className="text-slate-700 group-hover:text-violet-400 rotate-180 transition-colors" />
                 </Link>
               ))}
             </div>
@@ -148,22 +147,22 @@ export default async function MarktberichtPage() {
         )}
 
         <section>
-          <p className="text-xs text-gray-400 mb-2 flex items-center gap-1"><Shield size={10} />Partner & Affiliate-Links</p>
+          <p className="text-xs text-slate-700 mb-2 flex items-center gap-1"><Shield size={10} />Partner & Affiliate-Links</p>
           <AffiliateBar />
         </section>
 
-        <footer className="border-t border-gray-200 pt-6 space-y-3">
-          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1">
-            <p className="text-[11px] font-semibold text-amber-800">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
-            <p className="text-[10px] text-amber-700 leading-relaxed">
-              Alle Inhalte dienen ausschließlich der Information — <strong>keine Anlageberatung</strong>.
+        <footer className="space-y-4 border-t border-[#1e1e30] pt-6">
+          <div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">
+            <p className="text-xs font-bold text-amber-400/80">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
+            <p className="text-[10px] text-amber-400/60 leading-relaxed">
+              Alle Inhalte dienen ausschließlich der Information — <strong className="text-amber-400/80">keine Anlageberatung</strong>.
               Preisangaben (Cardmarket, EUR) ohne Gewähr.
             </p>
           </div>
           <div className="flex justify-center gap-5 text-xs">
-            <a href="/impressum" className="text-gray-400 hover:text-violet-600 transition-colors">Impressum</a>
-            <span className="text-gray-200">|</span>
-            <a href="/datenschutz" className="text-gray-400 hover:text-violet-600 transition-colors">Datenschutz</a>
+            <a href="/impressum" className="text-slate-700 hover:text-violet-400 transition-colors">Impressum</a>
+            <span className="text-slate-800">|</span>
+            <a href="/datenschutz" className="text-slate-700 hover:text-violet-400 transition-colors">Datenschutz</a>
           </div>
         </footer>
       </main>

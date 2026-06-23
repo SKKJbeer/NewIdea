@@ -53,7 +53,6 @@ export function SearchResultsLang({ cards, query }: SearchResultsLangProps) {
       .finally(() => setLoading(false));
   }, [language, cards]);
 
-  // Check if CM OAuth is not configured (all results fell back to EN)
   const hasAnyResult = Object.keys(actualLanguages).length > 0;
   const cmFallback =
     language !== 'EN' &&
@@ -63,26 +62,25 @@ export function SearchResultsLang({ cards, query }: SearchResultsLangProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-        <p className="text-sm text-gray-500">
-          <span className="font-semibold text-gray-900">{cards.length}</span> Treffer für „
-          <span className="font-semibold text-gray-900">{query}</span>"
+        <p className="text-sm text-slate-400">
+          <span className="font-semibold text-slate-200">{cards.length}</span> Treffer für „
+          <span className="font-semibold text-slate-200">{query}</span>"
         </p>
         <div className="flex items-center gap-2">
-          {loading && <Loader2 size={14} className="animate-spin text-violet-500" />}
+          {loading && <Loader2 size={14} className="animate-spin text-violet-400" />}
           <LangPicker value={language} onChange={setLanguage} />
         </div>
       </div>
 
       {cmFallback && (
-        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-700">
-          <strong>Sprachspezifische Preise nicht verfügbar:</strong> Die Cardmarket OAuth API ist noch nicht konfiguriert
-          ({['CARDMARKET_APP_TOKEN', 'CARDMARKET_USER_TOKEN'].join(', ')} fehlen in Vercel).
-          Es werden EN-Cardmarket-Preise angezeigt.
+        <div className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-400/80">
+          <strong className="text-amber-400">Sprachspezifische Preise nicht verfügbar:</strong>{' '}
+          Die Cardmarket OAuth API ist noch nicht konfiguriert — EN-Preise werden angezeigt.
         </div>
       )}
 
       {language !== 'EN' && !loading && !cmFallback && hasAnyResult && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs text-emerald-700">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs text-emerald-400">
           ✓ Cardmarket-Preise für {language === 'DE' ? 'deutsche' : language === 'JP' ? 'japanische' : 'koreanische'} Ausgaben
         </div>
       )}

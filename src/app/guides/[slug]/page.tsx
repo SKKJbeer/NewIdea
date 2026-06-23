@@ -27,52 +27,43 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const COLOR: Record<string, { badge: string; tip: string; accent: string; num: string }> = {
-  violet:  { badge: 'bg-violet-100 text-violet-700',   tip: 'bg-violet-50 border-violet-200 text-violet-900',  accent: 'bg-violet-600', num: 'bg-violet-600' },
-  blue:    { badge: 'bg-blue-100 text-blue-700',       tip: 'bg-blue-50 border-blue-200 text-blue-900',        accent: 'bg-blue-600',   num: 'bg-blue-600' },
-  emerald: { badge: 'bg-emerald-100 text-emerald-700', tip: 'bg-emerald-50 border-emerald-200 text-emerald-900', accent: 'bg-emerald-600', num: 'bg-emerald-600' },
-  amber:   { badge: 'bg-amber-100 text-amber-700',     tip: 'bg-amber-50 border-amber-200 text-amber-900',     accent: 'bg-amber-500',  num: 'bg-amber-500' },
-  rose:    { badge: 'bg-rose-100 text-rose-700',       tip: 'bg-rose-50 border-rose-200 text-rose-900',        accent: 'bg-rose-600',   num: 'bg-rose-600' },
-};
-
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const guide = getGuide(slug);
   if (!guide) notFound();
 
-  const c = COLOR[guide.color] ?? COLOR.violet;
   const otherGuides = GUIDES.filter((g) => g.slug !== slug).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className={`bg-gradient-to-br ${guide.headerGradient} text-white`}>
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 pt-8 pb-14 sm:py-16">
-          <Link href="/guides" className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs mb-5 transition-colors">
+          <Link href="/guides" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
             <ArrowLeft size={12} /> Alle Guides
           </Link>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-white/15 text-white">{guide.emoji} {guide.badge}</span>
-            <span className="text-xs text-white/60 flex items-center gap-1"><Clock size={11} /> {guide.readingTimeMin} Min Lektüre</span>
+            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">{guide.emoji} {guide.badge}</span>
+            <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {guide.readingTimeMin} Min Lektüre</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black leading-tight">{guide.title}</h1>
+          <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">{guide.title}</h1>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pb-16 -mt-4 space-y-5">
         {/* Intro */}
-        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
-          <p className="text-gray-700 text-base leading-relaxed font-medium">{guide.intro}</p>
+        <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6">
+          <p className="text-slate-300 text-base leading-relaxed font-medium">{guide.intro}</p>
         </section>
 
         {/* Key Points */}
-        <section className={`rounded-2xl border p-5 ${c.tip}`}>
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3 opacity-70">Das Wichtigste auf einen Blick</p>
+        <section className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5">
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3 text-violet-400">Das Wichtigste auf einen Blick</p>
           <ul className="space-y-2.5">
             {guide.keyPoints.map((point, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-sm">
-                <span className={`w-5 h-5 ${c.num} rounded-full text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5`}>{i + 1}</span>
+              <li key={i} className="flex items-start gap-2.5 text-sm text-slate-300">
+                <span className="w-5 h-5 bg-violet-600 rounded-full text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                 {point}
               </li>
             ))}
@@ -81,21 +72,21 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         {/* Sections */}
         {guide.sections.map((section, i) => (
-          <section key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 space-y-3">
-            <h2 className="text-base font-black text-gray-900">{section.heading}</h2>
-            <p className="text-gray-700 text-sm leading-relaxed">{section.content}</p>
+          <section key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6 space-y-3">
+            <h2 className="text-base font-black text-slate-200">{section.heading}</h2>
+            <p className="text-slate-400 text-sm leading-relaxed">{section.content}</p>
 
             {section.tip && (
-              <div className={`flex items-start gap-2.5 rounded-xl border p-3.5 ${c.tip}`}>
-                <Lightbulb size={15} className="shrink-0 mt-0.5 opacity-70" />
-                <p className="text-sm leading-relaxed">{section.tip}</p>
+              <div className="flex items-start gap-2.5 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3.5">
+                <Lightbulb size={15} className="shrink-0 mt-0.5 text-violet-400 opacity-70" />
+                <p className="text-sm leading-relaxed text-slate-300">{section.tip}</p>
               </div>
             )}
 
             {section.cards && section.cards.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
                 {section.cards.map((card) => (
-                  <div key={card.name} className="border border-gray-100 rounded-xl p-3 bg-gray-50 flex items-start gap-3">
+                  <div key={card.name} className="border border-[#2a2a3a] rounded-xl p-3 bg-[#0a0a0f] flex items-start gap-3">
                     {card.imageUrl ? (
                       <div className="flex-none text-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,9 +110,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                       <span className="text-xl shrink-0 mt-1">🃏</span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-gray-900 leading-tight">{card.name}</p>
-                      <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${c.badge}`}>{card.rarity}</span>
-                      <p className="text-[11px] text-gray-500 mt-1 leading-snug">{card.why}</p>
+                      <p className="text-xs font-bold text-slate-200 leading-tight">{card.name}</p>
+                      <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 bg-violet-500/10 text-violet-400">{card.rarity}</span>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-snug">{card.why}</p>
                     </div>
                   </div>
                 ))}
@@ -132,26 +123,29 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 items-center pt-1">
-          <Tag size={12} className="text-gray-400" />
+          <Tag size={12} className="text-slate-700" />
           {guide.tags.map((tag) => (
-            <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{tag}</span>
+            <span key={tag} className="text-xs bg-[#13131e] border border-[#2a2a3a] text-slate-500 px-2.5 py-1 rounded-full">{tag}</span>
           ))}
         </div>
 
         {/* More Guides */}
         {otherGuides.length > 0 && (
           <section className="pt-2">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Weitere Guides</p>
+            <div className="mb-3 flex items-center gap-3">
+              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Weitere Guides</span>
+              <span className="h-px flex-1 bg-[#1e1e30]" />
+            </div>
             <div className="space-y-2">
               {otherGuides.map((g) => (
                 <Link key={g.slug} href={`/guides/${g.slug}`}
-                  className="flex items-center gap-3 bg-white border border-gray-100 hover:border-violet-200 hover:shadow-sm rounded-2xl p-4 transition-all group">
+                  className="flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] p-4 transition-all group">
                   <span className="text-2xl shrink-0">{g.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${c.badge}`}>{g.badge}</span>
-                    <p className="text-sm font-bold text-gray-900 group-hover:text-violet-700 mt-0.5 leading-tight">{g.title}</p>
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400">{g.badge}</span>
+                    <p className="text-sm font-bold text-slate-200 group-hover:text-white mt-0.5 leading-tight transition-colors">{g.title}</p>
                   </div>
-                  <ChevronRight size={15} className="text-gray-300 group-hover:text-violet-500 shrink-0" />
+                  <ChevronRight size={15} className="text-slate-700 group-hover:text-violet-400 shrink-0 transition-colors" />
                 </Link>
               ))}
             </div>
@@ -159,12 +153,11 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         )}
 
         <div className="flex justify-between items-center pt-2">
-          <Link href="/guides" className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold">
+          <Link href="/guides" className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold">
             <ArrowLeft size={14} /> Alle Guides
           </Link>
-          <Link href="/artikel" className="text-sm text-violet-600 hover:text-violet-800 font-semibold">Blog →</Link>
+          <Link href="/artikel" className="text-sm text-violet-400 hover:text-violet-300 font-semibold">Blog →</Link>
         </div>
-
       </main>
     </div>
   );

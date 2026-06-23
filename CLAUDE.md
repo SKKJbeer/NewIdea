@@ -289,6 +289,105 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, article-generator.ts, 
 
 ## UI-Design-Regeln (PFLICHT — immer einhalten!)
 
+### ⛔ Dark Mode — Bloomberg/TradingView-Design (GLOBAL BINDEND — keine Ausnahmen!)
+
+**REGEL:** Die gesamte Plattform verwendet ein einheitliches dunkles Design im Bloomberg/TradingView-Stil. Kein Weiß, kein Hellgrau, kein `bg-gray-50`, kein `bg-white` auf Seiten oder Cards.
+
+#### Design-Token (IMMER diese Werte verwenden)
+
+| Token | Klasse | Verwendung |
+|---|---|---|
+| Seiten-Hintergrund | `bg-[#0a0a0f]` | Jede Seite: `<div className="min-h-screen bg-[#0a0a0f] text-slate-200">` |
+| Ticker/Sub-Header | `bg-[#0d0d18]` | Schmale Streifen, NavBar-Hintergrund |
+| Card-Hintergrund | `bg-[#13131e]` | Panels, Cards, Sektionen |
+| Hover-Hintergrund | `bg-[#1a1a28]` | Hover-States auf Cards und Rows |
+| Card-Border | `border-[#2a2a3a]` | Rahmen aller Cards/Panels |
+| Divider | `border-[#1e1e30]` | Trennlinien zwischen Sektionen |
+| Text primär | `text-slate-200` / `text-white` | Haupttext, Überschriften |
+| Text sekundär | `text-slate-400` | Beschreibungen, Fließtext |
+| Text muted | `text-slate-600` | Labels, Metadaten |
+| Text sehr muted | `text-slate-700` | Footer-Links inaktiv |
+| Akzent | `text-violet-400` / `text-violet-500` | Links, aktive States, Icons |
+| Positiv/Up | `text-emerald-400` | Kursgewinne, positive Trends |
+| Negativ/Down | `text-rose-400` | Kursverluste, negative Trends |
+| Warnung | `text-amber-400/80` · `bg-amber-500/5` · `border-amber-500/10` | Disclaimer-Boxen |
+| Section-Label | `text-[10px] font-bold uppercase tracking-widest text-slate-600` | Beschriftungen über Sektionen |
+| Divider-Linie | `h-px flex-1 bg-[#1e1e30]` | Horizontale Trennlinie mit Label |
+
+#### Header-Pattern (IMMER für Seiten-Header verwenden)
+
+```tsx
+<header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
+  <div className="max-w-3xl mx-auto px-4 pt-10 pb-14 sm:py-16 text-center">
+    <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
+      <Icon size={10} /> Label
+    </div>
+    <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white">
+      Titel <span className="text-violet-400">Akzent</span>
+    </h1>
+  </div>
+</header>
+```
+
+#### Card-Pattern
+
+```tsx
+<div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+  ...
+</div>
+```
+
+#### Hover-Row-Pattern (Tabellen, Listen)
+
+```tsx
+<div className="hover:bg-[#1a1a28] transition-colors">
+```
+
+#### Card-Hover-Pattern
+
+```tsx
+<div className="border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] transition-all">
+```
+
+#### NavBar
+
+NavBar ist permanent dunkel: `bg-[#0d0d18]/95 border-[#1e1e30]`. Aktive Links: `text-violet-400 bg-violet-500/10`. Inaktive Links: `text-slate-500 hover:text-violet-400`.
+
+#### Disclaimer/Footer-Box
+
+```tsx
+<div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
+  <p className="text-xs font-bold text-amber-400/80">...</p>
+  <p className="text-[10px] text-amber-400/60">...</p>
+</div>
+```
+
+#### Was VERBOTEN ist
+
+| Verboten | Stattdessen |
+|---|---|
+| `bg-white` auf Cards/Seiten | `bg-[#13131e]` |
+| `bg-gray-50` als Seiten-BG | `bg-[#0a0a0f]` |
+| `text-gray-900` als Primärtext | `text-slate-200` oder `text-white` |
+| `text-gray-400` als Sekundärtext | `text-slate-400` |
+| `border-gray-100` auf Cards | `border-[#2a2a3a]` |
+| `hover:border-violet-200` | `hover:border-violet-500/30` |
+| `text-green-600` für Trends | `text-emerald-400` |
+| `text-red-500` für Trends | `text-rose-400` |
+| Helles Gradient-Header | `bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]` |
+
+**Betroffene Dateien — ALLE müssen dark bleiben:**
+- Alle `src/app/*/page.tsx` (Seiten)
+- `src/components/NavBar.tsx`
+- `src/components/CardGrid.tsx`
+- `src/components/SearchResultsLang.tsx`
+- `src/components/ArticleCardGallery.tsx`
+- `src/components/CardLangPrice.tsx`
+- `src/components/AffiliateBar.tsx`
+- `src/app/suche/loading.tsx`
+
+---
+
 ### Boosterpack-Bild überall dort wo Karten erwähnt werden
 
 **REGEL:** Jedes Mal wenn eine Pokémon-Karte in der UI angezeigt oder erwähnt wird, MUSS das zugehörige Boosterpack-Produktbild (wie man es im Laden sieht) ebenfalls angezeigt werden — damit Nutzer sofort erkennen, aus welchem Set die Karte stammt und wo sie sie kaufen können.

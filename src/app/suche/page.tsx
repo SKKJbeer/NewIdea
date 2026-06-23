@@ -60,7 +60,7 @@ export default async function SearchPage({
       : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       {structuredData && (
         <script
           type="application/ld+json"
@@ -70,16 +70,16 @@ export default async function SearchPage({
 
       <NavBar />
 
-      <header className="bg-gradient-to-br from-violet-700 via-indigo-700 to-indigo-900 text-white">
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 sm:py-14 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5 text-violet-200 text-xs mb-4">
-            <Search size={12} />
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
+            <Search size={10} />
             Karten-Suche
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black mb-3">
-            Was ist deine Karte <span className="text-yellow-300">wert?</span>
+          <h1 className="text-2xl sm:text-4xl font-black mb-3 text-white">
+            Was ist deine Karte <span className="text-violet-400">wert?</span>
           </h1>
-          <p className="text-violet-200 text-sm max-w-md mx-auto mb-6">
+          <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
             Suche eine Pokémon-Karte und sieh sofort Marktwert, Trend und 30-Tage-Preisverlauf.
           </p>
           <SearchBox initialQuery={query} autoFocus={!query} />
@@ -88,19 +88,19 @@ export default async function SearchPage({
 
       <main className="max-w-7xl mx-auto px-4 py-10">
         {query.length < 2 ? (
-          <div className="text-center text-gray-400 py-16">
+          <div className="text-center text-slate-600 py-16">
             <Search size={40} className="mx-auto mb-4 opacity-40" />
             <p className="text-sm">Gib mindestens 2 Zeichen ein, z.&nbsp;B. „Pikachu", „Charizard" oder „Mewtu".</p>
           </div>
         ) : error ? (
-          <div className="max-w-md mx-auto bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-800 text-center">
+          <div className="max-w-md mx-auto rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 text-center">
             <p className="font-semibold">⚠️ Suche momentan nicht verfügbar</p>
-            <p className="text-sm mt-1 text-amber-600">Bitte versuche es später erneut.</p>
+            <p className="text-sm mt-1 text-amber-400/60">Bitte versuche es später erneut.</p>
           </div>
         ) : results.length === 0 ? (
-          <div className="text-center text-gray-400 py-16">
+          <div className="text-center text-slate-600 py-16">
             <SearchX size={40} className="mx-auto mb-4 opacity-40" />
-            <p className="text-sm">Keine Karten für „<span className="font-semibold text-gray-600">{query}</span>" gefunden.</p>
+            <p className="text-sm">Keine Karten für „<span className="font-semibold text-slate-400">{query}</span>" gefunden.</p>
             <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
           </div>
         ) : (
@@ -108,7 +108,7 @@ export default async function SearchPage({
         )}
       </main>
 
-      <p className="text-center text-xs text-gray-400 pb-10">
+      <p className="text-center text-xs text-slate-700 pb-10">
         Preisangaben in EUR ohne Gewähr. Kein Anlageversprechen.
       </p>
     </div>

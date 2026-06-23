@@ -7,6 +7,29 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.6.0] — 2026-06-23 · Einheitliches Dark Mode Design auf allen Seiten
+
+### Geändert
+- **Global Dark Mode**: Bloomberg/TradingView-Design-System auf alle Seiten und Komponenten ausgerollt
+- **NavBar**: Dunkle Variante (`#0d0d18`, Violet-Akzente), Disclaimer-Bar oben, aktive Links `text-violet-400`
+- **CardGrid**: Dunkle Karten-Panels (`bg-[#13131e]`, `border-[#2a2a3a]`), Hover `border-violet-500/30`
+- **SearchResultsLang**: Dunkle Texte und Alert-Boxen
+- **ArticleCardGallery**: Dunkle Panels, Recharts-Tooltip angepasst
+- **CardLangPrice**: Dunkle Preisdarstellung, `text-white` für Hauptpreis
+- **Suche (`/suche`)**: Vollständig dunkel, violette Akzentfarbe im Header
+- **Suche Loading Skeleton**: Dunkel mit passenden Skeleton-Farben
+- **Artikel-Index (`/artikel`)**: Dunkel, heute-Karte mit Violet-Gradient
+- **Artikel-Detail (`/artikel/[date]`)**: Dunkel, Archiv-Disclaimer amber, Key-Points violet
+- **Karten-Detail (`/karten/[id]`)**: Dunkel + NavBar ergänzt (fehlte vorher)
+- **Guides-Index (`/guides`)**: Dunkel, Featured-Guide mit Violet-Gradient
+- **Guide-Detail (`/guides/[slug]`)**: Dunkel, COLOR-Map entfernt, Tip-Boxen violet
+- **Marktbericht (`/marktbericht`)**: Dunkel, Statistik-Panels, Archiv-Liste
+- **Marktbericht-Detail (`/marktbericht/[week]`)**: Dunkel
+- **Marktbericht-Archiv (`/marktbericht/archiv`)**: Dunkel, KW-Badge violet
+- **CLAUDE.md**: Design-Token-Tabelle, Code-Patterns und Verbotsliste dauerhaft verankert
+
+---
+
 ## [2.5.4] — 2026-06-23 · Newsletter global deaktiviert
 
 ### Entfernt

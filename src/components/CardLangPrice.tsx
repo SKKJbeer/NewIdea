@@ -74,15 +74,15 @@ export function CardLangPrice({
     <div>
       {/* Language Picker */}
       <div className="mb-3">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1.5">
           Kartensprache · Preis
         </p>
         <LangPicker value={language} onChange={handleLangChange} size="md" />
         {language !== 'EN' && (
-          <p className="mt-1.5 text-[10px] text-gray-400">
+          <p className="mt-1.5 text-[10px] text-slate-600">
             {status === 'ok' && `✓ Cardmarket-Preis für ${LANG_LABEL[language]}-Ausgaben`}
             {status === 'fallback' &&
-              '⚠ Sprachspezifischer Preis nicht verfügbar (Cardmarket OAuth fehlt) — EN-Fallback'}
+              '⚠ Sprachspezifischer Preis nicht verfügbar — EN-Fallback'}
           </p>
         )}
       </div>
@@ -90,18 +90,18 @@ export function CardLangPrice({
       {/* Price display */}
       <div className="flex items-end gap-4 mt-2">
         <div>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-600">
             Marktpreis
             {priceSource === 'cardmarket' ? ` (Cardmarket · ${LANG_LABEL[language]})` : ''}
           </p>
           <div className="flex items-center gap-2">
             {loading ? (
               <div className="flex items-center gap-2">
-                <Loader2 size={20} className="animate-spin text-violet-500" />
-                <span className="text-2xl font-black text-gray-400">...</span>
+                <Loader2 size={20} className="animate-spin text-violet-400" />
+                <span className="text-2xl font-black text-slate-600">...</span>
               </div>
             ) : (
-              <p className="text-3xl font-black text-gray-900">
+              <p className="text-3xl font-black text-white">
                 {price > 0 ? `${price.toFixed(2)} €` : 'N/A'}
               </p>
             )}
@@ -111,7 +111,7 @@ export function CardLangPrice({
         {realData && !loading && (
           <div
             className={`flex items-center gap-1 text-sm font-semibold pb-1 ${
-              isPositive ? 'text-green-600' : 'text-red-500'
+              isPositive ? 'text-emerald-400' : 'text-rose-400'
             }`}
           >
             {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}

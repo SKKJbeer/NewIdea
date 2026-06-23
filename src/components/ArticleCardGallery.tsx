@@ -18,7 +18,7 @@ function TrendBadge({ trend }: { trend: number }) {
   if (trend === 0) return null;
   const up = trend > 0;
   return (
-    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
+    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${up ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
       {up ? '+' : ''}{trend.toFixed(1)}%
     </span>
   );
@@ -43,13 +43,12 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
   return (
     <div className="space-y-4">
       {/* Card image strip */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Karten im Artikel</p>
+      <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
+        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Karten im Artikel</p>
         <div className="flex gap-3 overflow-x-auto pb-1 snap-x">
           {cards.map((card) => (
             <div key={card.name} className="flex-none w-28 snap-start text-center">
-              {/* Card image */}
-              <div className="relative w-28 h-[154px] rounded-lg overflow-hidden bg-gray-50 border border-gray-100 mb-1.5">
+              <div className="relative w-28 h-[154px] rounded-lg overflow-hidden bg-[#0a0a0f] border border-[#2a2a3a] mb-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.imageUrl}
@@ -58,8 +57,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
                   loading="lazy"
                 />
               </div>
-              <p className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2 mt-1">{card.name}</p>
-              {/* Booster pack product image */}
+              <p className="text-[10px] font-bold text-slate-300 leading-tight line-clamp-2 mt-1">{card.name}</p>
               {card.setCode && (
                 <div className="mt-1.5 flex justify-center">
                   <BoosterPackImage
@@ -71,7 +69,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
               )}
               <div className="flex items-center justify-center gap-1 mt-0.5">
                 {card.price > 0 && (
-                  <span className="text-[10px] font-bold text-gray-700">{card.price.toFixed(2)}€</span>
+                  <span className="text-[10px] font-bold text-slate-400">{card.price.toFixed(2)}€</span>
                 )}
                 <TrendBadge trend={card.trend} />
               </div>
@@ -82,38 +80,38 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
 
       {/* Price comparison bar chart */}
       {chartData.length >= 2 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Preisvergleich (€)</p>
+        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
+          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Preisvergleich (€)</p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: 9, fill: '#9ca3af' }}
+                tick={{ fontSize: 9, fill: '#475569' }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 9, fill: '#9ca3af' }}
+                tick={{ fontSize: 9, fill: '#475569' }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `${v}€`}
               />
               <Tooltip
-                contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #f3f4f6' }}
+                contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #2a2a3a', background: '#13131e', color: '#cbd5e1' }}
                 formatter={(v) => [`${Number(v).toFixed(2)}€`, 'Preis']}
               />
               <Bar dataKey="price" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, i) => (
                   <Cell
                     key={i}
-                    fill={entry.trend >= 0 ? color : '#ef4444'}
+                    fill={entry.trend >= 0 ? color : '#f43f5e'}
                     opacity={0.85}
                   />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-[9px] text-gray-300 text-right mt-1">Balkenfarbe: grün = Aufwärtstrend · rot = Abwärtstrend</p>
+          <p className="text-[9px] text-slate-700 text-right mt-1">Balkenfarbe: akzentuiert = Aufwärtstrend · rot = Abwärtstrend</p>
         </div>
       )}
     </div>

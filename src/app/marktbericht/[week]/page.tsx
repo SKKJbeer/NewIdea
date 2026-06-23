@@ -35,31 +35,30 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
 
   if (!report) notFound();
 
-  // Prev / next week navigation
   const idx = allMeta.findIndex((m) => m.weekStart === week);
-  const newerReport = idx > 0 ? allMeta[idx - 1] : null;       // sorted desc, so idx-1 is newer
+  const newerReport = idx > 0 ? allMeta[idx - 1] : null;
   const olderReport = idx >= 0 && idx < allMeta.length - 1 ? allMeta[idx + 1] : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="bg-gradient-to-br from-violet-800 via-indigo-800 to-indigo-950 text-white">
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-14 sm:py-16">
           <Link
             href="/marktbericht"
-            className="inline-flex items-center gap-1.5 text-violet-300 hover:text-white text-xs mb-5 transition-colors"
+            className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors"
           >
             <ArrowLeft size={12} /> Aktueller Bericht
           </Link>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1 text-violet-200 text-xs">
+            <span className="inline-flex items-center gap-1.5 border border-violet-500/20 bg-violet-500/10 rounded-full px-3 py-1 text-violet-400 text-xs">
               <Calendar size={11} />
               KW {report.weekNumber} · {formatWeekDate(report.weekStart)}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black leading-tight">
-            Marktanalyse <span className="text-yellow-300">KW {report.weekNumber}</span>
+          <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">
+            Marktanalyse <span className="text-violet-400">KW {report.weekNumber}</span>
           </h1>
         </div>
       </header>
@@ -70,27 +69,27 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
           {olderReport ? (
             <Link
               href={`/marktbericht/${olderReport.weekStart}`}
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               <ChevronLeft size={16} /> KW {olderReport.weekNumber}
             </Link>
           ) : (
             <span />
           )}
-          <Link href="/marktbericht/archiv" className="text-xs text-gray-400 hover:text-violet-600 transition-colors">
+          <Link href="/marktbericht/archiv" className="text-xs text-slate-600 hover:text-violet-400 transition-colors">
             Alle Berichte
           </Link>
           {newerReport ? (
             <Link
               href={`/marktbericht/${newerReport.weekStart}`}
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               KW {newerReport.weekNumber} <ChevronRight size={16} />
             </Link>
           ) : (
             <Link
               href="/marktbericht"
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               Aktuell <ChevronRight size={16} />
             </Link>
@@ -98,18 +97,18 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
         </div>
 
         {/* Report text */}
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-violet-50 to-indigo-50 px-5 py-4 border-b border-violet-100 flex items-center gap-3">
+        <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+          <div className="bg-[#1a1a28] px-5 py-4 border-b border-[#1e1e30] flex items-center gap-3">
             <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shrink-0">
               <Zap size={15} className="text-yellow-300 fill-yellow-300" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">KI-Marktbericht</p>
-              <h2 className="text-sm font-black text-gray-900">Wochenüberblick KW {report.weekNumber}</h2>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">KI-Marktbericht</p>
+              <h2 className="text-sm font-black text-slate-200">Wochenüberblick KW {report.weekNumber}</h2>
             </div>
           </div>
           <div className="p-5 sm:p-6">
-            <p className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
+            <p className="text-slate-400 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
           </div>
         </section>
 
@@ -122,11 +121,11 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
         )}
 
         {/* Bottom navigation */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-2 border-t border-[#1e1e30]">
           {olderReport ? (
             <Link
               href={`/marktbericht/${olderReport.weekStart}`}
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               <ChevronLeft size={16} /> KW {olderReport.weekNumber}
             </Link>
@@ -136,31 +135,31 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
           {newerReport ? (
             <Link
               href={`/marktbericht/${newerReport.weekStart}`}
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               KW {newerReport.weekNumber} <ChevronRight size={16} />
             </Link>
           ) : (
             <Link
               href="/marktbericht"
-              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-800 font-semibold"
+              className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-semibold"
             >
               Aktuell <ChevronRight size={16} />
             </Link>
           )}
         </div>
 
-        <footer className="border-t border-gray-200 pt-5 space-y-3">
-          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-center space-y-1">
-            <p className="text-[11px] font-semibold text-amber-800">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
-            <p className="text-[10px] text-amber-700">
-              Alle Inhalte dienen ausschließlich der Information — <strong>keine Anlageberatung</strong>.
+        <footer className="border-t border-[#1e1e30] pt-5 space-y-3">
+          <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">
+            <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
+            <p className="text-[10px] text-amber-400/60">
+              Alle Inhalte dienen ausschließlich der Information — <strong className="text-amber-400/80">keine Anlageberatung</strong>.
             </p>
           </div>
           <div className="flex justify-center gap-5 text-xs">
-            <a href="/impressum" className="text-gray-400 hover:text-violet-600 transition-colors">Impressum</a>
-            <span className="text-gray-200">|</span>
-            <a href="/datenschutz" className="text-gray-400 hover:text-violet-600 transition-colors">Datenschutz</a>
+            <a href="/impressum" className="text-slate-700 hover:text-violet-400 transition-colors">Impressum</a>
+            <span className="text-slate-800">|</span>
+            <a href="/datenschutz" className="text-slate-700 hover:text-violet-400 transition-colors">Datenschutz</a>
           </div>
         </footer>
       </main>

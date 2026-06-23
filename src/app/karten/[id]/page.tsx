@@ -8,6 +8,7 @@ import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history'
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
+import { NavBar } from '@/components/NavBar';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -71,11 +72,10 @@ export default async function CardDetailPage({ params }: Props) {
   const realData = historyKind !== 'sample';
 
   const scoreColor =
-    score >= 70 ? 'text-green-600 bg-green-50' : score >= 50 ? 'text-yellow-600 bg-yellow-50' : 'text-gray-500 bg-gray-50';
+    score >= 70 ? 'text-emerald-400 bg-emerald-500/10' : score >= 50 ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 bg-[#1a1a28]';
   const scoreLabel =
     score >= 70 ? 'Starkes Investment' : score >= 50 ? 'Mittleres Potenzial' : 'Vorsicht geboten';
 
-  // JSON-LD structured data
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -98,20 +98,22 @@ export default async function CardDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
+      <NavBar />
+
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-violet-600 hover:text-violet-800 text-sm mb-6">
+        <Link href="/" className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-6 transition-colors">
           <ArrowLeft size={16} />Alle Karten
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-            <div className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl p-4 w-full max-w-xs">
+          <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 flex flex-col items-center">
+            <div className="bg-[#1a1a28] rounded-xl p-4 w-full max-w-xs">
               {card.imageUrlHiRes || card.imageUrl ? (
                 <div className="relative aspect-[3/4] w-full">
                   <Image
@@ -144,18 +146,18 @@ export default async function CardDetailPage({ params }: Props) {
               >
                 Amazon<ExternalLink size={12} className="opacity-70" />
               </a>
-              <p className="text-xs text-gray-400 text-center">* Affiliate-Links</p>
+              <p className="text-xs text-slate-700 text-center">* Affiliate-Links</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{card.set}</p>
-              <h1 className="text-2xl font-black text-gray-900">{card.name}</h1>
+            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+              <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">{card.set}</p>
+              <h1 className="text-2xl font-black text-white">{card.name}</h1>
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
-                <p className="text-sm font-semibold text-violet-600 mt-0.5">🇩🇪 {card.nameDe}</p>
+                <p className="text-sm font-semibold text-violet-400 mt-0.5">🇩🇪 {card.nameDe}</p>
               )}
-              <p className="text-sm text-gray-500 mt-1">{card.rarity}</p>
+              <p className="text-sm text-slate-600 mt-1">{card.rarity}</p>
               <div className="mt-4">
                 <CardLangPrice
                   cardId={card.id}
@@ -168,33 +170,33 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-bold text-gray-900">Investment-Score</h2>
+                <h2 className="font-bold text-slate-200">Investment-Score</h2>
                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${scoreColor}`}>{score}/100</span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
+              <div className="w-full bg-[#2a2a3a] rounded-full h-2 mb-2">
                 <div
-                  className={`h-2 rounded-full ${score >= 70 ? 'bg-green-500' : score >= 50 ? 'bg-yellow-400' : 'bg-gray-400'}`}
+                  className={`h-2 rounded-full ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-slate-700'}`}
                   style={{ width: `${score}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <Star size={14} className={score >= 70 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'} />
+              <p className="text-sm text-slate-400 flex items-center gap-1">
+                <Star size={14} className={score >= 70 ? 'text-amber-400 fill-amber-400' : 'text-slate-700'} />
                 {scoreLabel}
               </p>
             </div>
 
             {card.setCode && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Aus diesem Booster-Set</p>
+              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Aus diesem Booster-Set</p>
                 <div className="flex flex-col items-center">
                   <BoosterPackImage
                     setCode={card.setCode}
                     setName={card.set}
                     className="h-48 w-auto object-contain drop-shadow-xl"
                   />
-                  <p className="text-sm font-semibold text-gray-700 mt-3 text-center leading-snug">{card.set}</p>
+                  <p className="text-sm font-semibold text-slate-400 mt-3 text-center leading-snug">{card.set}</p>
                 </div>
                 <a
                   href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.set} Booster`)}`}
@@ -204,48 +206,48 @@ export default async function CardDetailPage({ params }: Props) {
                 >
                   Booster auf Amazon kaufen <ExternalLink size={13} className="opacity-70" />
                 </a>
-                <p className="text-xs text-gray-400 text-center mt-1.5">* Affiliate-Link</p>
+                <p className="text-xs text-slate-700 text-center mt-1.5">* Affiliate-Link</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mt-6">
+        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 mt-6">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-            <h2 className="font-bold text-gray-900">
+            <h2 className="font-bold text-slate-200">
               Preis-Historie ({history.length} {history.length === 1 ? 'Tag' : 'Tage'})
             </h2>
             {historyKind === 'daily' ? (
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
+              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">
                 ✓ Echte Preise · täglich erfasst
               </span>
             ) : historyKind === 'cardmarket' ? (
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
+              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">
                 ✓ Cardmarket-Durchschnitte
               </span>
             ) : (
-              <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-full">
+              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-full">
                 Beispielhafter Verlauf
               </span>
             )}
           </div>
           <PriceChart data={history} />
           {historyKind === 'daily' ? (
-            <p className="text-xs text-gray-400 mt-3">
+            <p className="text-xs text-slate-600 mt-3">
               Echte Cardmarket-Preise — ab jetzt täglich erfasst. Der Verlauf wird mit jedem Tag dichter und genauer.
             </p>
           ) : historyKind === 'cardmarket' ? (
-            <p className="text-xs text-gray-400 mt-3">
-              Basierend auf realen Cardmarket-Durchschnittspreisen (Ø 1/7/30 Tage &amp; Trend), zwischen den Eckwerten interpoliert. Sobald täglich Preise erfasst werden, entsteht hier ein tag-genauer Verlauf.
+            <p className="text-xs text-slate-600 mt-3">
+              Basierend auf realen Cardmarket-Durchschnittspreisen (Ø 1/7/30 Tage &amp; Trend), zwischen den Eckwerten interpoliert.
             </p>
           ) : (
-            <p className="text-xs text-amber-600 mt-3">
+            <p className="text-xs text-amber-400/60 mt-3">
               Für diese Karte liegen aktuell keine Cardmarket-Verlaufsdaten vor — die Kurve ist nur ein Beispiel.
             </p>
           )}
         </div>
 
-        <p className="text-xs text-gray-400 text-center mt-6">
+        <p className="text-xs text-slate-700 text-center mt-6">
           Preise: Cardmarket (EUR), ohne Gewähr. Kein Anlageversprechen.
         </p>
       </div>
