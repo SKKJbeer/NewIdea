@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.6.1',
+    date: '24. Juni 2026',
+    label: 'Portfolio Dark Mode + Preis-Bug-Fix',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Portfolio: vollständig auf dunkles Design umgestellt (Seite, Karten, Modals, LangPicker)' },
+      { type: 'changed', text: 'CTA-Buttons in Portfolio-Modals: Violet statt Schwarz' },
+      { type: 'fixed',   text: 'Kaufpreis-Eingabe: negatives Vorzeichen wird auf iOS/Android jetzt blockiert' },
+    ],
+  },
+  {
     version: '2.6.0',
     date: '23. Juni 2026',
     label: 'Einheitliches Dark Mode Design auf allen Seiten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Bloomberg/TradingView-Design-System auf alle Seiten und Komponenten ausgerollt' },
       { type: 'changed', text: 'NavBar: dunkle Variante mit Disclaimer-Bar und Violet-Akzenten' },

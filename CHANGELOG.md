@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.6.1] — 2026-06-24 · Portfolio Dark Mode + Preis-Bug-Fix
+
+### Geändert
+- **Portfolio `/portfolio`**: Vollständig auf Bloomberg/TradingView-Dark-Palette umgestellt (`#0a0a0f`, `#13131e`, Violet-Akzente)
+- **LangPicker**: Aktiver Button jetzt `violet`, nicht mehr schwarz
+- **AddCardModal + EditCardModal**: Dunkler Modal-Hintergrund (`bg-[#13131e]`), dunkle Inputs, CTA-Button Violet
+- **ResetDialog**: Dunkler Hintergrund, `rose`-Farben
+
+### Behoben
+- **Kaufpreis darf nicht negativ werden**: `onChange` strippt führendes Minuszeichen — iOS/Android können in `type="number"` trotz `min={0}` Minuswerte eingeben; das ist jetzt blockiert
+
+---
+
 ## [2.6.0] — 2026-06-23 · Einheitliches Dark Mode Design auf allen Seiten
 
 ### Geändert
