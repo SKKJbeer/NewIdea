@@ -27,6 +27,14 @@ interface Suggestion {
 
 const STORAGE_KEY = 'portfolio_v1';
 
+const RANGE_LABEL: Record<keyof typeof RANGE_DAYS, string> = {
+  '1D': '1 Tag',
+  '1W': '1 Woche',
+  '1M': '1 Monat',
+  '3M': '3 Monate',
+  '1Y': '1 Jahr',
+};
+
 // ─── Language picker ─────────────────────────────────────────────────────────
 
 function LangPicker({ value, onChange }: { value: CardLanguage; onChange: (l: CardLanguage) => void }) {
@@ -114,11 +122,18 @@ export default function PortfolioPage() {
     () => computePnl(holdings, liveData),
     [holdings, liveData],
   );
-  const isUp      = pnl >= 0;
-  const lineColor = isUp ? '#34d399' : '#fb7185';
 
   const allChartData = useMemo(() => computeChartData(holdings, liveData), [holdings, liveData]);
   const chartData    = useMemo(() => filterByRange(allChartData, timeRange), [allChartData, timeRange]);
+
+  // P&L gekoppelt an gewählten Zeitraum — nutzt ersten Chart-Punkt als Referenzwert
+  const rangeStartValue = chartData.length >= 2 ? chartData[0].value : null;
+  const rangePnl    = rangeStartValue !== null ? totalValue - rangeStartValue : pnl;
+  const rangePnlPct = rangeStartValue !== null && rangeStartValue > 0
+    ? (rangePnl / rangeStartValue) * 100
+    : pnlPct;
+  const isUp      = rangePnl >= 0;
+  const lineColor = isUp ? '#34d399' : '#fb7185';
 
   if (!mounted) return <div className="min-h-screen bg-[#0a0a0f]" />;
 
@@ -168,17 +183,19 @@ export default function PortfolioPage() {
             {formatEur(totalValue)}
           </p>
 
-          {/* P&L */}
+          {/* P&L — gekoppelt an gewählten Zeitraum */}
           <div className="flex items-baseline gap-2 mt-3 mb-1">
             <span className={`text-base font-bold tabular-nums ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {isUp ? '+' : ''}{formatEur(pnl)}
+              {isUp ? '+' : ''}{formatEur(rangePnl)}
             </span>
             <span className={`text-sm font-semibold tabular-nums ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              ({isUp ? '+' : ''}{pnlPct.toFixed(2)}%)
+              ({isUp ? '+' : ''}{rangePnlPct.toFixed(2)}%)
             </span>
           </div>
           <p className="text-xs text-slate-600 mb-6">
-            seit Kauf · Einstand {formatEur(totalCost)}
+            {rangeStartValue !== null
+              ? `${RANGE_LABEL[timeRange]} · Start ${formatEur(rangeStartValue)}`
+              : `seit Kauf · Einstand ${formatEur(totalCost)}`}
           </p>
 
           {/* Chart */}

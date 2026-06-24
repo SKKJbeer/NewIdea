@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.6.2',
+    date: '24. Juni 2026',
+    label: 'Portfolio: P&L an Zeitraum gekoppelt',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'P&L-Zahlen oben im Portfolio folgen dem gewählten Zeitraum (1D/1W/1M/3M/1Y)' },
+      { type: 'new',   text: 'Sublabel zeigt Zeitraum + Startwert statt immer "seit Kauf"' },
+      { type: 'new',   text: 'Linienfarbe des Charts passt sich ebenfalls dem Zeitraum an' },
+    ],
+  },
+  {
     version: '2.6.1',
     date: '24. Juni 2026',
     label: 'Portfolio Dark Mode + Preis-Bug-Fix',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Portfolio: vollständig auf dunkles Design umgestellt (Seite, Karten, Modals, LangPicker)' },
       { type: 'changed', text: 'CTA-Buttons in Portfolio-Modals: Violet statt Schwarz' },

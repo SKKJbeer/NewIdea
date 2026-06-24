@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.6.2] — 2026-06-24 · Portfolio: P&L an Zeitraum gekoppelt
+
+### Neu
+- **P&L-Anzeige gekoppelt**: Die Gewinn/Verlust-Zahlen oben folgen jetzt dem gewählten Zeitraum (1D / 1W / 1M / 3M / 1Y)
+- Wechsel von 1M auf 1D → oben steht z. B. "+5,20 € (+1,1%) · 1 Tag · Start 465,52 €"
+- Bei unzureichenden Verlaufsdaten (nur 1 Datenpunkt): Fallback auf "seit Kauf"
+- Linienfarbe des Charts passt sich ebenfalls dem gewählten Zeitraum an
+
+---
+
 ## [2.6.1] — 2026-06-24 · Portfolio Dark Mode + Preis-Bug-Fix
 
 ### Geändert
