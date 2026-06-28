@@ -7,6 +7,32 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.7.0] — 2026-06-24 · Code-Review: Sicherheit, Robustheit & Architektur
+
+### Behoben (Sicherheit)
+- **Timing-safe Auth**: Session-Token-Vergleich nutzt jetzt `crypto.timingSafeEqual` statt `===` (verhindert Timing-Oracle)
+- **Fail-closed in Production**: Fehlt `STUDIO_PASSWORD` in Prod, ist der Zugang gesperrt statt offen (Dev bleibt offen)
+- **Keine Fehler-Leaks**: API-Error-Responses geben keine Stacktraces/internen Details mehr zurück (nur `internal_error` + Server-Log)
+- **Such-Sanitisierung**: Lucene/TCG-Query-Metazeichen werden aus Nutzereingaben entfernt (Query-Injection verhindert)
+
+### Behoben (Robustheit)
+- **Median statt Minimum**: Cardmarket-Preise nutzen jetzt den Median — ein einzelnes Fake-/Cent-Listing verfälscht nicht mehr den Portfoliowert
+- **Fetch-Timeouts**: Externe TCG/Cardmarket-Abrufe in der Preis-Route haben jetzt 8s-Timeout (kein Hängen bis Vercel-Hardlimit)
+- **Model-ID per Env**: Anthropic-Model über `ANTHROPIC_MODEL` überschreibbar (zentral, kein verstreuter String)
+
+### Behoben (Portfolio-Frontend)
+- **Sprachwechsel lädt Preise neu**: `useEffect` reagiert jetzt auf alle preisrelevanten Felder (fetchKey statt `.length`) — kein stale-data mehr beim Edit
+- **Fehler-Hinweis bei Preisabruf**: Schlägt der Live-Preis-Abruf fehl, sieht der Nutzer einen Hinweis statt stiller Kaufpreise
+- **LangPicker dark**: Inaktive Sprach-Buttons nutzen jetzt Dark-Tokens (vorher hellgrau auf dunklem Grund)
+- **Trend-Farbe vereinheitlicht**: Sparkline-Rot auf `#fb7185` angeglichen (Design-System-Token)
+
+### Geändert
+- **CLAUDE.md**: Neue Sektion "Code-Qualität & Architektur-Regeln" mit 10 verbindlichen Regeln + Commit-Checkliste
+- **Neuer `/code-review`-Skill**: Strukturiertes Review entlang der projektspezifischen Regeln
+- **Tests**: 6 neue Median-Tests (65 gesamt)
+
+---
+
 ## [2.6.2] — 2026-06-24 · Portfolio: P&L an Zeitraum gekoppelt
 
 ### Neu

@@ -97,7 +97,10 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   const translated = germanToEnglishName(term);
 
   // TCG-API: Wildcard-Suche über den Kartennamen, z.B. name:"*charizard*"
-  const escaped = translated.replace(/"/g, '');
+  // Lucene-Query-Metazeichen entfernen, damit Nutzereingaben nicht aus dem name-Feld
+  // ausbrechen können (z.B. `") OR set.id:(*` zur Enumeration beliebiger Karten).
+  const escaped = translated.replace(/["*?:()\[\]{}^~\\+\-!&|]/g, '').trim();
+  if (!escaped) return [];
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: {
       ...tcgHeaders(),

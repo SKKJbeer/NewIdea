@@ -50,16 +50,26 @@ export async function POST(request: Request) {
 
   if (cards.length === 0) return NextResponse.json({});
 
+  // Begrenzt jede Karten-Verarbeitung zeitlich, damit eine hängende Upstream-API (TCG/Cardmarket)
+  // nicht die ganze Funktion bis zum Vercel-Hardlimit (maxDuration) blockiert.
+  const PER_CARD_TIMEOUT_MS = 8000;
+  function withTimeout<T>(p: Promise<T>): Promise<T | null> {
+    return Promise.race([
+      p,
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), PER_CARD_TIMEOUT_MS)),
+    ]);
+  }
+
   const results = await Promise.allSettled(
     cards.map(async (c) => {
-      const card = await fetchCardById(c.id);
+      const card = await withTimeout(fetchCardById(c.id));
       if (!card) return null;
 
       let price = card.prices.market || card.prices.holofoil?.market || 0;
       let priceLanguage: CardLanguage = 'EN';
 
       if (c.language !== 'EN') {
-        const langPrice = await fetchCMLanguagePrice(c.name || card.name, c.language);
+        const langPrice = await withTimeout(fetchCMLanguagePrice(c.name || card.name, c.language));
         if (langPrice !== null) {
           price = langPrice;
           priceLanguage = c.language;

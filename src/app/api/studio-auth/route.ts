@@ -9,16 +9,21 @@ export async function GET(request: Request) {
 
 // POST — validate password, set HttpOnly session cookie
 export async function POST(req: Request) {
-  const { password } = await req.json();
+  const { password } = await req.json().catch(() => ({ password: undefined }));
   const secret = process.env.STUDIO_PASSWORD;
+  const isProd = process.env.NODE_ENV === 'production';
 
-  const valid = !secret || password === secret;
-  if (!valid) {
+  // In production: STUDIO_PASSWORD must be set, otherwise fail-closed (no login possible).
+  // In development: open login when no password configured.
+  if (!secret) {
+    if (isProd) {
+      return NextResponse.json({ ok: false, error: 'not_configured' }, { status: 503 });
+    }
+  } else if (password !== secret) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
   const token = secret ? makeToken(secret) : 'dev';
-  const isProd = process.env.NODE_ENV === 'production';
 
   const res = NextResponse.json({ ok: true });
   res.cookies.set(COOKIE_NAME, token, {

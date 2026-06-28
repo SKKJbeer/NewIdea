@@ -53,6 +53,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ success: true, timestamp: new Date().toISOString(), results });
   } catch (error) {
-    return NextResponse.json({ success: false, error: String(error), partial: results }, { status: 500 });
+    // Detaillierte Fehler nur ins Server-Log, nicht in die Response (kein Leak interner Details/Keys).
+    console.error('Weekly cron failed:', error);
+    return NextResponse.json({ success: false, error: 'internal_error' }, { status: 500 });
   }
 }

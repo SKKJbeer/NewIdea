@@ -557,6 +557,77 @@ Settings → API → regenerate service_role key). Neuen Wert danach in Vercel a
 
 ---
 
+## Code-Qualität & Architektur-Regeln (PFLICHT — aus Code-Review v2.6.x verankert)
+
+Diese Regeln entstanden aus konkreten Review-Findings. Sie verhindern, dass dieselben
+Fehler erneut eingebaut werden. Vor jedem Commit gegen diese Liste prüfen.
+
+### Sicherheit (Backend / API)
+
+1. **Auth-Vergleiche immer timing-safe** — Session-Token/Secrets NIE mit `===` vergleichen
+   (Timing-Oracle). Stattdessen `crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))`
+   in einem `try/catch` (unterschiedliche Längen werfen). Siehe `src/lib/studio-auth.ts` → `safeEqual()`.
+
+2. **Auth fail-closed in Production** — Fehlt ein Secret (`STUDIO_PASSWORD`) in Production,
+   muss der Zugang **gesperrt** sein, nicht offen. Nur in `NODE_ENV !== 'production'` darf
+   ohne Passwort geöffnet werden. Niemals `if (!secret) return true` ohne Dev-Guard.
+
+3. **Keine internen Fehlerdetails in API-Responses** — In `catch`-Blöcken NIE `String(error)`,
+   Stacktraces oder `partial`-State an den Client zurückgeben (leakt Pfade, Keys, Architektur).
+   Stattdessen: `console.error(...)` server-seitig loggen + generische Antwort
+   `{ error: 'internal_error' }` mit passendem Status.
+
+4. **Nutzereingaben für externe Query-APIs sanitisieren** — Suchbegriffe, die in eine
+   Query-Sprache (Lucene/TCG-API `name:"..."`) interpoliert werden, müssen Metazeichen
+   entfernen: `replace(/["*?:()\[\]{}^~\\+\-!&|]/g, '')`. Sonst Query-Injection / Enumeration.
+   Siehe `src/lib/pokemon-api.ts` → `searchCards()`.
+
+### Robustheit (externe Daten & Netzwerk)
+
+5. **Marktpreise immer als Median, nie als Minimum** — Bei Cardmarket/TCG-Listings den
+   **Median** der Preise verwenden (`median()` aus `src/lib/portfolio.ts`). Ein einzelnes
+   Fake-/Schaden-Listing (Cent-Preise von Bots) verfälscht sonst den ganzen Portfoliowert.
+
+6. **Externe Fetches immer mit Timeout** — Jeder `fetch` zu TCG/Cardmarket/Anthropic, der
+   in einer Request-Handler-Schleife läuft, braucht ein Timeout (z.B. `Promise.race` mit
+   8s oder `AbortSignal.timeout(8000)`). Sonst hängt die Funktion bis zum Vercel-Hardlimit.
+   Siehe `src/app/api/portfolio/prices/route.ts` → `withTimeout()`.
+
+7. **Model-ID per Env-Var überschreibbar** — Anthropic-Model-IDs NIE als nackten String
+   verstreuen. Zentral `process.env.ANTHROPIC_MODEL || 'claude-opus-4-8'`. Siehe
+   `src/lib/ai-generator.ts` (`MODEL`) und `src/lib/article-generator.ts`.
+
+### Frontend (React / Client-Komponenten)
+
+8. **`useEffect`-Dependencies müssen ALLE preisrelevanten Felder erfassen** — Nicht
+   `holdings.length` als Dependency nutzen, wenn sich auch Sprache/ID ändern können.
+   Stattdessen einen stabilen `fetchKey` bauen: `holdings.map(h => \`${h.cardId}:${h.language}\`).join('|')`.
+   Sonst werden Änderungen (z.B. Sprachwechsel im Edit-Modal) nie neu gefetcht (stale data).
+
+9. **Fetch-Fehler NIE stumm schlucken** — Kein `.catch(() => {})` ohne UI-Rückmeldung.
+   Bei fehlgeschlagenem Live-Preis-Abruf einen `priceError`-State setzen und dem Nutzer
+   einen Hinweis zeigen ("Live-Preise konnten nicht geladen werden — Kaufpreise angezeigt").
+   Außerdem `if (!r.ok) throw` und Cleanup via `cancelled`-Flag im Effect.
+
+10. **Eine Quelle pro UI-Komponente** — Keine zweite Inline-Implementierung einer bereits
+    existierenden Komponente (z.B. `LangPicker`). Wenn eine Variante (Layout/Größe) nötig ist,
+    die bestehende Komponente per Prop erweitern. Shared Components nutzen ausschließlich
+    die Dark-Mode-Tokens aus den UI-Design-Regeln — nie `bg-gray-*`/`text-gray-*`.
+
+### Review-Pflicht vor Code-Commits (nicht Content)
+
+Vor jedem Commit von Logik-/Komponenten-Code:
+- [ ] Keine `===`-Vergleiche auf Secrets/Tokens
+- [ ] Kein `if (!secret) return true` ohne `NODE_ENV`-Dev-Guard
+- [ ] Kein `String(error)`/`partial` in API-Error-Responses
+- [ ] Externe Fetches in Schleifen haben ein Timeout
+- [ ] Marktpreis = Median, nicht `prices[0]`
+- [ ] `useEffect`-Deps erfassen alle relevanten Felder (fetchKey statt `.length`)
+- [ ] Kein stummes `.catch(() => {})` ohne Error-State
+- [ ] Keine doppelten Komponenten-Implementierungen, keine `gray-*`-Tokens
+
+---
+
 ## Bekannte Stolperstellen
 
 1. **Deployment geht nicht** → Fast immer: `HEAD:main` nicht gepusht. Immer beide Branches!

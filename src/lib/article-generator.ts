@@ -494,7 +494,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await client.messages.create({
-      model: 'claude-opus-4-8',
+      model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
       max_tokens: 2048,
       messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel) }],
     });

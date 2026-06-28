@@ -56,7 +56,7 @@ function Sparkline({
       return `${x},${y}`;
     })
     .join(' ');
-  const color = up ? '#34d399' : '#f87171';
+  const color = up ? '#34d399' : '#fb7185';
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
       <polyline
@@ -79,7 +79,7 @@ function FearGreedBar({ value }: { value: number }) {
   if (pct >= 75) { label = 'Extreme Gier'; color = '#34d399'; }
   else if (pct >= 60) { label = 'Gier'; color = '#86efac'; }
   else if (pct >= 40) { label = 'Neutral'; color = '#fbbf24'; }
-  else if (pct >= 25) { label = 'Angst'; color = '#f87171'; }
+  else if (pct >= 25) { label = 'Angst'; color = '#fb7185'; }
   else { label = 'Extreme Angst'; color = '#ef4444'; }
   return (
     <div>

@@ -1,5 +1,6 @@
 import 'server-only';
 import crypto from 'crypto';
+import { median } from '@/lib/portfolio';
 
 export type CardLanguage = 'EN' | 'DE' | 'JP' | 'KR';
 
@@ -103,11 +104,16 @@ export async function fetchCMLanguagePrice(
     if (!res.ok) return null;
 
     const data = (await res.json()) as { article?: Array<{ price: number }> };
-    const prices = (data.article ?? []).map((a) => a.price).sort((a, b) => a - b);
+    const prices = (data.article ?? [])
+      .map((a) => a.price)
+      .filter((p) => typeof p === 'number' && p > 0);
 
-    if (prices.length === 0) return null;
+    // Median statt Minimum: ein einzelnes Fake-/Schaden-Listing (Cent-Preise von Bots)
+    // verfälscht sonst den gesamten Portfoliowert. Median ist robust gegen Ausreißer.
+    const m = median(prices);
+    if (m === null) return null;
 
-    return Math.round(prices[0] * 100) / 100;
+    return Math.round(m * 100) / 100;
   } catch {
     return null;
   }

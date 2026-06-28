@@ -8,6 +8,7 @@ import {
   shortEur,
   setCodeFromId,
   livePriceOf,
+  median,
   RANGE_DAYS,
   type PortfolioHolding,
   type LiveCardData,
@@ -30,6 +31,36 @@ function makeHolding(overrides: Partial<PortfolioHolding> & { cardId: string }):
     ...overrides,
   };
 }
+
+// ─── median ─────────────────────────────────────────────────────────────────
+
+describe('median', () => {
+  it('returns null for an empty list', () => {
+    expect(median([])).toBeNull();
+  });
+
+  it('returns the single value for one element', () => {
+    expect(median([42])).toBe(42);
+  });
+
+  it('returns the middle value for an odd-length list', () => {
+    expect(median([5, 1, 3])).toBe(3);
+  });
+
+  it('averages the two middle values for an even-length list', () => {
+    expect(median([1, 2, 3, 4])).toBe(2.5);
+  });
+
+  it('is robust against a single low outlier (Fake-Listing)', () => {
+    // Ein Cent-Listing darf den repräsentativen Preis nicht nach unten ziehen.
+    const withOutlier = median([0.01, 95, 100, 105, 110]);
+    expect(withOutlier).toBe(100);
+  });
+
+  it('ignores NaN entries', () => {
+    expect(median([NaN, 10, 20, NaN, 30])).toBe(20);
+  });
+});
 
 // ─── normalizeHolding ─────────────────────────────────────────────────────────
 

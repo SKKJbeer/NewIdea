@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.7.0',
+    date: '24. Juni 2026',
+    label: 'Code-Review: Sicherheit, Robustheit & Architektur',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Timing-safe Auth-Vergleich (crypto.timingSafeEqual) + Fail-closed in Production' },
+      { type: 'fixed',   text: 'API-Fehler leaken keine internen Details mehr; Suchquery wird sanitisiert' },
+      { type: 'fixed',   text: 'Cardmarket-Preis nutzt Median statt Minimum — robuster gegen Fake-Listings' },
+      { type: 'fixed',   text: 'Externe Preis-Fetches mit 8s-Timeout; Sprachwechsel lädt Preise korrekt neu' },
+      { type: 'fixed',   text: 'Portfolio zeigt Fehler-Hinweis bei Preisabruf; LangPicker dark; Trend-Farbe vereinheitlicht' },
+      { type: 'changed', text: 'CLAUDE.md + neuer /code-review-Skill verankern Architektur-Regeln; 65 Tests' },
+    ],
+  },
+  {
     version: '2.6.2',
     date: '24. Juni 2026',
     label: 'Portfolio: P&L an Zeitraum gekoppelt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'P&L-Zahlen oben im Portfolio folgen dem gewählten Zeitraum (1D/1W/1M/3M/1Y)' },
       { type: 'new',   text: 'Sublabel zeigt Zeitraum + Startwert statt immer "seit Kauf"' },

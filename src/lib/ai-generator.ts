@@ -6,7 +6,8 @@ const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const MODEL = 'claude-opus-4-8';
+// Zentrale Model-ID mit Env-Override — bei Deprecation nur eine Stelle/Env-Var ändern.
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 
 export async function generateMarketSummary(
   cards: PokemonCard[],

@@ -74,6 +74,7 @@ export default function PortfolioPage() {
   const [holdings,   setHoldings]   = useState<PortfolioHolding[]>([]);
   const [liveData,   setLiveData]   = useState<Record<string, LiveCardData>>({});
   const [loading,    setLoading]    = useState(false);
+  const [priceError, setPriceError] = useState(false);
   const [showAdd,    setShowAdd]    = useState(false);
   const [showReset,  setShowReset]  = useState(false);
   const [editTarget, setEditTarget] = useState<PortfolioHolding | null>(null);
@@ -90,9 +91,15 @@ export default function PortfolioPage() {
     } catch {}
   }, []);
 
+  // Refetch wenn sich die preisrelevanten Felder ändern (cardId + Sprache), nicht nur die Anzahl.
+  // So löst auch ein Sprachwechsel im Edit-Modal einen neuen Preisabruf aus.
+  const fetchKey = holdings.map((h) => `${h.cardId}:${h.language || 'EN'}`).join('|');
+
   useEffect(() => {
-    if (!mounted || holdings.length === 0) { setLiveData({}); return; }
+    if (!mounted || holdings.length === 0) { setLiveData({}); setPriceError(false); return; }
+    let cancelled = false;
     setLoading(true);
+    setPriceError(false);
     fetch('/api/portfolio/prices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -100,11 +107,16 @@ export default function PortfolioPage() {
         cards: holdings.map((h) => ({ id: h.cardId, language: h.language || 'EN', name: h.cardName })),
       }),
     })
-      .then((r) => r.json())
-      .then((data) => setLiveData(data as Record<string, LiveCardData>))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [mounted, holdings.length]);
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => { if (!cancelled) setLiveData(data as Record<string, LiveCardData>); })
+      .catch(() => { if (!cancelled) setPriceError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, fetchKey]);
 
   function saveHoldings(h: PortfolioHolding[]) {
     setHoldings(h);
@@ -197,6 +209,18 @@ export default function PortfolioPage() {
               ? `${RANGE_LABEL[timeRange]} · Start ${formatEur(rangeStartValue)}`
               : `seit Kauf · Einstand ${formatEur(totalCost)}`}
           </p>
+
+          {/* Fehler-Hinweis wenn Live-Preise nicht geladen werden konnten */}
+          {priceError && (
+            <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5">
+              <p className="text-[11px] font-semibold text-amber-400/80">
+                Live-Preise konnten nicht geladen werden — angezeigt werden Kaufpreise.
+              </p>
+              <p className="text-[10px] text-amber-400/60 mt-0.5">
+                Cardmarket/TCG-API evtl. ausgelastet · in ein paar Minuten erneut versuchen.
+              </p>
+            </div>
+          )}
 
           {/* Chart */}
           <div className="-mx-1 mb-3">

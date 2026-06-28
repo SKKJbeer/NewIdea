@@ -119,6 +119,19 @@ export function filterByRange(
   return data.slice(-RANGE_DAYS[range]);
 }
 
+/**
+ * Median einer Zahlenliste — robust gegen Ausreißer (z.B. einzelne Fake-/Cent-Listings
+ * auf Cardmarket, die den Minimumpreis verfälschen würden). Gibt null bei leerer Liste.
+ */
+export function median(values: number[]): number | null {
+  const sorted = values.filter((v) => typeof v === 'number' && !isNaN(v)).sort((a, b) => a - b);
+  if (sorted.length === 0) return null;
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
+
 export function formatEur(n: number): string {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency', currency: 'EUR',

@@ -27,7 +27,7 @@ export function LangPicker({
           } ${
             value === lang
               ? 'bg-violet-600 text-white shadow-sm'
-              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              : 'bg-[#1a1a28] text-slate-400 hover:bg-[#2a2a3a] border border-[#2a2a3a]'
           }`}
         >
           <span className="text-sm leading-none">{LANG_FLAG[lang]}</span>
