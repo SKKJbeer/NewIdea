@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.7.1',
+    date: '28. Juni 2026',
+    label: 'Artikel-Generierung: Selbstheilung + 404-Fix',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '404 auf der heutigen Artikel-Seite vor 12:00 UTC behoben (Datums-String-Vergleich statt Zeitstempel)' },
+      { type: 'fixed', text: 'Artikel werden on-demand generiert, wenn der Cron sie nicht erzeugt hat — Seite selbstheilend' },
+      { type: 'fixed', text: 'Daily-Cron revalidiert jetzt auch die Artikel-Detailseite (keine 24h-Leerversion mehr)' },
+      { type: 'fixed', text: 'Publish-Day-Check vereinheitlicht — kein TZ-Auseinanderlaufen von Wochentag und Artikeltyp' },
+    ],
+  },
+  {
     version: '2.7.0',
     date: '24. Juni 2026',
     label: 'Code-Review: Sicherheit, Robustheit & Architektur',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Timing-safe Auth-Vergleich (crypto.timingSafeEqual) + Fail-closed in Production' },
       { type: 'fixed',   text: 'API-Fehler leaken keine internen Details mehr; Suchquery wird sanitisiert' },

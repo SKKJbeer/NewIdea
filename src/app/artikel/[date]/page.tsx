@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NavBar } from '@/components/NavBar';
-import { readArticle, getArticleType, ARTICLE_META } from '@/lib/article-generator';
+import { readArticle, generateArticle, getArticleType, ARTICLE_META } from '@/lib/article-generator';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
@@ -77,9 +77,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const d = parseDate(date);
   if (!d) notFound();
 
-  const now = new Date();
-  const daysDiff = Math.floor((now.getTime() - d.getTime()) / 86400000);
-  if (daysDiff < 0) notFound();
+  // Zukunfts-Artikel sperren — aber über reinen Datums-String-Vergleich (beide UTC),
+  // nicht über Zeitstempel mit T12:00:00-Anker. Sonst 404t die heutige Seite, wenn sie
+  // vor 12:00 UTC gerendert wird (geparstes Datum läge dann "in der Zukunft").
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (date > todayStr) notFound();
 
   const type = getArticleType(date);
   if (!type) notFound();
@@ -87,7 +89,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const accent = ACCENT_COLOR[meta.color] ?? 'bg-violet-600';
   const dateLabel = d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  const article = await readArticle(date);
+  // Zuerst aus dem Speicher lesen (statisch oder vom Cron generiert).
+  let article = await readArticle(date);
+
+  // Selbstheilung: Hat der Cron den Artikel (noch) nicht erzeugt, generieren wir ihn
+  // jetzt on-demand. generateArticle prüft intern Static + Cache, liefert auch ohne
+  // ANTHROPIC_API_KEY einen vollständigen Fallback-Artikel und persistiert das Ergebnis.
+  // Dank ISR (revalidate=86400) passiert das höchstens einmal pro Tag pro Artikel.
+  if (!article) {
+    article = await generateArticle(type, date).catch(() => null);
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">

@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.7.1] — 2026-06-28 · Artikel-Generierung: Selbstheilung + 404-Fix
+
+### Behoben
+- **404 auf der heutigen Artikel-Seite vor 12:00 UTC**: Der Future-Guard verglich das mit `T12:00:00` geparste Datum gegen `now` — vor Mittag (UTC) lag „heute" damit in der Zukunft → fälschlich 404. Jetzt reiner Datums-String-Vergleich (timezone-konsistent)
+- **„Artikel noch nicht verfügbar" trotz Publish-Day**: `/artikel/[date]` generiert den Artikel jetzt on-demand, wenn der Cron ihn (noch) nicht erzeugt hat — die Seite ist selbstheilend und liefert auch ohne erfolgreichen Cron Inhalt (mit Fallback-Artikel selbst ohne API-Key)
+- **Cron revalidiert jetzt auch die Detailseite**: Nach Generierung wird `/artikel/[date]` revalidiert (nicht nur das Listing) — keine 24h-stehenbleibende Leer-Version mehr
+- **Publish-Day-Check vereinheitlicht**: `getArticleType(today)` ist Single Source of Truth — kein Auseinanderlaufen von Wochentag-Check und Artikeltyp an Zeitzonen-Grenzen
+
+---
+
 ## [2.7.0] — 2026-06-24 · Code-Review: Sicherheit, Robustheit & Architektur
 
 ### Behoben (Sicherheit)

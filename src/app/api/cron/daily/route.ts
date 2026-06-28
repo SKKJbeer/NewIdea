@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { fetchTrendingCards, fetchTopValueCards } from '@/lib/pokemon-api';
 import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { generateArticle, getArticleType, PUBLISH_DAYS } from '@/lib/article-generator';
+import { generateArticle, getArticleType } from '@/lib/article-generator';
 
 // Called daily at 08:00 to pre-warm today's article so first visitors don't wait
 export async function GET(request: Request) {
@@ -36,19 +36,24 @@ export async function GET(request: Request) {
     results.priceSnapshots = 'skipped (Supabase nicht konfiguriert)';
   }
 
-  const dayOfWeek = new Date().getDay();
-  if (PUBLISH_DAYS.has(dayOfWeek)) {
-    const type = getArticleType(today)!;
+  // dayOfWeek konsistent aus `today` ableiten (gleiche Basis wie getArticleType),
+  // damit Publish-Day-Check und Artikeltyp nie auseinanderlaufen.
+  const type = getArticleType(today);
+  if (type) {
     try {
       const article = await generateArticle(type, today);
       results.articleGenerated = true;
       results.articleTitle = article.title;
       console.log(`✅ Article generated (${type}): ${article.title}`);
+      // WICHTIG: auch die Detailseite revalidieren, sonst bleibt eine evtl. gecachte
+      // "noch nicht verfügbar"-Version bis zum nächsten ISR-Intervall (24h) stehen.
+      revalidatePath(`/artikel/${today}`);
     } catch (err) {
-      results.articleError = String(err);
+      results.articleError = 'generation_failed';
       console.error('Failed to generate article:', err);
     }
   } else {
+    const dayOfWeek = new Date(today + 'T12:00:00').getDay();
     results.articleGenerated = false;
     results.articleSkipped = `Kein Publish-Day (Wochentag ${dayOfWeek}) — nur Sonntag (0) und Donnerstag (4)`;
   }
