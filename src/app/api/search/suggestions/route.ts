@@ -1,4 +1,4 @@
-import { searchCards } from '@/lib/pokemon-api';
+import { searchCards, displayPrice } from '@/lib/pokemon-api';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       name: c.name,
       nameDe: c.nameDe,
       imageUrl: c.imageUrl,
-      price: c.prices.market || c.prices.holofoil?.market || 0,
+      price: displayPrice(c),
       set: c.set,
     }));
     return NextResponse.json(suggestions, {

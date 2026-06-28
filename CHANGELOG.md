@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.7.2] — 2026-06-28 · Suche: keine leeren Karten ohne Bild/Preis mehr
+
+### Behoben
+- **Leere Platzhalter-Karten in Suche & Ergebnissen**: Unveröffentlichte/Preview-Karten aus der TCG-Datenbank (künftige Sets ohne Bild und Preis, z.B. „Ascended Heroes") werden zentral herausgefiltert — angezeigt werden nur handelbare Karten mit echtem Marktpreis und Bild
+- Filter sitzt an einer einzigen Stelle (`mapAndFilter` / `isDisplayableCard`) und wirkt auf Suche, Suggestions, Trending, Set- und Top-Value-Listen gleichzeitig
+- **Such-Dropdown auf Dark Mode umgestellt**: war noch weiß (Bloomberg/TradingView-Design jetzt durchgängig)
+
+### Geändert
+- `displayPrice()`-Helper als Single Source für den UI-Marktpreis (entfernt duplizierte Preis-Logik an 5 Stellen)
+- 8 neue Tests (73 gesamt)
+
+---
+
 ## [2.7.1] — 2026-06-28 · Artikel-Generierung: Selbstheilung + 404-Fix
 
 ### Behoben

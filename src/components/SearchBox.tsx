@@ -92,7 +92,7 @@ export function SearchBox({
         {loadingSuggestions ? (
           <Loader2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-400 animate-spin pointer-events-none" />
         ) : (
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
         )}
         <input
           type="search"
@@ -105,7 +105,7 @@ export function SearchBox({
           aria-label="Pokémon-Karte suchen"
           aria-autocomplete="list"
           aria-expanded={open}
-          className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-28 text-sm text-gray-900 shadow-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+          className="w-full rounded-full border border-[#2a2a3a] bg-[#13131e] py-3 pl-11 pr-28 text-sm text-slate-200 placeholder:text-slate-600 shadow-sm focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
         />
         <button
           type="submit"
@@ -117,16 +117,16 @@ export function SearchBox({
 
       {/* Autocomplete dropdown */}
       {open && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] shadow-xl">
           <ul role="listbox">
             {suggestions.map((s) => (
               <li key={s.id} role="option">
                 <Link
                   href={`/karten/${s.id}`}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-violet-50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a1a28] transition-colors"
                 >
-                  <div className="relative flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-violet-50 to-indigo-50">
+                  <div className="relative flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1a1a28]">
                     {s.imageUrl ? (
                       <Image src={s.imageUrl} alt={s.name} fill sizes="32px" className="object-contain" />
                     ) : (
@@ -134,20 +134,20 @@ export function SearchBox({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">{s.name}</p>
-                    <p className="truncate text-xs text-gray-400">
+                    <p className="truncate text-sm font-semibold text-slate-200">{s.name}</p>
+                    <p className="truncate text-xs text-slate-500">
                       {s.nameDe && s.nameDe.toLowerCase() !== s.name.toLowerCase() ? s.nameDe : s.set}
                     </p>
                   </div>
                   {s.price > 0 && (
-                    <span className="shrink-0 text-sm font-bold text-gray-700 tabular-nums">
+                    <span className="shrink-0 text-sm font-bold text-slate-300 tabular-nums">
                       {s.price.toFixed(2)} €
                     </span>
                   )}
                 </Link>
               </li>
             ))}
-            <li className="border-t border-gray-50 px-4 py-2 text-center">
+            <li className="border-t border-[#1e1e30] px-4 py-2 text-center">
               <button
                 type="button"
                 onClick={submit as never}
@@ -156,7 +156,7 @@ export function SearchBox({
                   setOpen(false);
                   router.push(`/suche?q=${encodeURIComponent(value.trim())}`);
                 }}
-                className="text-xs font-semibold text-violet-600 hover:text-violet-800"
+                className="text-xs font-semibold text-violet-400 hover:text-violet-300"
               >
                 Alle Ergebnisse für „{value.trim()}" anzeigen →
               </button>

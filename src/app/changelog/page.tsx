@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.7.2',
+    date: '28. Juni 2026',
+    label: 'Suche: keine leeren Karten ohne Bild/Preis mehr',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Leere Preview-Karten (kein Bild/Preis) werden aus Suche & Ergebnissen gefiltert — zentral an einer Stelle' },
+      { type: 'fixed',   text: 'Such-Dropdown auf Dark Mode umgestellt (war noch weiß)' },
+      { type: 'changed', text: 'displayPrice()-Helper als Single Source für den Marktpreis; 73 Tests' },
+    ],
+  },
+  {
     version: '2.7.1',
     date: '28. Juni 2026',
     label: 'Artikel-Generierung: Selbstheilung + 404-Fix',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '404 auf der heutigen Artikel-Seite vor 12:00 UTC behoben (Datums-String-Vergleich statt Zeitstempel)' },
       { type: 'fixed', text: 'Artikel werden on-demand generiert, wenn der Cron sie nicht erzeugt hat — Seite selbstheilend' },

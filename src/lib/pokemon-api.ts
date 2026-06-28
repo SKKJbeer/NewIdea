@@ -11,6 +11,33 @@ function tcgHeaders(): Record<string, string> {
   return key ? { 'X-Api-Key': key } : {};
 }
 
+/** Der in der UI angezeigte Marktpreis einer Karte (EUR Cardmarket > TCGplayer Holo > 0). */
+export function displayPrice(card: PokemonCard): number {
+  return card.prices.market || card.prices.holofoil?.market || 0;
+}
+
+/**
+ * Eine Karte ist nur dann anzeigbar, wenn sie einen echten Marktpreis UND ein Bild hat.
+ * Unveröffentlichte/Preview-Karten in der TCG-Datenbank (z.B. künftige Sets) haben weder
+ * Preis noch Bild — sie würden sonst als leere Platzhalter-Zeilen in Suche/Ergebnissen
+ * erscheinen. Ein Preis-Tracking-Marktplatz zeigt nur handelbare, vollständige Karten.
+ */
+export function isDisplayableCard(card: PokemonCard): boolean {
+  return displayPrice(card) > 0 && !!card.imageUrl;
+}
+
+/** Mappt die API-Antwort und entfernt nicht-anzeigbare (Preview-)Karten — zentrale Stelle. */
+function mapAndFilter(data: unknown[]): PokemonCard[] {
+  return (data as Array<Record<string, unknown>>)
+    .map(mapApiCardToCard)
+    .filter(isDisplayableCard);
+}
+
+/** Sortiert Karten nach Marktpreis absteigend (höchster Wert zuerst). */
+function byPriceDesc(a: PokemonCard, b: PokemonCard): number {
+  return displayPrice(b) - displayPrice(a);
+}
+
 // Deterministisch per ISO-Kalenderwoche — gleiche Woche, gleiche Karten, cachebar.
 function weeklySetIndex(count: number): number {
   const now = new Date();
@@ -32,12 +59,7 @@ export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
     timeout: 8000,
   });
 
-  const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
-  return cards.sort((a, b) => {
-    const pa = a.prices.market || a.prices.holofoil?.market || 0;
-    const pb = b.prices.market || b.prices.holofoil?.market || 0;
-    return pb - pa;
-  });
+  return mapAndFilter(response.data.data).sort(byPriceDesc);
 }
 
 export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
@@ -51,12 +73,7 @@ export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
     },
   });
 
-  const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
-  return cards.sort((a, b) => {
-    const pa = a.prices.market || a.prices.holofoil?.market || 0;
-    const pb = b.prices.market || b.prices.holofoil?.market || 0;
-    return pb - pa;
-  });
+  return mapAndFilter(response.data.data).sort(byPriceDesc);
 }
 
 export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
@@ -73,13 +90,9 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
         params: { q, pageSize: limit },
         timeout: 8000,
       });
-      const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
+      const cards = mapAndFilter(response.data.data);
       if (cards.length > 0) {
-        return cards.sort((a, b) => {
-          const pa = a.prices.market || a.prices.holofoil?.market || 0;
-          const pb = b.prices.market || b.prices.holofoil?.market || 0;
-          return pb - pa;
-        });
+        return cards.sort(byPriceDesc);
       }
     } catch {
       // Try next query
@@ -112,13 +125,8 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
     },
   });
 
-  const cards: PokemonCard[] = response.data.data.map(mapApiCardToCard);
-  // Karten mit Preis zuerst, dann nach Marktpreis absteigend
-  return cards.sort((a, b) => {
-    const pa = a.prices.market || a.prices.holofoil?.market || 0;
-    const pb = b.prices.market || b.prices.holofoil?.market || 0;
-    return pb - pa;
-  });
+  // Nur vollständige, handelbare Karten (Preis + Bild) — nach Marktpreis absteigend.
+  return mapAndFilter(response.data.data).sort(byPriceDesc);
 }
 
 export async function fetchCardById(id: string): Promise<PokemonCard | null> {
