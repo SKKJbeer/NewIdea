@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.9.0] — 2026-07-17 · Set-Landingpages: SEO-Einstiege für jedes TCG-Set
+
+### Neu
+- **`/sets`** — Übersicht der 24 aktuellsten Pokémon-TCG-Sets mit Boosterpack-Bild, Serie, Erscheinungsdatum und Kartenanzahl (ISR 24h)
+- **`/sets/[setCode]`** — Landingpage pro Set: alle handelbaren Karten nach Marktwert sortiert (CardGrid), Boosterpack-Hero, Gesamtwert, Kauf-Button (Affiliate-Pattern mit Env-Fallback), JSON-LD ItemList, Canonical-URL
+- **NavBar**: "Sets"-Link (Desktop)
+- **Sitemap**: alle Set-Seiten enthalten — jede ist ein Google-Einstieg für "[Setname] Karten Preise"
+
+### Sicherheit/Robustheit
+- **`isValidSetCode()`**: Set-Codes aus der URL werden validiert, bevor sie in die TCG-Query interpoliert werden (Lucene-Injection-Schutz) — mit Tests
+- **`fetchCardsBySet` + `fetchRecentSets`**: 8s-Timeout ergänzt
+
+---
+
 ## [2.8.1] — 2026-07-17 · Schreibstil-System: Texte klingen menschlich, nicht nach KI
 
 ### Neu

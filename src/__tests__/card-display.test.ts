@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { displayPrice, isDisplayableCard } from '@/lib/pokemon-api';
+import { displayPrice, isDisplayableCard, isValidSetCode } from '@/lib/pokemon-api';
 import type { PokemonCard } from '@/types';
 
 function makeCard(overrides: Partial<PokemonCard>): PokemonCard {
@@ -51,5 +51,19 @@ describe('isDisplayableCard', () => {
 
   it('accepts a card priced only via holofoil', () => {
     expect(isDisplayableCard(makeCard({ prices: { market: 0, holofoil: { market: 3 } } }))).toBe(true);
+  });
+});
+
+describe('isValidSetCode', () => {
+  it('accepts real set codes', () => {
+    for (const code of ['sv3pt5', 'swsh7', 'cel25', 'base1', 'sm3.5', 'sv8']) {
+      expect(isValidSetCode(code), code).toBe(true);
+    }
+  });
+
+  it('rejects Lucene injection attempts and malformed input', () => {
+    for (const code of ['sv3 OR set.id:*', 'a"b', 'x', '', 'sv3)!(', '../etc', 'a'.repeat(30)]) {
+      expect(isValidSetCode(code), JSON.stringify(code)).toBe(false);
+    }
   });
 });

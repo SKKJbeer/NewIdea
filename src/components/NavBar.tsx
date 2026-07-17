@@ -6,6 +6,7 @@ import { Zap, Search, BarChart3 } from 'lucide-react';
 
 const NAV_LINKS = [
   { href: '/suche',        label: 'Suche'       },
+  { href: '/sets',         label: 'Sets'         },
   { href: '/marktbericht', label: 'Marktbericht' },
   { href: '/artikel',      label: 'Blog'         },
   { href: '/guides',       label: 'Guides'       },

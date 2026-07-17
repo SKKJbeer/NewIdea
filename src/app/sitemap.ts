@@ -3,6 +3,7 @@ import { GUIDES } from '@/lib/guides';
 import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
+import { fetchRecentSets } from '@/lib/pokemon-api';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -25,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`,                  lastModified: now, changeFrequency: 'daily',   priority: 1.0 },
     { url: `${BASE_URL}/suche`,             lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
+    { url: `${BASE_URL}/sets`,              lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${BASE_URL}/artikel`,           lastModified: now, changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE_URL}/guides`,            lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${BASE_URL}/marktbericht`,      lastModified: now, changeFrequency: 'weekly',  priority: 0.7 },
@@ -62,5 +64,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }));
 
-  return [...staticPages, ...guidePages, ...articlePages, ...reportPages];
+  // Set-Landingpages — die wichtigsten SEO-Einstiege (falls TCG-API down: leerer Fallback).
+  const sets = await fetchRecentSets(24).catch(() => []);
+  const setPages: MetadataRoute.Sitemap = sets.map((s) => ({
+    url: `${BASE_URL}/sets/${s.id}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages];
 }

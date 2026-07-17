@@ -62,15 +62,23 @@ export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
   return mapAndFilter(response.data.data).sort(byPriceDesc);
 }
 
+// Gültige Set-Codes: nur Kleinbuchstaben/Ziffern/Punkt (z.B. sv3pt5, swsh7, cel25).
+// Verhindert Lucene-Query-Injection, da der Code in `set.id:` interpoliert wird.
+export function isValidSetCode(setCode: string): boolean {
+  return /^[a-z0-9.]{2,20}$/i.test(setCode);
+}
+
 export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
+  if (!isValidSetCode(setCode)) return [];
   const response = await axios.get(`${TCG_API_BASE}/cards`, {
     headers: {
       ...tcgHeaders(),
     },
     params: {
       q: `set.id:${setCode}`,
-      pageSize: 50,
+      pageSize: 60,
     },
+    timeout: 8000,
   });
 
   return mapAndFilter(response.data.data).sort(byPriceDesc);
@@ -142,21 +150,32 @@ export async function fetchCardById(id: string): Promise<PokemonCard | null> {
   }
 }
 
-export async function fetchRecentSets(): Promise<Array<{ id: string; name: string; releaseDate: string }>> {
+export interface SetMeta {
+  id: string;
+  name: string;
+  series: string;
+  releaseDate: string;
+  total: number;
+}
+
+export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
   const response = await axios.get(`${TCG_API_BASE}/sets`, {
     headers: {
       ...tcgHeaders(),
     },
     params: {
       orderBy: '-releaseDate',
-      pageSize: 10,
+      pageSize: limit,
     },
+    timeout: 8000,
   });
 
-  return response.data.data.map((set: { id: string; name: string; releaseDate: string }) => ({
-    id: set.id,
-    name: set.name,
-    releaseDate: set.releaseDate,
+  return (response.data.data as Array<Record<string, unknown>>).map((set) => ({
+    id: set.id as string,
+    name: set.name as string,
+    series: (set.series as string) || '',
+    releaseDate: (set.releaseDate as string) || '',
+    total: (set.total as number) || 0,
   }));
 }
 

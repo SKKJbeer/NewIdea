@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.8.1` · **Stand:** 17. Juli 2026 · **Branch:** `main`
+**Version:** `v2.9.0` · **Stand:** 17. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -132,7 +132,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.7.3 | Technisches Aufräumen: verwaiste Crons entfernt, Sitemap erweitert, Karten-Detail ISR, STATUS aktuell |
 | v2.8.0 | Inhaltlicher Komplett-Review: Wahrheitspflicht & Neutralität erzwungen, Compliance-Tests, Admin-Bereich dark |
 | v2.8.1 | Schreibstil-System: Anleitung gegen KI-Klang, STYLE_RULES im Prompt, Floskel-Blockliste im Test |
+| v2.9.0 | Set-Landingpages /sets + /sets/[setCode]: SEO-Einstiege, NavBar-Link, Sitemap, Injection-Schutz |
 
 ---
 
-*Zuletzt aktualisiert: v2.8.1 — 17. Juli 2026*
+*Zuletzt aktualisiert: v2.9.0 — 17. Juli 2026*

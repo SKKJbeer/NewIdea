@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.9.0',
+    date: '17. Juli 2026',
+    label: 'Set-Landingpages: SEO-Einstiege für jedes TCG-Set',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: '/sets — Übersicht der 24 aktuellsten TCG-Sets mit Boosterpack-Bildern' },
+      { type: 'new',     text: '/sets/[setCode] — pro Set alle handelbaren Karten nach Marktwert, Kauf-Button, JSON-LD' },
+      { type: 'new',     text: 'NavBar-Link "Sets" + alle Set-Seiten in der Sitemap' },
+      { type: 'fixed',   text: 'Set-Codes aus der URL werden validiert (Injection-Schutz), Set-Fetches mit Timeout' },
+    ],
+  },
+  {
     version: '2.8.1',
     date: '17. Juli 2026',
     label: 'Schreibstil-System: Texte klingen menschlich, nicht nach KI',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Schreibstil-Anleitung mit 12 verbotenen KI-Mustern und Faktendichte-Test verankert' },
       { type: 'new',     text: 'KI-Generierung bekommt Stilregeln in jedem Prompt (direkter Fakteneinstieg, variabler Satzrhythmus)' },
