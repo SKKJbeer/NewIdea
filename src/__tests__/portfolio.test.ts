@@ -184,23 +184,26 @@ describe('computeChartData', () => {
     expect(computeChartData([], {}, TODAY)).toHaveLength(0);
   });
 
-  it('returns a flat line at purchasePrice when no live history', () => {
+  it('returns a continuous flat daily line at purchasePrice when no live history', () => {
     const h = makeHolding({ cardId: 'no-hist', purchasePrice: 50, quantity: 1, purchaseDate: '2024-06-10' });
     const result = computeChartData([h], {}, TODAY);
-    expect(result).toHaveLength(2);
+    // 10.–15. Juni = 6 lückenlose Tage, alle auf Kaufpreis
+    expect(result).toHaveLength(6);
     expect(result[0]).toEqual({ date: '2024-06-10', value: 50 });
-    expect(result[1]).toEqual({ date: TODAY, value: 50 });
+    expect(result[5]).toEqual({ date: TODAY, value: 50 });
+    expect(result.every((p) => p.value === 50)).toBe(true);
   });
 
-  it('returns a single flat point when purchaseDate equals today', () => {
+  it('renders a flat 2-point line when purchaseDate equals today', () => {
     const h = makeHolding({ cardId: 'today', purchasePrice: 80, quantity: 1, purchaseDate: TODAY });
     const result = computeChartData([h], {}, TODAY);
-    // from === today → only one entry
-    expect(result).toHaveLength(1);
-    expect(result[0]).toEqual({ date: TODAY, value: 80 });
+    // Ein einzelner Punkt ergäbe keine Linie → synthetischer flacher Vortagespunkt
+    expect(result).toHaveLength(2);
+    expect(result[0].value).toBe(80);
+    expect(result[1]).toEqual({ date: TODAY, value: 80 });
   });
 
-  it('uses live price history when available', () => {
+  it('carry-forwards history prices between data points (no gap dips)', () => {
     const h = makeHolding({ cardId: 'live', quantity: 2, purchaseDate: '2024-06-01' });
     const live: Record<string, LiveCardData> = {
       live: {
@@ -213,10 +216,25 @@ describe('computeChartData', () => {
       },
     };
     const result = computeChartData([h], live, TODAY);
-    expect(result).toHaveLength(3);
-    expect(result[0]).toEqual({ date: '2024-06-01', value: 100 }); // 50*2
-    expect(result[1]).toEqual({ date: '2024-06-08', value: 120 }); // 60*2
-    expect(result[2]).toEqual({ date: '2024-06-15', value: 140 }); // 70*2
+    // 1.–15. Juni = 15 lückenlose Tage
+    expect(result).toHaveLength(15);
+    expect(result[0]).toEqual({ date: '2024-06-01', value: 100 });  // 50*2
+    expect(result[6]).toEqual({ date: '2024-06-07', value: 100 });  // Carry-Forward, kein Dip
+    expect(result[7]).toEqual({ date: '2024-06-08', value: 120 });  // 60*2
+    expect(result[14]).toEqual({ date: TODAY, value: 140 });        // Live-Preis 70*2
+  });
+
+  it('chart endpoint equals the live total value shown in the header', () => {
+    const h = makeHolding({ cardId: 'sync', quantity: 1, purchaseDate: '2024-06-10', purchasePrice: 50 });
+    const live: Record<string, LiveCardData> = {
+      sync: {
+        price: 99, // Live-Preis weicht vom letzten History-Punkt ab
+        priceHistory: [{ date: '2024-06-14', price: 60 }],
+      },
+    };
+    const result = computeChartData([h], live, TODAY);
+    const { totalValue } = computePnl([h], live);
+    expect(result[result.length - 1].value).toBe(totalValue); // 99, nicht 60
   });
 
   it('filters out price history before purchaseDate', () => {
@@ -233,12 +251,12 @@ describe('computeChartData', () => {
       },
     };
     const result = computeChartData([h], live, TODAY);
-    expect(result.map((p) => p.date)).toEqual(['2024-06-10', '2024-06-15']);
+    expect(result[0].date).toBe('2024-06-10'); // beginnt am Kaufdatum, nicht früher
     expect(result[0].value).toBe(50);
-    expect(result[1].value).toBe(60);
+    expect(result[result.length - 1].value).toBe(60);
   });
 
-  it('aggregates multiple holdings on the same dates', () => {
+  it('aggregates multiple holdings on every day (no missing-card dips)', () => {
     const h1 = makeHolding({ cardId: 'h1', quantity: 1, purchaseDate: '2024-06-01' });
     const h2 = makeHolding({ cardId: 'h2', quantity: 2, purchaseDate: '2024-06-01' });
     const live: Record<string, LiveCardData> = {
@@ -246,45 +264,55 @@ describe('computeChartData', () => {
       h2: { price: 30,  priceHistory: [{ date: '2024-06-01', price: 30 }] },
     };
     const result = computeChartData([h1, h2], live, TODAY);
-    expect(result).toHaveLength(1);
-    expect(result[0].value).toBe(160); // 100*1 + 30*2
+    expect(result).toHaveLength(15);
+    // Beide Karten tragen an JEDEM Tag bei — konstant 160, kein Einbruch
+    expect(result.every((p) => p.value === 160)).toBe(true);
   });
 
-  it('sorts output chronologically', () => {
-    const h = makeHolding({ cardId: 'sort', quantity: 1, purchaseDate: '2024-01-01' });
+  it('sorts output chronologically even with unsorted history', () => {
+    const h = makeHolding({ cardId: 'sort', quantity: 1, purchaseDate: '2024-06-01' });
     const live: Record<string, LiveCardData> = {
       sort: {
         price: 30,
         priceHistory: [
-          { date: '2024-03-01', price: 30 },
-          { date: '2024-01-01', price: 10 },
-          { date: '2024-02-01', price: 20 },
+          { date: '2024-06-10', price: 30 },
+          { date: '2024-06-01', price: 10 },
+          { date: '2024-06-05', price: 20 },
         ],
       },
     };
     const result = computeChartData([h], live, TODAY);
-    expect(result[0].date).toBe('2024-01-01');
-    expect(result[1].date).toBe('2024-02-01');
-    expect(result[2].date).toBe('2024-03-01');
+    const dates = result.map((p) => p.date);
+    expect(dates).toEqual([...dates].sort());
+    expect(result[0].value).toBe(10);
   });
 
   it('rounds values to 2 decimal places', () => {
     const h = makeHolding({ cardId: 'round', purchasePrice: 33.333, quantity: 3, purchaseDate: TODAY });
     const result = computeChartData([h], {}, TODAY);
     // 33.333 * 3 = 99.999 → rounds to 100.00
-    expect(result[0].value).toBe(100);
+    expect(result[result.length - 1].value).toBe(100);
+  });
+
+  it('caps the series at 365 days', () => {
+    const h = makeHolding({ cardId: 'old', purchasePrice: 10, quantity: 1, purchaseDate: '2020-01-01' });
+    const result = computeChartData([h], {}, TODAY);
+    expect(result.length).toBeLessThanOrEqual(365);
+    expect(result[result.length - 1].date).toBe(TODAY);
   });
 });
 
 // ─── filterByRange ────────────────────────────────────────────────────────────
 
 describe('filterByRange', () => {
-  const points = Array.from({ length: 400 }, (_, i) => ({
-    date: `2024-${String(Math.floor(i / 30) + 1).padStart(2, '0')}-01`,
-    value: i,
-  }));
+  // Lückenlose Tagesserie über 400 Tage, endet am 2024-06-15
+  const points = Array.from({ length: 400 }, (_, i) => {
+    const d = new Date('2024-06-15T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() - (399 - i));
+    return { date: d.toISOString().split('T')[0], value: i };
+  });
 
-  it('returns the last N days for each range', () => {
+  it('filters by real DAYS for each range (daily series)', () => {
     expect(filterByRange(points, '1D')).toHaveLength(RANGE_DAYS['1D']);
     expect(filterByRange(points, '1W')).toHaveLength(RANGE_DAYS['1W']);
     expect(filterByRange(points, '1M')).toHaveLength(RANGE_DAYS['1M']);
@@ -292,9 +320,25 @@ describe('filterByRange', () => {
     expect(filterByRange(points, '1Y')).toHaveLength(RANGE_DAYS['1Y']);
   });
 
-  it('returns all points when data is shorter than the range', () => {
-    const short = [{ date: '2024-01-01', value: 10 }];
-    expect(filterByRange(short, '1Y')).toHaveLength(1);
+  it('filters by date, not point count — sparse series shows only the real window', () => {
+    // Nur 5 Punkte, aber über 5 Monate verteilt: "1W" darf davon nicht einfach 5 nehmen
+    const sparse = ['2024-02-01', '2024-03-01', '2024-04-01', '2024-06-10', '2024-06-15']
+      .map((date, i) => ({ date, value: i }));
+    const week = filterByRange(sparse, '1W');
+    expect(week.map((p) => p.date)).toEqual(['2024-06-10', '2024-06-15']);
+  });
+
+  it('always keeps at least 2 points for rendering', () => {
+    const sparse = [
+      { date: '2024-01-01', value: 1 },
+      { date: '2024-06-15', value: 2 },
+    ];
+    // Im 1D-Fenster liegt nur der letzte Punkt — Fallback auf die letzten 2
+    expect(filterByRange(sparse, '1D')).toHaveLength(2);
+  });
+
+  it('returns empty array unchanged', () => {
+    expect(filterByRange([], '1Y')).toHaveLength(0);
   });
 
   it('returns the most recent points (end of array)', () => {

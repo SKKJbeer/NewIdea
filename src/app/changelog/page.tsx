@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.10.1',
+    date: '17. Juli 2026',
+    label: 'Portfolio-Chart: lückenlose Tagesserie statt Sprung-Kurve',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Performance-Kurve ohne falsche Einbrüche: jede Karte zählt an jedem Besitztag (Carry-Forward)' },
+      { type: 'fixed', text: 'Kurvenende entspricht jetzt exakt dem angezeigten Gesamtwert (Live-Preis als Endpunkt)' },
+      { type: 'fixed', text: 'Zeitraum-Filter (1D/1W/1M/3M/1Y) filtert nach echten Tagen statt Datenpunkten' },
+    ],
+  },
+  {
     version: '2.10.0',
     date: '17. Juli 2026',
     label: 'Merkliste + Bild-Text-Kopplung in Artikeln',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'Merkliste: Karten beobachten, Preisveränderung seit Vormerkung — Button auf jeder Kartenseite' },
       { type: 'new',   text: 'NavBar-Link "Merkliste"' },

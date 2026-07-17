@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.10.1] — 2026-07-17 · Portfolio-Chart: lückenlose Tagesserie statt Sprung-Kurve
+
+### Behoben
+- **Einbrüche in der Performance-Kurve**: Karten trugen nur an Tagen mit eigenem History-Punkt zum Portfoliowert bei — an allen anderen Tagen fehlte ihr Wert in der Summe, die Kurve sackte ab und sprang wieder hoch. Jetzt lückenlose Tagesserie mit Carry-Forward: Jede Karte zählt an jedem Besitztag mit ihrem letzten bekannten Preis
+- **Kurvenende = Kopfzahl**: Der letzte Chart-Punkt nutzt jetzt den Live-Preis — die Kurve endet exakt auf dem oben angezeigten Gesamtwert (vorher: gestriger History-Wert, Endpunkt und Anzeige wichen ab)
+- **Zeitraum-Filter nach echten Tagen**: "1W" filtert jetzt nach Datum statt nach den letzten 7 Datenpunkten (bei lückenhaften Daten zeigte "1W" sonst Monate)
+- Serie auf 365 Tage begrenzt, mindestens 2 Punkte fürs Rendering, 12 Chart-Tests angepasst/ergänzt
+
+---
+
 ## [2.10.0] — 2026-07-17 · Merkliste + Bild-Text-Kopplung in Artikeln
 
 ### Neu

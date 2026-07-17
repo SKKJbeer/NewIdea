@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.10.0` · **Stand:** 17. Juli 2026 · **Branch:** `main`
+**Version:** `v2.10.1` · **Stand:** 17. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -134,7 +134,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.8.1 | Schreibstil-System: Anleitung gegen KI-Klang, STYLE_RULES im Prompt, Floskel-Blockliste im Test |
 | v2.9.0 | Set-Landingpages /sets + /sets/[setCode]: SEO-Einstiege, NavBar-Link, Sitemap, Injection-Schutz |
 | v2.10.0 | Merkliste (Karten beobachten, Δ seit Vormerkung) + Bild-Text-Kopplung in Artikeln erzwungen |
+| v2.10.1 | Portfolio-Chart: lückenlose Tagesserie (Carry-Forward), Kurvenende = Live-Gesamtwert, Filter nach Tagen |
 
 ---
 
-*Zuletzt aktualisiert: v2.10.0 — 17. Juli 2026*
+*Zuletzt aktualisiert: v2.10.1 — 17. Juli 2026*

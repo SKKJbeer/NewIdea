@@ -76,9 +76,18 @@ export function computePnl(
 }
 
 /**
- * Builds the aggregated portfolio value time series.
- * - Uses live price history when available (filtered to dates >= purchaseDate).
- * - Falls back to a flat line at purchasePrice when no live data is available yet.
+ * Builds the aggregated portfolio value time series as a CONTINUOUS daily series.
+ *
+ * Warum lückenlos: Karten haben unterschiedlich dichte Preis-Historien. Würde jede
+ * Karte nur an "ihren" Datenpunkten summiert, bricht die Kurve an allen anderen Tagen
+ * ein (fehlender Kartenwert) — die Grafik zeigt dann Dips, die nie passiert sind.
+ *
+ * Regeln pro Karte und Tag:
+ * - vor dem Kaufdatum: trägt nichts bei (Portfolio besaß die Karte nicht)
+ * - sonst: letzter bekannter History-Preis ≤ Tag (Carry-Forward), Fallback Kaufpreis
+ * - am heutigen Tag: Live-Preis — damit endet die Kurve exakt auf dem Gesamtwert,
+ *   der oben im Portfolio angezeigt wird
+ *
  * `today` is injectable for deterministic testing.
  */
 export function computeChartData(
@@ -87,36 +96,71 @@ export function computeChartData(
   today: string = new Date().toISOString().split('T')[0],
 ): ChartPoint[] {
   if (holdings.length === 0) return [];
-  const dateMap = new Map<string, number>();
 
-  for (const h of holdings) {
-    const hist = liveData[h.cardId]?.priceHistory ?? [];
-    if (hist.length > 0) {
-      for (const { date, price } of hist) {
-        if (h.purchaseDate && date < h.purchaseDate) continue;
-        dateMap.set(date, (dateMap.get(date) ?? 0) + price * h.quantity);
+  const MAX_DAYS = 365;
+
+  const prepared = holdings.map((h) => {
+    const hist = (liveData[h.cardId]?.priceHistory ?? [])
+      .filter((p) => (!h.purchaseDate || p.date >= h.purchaseDate) && p.date <= today)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const ownedFrom = h.purchaseDate || hist[0]?.date || today;
+    return { h, hist, ownedFrom };
+  });
+
+  let start = prepared.reduce((min, p) => (p.ownedFrom < min ? p.ownedFrom : min), today);
+  const cap = new Date(today + 'T00:00:00Z');
+  cap.setUTCDate(cap.getUTCDate() - (MAX_DAYS - 1));
+  const capStr = cap.toISOString().split('T')[0];
+  if (start < capStr) start = capStr;
+
+  const series: ChartPoint[] = [];
+  const cursor = new Date(start + 'T00:00:00Z');
+  const end = new Date(today + 'T00:00:00Z');
+
+  while (cursor.getTime() <= end.getTime()) {
+    const day = cursor.toISOString().split('T')[0];
+    let value = 0;
+    for (const { h, hist, ownedFrom } of prepared) {
+      if (day < ownedFrom) continue;
+      // Carry-Forward: letzter History-Preis bis zu diesem Tag, sonst Kaufpreis
+      let carry = h.purchasePrice;
+      for (const p of hist) {
+        if (p.date <= day) carry = p.price;
+        else break;
       }
-    } else {
-      const from = h.purchaseDate || today;
-      dateMap.set(from, (dateMap.get(from) ?? 0) + h.purchasePrice * h.quantity);
-      if (from !== today) {
-        dateMap.set(today, (dateMap.get(today) ?? 0) + h.purchasePrice * h.quantity);
-      }
+      const live = liveData[h.cardId]?.price || 0;
+      const price = day === today && live > 0 ? live : carry;
+      value += price * h.quantity;
     }
+    series.push({ date: day, value: Math.round(value * 100) / 100 });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
-  if (dateMap.size === 0) return [];
-  return Array.from(dateMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, value]) => ({ date, value: Math.round(value * 100) / 100 }));
+  // Alles heute gekauft → nur 1 Punkt. Flachen Vortagespunkt ergänzen, damit eine Linie rendert.
+  if (series.length === 1) {
+    const prev = new Date(today + 'T00:00:00Z');
+    prev.setUTCDate(prev.getUTCDate() - 1);
+    series.unshift({ date: prev.toISOString().split('T')[0], value: series[0].value });
+  }
+
+  return series;
 }
 
-/** Slices chart data to the last N days for the chosen time range. */
+/**
+ * Filtert die Serie auf die letzten N TAGE (echte Datums-Differenz, nicht Punktanzahl —
+ * sonst zeigt "1W" bei lückenhaften Daten Monate an). Mindestens 2 Punkte fürs Rendering.
+ */
 export function filterByRange(
   data: ChartPoint[],
   range: keyof typeof RANGE_DAYS,
 ): ChartPoint[] {
-  return data.slice(-RANGE_DAYS[range]);
+  if (data.length === 0) return data;
+  const last = data[data.length - 1].date;
+  const cutoff = new Date(last + 'T00:00:00Z');
+  cutoff.setUTCDate(cutoff.getUTCDate() - (RANGE_DAYS[range] - 1));
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+  const filtered = data.filter((p) => p.date >= cutoffStr);
+  return filtered.length >= 2 ? filtered : data.slice(-2);
 }
 
 /**
