@@ -4,9 +4,26 @@ import {
   ARTICLE_META,
   ARTICLE_PREVIEW_TITLES,
   ARTICLE_PREVIEW_SUBTITLES,
+  matchCardsFromText,
+  matchFeaturedCards,
   type ArticleType,
 } from '@/lib/article-generator';
 import { STATIC_ARTICLES } from '@/lib/static-articles';
+import type { PokemonCard } from '@/types';
+
+function makeTrendingCard(overrides: Partial<PokemonCard> & { id: string; name: string }): PokemonCard {
+  return {
+    set: 'Test Set',
+    setCode: 'sv1',
+    rarity: 'Rare',
+    imageUrl: `https://images.pokemontcg.io/${overrides.id}.png`,
+    prices: { market: 10 },
+    trendPercent: 0,
+    priceSource: 'cardmarket',
+    realData: true,
+    ...overrides,
+  } as PokemonCard;
+}
 
 const ALL_TYPES: ArticleType[] = ['markt', 'karte', 'strategie', 'set', 'ausblick', 'guide', 'rueckblick'];
 const VALID_COLORS = ['violet', 'blue', 'emerald', 'amber', 'rose', 'indigo', 'gray'];
@@ -55,6 +72,57 @@ describe('ARTICLE_PREVIEW_SUBTITLES', () => {
     for (const type of ALL_TYPES) {
       expect(ARTICLE_PREVIEW_SUBTITLES[type], `ARTICLE_PREVIEW_SUBTITLES missing "${type}"`).toBeTruthy();
     }
+  });
+});
+
+// ─── Bild-Text-Kopplung: Kartenbilder müssen zum Artikeltext passen ──────────
+
+describe('matchCardsFromText', () => {
+  const charizard = makeTrendingCard({ id: 'sv3pt5-201', name: 'Charizard ex', nameDe: 'Glurak' });
+  const pikachu   = makeTrendingCard({ id: 'sv3pt5-205', name: 'Pikachu ex',   nameDe: 'Pikachu' });
+  const umbreon   = makeTrendingCard({ id: 'swsh7-215',  name: 'Umbreon VMAX', nameDe: 'Nachtara' });
+
+  it('findet Karten über den englischen Namen im Text', () => {
+    const result = matchCardsFromText(['Der Charizard ex SIR zeigt Stärke.'], [charizard, pikachu]);
+    expect(result.map((c) => c.name)).toEqual(['Charizard ex']);
+  });
+
+  it('findet Karten über den deutschen Namen (Glurak → Charizard)', () => {
+    const result = matchCardsFromText(['Glurak bleibt die Referenzkarte des Markts.'], [charizard, pikachu]);
+    expect(result.map((c) => c.name)).toEqual(['Charizard ex']);
+  });
+
+  it('zeigt KEINE Karten, die im Text nicht vorkommen (kein Pikachu bei Glurak-Text)', () => {
+    const result = matchCardsFromText(['Nachtara und Glurak halten ihre Preiszonen.'], [charizard, pikachu, umbreon]);
+    const names = result.map((c) => c.name);
+    expect(names).toContain('Charizard ex');
+    expect(names).toContain('Umbreon VMAX');
+    expect(names).not.toContain('Pikachu ex');
+  });
+
+  it('gibt leere Liste zurück, wenn keine Karte im Text vorkommt', () => {
+    expect(matchCardsFromText(['Allgemeine Marktbeobachtung ohne Kartennamen.'], [charizard, pikachu])).toEqual([]);
+  });
+});
+
+describe('matchFeaturedCards', () => {
+  it('füllt NICHT mit unpassenden Trending-Karten auf (Padding-Regression)', () => {
+    const cards = [
+      makeTrendingCard({ id: 'a', name: 'Pikachu ex' }),
+      makeTrendingCard({ id: 'b', name: 'Mewtwo ex' }),
+      makeTrendingCard({ id: 'c', name: 'Snorlax' }),
+    ];
+    // KI hat keine Karten genannt → Galerie bleibt leer statt zufällig befüllt
+    expect(matchFeaturedCards([], cards)).toEqual([]);
+  });
+
+  it('matcht nur explizit genannte Karten', () => {
+    const cards = [
+      makeTrendingCard({ id: 'a', name: 'Pikachu ex' }),
+      makeTrendingCard({ id: 'b', name: 'Mewtwo ex' }),
+    ];
+    const result = matchFeaturedCards([{ name: 'Mewtwo' }], cards);
+    expect(result.map((c) => c.name)).toEqual(['Mewtwo ex']);
   });
 });
 

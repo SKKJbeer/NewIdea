@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/marktbericht`,      lastModified: now, changeFrequency: 'weekly',  priority: 0.7 },
     { url: `${BASE_URL}/marktbericht/archiv`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${BASE_URL}/portfolio`,         lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/merkliste`,         lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/impressum`,         lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE_URL}/datenschutz`,       lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
   ];

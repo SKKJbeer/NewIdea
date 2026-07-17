@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.10.0',
+    date: '17. Juli 2026',
+    label: 'Merkliste + Bild-Text-Kopplung in Artikeln',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'Merkliste: Karten beobachten, Preisveränderung seit Vormerkung — Button auf jeder Kartenseite' },
+      { type: 'new',   text: 'NavBar-Link "Merkliste"' },
+      { type: 'fixed', text: 'Kartenbilder passen jetzt immer zum Artikeltext (kein Pikachu-Bild bei Glurak-Text mehr)' },
+      { type: 'fixed', text: 'Artikel-Galerien werden nicht mehr mit unpassenden Trending-Karten aufgefüllt' },
+    ],
+  },
+  {
     version: '2.9.0',
     date: '17. Juli 2026',
     label: 'Set-Landingpages: SEO-Einstiege für jedes TCG-Set',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: '/sets — Übersicht der 24 aktuellsten TCG-Sets mit Boosterpack-Bildern' },
       { type: 'new',     text: '/sets/[setCode] — pro Set alle handelbaren Karten nach Marktwert, Kauf-Button, JSON-LD' },

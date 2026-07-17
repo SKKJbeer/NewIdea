@@ -9,6 +9,7 @@ import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
+import { WatchButton } from '@/components/WatchButton';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -152,6 +153,14 @@ export default async function CardDetailPage({ params }: Props) {
                 Amazon<ExternalLink size={12} className="opacity-70" />
               </a>
               <p className="text-xs text-slate-700 text-center">* Affiliate-Links</p>
+              <WatchButton
+                cardId={card.id}
+                cardName={card.name}
+                setName={card.set}
+                setCode={card.setCode}
+                imageUrl={card.imageUrl}
+                price={price}
+              />
             </div>
           </div>
 

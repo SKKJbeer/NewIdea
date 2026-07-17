@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: '/marktbericht', label: 'Marktbericht' },
   { href: '/artikel',      label: 'Blog'         },
   { href: '/guides',       label: 'Guides'       },
+  { href: '/merkliste',    label: 'Merkliste'    },
   { href: '/portfolio',    label: 'Portfolio'    },
 ];
 

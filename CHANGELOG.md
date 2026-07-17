@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.10.0] — 2026-07-17 · Merkliste + Bild-Text-Kopplung in Artikeln
+
+### Neu
+- **Merkliste `/merkliste`**: Karten beobachten ohne Login — auf jeder Karten-Detailseite gibt es jetzt „Auf die Merkliste". Die Liste zeigt den aktuellen Preis und die Veränderung (absolut + Prozent) seit dem Vormerk-Zeitpunkt. Lokal gespeichert (localStorage), Live-Preise mit Fehler-Hinweis bei API-Ausfall
+- **NavBar**: „Merkliste"-Link (Desktop)
+
+### Behoben
+- **Kartenbilder passen jetzt immer zum Text**: Artikel zeigten teils Karten, die im Text gar nicht vorkamen (Text über Glurak, Bild von Pikachu). Ursache: Die Galerie wurde mit beliebigen Trending-Karten aufgefüllt. Jetzt erscheint eine Karte nur noch, wenn ihr Name (deutsch ODER englisch — Glurak/Charizard) im Artikeltext steht. Auffüll-Logik komplett entfernt, mit Regressions-Tests
+- **Statische Artikel**: zwei Highlight-Boxen ohne Textbezug angeglichen (Karte im Text ergänzt bzw. Box entfernt)
+
+---
+
 ## [2.9.0] — 2026-07-17 · Set-Landingpages: SEO-Einstiege für jedes TCG-Set
 
 ### Neu

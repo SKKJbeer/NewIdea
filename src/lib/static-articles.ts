@@ -62,7 +62,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       },
       {
         heading: 'Ausblick auf die kommende Woche',
-        content: 'Temporal Forces (SV5) rückt in den Fokus der Beobachtung — die Preise haben sich seit Release beruhigt, die Konsolidierungsphase nach dem Release-Hype ist ein gut dokumentiertes Muster. Historisch hat überhastetes Handeln aus Ungeduld im TCG-Markt selten besser abgeschnitten als ruhige Beobachtung. Ruhige Phasen sind Teil jedes Marktzyklus.',
+        content: 'Temporal Forces (SV5) rückt in den Fokus der Beobachtung — die Preise haben sich seit Release beruhigt, die Konsolidierungsphase nach dem Release-Hype ist ein gut dokumentiertes Muster. Karten wie Walking Wake ex SIR (die urzeitliche Suicune-Variante) stehen dabei besonders im Blick. Historisch hat überhastetes Handeln aus Ungeduld im TCG-Markt selten besser abgeschnitten als ruhige Beobachtung.',
         highlight: { name: 'Walking Wake ex SIR', set: 'Temporal Forces', setCode: 'sv5', imageUrl: '', price: 45, trend: 0, rarity: 'Special Illustration Rare' },
       },
     ],
@@ -133,7 +133,6 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
       {
         heading: '😅 Marktmuster der Woche: Der Ankereffekt',
         content: 'Ein bekanntes Verhaltensmuster im Sammlermarkt: Wer einen bestimmten Preis einmal gesehen hat, nimmt ihn als Anker — und empfindet jede spätere Notierung darüber als "zu teuer". Der Markt orientiert sich aber nicht an individuellen Ankern, sondern an Angebot und Nachfrage. Historisch haben sich Preiszonen etablierter Karten unabhängig davon weiterentwickelt, ob einzelne Beobachter auf eine Rückkehr zu früheren Niveaus gewartet haben. Ein Muster, das in der Verhaltensökonomie als Ankerheuristik gut beschrieben ist.',
-        highlight: { name: 'Tinkaton ex SIR', set: 'Paldea Evolved', setCode: 'sv2', imageUrl: '', price: 48, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: '🔮 Beobachtung für die kommende Woche',

@@ -382,11 +382,61 @@ function buildPrompt(type: ArticleType, cards: string, dateLabel: string): strin
   return `${persona}\n\n${contexts[type]}`;
 }
 
-function matchFeaturedCards(
+function toFeaturedCard(c: PokemonCard): FeaturedCard {
+  return {
+    name: c.name,
+    imageUrl: c.imageUrl,
+    price: c.prices.market || c.prices.holofoil?.market || 0,
+    trend: c.trendPercent || 0,
+    rarity: c.rarity,
+    set: c.set,
+    setCode: c.setCode,
+  };
+}
+
+/**
+ * Basisname eines Kartennamens ohne Varianten-Suffixe ("Charizard ex SIR" → "charizard").
+ * Für den Text-Abgleich: Nur Karten anzeigen, deren Pokémon im Artikel wirklich vorkommt.
+ */
+function baseCardName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\s+(ex|gx|v|vmax|vstar|sir|sar|alt art)\b.*$/i, '')
+    .trim();
+}
+
+/**
+ * BILD-TEXT-KOPPLUNG (PFLICHT): Eine Karte erscheint nur dann als Bild im Artikel,
+ * wenn ihr Name (englisch ODER deutsch, z.B. Charizard/Glurak) im Artikeltext vorkommt.
+ * Kein Auffüllen mit beliebigen Trending-Karten — sonst zeigt der Artikel Pikachu,
+ * während der Text über Glurak spricht.
+ */
+export function matchCardsFromText(texts: string[], trendingCards: PokemonCard[]): FeaturedCard[] {
+  const haystack = texts.join(' ').toLowerCase();
+  const matched: FeaturedCard[] = [];
+  const usedBases = new Set<string>();
+
+  for (const c of trendingCards) {
+    if (!c.imageUrl) continue;
+    const baseEn = baseCardName(c.name);
+    const baseDe = c.nameDe ? baseCardName(c.nameDe) : '';
+    if (baseEn.length < 3) continue;
+    if (usedBases.has(baseEn)) continue;
+    if (haystack.includes(baseEn) || (baseDe.length >= 3 && haystack.includes(baseDe))) {
+      usedBases.add(baseEn);
+      matched.push(toFeaturedCard(c));
+      if (matched.length >= 4) break;
+    }
+  }
+  return matched;
+}
+
+export function matchFeaturedCards(
   aiNames: Array<{ name: string }>,
   trendingCards: PokemonCard[],
 ): FeaturedCard[] {
-  // Try to match AI-suggested card names against fetched card data
+  // KI-genannte Kartennamen gegen echte Kartendaten matchen.
+  // KEIN Auffüllen mit unpassenden Trending-Karten — nur Karten, die der Artikel nennt.
   const matched: FeaturedCard[] = [];
   const used = new Set<string>();
 
@@ -397,33 +447,7 @@ function matchFeaturedCards(
     );
     if (found) {
       used.add(found.id);
-      matched.push({
-        name: found.name,
-        imageUrl: found.imageUrl,
-        price: found.prices.market || found.prices.holofoil?.market || 0,
-        trend: found.trendPercent || 0,
-        rarity: found.rarity,
-        set: found.set,
-        setCode: found.setCode,
-      });
-    }
-  }
-
-  // Pad with top trending cards that have images if we have fewer than 3
-  if (matched.length < 3) {
-    for (const c of trendingCards) {
-      if (matched.length >= 4) break;
-      if (used.has(c.id) || !c.imageUrl) continue;
-      used.add(c.id);
-      matched.push({
-        name: c.name,
-        imageUrl: c.imageUrl,
-        price: c.prices.market || c.prices.holofoil?.market || 0,
-        trend: c.trendPercent || 0,
-        rarity: c.rarity,
-        set: c.set,
-        setCode: c.setCode,
-      });
+      matched.push(toFeaturedCard(found));
     }
   }
 
@@ -501,7 +525,10 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
-    fallback.featuredCards = matchFeaturedCards([], trendingCards);
+    fallback.featuredCards = matchCardsFromText(
+      [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
+      trendingCards,
+    );
     return fallback;
   }
 
@@ -529,7 +556,10 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
 
     if (!data.title || !data.sections || data.sections.length === 0) {
       const fallback = fallbackArticle(type, dateLabel, cardSummary);
-      fallback.featuredCards = matchFeaturedCards([], trendingCards);
+      fallback.featuredCards = matchCardsFromText(
+      [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
+      trendingCards,
+    );
       return fallback;
     }
 
@@ -550,7 +580,10 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     return article;
   } catch {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
-    fallback.featuredCards = matchFeaturedCards([], trendingCards);
+    fallback.featuredCards = matchCardsFromText(
+      [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
+      trendingCards,
+    );
     return fallback;
   }
 }
