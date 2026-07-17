@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.8.1',
+    date: '17. Juli 2026',
+    label: 'Schreibstil-System: Texte klingen menschlich, nicht nach KI',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Schreibstil-Anleitung mit 12 verbotenen KI-Mustern und Faktendichte-Test verankert' },
+      { type: 'new',     text: 'KI-Generierung bekommt Stilregeln in jedem Prompt (direkter Fakteneinstieg, variabler Satzrhythmus)' },
+      { type: 'new',     text: 'KI-Floskel-Blockliste + Emoji-Verbot im Compliance-Test — Verstöße blockieren den Build' },
+      { type: 'changed', text: 'Fallback-Artikel: Floskel-Opener durch direkte Fakteneinstiege ersetzt' },
+    ],
+  },
+  {
     version: '2.8.0',
     date: '17. Juli 2026',
     label: 'Inhaltlicher Komplett-Review: Wahrheitspflicht & Neutralität erzwungen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Alle Artikel & Guides bereinigt: keine Preiszahlen im Fließtext, keine erfundenen Markt-Events, keine Kaufempfehlungen oder Renditeversprechen' },
       { type: 'changed', text: '10 unerreichbare statische Artikel entfernt (lagen auf Nicht-Publish-Tagen)' },

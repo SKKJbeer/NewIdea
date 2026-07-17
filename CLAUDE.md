@@ -287,6 +287,27 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, article-generator.ts, 
 
 ---
 
+## Schreibstil (PFLICHT — Texte dürfen NICHT nach KI klingen!)
+
+**Vollständige Anleitung:** `.claude/commands/schreibstil.md` (Skill `/schreibstil`) — vor JEDEM Content-Schreiben lesen.
+
+Kurzfassung der verbotenen KI-Muster:
+1. **Floskel-Opener** („Hier ein Überblick", „In der heutigen Zeit", „Tauchen wir ein") → direkt mit Fakt/Beobachtung/Kontrast einsteigen
+2. **Aufgeblasene Adjektive** (atemberaubend, revolutionär, bahnbrechend, faszinierend, episch, spektakulär) → das konkrete Detail nennen
+3. **Meta-Kommentare** („In diesem Artikel...", „Zusammenfassend...", „Fazit:") → weglassen
+4. **Symmetrie-Zwang** (immer 3 Punkte, gleichlange Absätze) → Ungleichgewicht zulassen
+5. **Gleichförmiger Satzrhythmus** → kurze Sätze einstreuen (3–6 Wörter)
+6. **Doppelpunkt-Konstruktionen** („Der Grund: ...") → max. 1 pro Text
+7. **Emoji im Fließtext** → nur in Überschriften/Tip-Boxen
+8. **Absatz-Schlusssätze die sich selbst zusammenfassen** → Absatz endet mit dem letzten Fakt
+
+**Faktendichte-Test:** Jeder Satz beantwortet Was/Wann/Wie viel/Warum/Woher — sonst streichen.
+
+**Durchsetzung:** `content-compliance.test.ts` (AI_PHRASES-Blockliste + Emoji-Regex) schlägt bei Verstößen fehl.
+Die KI-Generierung bekommt `STYLE_RULES` (article-generator.ts) in jedem Prompt.
+
+---
+
 ## UI-Design-Regeln (PFLICHT — immer einhalten!)
 
 ### ⛔ Dark Mode — Bloomberg/TradingView-Design (GLOBAL BINDEND — keine Ausnahmen!)

@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.8.1] — 2026-07-17 · Schreibstil-System: Texte klingen menschlich, nicht nach KI
+
+### Neu
+- **Schreibstil-Anleitung** (`.claude/commands/schreibstil.md`, Skill `/schreibstil`): 12 verbotene KI-Muster mit Vorher/Nachher-Beispielen (Floskel-Opener, aufgeblasene Adjektive, Meta-Kommentare, Symmetrie-Zwang, gleichförmiger Satzrhythmus u.a.) + Faktendichte-Test + Commit-Checkliste
+- **`STYLE_RULES` im KI-Prompt**: Jeder Artikel-Generierungs-Prompt bekommt die Stilregeln in Kurzform — direkter Fakteneinstieg, variierende Satzlängen, keine Füllsätze, keine verbotenen Adjektive
+- **KI-Floskel-Blockliste im Compliance-Test**: „atemberaubend", „hier ein Überblick", „Fazit:", „zusammenfassend" etc. + Emoji-Verbot im Fließtext — Verstöße lassen `npm test` fehlschlagen
+
+### Geändert
+- **CLAUDE.md**: Schreibstil-Sektion mit den 8 wichtigsten Verboten verankert
+- **Fallback-Artikel**: zwei „Hier ein Überblick"-Floskeln durch direkte Fakteneinstiege ersetzt (vom neuen Test gefunden)
+
+---
+
 ## [2.8.0] — 2026-07-17 · Inhaltlicher Komplett-Review: Wahrheitspflicht & Neutralität erzwungen
 
 ### Geändert (Content — absolute Priorität)

@@ -164,7 +164,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
   const data: Record<ArticleType, Omit<Article, 'readingTimeMin' | 'generatedAt' | 'featuredCards'>> = {
     markt: {
       title: `Pokémon-Markt im Überblick: Preisbewegungen und Trends (${dateLabel})`,
-      intro: 'Der Pokémon-Kartenmarkt ist in ständiger Bewegung — und langfristig zeigen die Daten ein wiederkehrendes Muster: Qualität überdauert Hype. Hier ein Überblick zu den strukturellen Marktbewegungen.',
+      intro: 'Langfristig zeigt der Pokémon-Kartenmarkt ein wiederkehrendes Muster: Qualität überdauert Hype. Was hinter den aktuellen Bewegungen steckt.',
       sections: [
         {
           heading: 'Special Illustration Rares dominieren weiterhin',
@@ -260,7 +260,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
     },
     ausblick: {
       title: 'Wochenend-Ausblick: Aktuelle Entwicklungen für Sammler & Investoren',
-      intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket — Käufer haben mehr Zeit zum Stöbern, Verkäufer optimieren ihre Preise. Aktuelle Marktdaten zeigen klare Muster. Hier ein Überblick zu den wichtigsten Entwicklungen.',
+      intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket. Käufer haben mehr Zeit zum Stöbern, Verkäufer passen ihre Preise an — die Marktdaten zeigen dabei wiederkehrende Muster.',
       sections: [
         {
           heading: 'Karten in der Konsolidierungsphase: Aktuelle Daten',
@@ -351,12 +351,23 @@ const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel):
 3. KEINE PERSONA: Keine Ich-Form, kein Erzähler-Name. Impersonale Analyse ("Der Markt zeigt", "Die Daten bestätigen").
 4. QUELLEN: Im sources-Array nur echte, existierende URLs (Cardmarket, Bulbapedia, pokemon.com, Limitless TCG, PSA). Keine erfundenen Links.`;
 
+// Schreibstil-Regeln gegen KI-Klang — Kurzform von .claude/commands/schreibstil.md.
+// Werden jedem Generierungs-Prompt vorangestellt.
+const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen, NICHT nach KI):
+1. Direkt mit einem Fakt, einer Beobachtung oder einem Kontrast einsteigen. VERBOTEN: "Hier ein Überblick", "In der heutigen Zeit", "Tauchen wir ein", Panorama-Sätze.
+2. VERBOTENE Wörter: atemberaubend, revolutionär, bahnbrechend, faszinierend, episch, spektakulär, unglaublich. Stattdessen das konkrete Detail nennen, das den Eindruck erzeugt.
+3. Keine Meta-Kommentare ("In diesem Artikel...", "Zusammenfassend...", "Fazit:"). Kein Absatz endet mit einer Zusammenfassung seiner selbst — er endet mit dem letzten Fakt.
+4. Satzlängen VARIIEREN: kurze Sätze (3-6 Wörter) einstreuen, dann längere. Nicht jeder Absatz gleich lang, nicht immer drei Beispiele.
+5. Faktendichte-Test: Jeder Satz beantwortet Was/Wann/Wie viel/Warum/Woher. Füllsätze ohne Information streichen.
+6. Sparsam: max. eine Doppelpunkt-Konstruktion ("Der Grund: ..."), max. eine rhetorische Frage, Gedankenstriche selten. Keine Emojis im Fließtext (nur in Überschriften wo das Schema sie vorgibt).
+7. Aktiv statt Passiv, Verben statt Substantivierungen ("Preise steigen" statt "Preissteigerungen sind zu verzeichnen").`;
+
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {
   const isRueckblick = type === 'rueckblick';
 
   const persona = isRueckblick
-    ? `Du bist ein Pokémon-TCG-Marktanalyst der einen wöchentlichen Rückblick auf Deutsch schreibt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Geschwätz, klare sachliche Aussagen. Alle Altersgruppen ab 10 Jahren — alles jugendfrei.\n\n${CONTENT_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
-    : `Du bist ein Pokémon-TCG-Marktanalyst der Artikel auf Deutsch verfasst — klar, faktenbasiert und leicht verständlich. Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
+    ? `Du bist ein Pokémon-TCG-Marktanalyst der einen wöchentlichen Rückblick auf Deutsch schreibt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Geschwätz, klare sachliche Aussagen. Alle Altersgruppen ab 10 Jahren — alles jugendfrei.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
+    : `Du bist ein Pokémon-TCG-Marktanalyst der Artikel auf Deutsch verfasst — klar, faktenbasiert und leicht verständlich. Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
 
   const contexts: Record<ArticleType, string> = {
     markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit der auffälligsten Preisveränderung AUS DEN GELIEFERTEN DATEN. Analysiere Trends, nenne Gewinner und Verlierer aus den Daten. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,

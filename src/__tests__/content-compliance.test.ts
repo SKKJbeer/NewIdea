@@ -17,6 +17,12 @@ const FIRST_PERSON = /\b(?:ich|Ich)\b/;
 const PERSONA_NAME = /\bMarco\b/i;
 const BUY_ADVICE =
   /kaufenswert|pflichtkauf|kaufchance|kaufzeitpunkt|jetzt kaufen|jetzt zuschlagen|finger weg|geheimtipp|ich empfehle|solltest (?:du )?(?:jetzt )?kaufen|rendite|% des budgets/i;
+// KI-Floskeln (siehe .claude/commands/schreibstil.md) — Texte müssen menschlich/nüchtern klingen.
+const AI_PHRASES =
+  /atemberaubend|revolutionär|bahnbrechend|faszinierend|spektakulär|hier ein überblick|in der heutigen zeit|tauchen wir|zusammenfassend lässt sich|es ist wichtig zu beachten|abschließend lässt sich|fazit:|in diesem artikel/i;
+// Emojis gehören in Überschriften/Tips (visuelle Anker), nie in den Fließtext.
+// Bewusst nur der moderne Emoji-Block — Kartensymbole wie ●◆★ sind legitime Fachzeichen.
+const EMOJI = /[\u{1F300}-\u{1FAFF}]/u;
 
 // Sammelt alle Fließtext-Felder eines Artikels (ohne die strukturierten highlight-Objekte).
 function articleTexts(article: Omit<Article, 'generatedAt'> | Article): Array<[string, string]> {
@@ -38,6 +44,11 @@ function expectCompliant(label: string, texts: Array<[string, string]>) {
     expect(text, `${label} → ${field}: Erste-Person-Singular verboten`).not.toMatch(FIRST_PERSON);
     expect(text, `${label} → ${field}: Persona-Name verboten`).not.toMatch(PERSONA_NAME);
     expect(text, `${label} → ${field}: Kaufempfehlungs-Vokabular: "${text.match(BUY_ADVICE)?.[0]}"`).not.toMatch(BUY_ADVICE);
+    expect(text, `${label} → ${field}: KI-Floskel (schreibstil.md): "${text.match(AI_PHRASES)?.[0]}"`).not.toMatch(AI_PHRASES);
+    // Emoji-Verbot gilt für Fließtext-Felder — Überschriften (heading) und Tips sind ausgenommen.
+    if (/^(intro|sections\[\d+\]\.content|keyPoints)/.test(field)) {
+      expect(text, `${label} → ${field}: Emoji im Fließtext verboten: "${text.match(EMOJI)?.[0]}"`).not.toMatch(EMOJI);
+    }
   }
 }
 
