@@ -8,30 +8,32 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (v2.1.0)
+## Was gebaut ist (v2.7.2)
 
 | Bereich | Status | Details |
 |---|---|---|
-| Startseite `/` | ✅ Fertig | Kartenpreise, Investment-Scores, Blog-Teaser, Newsletter · ISR 1h |
-| Suche `/suche` | ✅ Fertig | Autocomplete (debounce 320ms), Ergebnisliste mit Preisen |
-| Marktbericht `/marktbericht` | ✅ Fertig | KI-Wochenanalyse, ISR 7 Tage |
-| Blog-Index `/artikel` | ✅ Fertig | 14 Tage, echte Artikel-Titel, Teaser-Texte, ISR 1h |
-| Tagesartikel `/artikel/[date]` | ✅ Fertig | 7 Typen, ISR 24h, KI-generiert + Marco-Fallback |
-| Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO |
+| Startseite `/` | ✅ Fertig | Bloomberg/TradingView Dark Mode, PMI, Fear & Greed, Sparklines, Ticker · ISR 1h |
+| Suche `/suche` | ✅ Fertig | Autocomplete (debounce 320ms), zentrale Filterung leerer Preview-Karten, Dark Dropdown |
+| Marktbericht `/marktbericht` | ✅ Fertig | KI-Wochenanalyse, ISR 1h, Archiv `/marktbericht/archiv` + `/marktbericht/[week]` |
+| Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
+| Tagesartikel `/artikel/[date]` | ✅ Fertig | Selbstheilend (on-demand-Generierung), ISR 24h, KI + Fallback, 404-Fix |
+| Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO, ISR 1h |
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
-| Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth, 3 Tabs: Content / Monitoring / Reels |
+| Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth (timing-safe, fail-closed), 3 Tabs |
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
-| **Portfolio `/portfolio`** | ✅ Fertig | Finance-App-Style Tracker: localStorage, Custom SVG Chart, Live-Preise, P&L, EN/DE/JP/KR |
-| **Reels Studio** | ✅ **Neu** | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
-| Impressum & Datenschutz | ⚠️ Platzhalter | Eckige Klammern noch ersetzen! |
-| Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | CRON_SECRET ✅ gesetzt |
-| Täglicher Cron (08:00 UTC) | ✅ Aktiv | Speichert Preis-Snapshots in Supabase |
+| Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR |
+| Reels Studio | ✅ Fertig | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
+| Design-System | ✅ Fertig | Einheitlicher Dark Mode über alle Seiten, in CLAUDE.md verankert |
+| **Impressum & Datenschutz** | 🔴 **Platzhalter** | **Eckige Klammern = akutes Rechtsrisiko — echte Daten nötig!** |
+| Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | Marktbericht + Newsletter-Draft, CRON_SECRET ✅ |
+| Täglicher Cron (08:00 UTC) | ✅ Aktiv | Preis-Snapshots + Publish-Artikel (So/Do), verwaiste Crons entfernt |
 | Supabase Preis-Snapshots | ✅ Aktiv | Sammelt täglich echte Daten seit Inbetriebnahme |
 | i18n DE/EN | ✅ Fertig | Cookie-basiert, NavBar-Umschalter |
-| SEO | ✅ Fertig | JSON-LD, Sitemap, robots.txt, OpenGraph |
+| SEO | ✅ Fertig | JSON-LD, Sitemap (inkl. Artikel/Guides/Berichte), robots.txt, OpenGraph |
+| Tests | ✅ 73 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht |
 | Newsletter-System (Beehiiv) | ⏸ Bereit | Code fertig — `BEEHIIV_API_KEY` noch nicht gesetzt |
 | Social-Media (Buffer) | ⏸ Bereit | Code fertig — `BUFFER_ACCESS_TOKEN` noch nicht gesetzt |
-| Affiliate-Links | ⚠️ Standard-URLs | Eigene Links in Vercel noch nicht eingetragen |
+| Affiliate-Links | ⚠️ Standard-URLs | Eigene Links in Vercel noch nicht eingetragen (0 € Provision aktiv) |
 
 ---
 
@@ -46,6 +48,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ Gesetzt (rotieren falls noch nicht gemacht!) |
 | `NEXT_PUBLIC_SITE_URL` | ✅ Gesetzt |
 | `STUDIO_PASSWORD` | ✅ Gesetzt |
+| `ANTHROPIC_MODEL` | ⚪ Optional (überschreibt Model-ID, Default `claude-opus-4-8`) |
 | `BEEHIIV_API_KEY` | ❌ Fehlt |
 | `BEEHIIV_PUBLICATION_ID` | ❌ Fehlt |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ❌ Eigener Affiliate-Link fehlt |
@@ -120,7 +123,14 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.5.2 | Datenintegrität: Archiv-Disclaimer, Persona-Bereinigung, erfundene Daten entfernt |
 | v2.5.3 | Guides + Fallback-Preise bereinigt, CLAUDE.md-Regeln permanent verankert |
 | v2.5.4 | Newsletter-Formular global von allen Seiten entfernt (Guides, Marktbericht, Wochenberichte) |
+| v2.6.0 | Einheitliches Dark Mode Design auf allen Seiten + Komponenten, in CLAUDE.md verankert |
+| v2.6.1 | Portfolio Dark Mode + negativer Kaufpreis blockiert |
+| v2.6.2 | Portfolio: P&L-Anzeige an Zeitraum-Selektor gekoppelt |
+| v2.7.0 | Code-Review: timing-safe Auth, fail-closed, keine Fehler-Leaks, Median-Preise, Fetch-Timeouts |
+| v2.7.1 | Artikel-Seite selbstheilend (on-demand) + 404-Fix vor 12:00 UTC |
+| v2.7.2 | Suche filtert leere Preview-Karten zentral; Such-Dropdown dark |
+| v2.7.3 | Technisches Aufräumen: verwaiste Crons entfernt, Sitemap erweitert, Karten-Detail ISR, STATUS aktuell |
 
 ---
 
-*Zuletzt aktualisiert: v2.5.4 — 23. Juni 2026*
+*Zuletzt aktualisiert: v2.7.3 — 28. Juni 2026*

@@ -13,6 +13,11 @@ import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
+// ISR: Karten-Detailseite pro Karte 1h cachen statt bei jedem Request neu zu rendern.
+// Reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots — der `after()`-Hook
+// schreibt dann höchstens einmal pro Stunde pro Karte statt bei jedem Aufruf.
+export const revalidate = 3600;
+
 interface Props {
   params: Promise<{ id: string }>;
 }

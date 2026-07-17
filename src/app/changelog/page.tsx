@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.7.3',
+    date: '28. Juni 2026',
+    label: 'Technisches Aufräumen: Crons, Sitemap, ISR',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Verwaiste Cron-Jobs entfernt (Mittwochs-Artikel war unerreichbar, Montags-Rückblick redundant)' },
+      { type: 'changed', text: 'Sitemap um Guides, Artikel und Marktberichte erweitert — bessere SEO-Crawlbarkeit' },
+      { type: 'changed', text: 'Karten-Detailseite auf ISR (1h) — weniger TCG-API-Last und redundante Snapshots' },
+      { type: 'changed', text: 'STATUS.md auf aktuellen Stand gebracht' },
+    ],
+  },
+  {
     version: '2.7.2',
     date: '28. Juni 2026',
     label: 'Suche: keine leeren Karten ohne Bild/Preis mehr',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Leere Preview-Karten (kein Bild/Preis) werden aus Suche & Ergebnissen gefiltert — zentral an einer Stelle' },
       { type: 'fixed',   text: 'Such-Dropdown auf Dark Mode umgestellt (war noch weiß)' },

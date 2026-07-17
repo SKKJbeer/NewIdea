@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.7.3] — 2026-06-28 · Technisches Aufräumen: Crons, Sitemap, ISR
+
+### Behoben
+- **Verwaiste Cron-Jobs entfernt**: `weekly-article` (Mittwoch) generierte Artikel mit unerreichbarem Datum (kein Publish-Tag → 404); `weekly-recap` (Montag) war redundant zum Daily-Cron. Beide Routen + vercel.json-Einträge entfernt — Artikelgenerierung läuft jetzt sauber nur über den Daily-Cron (So/Do) + selbstheilende Seite
+
+### Geändert
+- **Sitemap erweitert**: Enthält jetzt Guides, Artikel (Publish-Daten + gespeicherte), Marktbericht-Archiv und alle Wochenberichte — bessere Crawlbarkeit der wertvollsten Seiten
+- **Karten-Detailseite auf ISR (1h)**: Statt bei jedem Request neu zu rendern — reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots (höchstens 1×/h pro Karte)
+- **STATUS.md aktualisiert**: „Was gebaut ist" auf echten Stand (v2.7.2) gebracht, Versions-Log ergänzt, Env-Tabelle korrigiert
+
+---
+
 ## [2.7.2] — 2026-06-28 · Suche: keine leeren Karten ohne Bild/Preis mehr
 
 ### Behoben

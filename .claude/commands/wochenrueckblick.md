@@ -35,16 +35,17 @@ Finanz-Geschwätz. Unbekannte Pokémon immer kurz in Klammern beschreiben
 
 | Was | Details |
 |-----|---------|
-| Cron-Endpoint | `GET /api/cron/weekly-recap` |
-| Zeitplan | Montag 06:00 UTC (vercel.json) |
+| Cron-Endpoint | `GET /api/cron/daily` (läuft täglich 08:00 UTC, generiert an So/Do den Publish-Artikel) |
+| Zeitplan | Sonntag = Wochenrückblick, Donnerstag = rotierender Artikel (vercel.json) |
 | Persistenz | Supabase `articles`-Tabelle (date, type, content JSONB) |
 | Cache | `generateArticle()` prüft Supabase zuerst → sofortige Antwort bei erneuten Aufrufen |
+| Selbstheilung | `/artikel/[date]` generiert on-demand nach, falls der Cron ausfiel — unabhängig vom Cron |
 | Archiv | Alle vergangenen Rückblicke auf `/artikel/YYYY-MM-DD` abrufbar (kein Zeitlimit) |
 
 ## Manuell triggern
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" https://pokemarketintelligence.com/api/cron/weekly-recap
+curl -H "Authorization: Bearer $CRON_SECRET" https://pokemarketintelligence.com/api/cron/daily
 ```
 
 ## Supabase-Tabelle (falls noch nicht existiert)
