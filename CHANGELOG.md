@@ -7,6 +7,27 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.8.0] — 2026-07-17 · Inhaltlicher Komplett-Review: Wahrheitspflicht & Neutralität erzwungen
+
+### Geändert (Content — absolute Priorität)
+- **`static-articles.ts` komplett bereinigt**: Alle hardcodierten Preiszahlen aus Fließtext und keyPoints entfernt, erfundene Markt-Events gestrichen (u.a. eine fiktive Wochen-Preisbewegung, "Jahreshoch"-Behauptungen, erfundene Social-Media-Spikes), alle impliziten Kaufempfehlungen neutralisiert ("beste Kaufchance", "zahlt morgen mehr als heute")
+- **10 unerreichbare statische Artikel gelöscht**: Artikel auf Mo/Di/Mi/Fr/Sa-Daten waren seit der So/Do-Regel tote 404-Inhalte
+- **`fallbackArticle` bereinigt**: Budget-Aufteilungs-Ratschläge (60/30/10), Renditeversprechen ("100–200 % in 3–5 Jahren"), erfundene Druckraten (1:120) und fiktive Preisverläufe entfernt — jetzt reine Marktstruktur-Analyse
+- **`guides.ts` bereinigt**: "Wer 3–5 Jahre wartet, hat fast immer Gewinn gemacht" und ähnliche Renditeversprechen entfernt, Kauf-Timing-Tipps neutralisiert, Preiszahlen durch qualitative Formulierungen ersetzt, Investment-Framing zu Marktwissen-Framing
+- **KI-Prompt gehärtet**: `CONTENT_RULES` werden jedem Generierungs-Prompt vorangestellt — Zahlen nur aus gelieferten Daten, keine erfundenen Events/Druckraten/Illustratoren, keine Anlageberatung, keine Ich-Form, nur echte Quellen-URLs
+
+### Neu
+- **Compliance-Test-Suite** (`content-compliance.test.ts`): erzwingt maschinell — keine Preiszahlen im Fließtext, keine Ich-Form, kein Persona-Name, kein Kaufempfehlungs-Vokabular, statische Artikel nur an So/Do, isStatic-Pflicht. Verstöße lassen `npm test` fehlschlagen
+
+### Geändert (Design & Usability)
+- **`/changelog`, `/impressum`, `/datenschutz`**: von Light auf das Dark-Design-System umgestellt
+- **Studio, Monitoring, ReelsStudio**: Admin-Bereich ebenfalls vollständig auf Dark-Tokens
+- **PriceChart/PortfolioChart-Tooltips + AffiliateBar**: auf Design-Tokens vereinheitlicht
+- **Tote Komponenten gelöscht**: MoverList, MarketSummary, NewsletterSignup (nirgends mehr verwendet)
+- **Artikel-Hinweistext korrigiert**: "täglich um 08:00 Uhr" → "sonntags und donnerstags" (stimmte seit der So/Do-Regel nicht mehr)
+
+---
+
 ## [2.7.3] — 2026-06-28 · Technisches Aufräumen: Crons, Sitemap, ISR
 
 ### Behoben

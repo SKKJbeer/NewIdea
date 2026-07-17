@@ -30,14 +30,14 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0d0d18] flex items-center justify-center px-4">
       <div className="w-full max-w-xs">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-8 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 mx-auto mb-4">
             <Activity size={22} className="text-violet-600" />
           </div>
-          <h1 className="text-lg font-black text-gray-900 mb-1">Monitoring</h1>
-          <p className="text-xs text-gray-400 mb-6">Nur für interne Nutzung</p>
+          <h1 className="text-lg font-black text-slate-200 mb-1">Monitoring</h1>
+          <p className="text-xs text-slate-500 mb-6">Nur für interne Nutzung</p>
           <form onSubmit={submit} className="space-y-3">
             <input
               type="password"
@@ -45,7 +45,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
               onChange={(e) => setPw(e.target.value)}
               placeholder="Passwort"
               autoFocus
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-100"
+              className="w-full rounded-xl border border-[#2a2a3a] px-4 py-2.5 text-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-100"
             />
             {error && <p className="text-xs text-rose-600">{error}</p>}
             <button
@@ -59,7 +59,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
           </form>
         </div>
         <p className="text-center mt-4">
-          <Link href="/" className="text-xs text-gray-400 hover:text-violet-600">← Zurück zur Website</Link>
+          <Link href="/" className="text-xs text-slate-500 hover:text-violet-600">← Zurück zur Website</Link>
         </p>
       </div>
     </div>
@@ -77,7 +77,7 @@ export default function MonitoringPage() {
   }, []);
 
   if (!checked) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d0d18] flex items-center justify-center">
       <Loader2 size={20} className="animate-spin text-violet-600" />
     </div>
   );
@@ -85,7 +85,7 @@ export default function MonitoringPage() {
   if (!authed) return <PasswordGate onAuth={() => setAuthed(true)} />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0d0d18]">
       <header className="sticky top-0 z-40 bg-gradient-to-r from-violet-700 to-indigo-800 text-white shadow-md">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export default function MonitoringPage() {
             <h1 className="text-sm font-black">Monitoring</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/studio" className="bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 text-xs transition-colors">
+            <Link href="/studio" className="bg-[#13131e]/10 hover:bg-[#13131e]/20 rounded-lg px-3 py-1.5 text-xs transition-colors">
               Studio →
             </Link>
             <button
@@ -101,7 +101,7 @@ export default function MonitoringPage() {
                 await fetch('/api/studio-auth', { method: 'DELETE' });
                 setAuthed(false);
               }}
-              className="bg-white/10 hover:bg-white/20 rounded-lg px-2.5 py-1.5 text-xs transition-colors"
+              className="bg-[#13131e]/10 hover:bg-[#13131e]/20 rounded-lg px-2.5 py-1.5 text-xs transition-colors"
               title="Abmelden"
             >
               <Lock size={11} />

@@ -150,16 +150,16 @@ export function ReelsStudio() {
   return (
     <div className="space-y-4">
       {/* Step indicator */}
-      <div className="flex items-center gap-1 text-xs text-gray-400">
+      <div className="flex items-center gap-1 text-xs text-slate-500">
         {(['pick', 'trim', 'done'] as const).map((s, i) => {
           const labels = ['Upload', 'Schnitt', 'Reel'];
           const active = step === s || (s === 'pick' && step === 'uploading') || (s === 'trim' && step === 'processing');
           const done = (s === 'pick' && ['trim', 'processing', 'done'].includes(step)) || (s === 'trim' && step === 'done');
           return (
             <div key={s} className="flex items-center gap-1">
-              {i > 0 && <div className="w-6 h-px bg-gray-200" />}
+              {i > 0 && <div className="w-6 h-px bg-[#2a2a3a]" />}
               <span className={`px-2 py-0.5 rounded-full font-semibold transition-colors ${
-                done ? 'bg-green-100 text-green-700' : active ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-400'
+                done ? 'bg-green-100 text-green-700' : active ? 'bg-violet-100 text-violet-700' : 'bg-[#1a1a28] text-slate-500'
               }`}>
                 {labels[i]}
               </span>
@@ -172,13 +172,13 @@ export function ReelsStudio() {
       {step === 'pick' && (
         <div
           onClick={() => fileRef.current?.click()}
-          className="border-2 border-dashed border-gray-200 hover:border-violet-300 rounded-2xl p-10 text-center cursor-pointer transition-colors group"
+          className="border-2 border-dashed border-[#2a2a3a] hover:border-violet-300 rounded-2xl p-10 text-center cursor-pointer transition-colors group"
         >
           <div className="w-12 h-12 bg-violet-50 group-hover:bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-colors">
             <Upload size={22} className="text-violet-500" />
           </div>
-          <p className="text-sm font-semibold text-gray-800">Pack-Opening-Video hochladen</p>
-          <p className="text-xs text-gray-400 mt-1">MP4, MOV, AVI — max. 500 MB</p>
+          <p className="text-sm font-semibold text-slate-200">Pack-Opening-Video hochladen</p>
+          <p className="text-xs text-slate-500 mt-1">MP4, MOV, AVI — max. 500 MB</p>
           <input
             ref={fileRef}
             type="file"
@@ -191,20 +191,20 @@ export function ReelsStudio() {
 
       {/* Step: Uploading — show local preview while uploading */}
       {step === 'uploading' && (
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="bg-[#13131e] border border-[#2a2a3a] rounded-2xl overflow-hidden">
           {localPreviewUrl && (
             <video src={localPreviewUrl} controls playsInline muted className="w-full max-h-52 object-contain bg-black" />
           )}
           <div className="p-5 text-center">
             <Loader2 size={20} className="animate-spin text-violet-600 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-gray-800 mb-3">Video wird hochgeladen…</p>
-            <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+            <p className="text-sm font-semibold text-slate-200 mb-3">Video wird hochgeladen…</p>
+            <div className="bg-[#1a1a28] rounded-full h-2 overflow-hidden">
               <div
                 className="bg-violet-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-2">{uploadProgress}%</p>
+            <p className="text-xs text-slate-500 mt-2">{uploadProgress}%</p>
           </div>
         </div>
       )}
@@ -225,21 +225,21 @@ export function ReelsStudio() {
             </div>
           )}
 
-          <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
+          <div className="bg-[#13131e] border border-[#2a2a3a] rounded-2xl p-5 space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-violet-100 rounded-xl flex items-center justify-center shrink-0">
                 <Scissors size={15} className="text-violet-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900">Schnitt-Einstellungen</p>
-                <p className="text-xs text-gray-400">Video abspielen · Moment pausieren · Position übernehmen</p>
+                <p className="text-sm font-bold text-slate-200">Schnitt-Einstellungen</p>
+                <p className="text-xs text-slate-500">Video abspielen · Moment pausieren · Position übernehmen</p>
               </div>
             </div>
 
             {/* Start position */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-gray-600 flex items-center gap-1">
+                <label className="text-xs font-semibold text-slate-400 flex items-center gap-1">
                   <Timer size={11} /> Startposition
                 </label>
                 <button
@@ -257,9 +257,9 @@ export function ReelsStudio() {
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                   placeholder="leer = letzte Sekunden"
-                  className="flex-1 text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:border-violet-400"
+                  className="flex-1 text-xs border border-[#2a2a3a] rounded-xl px-3 py-2 focus:outline-none focus:border-violet-400"
                 />
-                <span className="text-xs text-gray-400 shrink-0 w-16 text-right">
+                <span className="text-xs text-slate-500 shrink-0 w-16 text-right">
                   {startTime !== '' ? `ab ${formatTime(parseFloat(startTime))}` : 'vom Ende'}
                 </span>
               </div>
@@ -268,7 +268,7 @@ export function ReelsStudio() {
             {/* Duration */}
             <div>
               <div className="flex justify-between text-xs mb-2">
-                <span className="font-semibold text-gray-600">Länge</span>
+                <span className="font-semibold text-slate-400">Länge</span>
                 <span className="font-bold text-violet-700">{clipDuration}s</span>
               </div>
               <input
@@ -280,22 +280,22 @@ export function ReelsStudio() {
                 onChange={(e) => setClipDuration(Number(e.target.value))}
                 className="w-full accent-violet-600"
               />
-              <div className="flex justify-between text-[10px] text-gray-300 mt-1">
+              <div className="flex justify-between text-[10px] text-slate-600 mt-1">
                 <span>10s</span><span>60s</span>
               </div>
             </div>
 
             {/* Moment description */}
             <div>
-              <label className="text-xs font-semibold text-gray-600 block mb-1.5">
-                Moment beschreiben <span className="font-normal text-gray-400">(optional — verbessert Caption)</span>
+              <label className="text-xs font-semibold text-slate-400 block mb-1.5">
+                Moment beschreiben <span className="font-normal text-slate-500">(optional — verbessert Caption)</span>
               </label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="z.B. Pokémon 151 Boosterbox — Pull von Charizard ex"
-                className="w-full text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:border-violet-400"
+                className="w-full text-xs border border-[#2a2a3a] rounded-xl px-3 py-2 focus:outline-none focus:border-violet-400"
               />
             </div>
 
@@ -324,15 +324,15 @@ export function ReelsStudio() {
 
       {/* Step: Processing */}
       {step === 'processing' && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
+        <div className="bg-[#13131e] border border-[#2a2a3a] rounded-2xl p-8 text-center">
           <div className="w-12 h-12 bg-violet-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Loader2 size={22} className="animate-spin text-violet-600" />
           </div>
-          <p className="text-sm font-bold text-gray-900 mb-1">Reel wird erstellt…</p>
-          <p className="text-xs text-gray-400">FFmpeg schneidet, croppt und rendert — kann 30–60 Sek dauern</p>
+          <p className="text-sm font-bold text-slate-200 mb-1">Reel wird erstellt…</p>
+          <p className="text-xs text-slate-500">FFmpeg schneidet, croppt und rendert — kann 30–60 Sek dauern</p>
           <div className="mt-4 space-y-2">
             {['Video schneiden', 'Auf 9:16 croppen', 'Wasserzeichen hinzufügen', 'Caption generieren'].map((s) => (
-              <div key={s} className="flex items-center gap-2 text-xs text-gray-500 justify-center">
+              <div key={s} className="flex items-center gap-2 text-xs text-slate-500 justify-center">
                 <Loader2 size={10} className="animate-spin text-violet-400 shrink-0" />
                 {s}
               </div>
@@ -344,10 +344,10 @@ export function ReelsStudio() {
       {/* Step: Done */}
       {step === 'done' && result && (
         <div className="space-y-4">
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-2">
+          <div className="bg-[#13131e] border border-[#2a2a3a] rounded-2xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#1e1e30] flex items-center gap-2">
               <Play size={14} className="text-violet-600" />
-              <p className="text-sm font-bold text-gray-900">Reel-Vorschau</p>
+              <p className="text-sm font-bold text-slate-200">Reel-Vorschau</p>
             </div>
             {result.reelUrl ? (
               <div className="p-4 flex justify-center">
@@ -360,20 +360,20 @@ export function ReelsStudio() {
                 />
               </div>
             ) : (
-              <div className="p-6 text-center text-xs text-gray-400">Vorschau nicht verfügbar</div>
+              <div className="p-6 text-center text-xs text-slate-500">Vorschau nicht verfügbar</div>
             )}
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-2">
+          <div className="bg-[#13131e] border border-[#2a2a3a] rounded-2xl p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-bold text-gray-900">Instagram-Caption</p>
-              <span className="text-[10px] text-gray-400">{caption.length} Zeichen</span>
+              <p className="text-sm font-bold text-slate-200">Instagram-Caption</p>
+              <span className="text-[10px] text-slate-500">{caption.length} Zeichen</span>
             </div>
             <textarea
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               rows={5}
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400 resize-none"
+              className="w-full text-sm border border-[#2a2a3a] rounded-xl px-3 py-2.5 focus:outline-none focus:border-violet-400 resize-none"
             />
           </div>
 
@@ -403,7 +403,7 @@ export function ReelsStudio() {
             </button>
           )}
 
-          <button onClick={reset} className="w-full flex items-center justify-center gap-1.5 text-xs text-gray-400 hover:text-violet-600 py-2 transition-colors">
+          <button onClick={reset} className="w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-violet-600 py-2 transition-colors">
             <RefreshCw size={12} /> Neues Video
           </button>
         </div>

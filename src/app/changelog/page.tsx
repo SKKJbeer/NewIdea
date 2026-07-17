@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.8.0',
+    date: '17. Juli 2026',
+    label: 'Inhaltlicher Komplett-Review: Wahrheitspflicht & Neutralität erzwungen',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Alle Artikel & Guides bereinigt: keine Preiszahlen im Fließtext, keine erfundenen Markt-Events, keine Kaufempfehlungen oder Renditeversprechen' },
+      { type: 'changed', text: '10 unerreichbare statische Artikel entfernt (lagen auf Nicht-Publish-Tagen)' },
+      { type: 'changed', text: 'KI-Prompt gehärtet: Zahlen nur aus echten Daten, keine Anlageberatung, keine erfundenen Fakten' },
+      { type: 'new',     text: 'Compliance-Test-Suite erzwingt die Content-Regeln maschinell bei jedem Build' },
+      { type: 'changed', text: 'Changelog, Impressum, Datenschutz und Admin-Bereich auf Dark-Design umgestellt' },
+      { type: 'fixed',   text: 'Artikel-Hinweistext korrigiert: Erscheinung sonntags + donnerstags statt "täglich"' },
+    ],
+  },
+  {
     version: '2.7.3',
     date: '28. Juni 2026',
     label: 'Technisches Aufräumen: Crons, Sitemap, ISR',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Verwaiste Cron-Jobs entfernt (Mittwochs-Artikel war unerreichbar, Montags-Rückblick redundant)' },
       { type: 'changed', text: 'Sitemap um Guides, Artikel und Marktberichte erweitert — bessere SEO-Crawlbarkeit' },
@@ -569,19 +583,19 @@ const RELEASES = [
 ];
 
 const TYPE_STYLE = {
-  new:     { icon: Plus,       color: 'text-green-600',  bg: 'bg-green-50',  label: 'Neu' },
-  changed: { icon: RefreshCw,  color: 'text-blue-600',   bg: 'bg-blue-50',   label: 'Geändert' },
-  fixed:   { icon: Wrench,     color: 'text-orange-600', bg: 'bg-orange-50', label: 'Behoben' },
+  new:     { icon: Plus,       color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Neu' },
+  changed: { icon: RefreshCw,  color: 'text-blue-400',    bg: 'bg-blue-500/10',    label: 'Geändert' },
+  fixed:   { icon: Wrench,     color: 'text-amber-400',   bg: 'bg-amber-500/10',   label: 'Behoben' },
 };
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-gray-400 hover:text-white text-xs mb-5 transition-colors">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
             <ArrowLeft size={12} /> Zur Startseite
           </Link>
           <div className="flex items-center gap-3 mb-3">
@@ -589,35 +603,35 @@ export default function ChangelogPage() {
               <GitMerge size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Release-History</p>
-              <h1 className="text-2xl font-black">Changelog</h1>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Release-History</p>
+              <h1 className="text-2xl font-black text-white">Changelog</h1>
             </div>
           </div>
-          <p className="text-gray-400 text-sm">
+          <p className="text-slate-400 text-sm">
             Alle Versionen von PokéMarket Intelligence — was wann hinzugekommen ist.
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 pb-16 -mt-4 space-y-4">
+      <main className="max-w-2xl mx-auto px-4 pb-16 pt-6 space-y-4">
         {RELEASES.map((release) => (
-          <div key={release.version} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-50 flex items-start justify-between gap-3">
+          <div key={release.version} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#1e1e30] flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-black text-gray-900 text-base">v{release.version}</span>
+                  <span className="font-black text-white text-base">v{release.version}</span>
                   {release.isLatest && (
                     <span className="text-[10px] font-bold bg-violet-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wide">
                       Aktuell
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-gray-700">{release.label}</p>
+                <p className="text-sm font-semibold text-slate-300">{release.label}</p>
               </div>
-              <span className="text-xs text-gray-400 shrink-0 pt-0.5">{release.date}</span>
+              <span className="text-xs text-slate-600 shrink-0 pt-0.5">{release.date}</span>
             </div>
 
-            <ul className="divide-y divide-gray-50">
+            <ul className="divide-y divide-[#1e1e30]">
               {release.changes.map((change, i) => {
                 const style = TYPE_STYLE[change.type as keyof typeof TYPE_STYLE];
                 const Icon = style.icon;
@@ -626,7 +640,7 @@ export default function ChangelogPage() {
                     <div className={`w-5 h-5 rounded-full ${style.bg} flex items-center justify-center shrink-0 mt-0.5`}>
                       <Icon size={10} className={style.color} />
                     </div>
-                    <span className="text-sm text-gray-700 leading-relaxed">{change.text}</span>
+                    <span className="text-sm text-slate-400 leading-relaxed">{change.text}</span>
                   </li>
                 );
               })}
@@ -634,8 +648,8 @@ export default function ChangelogPage() {
           </div>
         ))}
 
-        <p className="text-center text-xs text-gray-400 pt-2">
-          Vollständiger Verlauf: <a href="https://github.com/SKKJbeer/NewIdea/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" className="text-violet-500 hover:text-violet-700 underline">CHANGELOG.md auf GitHub</a>
+        <p className="text-center text-xs text-slate-600 pt-2">
+          Vollständiger Verlauf: <a href="https://github.com/SKKJbeer/NewIdea/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">CHANGELOG.md auf GitHub</a>
         </p>
       </main>
     </div>

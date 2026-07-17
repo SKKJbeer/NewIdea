@@ -9,21 +9,21 @@ export const metadata: Metadata = {
 
 export default function Datenschutz() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f]">
       <div className="max-w-2xl mx-auto px-4 py-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-violet-600 hover:text-violet-800 text-sm mb-8"
+          className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-8"
         >
           <ArrowLeft size={16} />
           Zurück zur Startseite
         </Link>
 
-        <h1 className="text-3xl font-black text-gray-900 mb-8">Datenschutzerklärung</h1>
+        <h1 className="text-3xl font-black text-slate-200 mb-8">Datenschutzerklärung</h1>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6 text-gray-700 text-sm leading-relaxed">
+        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 space-y-6 text-slate-400 text-sm leading-relaxed">
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">1. Verantwortlicher</h2>
+            <h2 className="font-bold text-slate-200 mb-2">1. Verantwortlicher</h2>
             <p>
               Verantwortlicher im Sinne der DSGVO ist:<br />
               [Dein Vor- und Nachname]<br />
@@ -34,7 +34,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">2. Hosting</h2>
+            <h2 className="font-bold text-slate-200 mb-2">2. Hosting</h2>
             <p>
               Diese Website wird bei <strong>Vercel Inc.</strong> (340 Pine Street, Suite 701, San Francisco,
               CA 94104, USA) gehostet. Beim Besuch dieser Website werden durch Vercel automatisch
@@ -46,7 +46,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">3. Newsletter (Beehiiv)</h2>
+            <h2 className="font-bold text-slate-200 mb-2">3. Newsletter (Beehiiv)</h2>
             <p>
               Wenn du dich für unseren Newsletter anmeldest, wird deine E-Mail-Adresse an
               <strong> Beehiiv</strong> (Morning Brew LLC, USA) übermittelt und dort gespeichert.
@@ -56,7 +56,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">4. Kartenpreisdaten (Pokémon TCG API)</h2>
+            <h2 className="font-bold text-slate-200 mb-2">4. Kartenpreisdaten (Pokémon TCG API)</h2>
             <p>
               Kartendaten und Preise werden über die <strong>Pokémon TCG API</strong> (TCGdex) abgerufen.
               Dabei werden keine personenbezogenen Daten übertragen.
@@ -64,7 +64,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">5. Affiliate-Links</h2>
+            <h2 className="font-bold text-slate-200 mb-2">5. Affiliate-Links</h2>
             <p>
               Diese Website enthält Affiliate-Links zu Cardmarket, Amazon und weiteren Partnern.
               Wenn du auf einen Affiliate-Link klickst, wird dies durch den jeweiligen Anbieter
@@ -74,7 +74,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">6. Deine Rechte (Art. 15–22 DSGVO)</h2>
+            <h2 className="font-bold text-slate-200 mb-2">6. Deine Rechte (Art. 15–22 DSGVO)</h2>
             <p>Du hast das Recht auf:</p>
             <ul className="list-disc list-inside mt-1 space-y-1">
               <li>Auskunft über deine gespeicherten Daten (Art. 15 DSGVO)</li>
@@ -91,7 +91,7 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">7. Cookies</h2>
+            <h2 className="font-bold text-slate-200 mb-2">7. Cookies</h2>
             <p>
               Diese Website verwendet keine eigenen Cookies zur Nachverfolgung oder Analyse.
               Affiliate-Links können durch externe Anbieter Cookies setzen (siehe Punkt 5).
@@ -99,14 +99,14 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">8. Keine Analysedienste</h2>
+            <h2 className="font-bold text-slate-200 mb-2">8. Keine Analysedienste</h2>
             <p>
               Diese Website verwendet kein Google Analytics, keine Tracking-Pixel und keine
               sozialen Plugins, die Daten an Dritte übermitteln.
             </p>
           </section>
 
-          <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">
+          <p className="text-xs text-slate-600 pt-4 border-t border-[#1e1e30]">
             Stand: Juni 2026 —
             Trage deine persönlichen Daten in die eckigen Klammern ein, bevor diese Seite live geht.
           </p>

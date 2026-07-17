@@ -28,9 +28,9 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-lg px-3 py-2 text-sm">
-      <p className="text-gray-500 text-xs">{label}</p>
-      <p className="font-bold text-gray-900">{payload[0].value.toFixed(2)} €</p>
+    <div className="bg-[#13131e] border border-[#2a2a3a] rounded-xl shadow-lg px-3 py-2 text-sm">
+      <p className="text-slate-500 text-xs">{label}</p>
+      <p className="font-bold text-slate-200">{payload[0].value.toFixed(2)} €</p>
     </div>
   );
 }

@@ -122,7 +122,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
         {!article ? (
           <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-8 text-center">
             <p className="text-slate-400 font-semibold">Artikel noch nicht verfügbar</p>
-            <p className="text-slate-600 text-sm mt-1">Dieser Artikel wird täglich um 08:00 Uhr automatisch erstellt.</p>
+            <p className="text-slate-600 text-sm mt-1">Neue Artikel erscheinen sonntags und donnerstags — bitte später erneut vorbeischauen.</p>
           </div>
         ) : (
           <>

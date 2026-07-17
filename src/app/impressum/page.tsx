@@ -9,21 +9,21 @@ export const metadata: Metadata = {
 
 export default function Impressum() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0a0a0f]">
       <div className="max-w-2xl mx-auto px-4 py-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-violet-600 hover:text-violet-800 text-sm mb-8"
+          className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-8"
         >
           <ArrowLeft size={16} />
           Zurück zur Startseite
         </Link>
 
-        <h1 className="text-3xl font-black text-gray-900 mb-8">Impressum</h1>
+        <h1 className="text-3xl font-black text-slate-200 mb-8">Impressum</h1>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6 text-gray-700 text-sm leading-relaxed">
+        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 space-y-6 text-slate-400 text-sm leading-relaxed">
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">Angaben gemäß § 5 TMG</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Angaben gemäß § 5 TMG</h2>
             <p>
               [Dein Vor- und Nachname]<br />
               [Straße und Hausnummer]<br />
@@ -32,12 +32,12 @@ export default function Impressum() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">Kontakt</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Kontakt</h2>
             <p>E-Mail: [deine@email.de]</p>
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)</h2>
             <p>
               [Dein Vor- und Nachname]<br />
               [Straße und Hausnummer]<br />
@@ -46,7 +46,7 @@ export default function Impressum() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">Haftungsausschluss</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Haftungsausschluss</h2>
             <h3 className="font-semibold mt-3 mb-1">Haftung für Inhalte</h3>
             <p>
               Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Die Inhalte
@@ -60,14 +60,14 @@ export default function Impressum() {
           </section>
 
           <section>
-            <h2 className="font-bold text-gray-900 mb-2">Affiliate-Hinweis</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Affiliate-Hinweis</h2>
             <p>
               Diese Website enthält Affiliate-Links. Wenn du über diese Links einkaufst, erhalten
               wir eine kleine Provision — für dich entstehen dabei keine Mehrkosten.
             </p>
           </section>
 
-          <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">
+          <p className="text-xs text-slate-600 pt-4 border-t border-[#1e1e30]">
             Bitte trage deine persönlichen Kontaktdaten in die eckigen Klammern ein,
             bevor diese Seite live geht.
           </p>

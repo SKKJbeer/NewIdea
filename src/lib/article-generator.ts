@@ -133,8 +133,8 @@ const RUECKBLICK_SCHEMA = `{
       "cardRef": "Diese Karte"
     },
     {
-      "heading": "😅 Der Fehler der Woche — damit du ihn nicht machst",
-      "content": "Ein typischer Anfänger- oder Fortgeschrittenen-Fehler der diese Woche im Markt sichtbar wurde. Humorvoll erklärt, aber mit echtem Lernwert.",
+      "heading": "😅 Marktmuster der Woche",
+      "content": "Ein typisches, allgemein bekanntes Marktverhaltensmuster (z.B. Hype-Käufe, Ankereffekt, Panikverkäufe) — humorvoll erklärt, aber mit echtem Lernwert. KEINE erfundenen konkreten Preisbewegungen als Beispiel.",
       "cardRef": "Optionale Beispielkarte"
     },
     {
@@ -153,25 +153,30 @@ const RUECKBLICK_SCHEMA = `{
 
 // Vollwertige Evergreen-Artikel als Fallback — sachliche Marktanalyse, keine Persona.
 // Diese laufen wenn kein ANTHROPIC_API_KEY gesetzt ist oder die KI-Generierung scheitert.
-function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: string): Article {
+//
+// PFLICHT-REGELN (CLAUDE.md → Content-Wahrheitspflicht):
+// - KEINE Preiszahlen im Fließtext/keyPoints, keine erfundenen Events/Trajektorien
+// - KEINE Kaufempfehlungen, keine Renditeversprechen, keine Ich-Form
+// Exportiert für den Compliance-Test (content-compliance.test.ts).
+export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: string): Article {
   const meta = ARTICLE_META[type];
 
   const data: Record<ArticleType, Omit<Article, 'readingTimeMin' | 'generatedAt' | 'featuredCards'>> = {
     markt: {
       title: `Pokémon-Markt im Überblick: Preisbewegungen und Trends (${dateLabel})`,
-      intro: 'Der Pokémon-Kartenmarkt schläft nie — wer kurz nicht hinschaut, hat eine Preisbewegung von 40 % verpasst. Qualität schlägt Hype, früher oder später — das zeigen die Daten immer wieder. Hier ein Überblick zu den aktuellen Marktbewegungen.',
+      intro: 'Der Pokémon-Kartenmarkt ist in ständiger Bewegung — und langfristig zeigen die Daten ein wiederkehrendes Muster: Qualität überdauert Hype. Hier ein Überblick zu den strukturellen Marktbewegungen.',
       sections: [
         {
           heading: 'Special Illustration Rares dominieren weiterhin',
-          content: 'SIRs (Special Illustration Rares — das sind die Karten mit dem vollflächigen Kunstwerk ohne Hintergrundbox, erkennbar am goldenen Stern-Symbol) sind seit Scarlet & Violet 2023 die absoluten Hochperformer. Warum? Weil ihre Druckrate extrem niedrig ist — oft 1 Karte auf 80–100 Boosterpacks — und weil die Artworks schlicht atemberaubend sind. Karten wie der Charizard ex SIR aus dem 151-Set oder Mewtu ex haben sich seit ihrem Tiefpunkt kurz nach Release teils verdoppelt. Der Markt zeigt: Diese Karten sind die Klassiker der nächsten Generation.',
+          content: 'SIRs (Special Illustration Rares — das sind die Karten mit dem vollflächigen Kunstwerk ohne Hintergrundbox, erkennbar am goldenen Stern-Symbol) sind seit Scarlet & Violet 2023 die gefragteste moderne Kartenklasse. Warum? Weil ihre Druckrate sehr niedrig ist und die Artworks weit über dem TCG-Standard liegen. Karten wie der Charizard ex SIR aus dem 151-Set oder Mewtu ex zeigen seit ihrem Post-Release-Tiefpunkt eine nachhaltige Erholung — aktuelle Notierungen direkt auf Cardmarket prüfen. Der Markt behandelt diese Karten zunehmend als die Klassiker der nächsten Generation.',
         },
         {
           heading: 'Wer gewinnt, wer verliert — und warum',
-          content: 'Gewinner sind gerade Karten von ikonischen Pokémon (Glurak/Charizard, Pikachu, Mewtu, Evoli/Eevee und seine Entwicklungen), die gleichzeitig aus Sets stammen, die nicht mehr gedruckt werden. Verlierer sind Generic-Ultra-Rares von weniger bekannten Pokémon — da ist der Hype nach Set-Release oft innerhalb von Wochen wieder verpufft. Eine gute Faustregel: Wenn ein Pokémon auch von jemandem erkannt wird, der kaum spielt, hat die Karte langfristig Wertpotenzial.',
+          content: 'Stabil zeigen sich Karten von ikonischen Pokémon (Glurak/Charizard, Pikachu, Mewtu, Evoli/Eevee und seine Entwicklungen), die gleichzeitig aus Sets stammen, die nicht mehr gedruckt werden. Schwächer laufen Generic-Ultra-Rares von weniger bekannten Pokémon — dort verpufft der Hype nach Set-Release oft innerhalb von Wochen. Ein beobachtbares Muster: Wenn ein Pokémon auch von jemandem erkannt wird, der kaum spielt, zeigt die Karte historisch die stabilere Nachfrage.',
         },
         {
           heading: 'Marktphase: Konsolidierung und ihre Bedeutung',
-          content: 'Der Markt befindet sich in einer Konsolidierungsphase — keine wilden Spikes, aber auch keine Panikverkäufe. Solche Phasen sind historisch oft der Boden vor weiteren Bewegungen. Für alle Karten gilt: Nur Near-Mint-Exemplare haben langfristig den vollen Wert — ein Kratzer kostet beim Wiederverkauf oft 30–50 % des Werts.',
+          content: 'Konsolidierungsphasen — keine wilden Spikes, keine Panikverkäufe — sind ein normaler Teil jedes Marktzyklus und historisch oft die Basis vor weiteren Bewegungen. Für alle Karten gilt: Der Zustand bestimmt den Wert maßgeblich. Near-Mint-Exemplare erzielen ein Vielfaches gegenüber Exemplaren mit sichtbaren Gebrauchsspuren.',
         },
       ],
       keyPoints: [
@@ -179,7 +184,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
         'Konsolidierungsphasen sind historisch Vorstufen zur nächsten Bewegung',
         'Zustand ist entscheidend — nur NM behält langfristig den vollen Wert',
       ],
-      tags: ['pokémon marktanalyse', 'special illustration rare', 'tcg preise', 'pokemon investment'],
+      tags: ['pokémon marktanalyse', 'special illustration rare', 'tcg preise', 'pokemon markt'],
     },
     karte: {
       title: 'Karte im Fokus: Charizard ex — Preisentwicklung und Marktanalyse',
@@ -187,7 +192,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
       sections: [
         {
           heading: 'Was diese Karte so besonders macht',
-          content: 'Die Charizard ex Special Illustration Rare aus dem Pokémon 151-Set (Set-Code sv3pt5) zeigt Glurak in einem epischen vollflächigen Kunstwerk, das an die klassischen Originalillustrationen der 90er erinnert. Das 151-Set war eine Hommage an die ersten 151 Pokémon — und dieser Charizard ist die Chase-Card des Sets. Die Druckrate lag bei schätzungsweise 1:120 Packs. Zum Vergleich: 10 Boosterboxen (360 Packs) ergeben statistisch 3 Exemplare.',
+          content: 'Die Charizard ex Special Illustration Rare aus dem Pokémon 151-Set (Set-Code sv3pt5) zeigt Glurak in einem epischen vollflächigen Kunstwerk, das an die klassischen Originalillustrationen der 90er erinnert. Das 151-Set war eine Hommage an die ersten 151 Pokémon — und dieser Charizard ist die Chase-Card des Sets. SIRs gehören zu den seltensten Karten moderner Sets — die Wahrscheinlichkeit, ein bestimmtes Exemplar aus Packs zu ziehen, ist gering.',
         },
         {
           heading: 'Preisentwicklung: Wo kommen wir her, wo gehen wir hin',
@@ -206,28 +211,28 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
       tags: ['charizard ex', 'pokemon 151', 'special illustration rare', 'karte im fokus'],
     },
     strategie: {
-      title: 'Portfolio-Strategie: Wie Pokémon-Sammler ihr Portfolio aufbauen',
-      intro: 'Die meisten Einsteiger machen ähnliche Fehler: Sie öffnen Packs (macht Spaß, vernichtet Kapital), kaufen was gerade viral geht (kauft man oben) oder horten hunderte günstige Karten (Masse statt Klasse). Die Marktdaten zeigen seit Jahren, was funktioniert — und es ist verblüffend einfach.',
+      title: 'Marktstrukturen verstehen: Wie sich Sammlerportfolios im TCG zusammensetzen',
+      intro: 'Im Pokémon-Sammlermarkt lassen sich wiederkehrende Verhaltensmuster beobachten: Pack-Öffnen aus Unterhaltung, Käufe auf dem Hype-Höhepunkt, Anhäufung vieler günstiger Karten. Die Marktdaten der letzten Jahre zeigen, welche Strukturen sich historisch als stabil erwiesen haben — eine Analyse, keine Anlageberatung.',
       sections: [
         {
-          heading: 'Stufe 1 — Das Fundament: 1–2 Blue-Chip-Karten',
-          content: 'Genau wie im Aktienmarkt gibt es "Blue Chips" — Karten die so ikonisch und so gefragt sind, dass sie fast unmöglich dauerhaft fallen. Das sind Charizard, Pikachu, Mewtu und Evoli-Entwicklungen in ihren Top-Versionen (SIR, Alternate Art, historische Holos). Diese Karten nehmen 60 % des Budgets ein. Gekauft in Near-Mint-Zustand, in einen Magnethalter gesteckt und für 2–3 Jahre gehalten — so funktioniert das Fundament.',
+          heading: 'Struktur-Baustein 1: Ikonische Karten als stabiler Kern',
+          content: 'Im Sammlermarkt gibt es Karten, deren Nachfrage historisch außergewöhnlich stabil ist: Charizard, Pikachu, Mewtu und Evoli-Entwicklungen in ihren Top-Versionen (SIR, Alternate Art, historische Holos). Ihre Nachfrage speist sich aus einer globalen, wachsenden Fangemeinde — nicht aus kurzfristigen Trends. Sammlungen, die auf solchen Karten in Near-Mint-Zustand aufbauen, zeigen historisch die geringste Volatilität. Keine Karte ist jedoch gegen Wertverlust immun.',
         },
         {
-          heading: 'Stufe 2 — Das Wachstum: 2–3 aktuelle SIRs kurz nach Release',
-          content: 'Neue Sets haben immer einen Hype-Spike direkt nach Veröffentlichung — dann crashen die Preise wenn der Markt mit frischen Karten geflutet wird. Historisch liegt der optimale Zeitpunkt 4–8 Wochen nach Set-Release, wenn die Preise auf ihrem Tiefpunkt sind. Die 2–3 stärksten SIRs des Sets (erkennbar an beliebten Pokémon und starkem Artwork) bilden den Wachstumsanteil für die nächsten 12–18 Monate. FOMO bei Release hat historisch selten gut abgeschnitten.',
+          heading: 'Struktur-Baustein 2: Der Release-Zyklus als Muster',
+          content: 'Neue Sets zeigen ein dokumentiertes Muster: Hype-Spike direkt nach Veröffentlichung, dann Preisrückgang, wenn der Markt mit frischen Karten geflutet wird. Historisch stabilisieren sich die Preise einige Wochen nach Set-Release auf einem Tiefpunkt, bevor sich langfristige Trends herausbilden. Käufe auf dem Release-Hype haben in den Marktdaten wiederholt schlechter abgeschnitten als geduldiges Beobachten dieses Zyklus.',
         },
         {
-          heading: 'Stufe 3 — Der Wildcard-Slot: Ein sealed Produkt',
-          content: 'Eine bewährte Aufteilung: 70 % Einzelkarten (gezielt, High-End, Near-Mint), 30 % sealed. Versiegelte Produkte steigen nach Produktionsende fast immer im Wert — manchmal 100–200 % in 3–5 Jahren. Kühle, trockene Lagerung ohne direkte Sonneneinstrahlung ist entscheidend. Packs öffnen ist Entertainment — die Statistik spricht gegen den wirtschaftlichen Vorteil gegenüber dem Direktkauf.',
+          heading: 'Struktur-Baustein 3: Sealed als passives Segment',
+          content: 'Versiegelte Produkte (Boosterboxen, Elite Trainer Boxen) zeigen nach Produktionsende historisch eine Aufwärtstendenz, weil das Angebot nicht mehr wächst — mit unterschiedlicher Ausprägung je nach Nostalgiefaktor des Sets. Der Zeithorizont ist lang, und kühle, trockene, UV-geschützte Lagerung ist Voraussetzung für den Werterhalt. Pack-Öffnen bleibt statistisch Unterhaltung: Der erwartete Kartenwert liegt unter dem Produktpreis.',
         },
       ],
       keyPoints: [
-        '60 % in Blue-Chip-Karten (Charizard, Pikachu, Mewtu als SIR oder Alternate Art)',
-        '30 % in aktuelle SIRs — 4–8 Wochen nach Release historisch der optimale Zeitpunkt',
-        '10 % in versiegelte Produkte für langfristigen, stabilen Wertzuwachs',
+        'Ikonische Karten (Charizard, Pikachu, Mewtu, Evoli) zeigen historisch die stabilste Nachfrage',
+        'Release-Zyklus: Hype-Spike, Korrektur, Stabilisierung — ein dokumentiertes Muster',
+        'Sealed nach Produktionsende: historische Aufwärtstendenz, aber langer Zeithorizont',
       ],
-      tags: ['pokemon investment strategie', 'pokemon portfolio', 'special illustration rare', 'sealed investment'],
+      tags: ['pokemon marktstruktur', 'pokemon portfolio', 'special illustration rare', 'tcg marktmuster'],
     },
     set: {
       title: 'Set-Analyse: Pokémon 151 — Marktdaten und Preisübersicht',
@@ -239,11 +244,11 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
         },
         {
           heading: 'Die Top-Chase-Cards und ihre Preisbewegung',
-          content: 'Die vier wertvollsten Karten des Sets sind der Charizard ex SIR (ab 120 €), der Mewtu ex SIR (ab 80 €), der Pikachu ex SIR (ab 60 €) und der Evoli ex SIR (Eevee — das süße braune Basisform-Pokémon vor seinen 8 Entwicklungen, ab 50 €). Alle vier haben nach ihrem Post-Release-Tiefpunkt nachhaltig zugelegt. Das liegt daran, dass das 151-Set nicht mehr aktiv gedruckt wird — das Angebot an frischen Packs schrumpft.',
+          content: 'Die vier wertvollsten Karten des Sets sind der Charizard ex SIR, der Mewtu ex SIR, der Pikachu ex SIR und der Evoli ex SIR (Eevee — das süße braune Basisform-Pokémon vor seinen 8 Entwicklungen) — aktuelle Notierungen direkt auf Cardmarket prüfen. Alle vier haben nach ihrem Post-Release-Tiefpunkt nachhaltig zugelegt. Das liegt daran, dass das 151-Set nicht mehr aktiv gedruckt wird — das Angebot an frischen Packs schrumpft.',
         },
         {
           heading: 'Sealed oder Einzelkarten — was zeigen die Preisdaten?',
-          content: 'Wer eine bestimmte Karte sucht: Der Direktkauf auf Cardmarket ist statistisch immer günstiger als das Öffnen von Packs. Eine Charizard ex SIR für 130 € kostet weniger als der statistische Durchschnittseinsatz beim Öffnen (15+ Boosterboxen = über 500 €). Versiegelte Boosterboxen des 151-Sets haben seit Produktionsende weiter zugelegt — ein historisch konsistentes Muster bei Sets mit starkem Nostalgiewert.',
+          content: 'Wer eine bestimmte Karte sucht: Der Direktkauf auf Cardmarket ist statistisch günstiger als das Öffnen von Packs — die Wahrscheinlichkeit, eine bestimmte SIR zu ziehen, ist gering, und der erwartete Einsatz beim Öffnen übersteigt den Direktkaufpreis deutlich. Versiegelte Boosterboxen des 151-Sets haben seit Produktionsende weiter zugelegt — ein historisch konsistentes Muster bei Sets mit starkem Nostalgiewert.',
         },
       ],
       keyPoints: [
@@ -279,7 +284,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
     },
     guide: {
       title: 'Pokémon-Fälschungen erkennen: Prüfmethoden im Überblick',
-      intro: 'Fälschungen im Pokémon-TCG sind ein wachsendes Problem — mit steigenden Kartenpreisen steigt der Anreiz für Fälscher. Eine Charizard ex SIR für 90 € die als Fälschung ankommt, bedeutet verlorenes Geld und verlorenes Vertrauen. Hier sind die wichtigsten Methoden zur Echtheitsprüfung.',
+      intro: 'Fälschungen im Pokémon-TCG sind ein wachsendes Problem — mit steigenden Kartenpreisen steigt der Anreiz für Fälscher. Eine teuer gekaufte Chase-Card, die als Fälschung ankommt, bedeutet verlorenes Geld und verlorenes Vertrauen. Hier sind die wichtigsten Methoden zur Echtheitsprüfung.',
       sections: [
         {
           heading: 'Der Lichttest — 30 Sekunden, keine Ausrüstung nötig',
@@ -311,7 +316,7 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
         },
         {
           heading: 'Was diese Woche als Lehrstück diente',
-          content: 'Ein neues Set hat Release-Hype ausgelöst — Preise für Chase-Cards sofort nach Release stiegen auf 200+ €. Innerhalb von 10 Tagen: -35 %. Das ist kein neues Phänomen und wird sich nicht ändern — die Marktpsychologie ist immer gleich. Der erste Preis nach Release ist selten der faire Preis. 4–8 Wochen Wartezeit nach Release zeigen historisch einen deutlichen Preisunterschied.',
+          content: 'Das Release-Muster bleibt das konstanteste Phänomen im TCG-Markt: Chase-Cards notieren direkt nach Set-Release auf ihrem Hype-Hoch, gefolgt von einer deutlichen Korrektur, sobald der Markt mit frischer Ware geflutet ist. Das ist kein neues Phänomen und wird sich nicht ändern — die Marktpsychologie wiederholt sich. Der erste Preis nach Release ist historisch selten der faire Preis; erst einige Wochen später bildet sich ein belastbares Niveau.',
         },
         {
           heading: 'Ausblick auf die kommende Woche',
@@ -319,8 +324,8 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
         },
       ],
       keyPoints: [
-        'Geduld schlägt Hype — ausgelaufene Set-Karten zeigen das woche für woche',
-        'Release-Preise sind Hype-Preise — historisch 4–8 Wochen für den fairen Preis warten',
+        'Geduld schlägt Hype — ausgelaufene Set-Karten zeigen das Woche für Woche',
+        'Release-Preise sind Hype-Preise — der faire Preis bildet sich historisch erst Wochen später',
         'Ruhige Marktphasen sind historisch Vorstufen zur nächsten Preisbewegung',
       ],
       tags: ['pokemon wochenrückblick', 'tcg markt', 'pokemon investment', 'cardmarket analyse'],
@@ -338,21 +343,29 @@ function fallbackArticle(type: ArticleType, dateLabel: string, _cardSummary: str
   };
 }
 
+// Harte Wahrheits- und Neutralitätsregeln — werden JEDEM Generierungs-Prompt vorangestellt.
+// Quelle: CLAUDE.md → Content-Wahrheitspflicht + Content-Tonalität.
+const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel):
+1. WAHRHEIT: Verwende Zahlen und Preise AUSSCHLIESSLICH aus den unten gelieferten Marktdaten. Erfinde NIEMALS Preise, Preisverläufe, Prozentbewegungen, Auktionsergebnisse, Turnierergebnisse, Ankündigungen, Druckraten oder Illustratoren-Namen. Wenn du eine Zahl nicht aus den Daten belegen kannst, formuliere qualitativ ("zeigt zunehmende Nachfrage", "notiert stabil").
+2. KEINE ANLAGEBERATUNG: Keine Kaufempfehlungen ("kaufenswert", "jetzt kaufen", "Pflichtkauf", "Kaufchance"), keine Budget-Aufteilungen, keine Renditeversprechen, keine Kauf-/Verkaufszeitpunkte als Handlungsanweisung. Nur Marktbeobachtungen, historische Muster und sachliche Einschätzungen.
+3. KEINE PERSONA: Keine Ich-Form, kein Erzähler-Name. Impersonale Analyse ("Der Markt zeigt", "Die Daten bestätigen").
+4. QUELLEN: Im sources-Array nur echte, existierende URLs (Cardmarket, Bulbapedia, pokemon.com, Limitless TCG, PSA). Keine erfundenen Links.`;
+
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {
   const isRueckblick = type === 'rueckblick';
 
   const persona = isRueckblick
-    ? `Du bist ein Pokémon-TCG-Marktanalyst der einen wöchentlichen Rückblick auf Deutsch schreibt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Geschwätz, klare sachliche Aussagen. Alle Altersgruppen ab 10 Jahren — alles jugendfrei. Antworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
-    : `Du bist ein Pokémon-TCG-Marktanalyst der Artikel auf Deutsch verfasst — klar, faktenbasiert und leicht verständlich. Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze echte Zahlen und Karten-Namen. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen. Antworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
+    ? `Du bist ein Pokémon-TCG-Marktanalyst der einen wöchentlichen Rückblick auf Deutsch schreibt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Geschwätz, klare sachliche Aussagen. Alle Altersgruppen ab 10 Jahren — alles jugendfrei.\n\n${CONTENT_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
+    : `Du bist ein Pokémon-TCG-Marktanalyst der Artikel auf Deutsch verfasst — klar, faktenbasiert und leicht verständlich. Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
 
   const contexts: Record<ArticleType, string> = {
-    markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit einer überraschenden Preisveränderung. Analysiere Trends, nenne Gewinner und Verlierer. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,
+    markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit der auffälligsten Preisveränderung AUS DEN GELIEFERTEN DATEN. Analysiere Trends, nenne Gewinner und Verlierer aus den Daten. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,
     karte:      `Wähle die spannendste Karte aus den Daten und analysiere sie tiefgehend (Geschichte, Artwork, Preisentwicklung). Stand: ${dateLabel}. Füge diese Karte + 2-3 vergleichbare in featuredCards ein.\n\nAktuelle Karten:\n${cards}`,
     strategie:  `Analysiere eine Strategie oder einen Ansatz im Pokémon-TCG-Markt für ${dateLabel}. Zeige Risiken und historische Muster. Karten in featuredCards eintragen.\n\nMarktdaten:\n${cards}`,
     set:        `Analysiere ein aktuell interessantes Pokémon-TCG-Set. Welche Chase-Cards stechen hervor? Sealed oder Einzelkarten — was zeigen die Preisdaten? Stand: ${dateLabel}. Die Top-Karten des Sets in featuredCards eintragen.\n\nKarten (mit Set-Info):\n${cards}`,
     ausblick:   `Gib einen sachlichen Ausblick auf aktuelle Marktentwicklungen für das Wochenende ab ${dateLabel}. Welche Karten zeigen Bewegungen, welche Risiken gibt es? Keine persönlichen Empfehlungen. Auffällige Karten in featuredCards.\n\nAktuelle Daten:\n${cards}`,
     guide:      `Schreibe einen unterhaltsamen Guide — praktisch für Einsteiger, trotzdem interessant für Fortgeschrittene. Mit echten Karten-Beispielen. Stand: ${dateLabel}. Beispielkarten in featuredCards.\n\nKontext:\n${cards}`,
-    rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Erzähl was diese Woche in der Pokémon-Welt passiert ist — Markt, Community, Turniere, Anime-News. Welche Karte hat überrascht? Welcher Fehler war lehrreich? Und was kommt nächste Woche? Locker erzählt, mit echten Zahlen. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
+    rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Analysiere was die GELIEFERTEN MARKTDATEN diese Woche zeigen: Welche Karte fällt auf? Welches allgemeine Marktmuster war sichtbar? Was verdient nächste Woche Beobachtung? WICHTIG: Erfinde keine Turnierergebnisse, News oder Ankündigungen — wenn du über die Pokémon-Welt schreibst, nur zeitlose, verifizierbare Fakten (z.B. dass Turniersaisons Nachfrage verschieben). Locker erzählt, Zahlen nur aus den Daten. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
   };
 
   return `${persona}\n\n${contexts[type]}`;

@@ -155,8 +155,8 @@ export function PortfolioChart({ data, color }: Props) {
                 : 'translateX(8px)',
           }}
         >
-          <div className="bg-gray-900 text-white rounded-2xl px-3.5 py-2.5 shadow-2xl whitespace-nowrap">
-            <p className="text-[10px] text-gray-400 leading-none mb-1">
+          <div className="bg-[#13131e] border border-[#2a2a3a] text-white rounded-2xl px-3.5 py-2.5 shadow-2xl whitespace-nowrap">
+            <p className="text-[10px] text-slate-500 leading-none mb-1">
               {new Date(hoverData.date + 'T00:00:00').toLocaleDateString('de-DE', {
                 weekday: 'short', day: '2-digit', month: 'short',
               })}
