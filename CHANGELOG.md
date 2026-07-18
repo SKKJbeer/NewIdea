@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.11.1] — 2026-07-18 · Performance & Feedback: kein "totes" Klicken mehr
+
+### Behoben
+- **Sofortiges Feedback bei jeder Navigation**: Beim Klick auf eine Karte, ein Set oder einen Artikel passierte sichtbar nichts, bis der Server fertig gerendert hatte (TCG-API bis 8s, Artikel-Generierung länger) — die Seite wirkte eingefroren. Jetzt erscheint sofort ein Lade-Skeleton der Zielseite: globale Loading-Boundary für alle Routen + formgetreue Skeletons für Karten-Detail, Set-Seiten und Artikel (mit Hinweis bei Erstgenerierung)
+- **Fehlende Timeouts in Suche & Karten-Detail**: `searchCards` und `fetchCardById` hatten als einzige TCG-Calls kein 8s-Timeout — eine zähe API konnte diese Seiten unbegrenzt blockieren
+- **Tap-Feedback**: Karten-Kacheln und Startseiten-Zeilen reagieren jetzt sichtbar auf Druck (scale/Hintergrund), bevor die Navigation greift — wichtig auf Mobile
+
+---
+
 ## [2.11.0] — 2026-07-17 · Portfolio-Chart auf Finance-App-Niveau (Trade-Republic-Pattern)
 
 ### Neu

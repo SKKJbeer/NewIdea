@@ -131,6 +131,7 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
       pageSize: limit,
       orderBy: '-set.releaseDate',
     },
+    timeout: 8000,
   });
 
   // Nur vollständige, handelbare Karten (Preis + Bild) — nach Marktpreis absteigend.
@@ -143,6 +144,7 @@ export async function fetchCardById(id: string): Promise<PokemonCard | null> {
       headers: {
         ...tcgHeaders(),
       },
+      timeout: 8000,
     });
     return mapApiCardToCard(response.data.data);
   } catch {

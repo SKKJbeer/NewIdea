@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.11.1',
+    date: '18. Juli 2026',
+    label: 'Performance & Feedback: kein "totes" Klicken mehr',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Sofortiges Lade-Skeleton bei jeder Navigation — Klicks wirken nie mehr eingefroren' },
+      { type: 'fixed', text: 'Formgetreue Skeletons für Karten-Detail, Set-Seiten und Artikel (mit Generierungs-Hinweis)' },
+      { type: 'fixed', text: 'Fehlende 8s-Timeouts in Suche und Karten-Detail ergänzt' },
+      { type: 'fixed', text: 'Tap-Feedback auf Karten-Kacheln und Startseiten-Zeilen (Mobile)' },
+    ],
+  },
+  {
     version: '2.11.0',
     date: '17. Juli 2026',
     label: 'Portfolio-Chart auf Finance-App-Niveau',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Scrubbing: Beim Ziehen über den Chart zeigt der Header Wert, Veränderung und Datum am Finger' },
       { type: 'new',     text: 'Gestrichelte Baseline auf Zeitraum-Startwert — Kurve grün/rot relativ dazu' },

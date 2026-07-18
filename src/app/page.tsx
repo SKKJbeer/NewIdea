@@ -369,7 +369,7 @@ export default async function Home() {
                         <Link
                           key={card.id}
                           href={`/karten/${card.id}`}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a1a28] transition-colors group"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a1a28] active:bg-[#20202e] transition-colors group"
                         >
                           <span className="w-4 shrink-0 text-[10px] text-slate-700 tabular-nums">{i + 1}</span>
                           {card.imageUrl && (
@@ -422,7 +422,7 @@ export default async function Home() {
                         <Link
                           key={card.id}
                           href={`/karten/${card.id}`}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a1a28] transition-colors group"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1a1a28] active:bg-[#20202e] transition-colors group"
                         >
                           <span className="w-4 shrink-0 text-[10px] text-slate-700 tabular-nums">{i + 1}</span>
                           {card.imageUrl && (
@@ -497,7 +497,7 @@ export default async function Home() {
                     <Link
                       key={card.id}
                       href={`/karten/${card.id}`}
-                      className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-3 px-4 py-2.5 hover:bg-[#1a1a28] transition-colors group"
+                      className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-3 px-4 py-2.5 hover:bg-[#1a1a28] active:bg-[#20202e] transition-colors group"
                     >
                       <span className="w-5 text-[10px] text-slate-700 tabular-nums">{i + 1}</span>
                       <div className="flex min-w-0 items-center gap-2.5">
