@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { CardImage } from './CardImage';
 import { PokemonCard } from '@/types';
 import { TrendingUp, TrendingDown, Star } from 'lucide-react';
 import { BoosterPackImage } from './BoosterPackImage';
@@ -46,10 +46,9 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
         <div className="bg-[#13131e] rounded-xl border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all overflow-hidden">
           <div className="relative aspect-[3/4] bg-[#1a1a28]">
             {card.imageUrl ? (
-              <Image
+              <CardImage
                 src={card.imageUrl}
                 alt={card.name}
-                fill
                 sizes="(max-width: 640px) 33vw, 16vw"
                 className="object-contain group-hover:scale-105 transition-transform duration-300"
               />
@@ -74,10 +73,9 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
       <div className="bg-[#13131e] rounded-xl border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all duration-200 overflow-hidden cursor-pointer">
         <div className="relative bg-[#1a1a28] p-3 aspect-[3/4]">
           {card.imageUrl ? (
-            <Image
+            <CardImage
               src={card.imageUrl}
               alt={card.name}
-              fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               className="object-contain group-hover:scale-105 transition-transform duration-300 p-3"
             />

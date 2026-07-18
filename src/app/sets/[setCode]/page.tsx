@@ -4,10 +4,17 @@ import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
-import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
+import { fetchCardsBySet, fetchRecentSets, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
+
+// Beim Build vorrendern: Die 12 neuesten Sets sind sofort da — kein Erstbesucher
+// wartet auf den TCG-API-Render. Ältere Sets rendern on-demand (dynamicParams default).
+export async function generateStaticParams() {
+  const sets = await fetchRecentSets(12).catch(() => []);
+  return sets.map((s) => ({ setCode: s.id }));
+}
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 

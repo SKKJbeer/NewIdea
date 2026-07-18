@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.12.0',
+    date: '18. Juli 2026',
+    label: 'Vorrendern + Bild-Shimmer: keine Erstbesucher-Wartezeit',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: '12 neueste Set-Seiten + Top-20-Karten werden beim Deploy vorgerendert — sofort aus dem CDN' },
+      { type: 'new',     text: 'Kartenbilder: animierter Shimmer-Platzhalter, dann weiches Einblenden statt Aufpoppen' },
+      { type: 'changed', text: 'Lade-Skeletons nutzen denselben Shimmer — durchgängiger Look' },
+    ],
+  },
+  {
     version: '2.11.1',
     date: '18. Juli 2026',
     label: 'Performance & Feedback: kein "totes" Klicken mehr',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Sofortiges Lade-Skeleton bei jeder Navigation — Klicks wirken nie mehr eingefroren' },
       { type: 'fixed', text: 'Formgetreue Skeletons für Karten-Detail, Set-Seiten und Artikel (mit Generierungs-Hinweis)' },

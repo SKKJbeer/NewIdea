@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.12.0] — 2026-07-18 · Vorrendern + Bild-Shimmer: keine Erstbesucher-Wartezeit mehr
+
+### Neu
+- **Build-Vorrendern statt On-Demand**: Die 12 neuesten Set-Seiten und die Top-20-Karten (die von der Startseite verlinkten) werden beim Deploy fertig gebaut — kein Besucher wartet mehr auf den ersten Server-Render, die Seiten kommen direkt aus dem CDN. Ältere Karten/Sets rendern weiterhin on-demand und werden dann gecacht
+- **Bild-Shimmer**: Kartenbilder haben jetzt einen grau leuchtenden, animierten Platzhalter, bis das Bild geladen ist — dann blendet es weich ein (CardGrid, Karten-Detailseite). Kein hartes Aufpoppen mehr
+- Lade-Skeletons nutzen denselben Shimmer-Effekt — durchgängiger Look
+
+---
+
 ## [2.11.1] — 2026-07-18 · Performance & Feedback: kein "totes" Klicken mehr
 
 ### Behoben

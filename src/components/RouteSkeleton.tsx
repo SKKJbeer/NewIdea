@@ -53,7 +53,7 @@ export function RouteSkeleton({ variant = 'list', hint }: RouteSkeletonProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 opacity-30">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="rounded-xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden animate-pulse">
-                <div className="aspect-[3/4] bg-[#1a1a28]" />
+                <div className="aspect-[3/4] shimmer" />
                 <div className="p-2.5 space-y-1.5">
                   <div className="h-3 bg-[#2a2a3a] rounded w-3/4" />
                   <div className="h-3 bg-[#2a2a3a] rounded w-1/2" />
@@ -80,7 +80,7 @@ export function RouteSkeleton({ variant = 'list', hint }: RouteSkeletonProps) {
         {variant === 'detail' && (
           <div className="grid md:grid-cols-2 gap-6 opacity-40">
             <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 animate-pulse">
-              <div className="aspect-[3/4] max-w-[280px] mx-auto bg-[#1a1a28] rounded-xl" />
+              <div className="aspect-[3/4] max-w-[280px] mx-auto shimmer rounded-xl" />
             </div>
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (

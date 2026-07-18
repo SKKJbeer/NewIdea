@@ -2,14 +2,14 @@ import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
-import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
+import { fetchCardById, fetchTopValueCards, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
 import { WatchButton } from '@/components/WatchButton';
+import { CardImage } from '@/components/CardImage';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -18,6 +18,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintellig
 // Reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots — der `after()`-Hook
 // schreibt dann höchstens einmal pro Stunde pro Karte statt bei jedem Aufruf.
 export const revalidate = 3600;
+
+// Beim Build vorrendern: Die Top-20-Karten (von der Startseite verlinkt) sind sofort
+// da — die meistgeklickten Detailseiten laden ohne Erstbesucher-Wartezeit.
+// Alle anderen Karten rendern on-demand und werden dann 1h gecacht.
+export async function generateStaticParams() {
+  const cards = await fetchTopValueCards(20).catch(() => []);
+  return cards.map((c) => ({ id: c.id }));
+}
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -121,11 +129,10 @@ export default async function CardDetailPage({ params }: Props) {
           <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 flex flex-col items-center">
             <div className="bg-[#1a1a28] rounded-xl p-4 w-full max-w-xs">
               {card.imageUrlHiRes || card.imageUrl ? (
-                <div className="relative aspect-[3/4] w-full">
-                  <Image
+                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden">
+                  <CardImage
                     src={card.imageUrlHiRes || card.imageUrl || ''}
                     alt={`${card.name} Pokémon Karte`}
-                    fill
                     sizes="(max-width: 768px) 80vw, 320px"
                     className="object-contain rounded-lg shadow-md"
                     priority
