@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { cachedImg } from '@/lib/cached-image';
 
 // Maps pokemontcg.io setId (lowercase) → Pokémon Company CDN capitalization
 const SET_ID_MAP: Record<string, string> = {
@@ -25,8 +26,8 @@ interface Props {
 }
 
 export function BoosterPackImage({ setCode, setName, className = '' }: Props) {
-  const [src, setSrc] = useState(() => getPackUrl(setCode));
-  const logo = `https://images.pokemontcg.io/${setCode}/logo.png`;
+  const [src, setSrc] = useState(() => cachedImg(getPackUrl(setCode)));
+  const logo = cachedImg(`https://images.pokemontcg.io/${setCode}/logo.png`);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element

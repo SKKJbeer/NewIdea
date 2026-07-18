@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.15.0] — 2026-07-18 · Bild-Robustheit: Caching-Proxy macht Bilder API-unabhängig
+
+### Neu
+- **Bild-Caching-Proxy `/api/img`**: Alle Kartenbilder, Set-Logos und Booster-Artworks laufen jetzt über einen eigenen Proxy. Vercels CDN cacht jede Antwort 30 Tage und bedient bei Ausfall der externen Bild-Hosts bis zu 1 Jahr aus dem Stale-Cache (`stale-if-error`) — ein einmal gesehenes Bild verschwindet praktisch nie wieder, auch wenn die TCG-API down oder rate-limitiert ist
+- **`cachedImg()`-Helper** (`src/lib/cached-image.ts`): eine zentrale Stelle, die externe Bild-URLs auf den Proxy umschreibt — strikte Host-Allowlist (images.pokemontcg.io, assets.pokemon.com), kein offener Proxy
+
+### Geändert
+- Alle Bild-Konsumenten auf den Proxy umgestellt: Kartenbilder (CardImage), Booster-Packs (BoosterPackImage), Such-Vorschläge, Artikel-Galerie + Highlights, Guide-Karten, Portfolio (Zeilen, Suche, Edit-Modal), Merkliste, Startseiten-Listen
+- `next/image`-Optimizer-Cache auf 31 Tage erhöht (`minimumCacheTTL`) — deutlich weniger Origin-Zugriffe auf externe Bild-Hosts
+
+---
+
 ## [2.14.2] — 2026-07-18 · 404-Bug auf Karten-Seiten behoben (API-Fehler ≠ nicht gefunden)
 
 ### Behoben

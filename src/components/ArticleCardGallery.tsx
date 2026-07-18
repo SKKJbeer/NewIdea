@@ -3,6 +3,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { FeaturedCard } from '@/lib/article-generator';
 import { BoosterPackImage } from './BoosterPackImage';
+import { cachedImg } from '@/lib/cached-image';
 
 const ACCENT: Record<string, string> = {
   violet:  '#7c3aed',
@@ -51,7 +52,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
               <div className="relative w-28 h-[154px] rounded-lg overflow-hidden bg-[#0a0a0f] border border-[#2a2a3a] mb-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={card.imageUrl}
+                  src={cachedImg(card.imageUrl)}
                   alt={card.name}
                   className="w-full h-full object-contain"
                   loading="lazy"

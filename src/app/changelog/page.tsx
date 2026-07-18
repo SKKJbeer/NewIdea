@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.15.0',
+    date: '18. Juli 2026',
+    label: 'Bilder API-unabhängig: Caching-Proxy',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Bild-Caching-Proxy /api/img: Bilder bleiben bis zu 1 Jahr aus dem CDN-Cache verfügbar, auch wenn die externen Bild-Hosts ausfallen' },
+      { type: 'changed', text: 'Alle Kartenbilder, Set-Logos und Booster-Artworks laufen jetzt über den Proxy (Suche, Artikel, Guides, Portfolio, Merkliste, Startseite)' },
+      { type: 'changed', text: 'Bild-Optimizer-Cache auf 31 Tage erhöht — weniger Abhängigkeit von der TCG-API' },
+    ],
+  },
+  {
     version: '2.14.2',
     date: '18. Juli 2026',
     label: '404-Bug auf Kartenseiten behoben',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Karten-Klicks führten bei API-Ausfällen zu 404, obwohl die Karten existieren' },
       { type: 'fixed', text: 'Bei API-Fehlern erscheint jetzt eine "Daten nicht erreichbar"-Seite mit Retry statt 404' },

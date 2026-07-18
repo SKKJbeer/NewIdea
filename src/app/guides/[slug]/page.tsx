@@ -5,6 +5,7 @@ import { getGuide, GUIDES, type Guide } from '@/lib/guides';
 import { loadGeneratedGuide, listGeneratedGuides } from '@/lib/guide-storage';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
+import { cachedImg } from '@/lib/cached-image';
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
@@ -101,7 +102,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                       <div className="flex-none text-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={card.imageUrl}
+                          src={cachedImg(card.imageUrl)}
                           alt={card.name}
                           width={56}
                           height={78}

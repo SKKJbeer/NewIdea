@@ -6,6 +6,7 @@ import { Star, Trash2, Loader2, Search } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { formatEur } from '@/lib/portfolio';
+import { cachedImg } from '@/lib/cached-image';
 import {
   WATCHLIST_KEY, parseWatchlist, watchChange,
   type WatchlistItem,
@@ -128,7 +129,7 @@ export default function MerklistePage() {
                         {item.imageUrl && (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
-                            src={item.imageUrl}
+                            src={cachedImg(item.imageUrl)}
                             alt={item.cardName}
                             className="w-full h-full object-contain"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

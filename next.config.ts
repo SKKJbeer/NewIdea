@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.pokemontcg.io' },
     ],
     formats: ['image/avif', 'image/webp'],
+    // Optimierte Bilder 31 Tage im Vercel-Cache behalten — reduziert
+    // Origin-Zugriffe auf die externen Bild-Hosts drastisch
+    minimumCacheTTL: 2678400,
   },
 };
 

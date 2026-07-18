@@ -11,6 +11,7 @@ import {
   LANG_FLAG, RANGE_DAYS,
   type PortfolioHolding, type LiveCardData, type CardLanguage,
 } from '@/lib/portfolio';
+import { cachedImg } from '@/lib/cached-image';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -296,7 +297,7 @@ export default function PortfolioPage() {
                   {/* Card image */}
                   <div className="shrink-0 w-11 h-[58px] rounded-md overflow-hidden bg-[#2a2a3a]">
                     <img
-                      src={h.imageUrl}
+                      src={cachedImg(h.imageUrl)}
                       alt={h.cardName}
                       className="w-full h-full object-contain"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -598,7 +599,7 @@ function AddCardModal({
                 >
                   <div className="shrink-0 w-10 h-14 rounded-md overflow-hidden bg-[#2a2a3a]">
                     {s.imageUrl
-                      ? <img src={s.imageUrl} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
+                      ? <img src={cachedImg(s.imageUrl)} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
                       : <div className="w-full h-full" />
                     }
                   </div>
@@ -640,7 +641,7 @@ function AddCardModal({
               <div className="flex items-center gap-3 p-4 bg-[#1a1a28] rounded-2xl">
                 <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-[#2a2a3a]">
                   {selected.imageUrl
-                    ? <img src={selected.imageUrl} alt={selected.name} className="w-full h-full object-contain" />
+                    ? <img src={cachedImg(selected.imageUrl)} alt={selected.name} className="w-full h-full object-contain" />
                     : <div className="w-full h-full" />
                   }
                 </div>
@@ -786,7 +787,7 @@ function EditCardModal({
             <div className="shrink-0 w-14 h-20 rounded-lg overflow-hidden bg-[#2a2a3a]">
               {holding.imageUrl
                 ? <img
-                    src={holding.imageUrl} alt={holding.cardName}
+                    src={cachedImg(holding.imageUrl)} alt={holding.cardName}
                     className="w-full h-full object-contain"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />

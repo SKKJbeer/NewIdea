@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.14.2` · **Stand:** 18. Juli 2026 · **Branch:** `main`
+**Version:** `v2.15.0` · **Stand:** 18. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -142,7 +142,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.14.0 | Phase 0: Vercel Analytics (Messung!) + globaler Site-Footer mit Navigation, Legal-Links entdoppelt |
 | v2.14.1 | Impressum & Datenschutz rechtssicher: echte Daten, § 5 DDG, Datenschutz für echten Datenfluss |
 | v2.14.2 | 404-Bug behoben: API-Fehler nie mehr als notFound, ApiErrorState mit Retry, Build-Vorrendern entfernt |
+| v2.15.0 | Bild-Robustheit: Caching-Proxy /api/img (stale-if-error bis 1 Jahr), cachedImg()-Helper, alle Bild-Konsumenten umgestellt |
 
 ---
 
-*Zuletzt aktualisiert: v2.14.2 — 18. Juli 2026*
+*Zuletzt aktualisiert: v2.15.0 — 18. Juli 2026*

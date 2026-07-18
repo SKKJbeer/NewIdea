@@ -1,4 +1,5 @@
 import { fetchTopValueCards } from '@/lib/pokemon-api';
+import { cachedImg } from '@/lib/cached-image';
 import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
@@ -374,7 +375,7 @@ export default async function Home() {
                           <span className="w-4 shrink-0 text-[10px] text-slate-700 tabular-nums">{i + 1}</span>
                           {card.imageUrl && (
                             <img
-                              src={card.imageUrl}
+                              src={cachedImg(card.imageUrl)}
                               alt={card.nameDe ?? card.name}
                               width={28}
                               height={39}
@@ -427,7 +428,7 @@ export default async function Home() {
                           <span className="w-4 shrink-0 text-[10px] text-slate-700 tabular-nums">{i + 1}</span>
                           {card.imageUrl && (
                             <img
-                              src={card.imageUrl}
+                              src={cachedImg(card.imageUrl)}
                               alt={card.nameDe ?? card.name}
                               width={28}
                               height={39}
@@ -503,7 +504,7 @@ export default async function Home() {
                       <div className="flex min-w-0 items-center gap-2.5">
                         {card.imageUrl && (
                           <img
-                            src={card.imageUrl}
+                            src={cachedImg(card.imageUrl)}
                             alt={card.nameDe ?? card.name}
                             width={24}
                             height={33}
