@@ -138,18 +138,33 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   return mapAndFilter(response.data.data).sort(byPriceDesc);
 }
 
+/**
+ * Einzelkarte laden. WICHTIG für Aufrufer:
+ * - `null` bedeutet: Die Karte existiert wirklich nicht (echtes HTTP 404) → notFound() ok.
+ * - Transiente Fehler (Timeout, 429-Rate-Limit, 5xx) werden nach einem Retry GEWORFEN —
+ *   sie dürfen NIE als 404 behandelt werden, sonst wird eine existierende Karte als
+ *   "nicht gefunden" gecacht (Ursache des Startseiten-404-Bugs).
+ */
 export async function fetchCardById(id: string): Promise<PokemonCard | null> {
-  try {
-    const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {
-      headers: {
-        ...tcgHeaders(),
-      },
-      timeout: 8000,
-    });
-    return mapApiCardToCard(response.data.data);
-  } catch {
-    return null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {
+        headers: {
+          ...tcgHeaders(),
+        },
+        timeout: 8000,
+      });
+      return mapApiCardToCard(response.data.data);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) return null;
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 800));
+        continue;
+      }
+      throw err;
+    }
   }
+  return null;
 }
 
 export interface SetMeta {

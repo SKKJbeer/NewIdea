@@ -4,17 +4,14 @@ import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
-import { fetchCardsBySet, fetchRecentSets, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
+import { ApiErrorState } from '@/components/ApiErrorState';
+import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
 import type { Metadata } from 'next';
 
+// BEWUSST KEIN generateStaticParams: Schlägt die TCG-API während des Builds fehl,
+// würden existierende Sets als 404 fest ins CDN gebacken (siehe karten/[id]).
+// On-Demand + ISR (24h) + Loading-Skeleton ist robuster.
 export const revalidate = 86400;
-
-// Beim Build vorrendern: Die 12 neuesten Sets sind sofort da — kein Erstbesucher
-// wartet auf den TCG-API-Render. Ältere Sets rendern on-demand (dynamicParams default).
-export async function generateStaticParams() {
-  const sets = await fetchRecentSets(12).catch(() => []);
-  return sets.map((s) => ({ setCode: s.id }));
-}
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -40,7 +37,14 @@ export default async function SetDetailPage({ params }: Props) {
   const { setCode } = await params;
   if (!isValidSetCode(setCode)) notFound();
 
-  const cards = await fetchCardsBySet(setCode).catch(() => []);
+  // API-Fehler ≠ "Set existiert nicht": Fehler-UI statt 404 (sonst wird ein
+  // existierendes Set bei Rate-Limits als 404 gecacht).
+  let cards;
+  try {
+    cards = await fetchCardsBySet(setCode);
+  } catch {
+    return <ApiErrorState backHref="/sets" backLabel="Alle Sets" />;
+  }
   if (cards.length === 0) notFound();
 
   const setName = cards[0].set;

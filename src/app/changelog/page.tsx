@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.14.2',
+    date: '18. Juli 2026',
+    label: '404-Bug auf Kartenseiten behoben',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Karten-Klicks führten bei API-Ausfällen zu 404, obwohl die Karten existieren' },
+      { type: 'fixed', text: 'Bei API-Fehlern erscheint jetzt eine "Daten nicht erreichbar"-Seite mit Retry statt 404' },
+      { type: 'fixed', text: 'Build-Vorrendern für Karten/Sets entfernt — keine fest gebackenen 404s mehr' },
+    ],
+  },
+  {
     version: '2.14.1',
     date: '18. Juli 2026',
     label: 'Impressum & Datenschutz: rechtssicher',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Impressum mit Betreiberdaten befüllt, auf § 5 DDG aktualisiert, Markenhinweis ergänzt' },
       { type: 'changed', text: 'Datenschutzerklärung komplett neu — beschreibt den echten Datenfluss (cookieloses Analytics, lokale Speicher, externe Bilder)' },

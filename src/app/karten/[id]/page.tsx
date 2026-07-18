@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, ExternalLink } from 'lucide-react';
-import { fetchCardById, fetchTopValueCards, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
+import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -10,6 +10,7 @@ import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
+import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -17,15 +18,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintellig
 // ISR: Karten-Detailseite pro Karte 1h cachen statt bei jedem Request neu zu rendern.
 // Reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots — der `after()`-Hook
 // schreibt dann höchstens einmal pro Stunde pro Karte statt bei jedem Aufruf.
+//
+// BEWUSST KEIN generateStaticParams: Das Build-Vorrendern (v2.12.0) hat bei
+// TCG-API-Ausfällen während des Builds 404-Seiten fest ins CDN gebacken —
+// existierende Karten waren dann eine Stunde lang "nicht gefunden".
+// On-Demand + ISR + Loading-Skeleton ist robuster.
 export const revalidate = 3600;
-
-// Beim Build vorrendern: Die Top-20-Karten (von der Startseite verlinkt) sind sofort
-// da — die meistgeklickten Detailseiten laden ohne Erstbesucher-Wartezeit.
-// Alle anderen Karten rendern on-demand und werden dann 1h gecacht.
-export async function generateStaticParams() {
-  const cards = await fetchTopValueCards(20).catch(() => []);
-  return cards.map((c) => ({ id: c.id }));
-}
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -33,8 +31,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const card = await fetchCardById(id);
-  if (!card) return { title: 'Karte nicht gefunden' };
+  // Metadata darf bei API-Fehlern nie den Seitenaufbau verhindern
+  const card = await fetchCardById(id).catch(() => null);
+  if (!card) return { title: 'Pokémon Karte' };
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
   const priceStr = price > 0 ? ` — ${price.toFixed(2)} €` : '';
@@ -59,7 +58,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CardDetailPage({ params }: Props) {
   const { id } = await params;
-  const card = await fetchCardById(id);
+
+  // API-Fehler (Timeout/Rate-Limit) ≠ "Karte existiert nicht": Fehler-UI statt 404.
+  // notFound() nur bei echtem 404 der Datenbank (fetchCardById liefert dann null).
+  let card;
+  try {
+    card = await fetchCardById(id);
+  } catch {
+    return <ApiErrorState />;
+  }
   if (!card) notFound();
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;

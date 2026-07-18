@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.14.2] — 2026-07-18 · 404-Bug auf Karten-Seiten behoben (API-Fehler ≠ nicht gefunden)
+
+### Behoben
+- **Karten-Klicks führten zu 404, obwohl die Karten existieren**: `fetchCardById` behandelte JEDEN API-Fehler (Timeout, Rate-Limit) als "Karte existiert nicht" → `notFound()`. Durch das Build-Vorrendern (v2.12.0) wurden diese 404s bei API-Ausfällen während des Builds sogar fest ins CDN gebacken
+- **Fix dreiteilig**: (1) `fetchCardById` gibt `null` nur noch bei echtem HTTP 404, transiente Fehler bekommen einen Retry und werden dann geworfen; (2) Karten- und Set-Seiten zeigen bei API-Fehlern eine "Daten gerade nicht erreichbar"-Seite mit Retry-Button statt 404; (3) Build-Vorrendern für Karten/Sets entfernt — On-Demand + ISR + Loading-Skeleton ist robuster
+- Regel in CLAUDE.md verankert (Stolperstelle 16): API-Fehler niemals als notFound behandeln
+
+---
+
 ## [2.14.1] — 2026-07-18 · Impressum & Datenschutz: rechtssicher mit echten Daten
 
 ### Geändert
