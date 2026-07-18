@@ -159,11 +159,6 @@ export default async function MarktberichtPage() {
               Preisangaben (Cardmarket, EUR) ohne Gewähr.
             </p>
           </div>
-          <div className="flex justify-center gap-5 text-xs">
-            <a href="/impressum" className="text-slate-700 hover:text-violet-400 transition-colors">Impressum</a>
-            <span className="text-slate-800">|</span>
-            <a href="/datenschutz" className="text-slate-700 hover:text-violet-400 transition-colors">Datenschutz</a>
-          </div>
         </footer>
       </main>
     </div>

@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.14.0',
+    date: '18. Juli 2026',
+    label: 'Vercel Analytics + globaler Site-Footer',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Vercel Analytics: Besucher und Seitenaufrufe werden ab jetzt gemessen' },
+      { type: 'new',     text: 'Globaler Footer mit Navigation (Markt/Wissen/Tools/Rechtliches) auf jeder Seite' },
+      { type: 'changed', text: 'Doppelte Legal-Link-Zeilen aus 7 Seiten-Footern entfernt' },
+    ],
+  },
+  {
     version: '2.13.0',
     date: '18. Juli 2026',
     label: 'Automatisierte Guide-Pipeline mit Qualitäts-Gate',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Guides werden automatisch generiert (Di + Fr) — aus 12 kuratierten Sammler-Themen' },
       { type: 'new', text: 'Qualitäts-Gate: regelwidrige KI-Ausgaben werden nicht veröffentlicht' },

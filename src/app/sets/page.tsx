@@ -84,11 +84,6 @@ export default async function SetsPage() {
               Alle Inhalte dienen ausschließlich der Information — <strong className="text-amber-400/80">keine Anlageberatung</strong>.
             </p>
           </div>
-          <div className="flex justify-center gap-5 text-xs">
-            <a href="/impressum" className="text-slate-700 hover:text-violet-400 transition-colors">Impressum</a>
-            <span className="text-slate-800">|</span>
-            <a href="/datenschutz" className="text-slate-700 hover:text-violet-400 transition-colors">Datenschutz</a>
-          </div>
         </footer>
       </main>
     </div>

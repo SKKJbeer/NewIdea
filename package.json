@@ -1,6 +1,6 @@
 {
   "name": "pokemarketapp",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -20,6 +20,7 @@
     "@remotion/cli": "^4.0.481",
     "@remotion/player": "^4.0.481",
     "@supabase/supabase-js": "^2.108.2",
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.18.0",
     "cheerio": "^1.2.0",
     "date-fns": "^4.4.0",

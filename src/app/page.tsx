@@ -693,21 +693,6 @@ export default async function Home() {
           <p className="text-center text-[11px] text-slate-700">
             Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision.
           </p>
-          <div className="flex justify-center gap-5 text-xs">
-            <Link href="/impressum" className="text-slate-700 transition-colors hover:text-violet-400">
-              Impressum
-            </Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/datenschutz" className="text-slate-700 transition-colors hover:text-violet-400">
-              Datenschutz
-            </Link>
-            <span className="text-slate-800">|</span>
-            <Link href="/changelog" className="text-slate-700 transition-colors hover:text-violet-400">
-              Changelog
-            </Link>
-            <span className="text-slate-800">|</span>
-            <span className="text-slate-800 font-mono">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
-          </div>
         </footer>
       </main>
     </div>

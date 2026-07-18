@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.14.0] — 2026-07-18 · Phase 0: Vercel Analytics + globaler Site-Footer
+
+### Neu
+- **Vercel Analytics eingebaut** (`@vercel/analytics`): Ab jetzt werden Besucher, Seitenaufrufe und Referrer gemessen — die Grundlage für alle weiteren Produktentscheidungen. Aktivierung: im Vercel-Dashboard unter Projekt → Analytics einmal einschalten
+- **Globaler Site-Footer** auf jeder Seite: Navigation in vier Gruppen (Markt / Wissen / Tools / Rechtliches), Marken-Block, Disclaimer-Zeile, Versionsnummer — bessere interne Verlinkung (SEO) und einheitlicher Seitenabschluss
+
+### Geändert
+- Duplizierte Impressum/Datenschutz-Link-Zeilen aus 7 Seiten-Footern entfernt — Legal-Links leben jetzt nur noch im globalen Footer; die inhaltsspezifischen Disclaimer-Boxen bleiben
+
+---
+
 ## [2.13.0] — 2026-07-18 · Automatisierte Guide-Pipeline mit Qualitäts-Gate
 
 ### Neu
