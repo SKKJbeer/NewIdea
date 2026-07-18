@@ -1,30 +1,58 @@
 'use client';
 
 import { useRef, useState, useCallback } from 'react';
-import { formatEur } from '@/lib/portfolio';
 
 export interface ChartPoint { date: string; value: number; }
 
 interface Props {
   data: ChartPoint[];
   color: string;
+  /** Startwert des gewählten Zeitraums — als gestrichelte Referenzlinie (Trade-Republic-Pattern). */
+  baselineValue?: number;
+  /** Scrub-Callback: Beim Ziehen über den Chart wird der Punkt gemeldet (null = losgelassen). */
+  onScrub?: (point: ChartPoint | null) => void;
 }
 
-// Lightweight custom SVG chart — no Recharts, instant render, touch-enabled.
-export function PortfolioChart({ data, color }: Props) {
+// Leichtgewichtiger Custom-SVG-Chart im Finance-App-Stil:
+// - Baseline (gestrichelt) auf Zeitraum-Startwert, Kurvenfarbe relativ dazu
+// - Scrubbing: Kurve rechts vom Finger dimmt ab, Datum erscheint am Crosshair,
+//   der Wert wandert über onScrub in den Seiten-Header (wie bei Trade Republic)
+// - Pulsierender Live-Punkt am aktuellen Wert
+export function PortfolioChart({ data, color, baselineValue, onScrub }: Props) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const clearScrub = useCallback(() => {
+    setHoverIdx(null);
+    onScrub?.(null);
+  }, [onScrub]);
+
+  const handlePointer = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>) => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const rect  = svg.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      const raw   = ratio * (data.length - 1);
+      const idx   = Math.max(0, Math.min(data.length - 1, Math.round(raw)));
+      setHoverIdx(idx);
+      onScrub?.(data[idx]);
+    },
+    [data, onScrub],
+  );
 
   if (data.length < 2) return null;
 
   // ── Coordinate space ──────────────────────────────────────────────────────
   const VW = 600;
   const VH = 170;
-  const PADL = 8, PADR = 8, PADT = 12, PADB = 22;
+  const PADL = 8, PADR = 8, PADT = 14, PADB = 22;
   const chartW = VW - PADL - PADR;
   const chartH = VH - PADT - PADB;
 
-  const vals  = data.map((d) => d.value);
+  const vals = data.map((d) => d.value);
+  // Baseline in die Skala einbeziehen, damit die Referenzlinie immer sichtbar ist
+  if (baselineValue !== undefined && baselineValue > 0) vals.push(baselineValue);
   const minV  = Math.min(...vals);
   const maxV  = Math.max(...vals);
   const vRange = maxV > minV ? maxV - minV : Math.abs(maxV) * 0.1 || 1;
@@ -38,6 +66,8 @@ export function PortfolioChart({ data, color }: Props) {
 
   // ── SVG path helpers ──────────────────────────────────────────────────────
 
+  function f(n: number) { return n.toFixed(2); }
+
   function buildLinePath(points: { x: number; y: number }[]): string {
     if (points.length < 2) return '';
     let d = `M ${f(points[0].x)} ${f(points[0].y)}`;
@@ -50,30 +80,16 @@ export function PortfolioChart({ data, color }: Props) {
     return d;
   }
 
-  function f(n: number) { return n.toFixed(2); }
-
   const linePath = buildLinePath(pts);
   const last     = pts[pts.length - 1];
   const areaPath = `${linePath} L ${f(last.x)} ${VH - PADB} L ${f(PADL)} ${VH - PADB} Z`;
 
-  // ── Interaction ───────────────────────────────────────────────────────────
-
-  const handlePointer = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
-      const svg = svgRef.current;
-      if (!svg) return;
-      const rect  = svg.getBoundingClientRect();
-      const ratio = (e.clientX - rect.left) / rect.width;
-      const raw   = ratio * (data.length - 1);
-      setHoverIdx(Math.max(0, Math.min(data.length - 1, Math.round(raw))));
-    },
-    [data.length],
-  );
-
   const hoverPt   = hoverIdx !== null ? pts[hoverIdx]  : null;
   const hoverData = hoverIdx !== null ? data[hoverIdx] : null;
+  const scrubbing = hoverPt !== null;
 
-  // ── X-axis date helper ────────────────────────────────────────────────────
+  const baselineY =
+    baselineValue !== undefined && baselineValue > 0 ? toY(baselineValue) : null;
 
   function axisDate(dateStr: string) {
     return new Date(dateStr + 'T00:00:00').toLocaleDateString('de-DE', {
@@ -81,92 +97,130 @@ export function PortfolioChart({ data, color }: Props) {
     });
   }
 
+  function scrubDate(dateStr: string) {
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('de-DE', {
+      weekday: 'short', day: '2-digit', month: 'short',
+    });
+  }
+
+  // Datum-Label am Crosshair horizontal einklemmen, damit es nie überläuft
+  const labelX = hoverPt ? Math.max(45, Math.min(VW - 45, hoverPt.x)) : 0;
+
   return (
-    <div className="relative select-none" style={{ touchAction: 'none' }}>
+    <div className="relative select-none" style={{ touchAction: 'pan-y' }}>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${VW} ${VH}`}
         className="w-full overflow-visible"
         style={{ height: 160 }}
         onPointerMove={handlePointer}
-        onPointerLeave={() => setHoverIdx(null)}
-        onPointerCancel={() => setHoverIdx(null)}
+        onPointerDown={handlePointer}
+        onPointerLeave={clearScrub}
+        onPointerCancel={clearScrub}
+        onPointerUp={clearScrub}
       >
         <defs>
           <linearGradient id="pf-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={color} stopOpacity="0.18" />
+            <stop offset="0%"   stopColor={color} stopOpacity="0.16" />
             <stop offset="100%" stopColor={color} stopOpacity="0"    />
           </linearGradient>
           <clipPath id="pf-clip">
-            <rect x={PADL} y={PADT} width={chartW} height={chartH + 4} />
+            <rect x={PADL} y={PADT - 6} width={chartW} height={chartH + 10} />
+          </clipPath>
+          {/* Beim Scrubben: nur der Bereich links vom Finger bleibt farbig */}
+          <clipPath id="pf-clip-active">
+            <rect
+              x={PADL}
+              y={PADT - 6}
+              width={scrubbing ? Math.max(0, (hoverPt as { x: number }).x - PADL) : chartW}
+              height={chartH + 10}
+            />
           </clipPath>
         </defs>
 
-        {/* Gradient area fill */}
-        <path d={areaPath} fill="url(#pf-grad)" clipPath="url(#pf-clip)" />
+        {/* Baseline: Zeitraum-Startwert als gestrichelte Referenzlinie */}
+        {baselineY !== null && (
+          <line
+            x1={PADL} y1={f(baselineY)}
+            x2={VW - PADR} y2={f(baselineY)}
+            stroke="#475569"
+            strokeWidth="1"
+            strokeDasharray="1 5"
+            strokeLinecap="round"
+            strokeOpacity="0.8"
+          />
+        )}
 
-        {/* Main line */}
+        {/* Gradient-Fläche — beim Scrubben nur bis zum Finger */}
+        <path d={areaPath} fill="url(#pf-grad)" clipPath="url(#pf-clip-active)" />
+
+        {/* Basis-Linie: beim Scrubben komplett sichtbar, aber abgedimmt */}
+        {scrubbing && (
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#475569"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeOpacity="0.45"
+            clipPath="url(#pf-clip)"
+          />
+        )}
+
+        {/* Farbige Linie — beim Scrubben bis zum Finger geclippt */}
         <path
           d={linePath}
           fill="none"
           stroke={color}
-          strokeWidth="2"
+          strokeWidth="2.25"
           strokeLinecap="round"
           strokeLinejoin="round"
+          clipPath="url(#pf-clip-active)"
         />
 
-        {/* Dot at the most recent point */}
-        <circle cx={last.x} cy={last.y} r="3.5" fill={color} />
-        <circle cx={last.x} cy={last.y} r="7"   fill={color} fillOpacity="0.15" />
+        {/* Live-Punkt am aktuellen Wert — mit dezentem Puls */}
+        {!scrubbing && (
+          <>
+            <circle cx={last.x} cy={last.y} r="7" fill={color} fillOpacity="0.15">
+              <animate attributeName="r" values="5;9;5" dur="2.4s" repeatCount="indefinite" />
+              <animate attributeName="fill-opacity" values="0.25;0.06;0.25" dur="2.4s" repeatCount="indefinite" />
+            </circle>
+            <circle cx={last.x} cy={last.y} r="3.5" fill={color} />
+          </>
+        )}
 
-        {/* X-axis dates — bottom-left and bottom-right only */}
-        <text x={PADL + 2} y={VH - 4} fontSize="14" fill="#d1d5db">
+        {/* X-Achse: nur Start- und Enddatum, dezent */}
+        <text x={PADL + 2} y={VH - 4} fontSize="13" fill="#475569">
           {axisDate(data[0].date)}
         </text>
-        <text x={VW - PADR - 2} y={VH - 4} fontSize="14" fill="#d1d5db" textAnchor="end">
+        <text x={VW - PADR - 2} y={VH - 4} fontSize="13" fill="#475569" textAnchor="end">
           {axisDate(data[data.length - 1].date)}
         </text>
 
-        {/* Hover crosshair */}
-        {hoverPt && (
+        {/* Scrub-Crosshair: Linie + Punkt + Datum darüber */}
+        {hoverPt && hoverData && (
           <>
             <line
-              x1={f(hoverPt.x)} y1={PADT}
+              x1={f(hoverPt.x)} y1={PADT - 2}
               x2={f(hoverPt.x)} y2={VH - PADB}
-              stroke={color}
+              stroke="#64748b"
               strokeWidth="1"
-              strokeDasharray="4 3"
-              strokeOpacity="0.35"
             />
-            <circle cx={f(hoverPt.x)} cy={f(hoverPt.y)} r="5" fill="white" stroke={color} strokeWidth="2" />
+            <circle cx={f(hoverPt.x)} cy={f(hoverPt.y)} r="5.5" fill="#0a0a0f" stroke={color} strokeWidth="2.5" />
+            <text
+              x={f(labelX)}
+              y={PADT - 4}
+              fontSize="13"
+              fontWeight="600"
+              fill="#94a3b8"
+              textAnchor="middle"
+            >
+              {scrubDate(hoverData.date)}
+            </text>
           </>
         )}
       </svg>
-
-      {/* Hover tooltip */}
-      {hoverIdx !== null && hoverData && hoverPt && (
-        <div
-          className="absolute top-0 pointer-events-none z-10"
-          style={{
-            left: `${(hoverPt.x / VW) * 100}%`,
-            transform:
-              hoverIdx >= Math.floor(data.length * 0.55)
-                ? 'translateX(calc(-100% - 8px))'
-                : 'translateX(8px)',
-          }}
-        >
-          <div className="bg-[#13131e] border border-[#2a2a3a] text-white rounded-2xl px-3.5 py-2.5 shadow-2xl whitespace-nowrap">
-            <p className="text-[10px] text-slate-500 leading-none mb-1">
-              {new Date(hoverData.date + 'T00:00:00').toLocaleDateString('de-DE', {
-                weekday: 'short', day: '2-digit', month: 'short',
-              })}
-            </p>
-            <p className="text-sm font-black tabular-nums leading-none">
-              {formatEur(hoverData.value)}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, Loader2, BarChart3, Search, X, Check } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { NavBar } from '@/components/NavBar';
-import { PortfolioChart } from '@/components/PortfolioChart';
+import { PortfolioChart, type ChartPoint } from '@/components/PortfolioChart';
 import {
   normalizeHolding, computePnl, computeChartData, filterByRange,
   formatEur, setCodeFromId,
@@ -79,6 +79,7 @@ export default function PortfolioPage() {
   const [showReset,  setShowReset]  = useState(false);
   const [editTarget, setEditTarget] = useState<PortfolioHolding | null>(null);
   const [timeRange,  setTimeRange]  = useState<keyof typeof RANGE_DAYS>('1M');
+  const [scrubPoint, setScrubPoint] = useState<ChartPoint | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -147,6 +148,15 @@ export default function PortfolioPage() {
   const isUp      = rangePnl >= 0;
   const lineColor = isUp ? '#34d399' : '#fb7185';
 
+  // Scrubbing (Trade-Republic-Pattern): Beim Ziehen über den Chart zeigt der Header
+  // den Wert am Finger + die Veränderung von Zeitraum-Start bis zu diesem Punkt.
+  const displayValue  = scrubPoint ? scrubPoint.value : totalValue;
+  const displayPnl    = scrubPoint && rangeStartValue !== null ? scrubPoint.value - rangeStartValue : rangePnl;
+  const displayPnlPct = scrubPoint && rangeStartValue !== null && rangeStartValue > 0
+    ? (displayPnl / rangeStartValue) * 100
+    : rangePnlPct;
+  const displayUp = displayPnl >= 0;
+
   if (!mounted) return <div className="min-h-screen bg-[#0a0a0f]" />;
 
   if (holdings.length === 0 && !showAdd) {
@@ -190,24 +200,28 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          {/* Total value */}
+          {/* Total value — beim Scrubben der Wert am Finger (Trade-Republic-Pattern) */}
           <p className="text-[46px] leading-none font-black text-white tabular-nums tracking-tight">
-            {formatEur(totalValue)}
+            {formatEur(displayValue)}
           </p>
 
-          {/* P&L — gekoppelt an gewählten Zeitraum */}
+          {/* P&L — gekoppelt an Zeitraum bzw. Scrub-Position */}
           <div className="flex items-baseline gap-2 mt-3 mb-1">
-            <span className={`text-base font-bold tabular-nums ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {isUp ? '+' : ''}{formatEur(rangePnl)}
+            <span className={`text-base font-bold tabular-nums ${displayUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {displayUp ? '+' : ''}{formatEur(displayPnl)}
             </span>
-            <span className={`text-sm font-semibold tabular-nums ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              ({isUp ? '+' : ''}{rangePnlPct.toFixed(2)}%)
+            <span className={`text-sm font-semibold tabular-nums ${displayUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+              ({displayUp ? '+' : ''}{displayPnlPct.toFixed(2)}%)
             </span>
           </div>
-          <p className="text-xs text-slate-600 mb-6">
-            {rangeStartValue !== null
-              ? `${RANGE_LABEL[timeRange]} · Start ${formatEur(rangeStartValue)}`
-              : `seit Kauf · Einstand ${formatEur(totalCost)}`}
+          <p className="text-xs text-slate-600 mb-6 tabular-nums">
+            {scrubPoint
+              ? new Date(scrubPoint.date + 'T00:00:00').toLocaleDateString('de-DE', {
+                  weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+                })
+              : rangeStartValue !== null
+                ? `${RANGE_LABEL[timeRange]} · Start ${formatEur(rangeStartValue)}`
+                : `seit Kauf · Einstand ${formatEur(totalCost)}`}
           </p>
 
           {/* Fehler-Hinweis wenn Live-Preise nicht geladen werden konnten */}
@@ -224,7 +238,12 @@ export default function PortfolioPage() {
 
           {/* Chart */}
           <div className="-mx-1 mb-3">
-            <PortfolioChart data={chartData} color={lineColor} />
+            <PortfolioChart
+              data={chartData}
+              color={lineColor}
+              baselineValue={rangeStartValue ?? undefined}
+              onScrub={setScrubPoint}
+            />
           </div>
 
           {/* Time-range segmented control */}
@@ -232,7 +251,7 @@ export default function PortfolioPage() {
             {(Object.keys(RANGE_DAYS) as Array<keyof typeof RANGE_DAYS>).map((r) => (
               <button
                 key={r}
-                onClick={() => setTimeRange(r)}
+                onClick={() => { setTimeRange(r); setScrubPoint(null); }}
                 className={`flex-1 text-xs font-bold py-1.5 rounded-full transition-all duration-150 ${
                   timeRange === r
                     ? 'bg-[#2a2a3a] text-slate-200 shadow-sm'

@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.11.0] — 2026-07-17 · Portfolio-Chart auf Finance-App-Niveau (Trade-Republic-Pattern)
+
+### Neu
+- **Scrubbing mit Header-Kopplung**: Beim Ziehen über den Chart zeigt die große Zahl oben den Wert am Finger, darunter die Veränderung vom Zeitraum-Start bis zu diesem Punkt und das Datum — wie bei Trade Republic. Loslassen springt zurück auf den Live-Wert
+- **Baseline-Referenzlinie**: Der Startwert des gewählten Zeitraums erscheint als gestrichelte Linie im Chart — die Kurve ist relativ dazu grün/rot
+- **Scrub-Dimmen**: Beim Ziehen bleibt nur der Bereich links vom Finger farbig, der Rest dimmt ab — der betrachtete Zeitpunkt ist sofort erkennbar
+- **Live-Punkt pulsiert** dezent am aktuellen Wert
+
+### Geändert
+- Tooltip-Kästchen entfernt — der Wert wandert in den Header, am Crosshair bleibt nur ein dezentes Datums-Label (aufgeräumter, mobile-freundlicher)
+- Zeitraum-Wechsel setzt den Scrub-Zustand zurück
+
+---
+
 ## [2.10.1] — 2026-07-17 · Portfolio-Chart: lückenlose Tagesserie statt Sprung-Kurve
 
 ### Behoben
