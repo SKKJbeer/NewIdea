@@ -4,6 +4,7 @@ import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
 import { fetchRecentSets } from '@/lib/pokemon-api';
+import { listGeneratedGuideSlugs } from '@/lib/guide-storage';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -37,9 +38,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/datenschutz`,       lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
   ];
 
-  // Guides — aus lokaler Datenquelle, immer verfügbar.
-  const guidePages: MetadataRoute.Sitemap = GUIDES.map((g) => ({
-    url: `${BASE_URL}/guides/${g.slug}`,
+  // Guides — statische (lokal, immer verfügbar) + automatisch generierte (Supabase).
+  const generatedGuides = await listGeneratedGuideSlugs().catch(() => [] as string[]);
+  const guideSlugs = [...new Set([...GUIDES.map((g) => g.slug), ...generatedGuides])];
+  const guidePages: MetadataRoute.Sitemap = guideSlugs.map((slug) => ({
+    url: `${BASE_URL}/guides/${slug}`,
     lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.6,

@@ -265,6 +265,40 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, article-generator.ts, 
 
 ---
 
+## Guide-Pipeline (automatisierte Evergreen-Guides)
+
+**Ablauf:** Daily-Cron generiert **dienstags + freitags** (versetzt zu Artikel-Tagen So/Do) den
+nächsten Guide aus der Themen-Warteschlange `src/lib/guide-topics.ts`.
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| Themen-Queue | `src/lib/guide-topics.ts` | Kuratierte Themen mit Slug, Brief (Such-Intention), Outline — Reihenfolge = Priorität |
+| Generator | `src/lib/guide-generator.ts` | Claude-Generierung mit GUIDE_RULES + **Qualitäts-Gate** `validateGuide()` |
+| Regeln | `src/lib/content-rules.ts` | EINE Regex-Quelle für Build-Tests UND Laufzeit-Gate |
+| Storage | `src/lib/guide-storage.ts` | Supabase-Tabelle `generated_guides` (slug PK, content JSONB) |
+| Anzeige | `/guides` + `/guides/[slug]` | Statische GUIDES + generierte zusammengeführt, Sitemap inklusive |
+
+**Qualitäts-Gate (nicht verhandelbar):** Verletzt die KI-Ausgabe eine Content-Regel
+(Preiszahl im Text, Ich-Form, Kaufempfehlung, KI-Floskel, Emoji im Fließtext), wird der Guide
+**NICHT gespeichert** — Status `rejected_quality`, neuer Versuch am nächsten Guide-Tag.
+Lieber kein Guide als ein regelwidriger.
+
+**Supabase-Tabelle (einmalig anlegen, SQL-Editor):**
+```sql
+CREATE TABLE IF NOT EXISTS generated_guides (
+  slug       TEXT PRIMARY KEY,
+  title      TEXT NOT NULL,
+  content    JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+**Neue Themen:** Unten an `GUIDE_TOPICS` anhängen — Slug-Kollision mit statischen Guides
+wird vom Test `guide-pipeline.test.ts` abgefangen. Briefs müssen Such-Intention nennen
+und die Wahrheits-/Neutralitätsregeln respektieren.
+
+---
+
 ## Content-Tonalität (PFLICHT — keine Kaufempfehlungen, kein Persona-Name!)
 
 **REGEL:** Alle Inhalte sind sachliche, neutrale Marktanalysen und -berichte.

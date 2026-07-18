@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.13.0] — 2026-07-18 · Automatisierte Guide-Pipeline mit Qualitäts-Gate
+
+### Neu
+- **Guide-Generierung automatisiert**: Der Daily-Cron generiert dienstags + freitags den nächsten Evergreen-Guide aus einer kuratierten Themen-Warteschlange (12 Themen nach echter Sammler-Such-Intention: Karten verkaufen, Sammlung bewerten, Erstauflage erkennen, PSA vs. CGC, Zustandsstufen, japanische Karten, Eltern-Guide u.a.)
+- **Hartes Qualitäts-Gate**: Jeder generierte Guide läuft durch dieselben Regeln wie die Build-Tests (keine Preiszahlen, keine Kaufempfehlungen, keine Ich-Form, keine KI-Floskeln, kein Emoji im Fließtext). Verstoß = Guide wird NICHT gespeichert
+- **Geteilte Regel-Quelle** (`content-rules.ts`): Build-Tests und Laufzeit-Gate nutzen exakt dieselben Regexe — keine Drift möglich
+- `/guides` + Sitemap führen statische und generierte Guides zusammen; Supabase-Tabelle `generated_guides`
+- 10 neue Tests (109 gesamt)
+
+### Hinweis
+- Einmalig in Supabase anzulegen: Tabelle `generated_guides` (SQL in CLAUDE.md)
+
+---
+
 ## [2.12.0] — 2026-07-18 · Vorrendern + Bild-Shimmer: keine Erstbesucher-Wartezeit mehr
 
 ### Neu

@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
-import { getGuide, GUIDES } from '@/lib/guides';
+import { getGuide, GUIDES, type Guide } from '@/lib/guides';
+import { loadGeneratedGuide, listGeneratedGuides } from '@/lib/guide-storage';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { Metadata } from 'next';
@@ -12,9 +13,14 @@ export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
 }
 
+// Statischer Guide zuerst (kein DB-Zugriff nötig), sonst generierter aus Supabase.
+async function resolveGuide(slug: string): Promise<Guide | null> {
+  return getGuide(slug) ?? (await loadGeneratedGuide(slug).catch(() => null));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const guide = getGuide(slug);
+  const guide = await resolveGuide(slug);
   if (!guide) return { title: 'Guide nicht gefunden' };
   return {
     title: `${guide.title} — PokéMarket Intelligence`,
@@ -29,10 +35,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const guide = getGuide(slug);
+  const guide = await resolveGuide(slug);
   if (!guide) notFound();
 
-  const otherGuides = GUIDES.filter((g) => g.slug !== slug).slice(0, 3);
+  // "Weitere Guides": aus dem Gesamtbestand (statisch + generiert)
+  const generated = await listGeneratedGuides().catch(() => []);
+  const staticSlugs = new Set(GUIDES.map((g) => g.slug));
+  const allGuides = [...GUIDES, ...generated.filter((g) => !staticSlugs.has(g.slug))];
+  const otherGuides = allGuides.filter((g) => g.slug !== slug).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">

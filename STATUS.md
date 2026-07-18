@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.12.0` · **Stand:** 18. Juli 2026 · **Branch:** `main`
+**Version:** `v2.13.0` · **Stand:** 18. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -138,7 +138,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.11.0 | Portfolio-Chart Finance-App-Niveau: Scrubbing mit Header-Kopplung, Baseline, Scrub-Dimmen, Puls-Punkt |
 | v2.11.1 | Performance & Feedback: Loading-Skeletons für alle Routen, fehlende API-Timeouts, Tap-Feedback |
 | v2.12.0 | Build-Vorrendern (12 Sets + Top-20-Karten) + Shimmer-Bildplatzhalter mit weichem Einblenden |
+| v2.13.0 | Automatisierte Guide-Pipeline: 12-Themen-Queue, Di+Fr-Cron, Qualitäts-Gate, generated_guides-Tabelle |
 
 ---
 
-*Zuletzt aktualisiert: v2.12.0 — 18. Juli 2026*
+*Zuletzt aktualisiert: v2.13.0 — 18. Juli 2026*

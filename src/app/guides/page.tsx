@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { GUIDES } from '@/lib/guides';
+import { listGeneratedGuides } from '@/lib/guide-storage';
 import { Clock, ChevronRight, BookOpen } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -11,7 +12,13 @@ export const metadata: Metadata = {
   description: 'Kostenlose Pokémon-Karten-Guides für Sammler und Investoren: Seltenheitsstufen, Grading, Lagerung und Investment-Strategien verständlich erklärt.',
 };
 
-export default function GuidesPage() {
+export default async function GuidesPage() {
+  // Statische Guides + automatisch generierte (Supabase) zusammenführen.
+  // Bei nicht erreichbarer DB: nur die statischen — Seite bleibt funktionsfähig.
+  const generated = await listGeneratedGuides().catch(() => []);
+  const staticSlugs = new Set(GUIDES.map((g) => g.slug));
+  const allGuides = [...GUIDES, ...generated.filter((g) => !staticSlugs.has(g.slug))];
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
@@ -32,7 +39,7 @@ export default function GuidesPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pb-16 -mt-5 space-y-3">
-        {GUIDES.map((guide, i) => (
+        {allGuides.map((guide, i) => (
           <Link
             key={guide.slug}
             href={`/guides/${guide.slug}`}

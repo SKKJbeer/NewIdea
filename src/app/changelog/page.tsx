@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.13.0',
+    date: '18. Juli 2026',
+    label: 'Automatisierte Guide-Pipeline mit Qualitäts-Gate',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Guides werden automatisch generiert (Di + Fr) — aus 12 kuratierten Sammler-Themen' },
+      { type: 'new', text: 'Qualitäts-Gate: regelwidrige KI-Ausgaben werden nicht veröffentlicht' },
+      { type: 'new', text: 'Guide-Übersicht und Sitemap zeigen statische + generierte Guides zusammen' },
+    ],
+  },
+  {
     version: '2.12.0',
     date: '18. Juli 2026',
     label: 'Vorrendern + Bild-Shimmer: keine Erstbesucher-Wartezeit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: '12 neueste Set-Seiten + Top-20-Karten werden beim Deploy vorgerendert — sofort aus dem CDN' },
       { type: 'new',     text: 'Kartenbilder: animierter Shimmer-Platzhalter, dann weiches Einblenden statt Aufpoppen' },

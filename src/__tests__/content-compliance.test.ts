@@ -12,17 +12,9 @@ import { GUIDES } from '@/lib/guides';
 // Schlägt ein Test fehl, verletzt neuer Content die Wahrheits-/Tonalitätsregeln.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PRICE_IN_TEXT = /\d+(?:[.,]\d+)?\s*(?:€|EUR\b|Euro\b|\$|Dollar\b)/;
-const FIRST_PERSON = /\b(?:ich|Ich)\b/;
-const PERSONA_NAME = /\bMarco\b/i;
-const BUY_ADVICE =
-  /kaufenswert|pflichtkauf|kaufchance|kaufzeitpunkt|jetzt kaufen|jetzt zuschlagen|finger weg|geheimtipp|ich empfehle|solltest (?:du )?(?:jetzt )?kaufen|rendite|% des budgets/i;
-// KI-Floskeln (siehe .claude/commands/schreibstil.md) — Texte müssen menschlich/nüchtern klingen.
-const AI_PHRASES =
-  /atemberaubend|revolutionär|bahnbrechend|faszinierend|spektakulär|hier ein überblick|in der heutigen zeit|tauchen wir|zusammenfassend lässt sich|es ist wichtig zu beachten|abschließend lässt sich|fazit:|in diesem artikel/i;
-// Emojis gehören in Überschriften/Tips (visuelle Anker), nie in den Fließtext.
-// Bewusst nur der moderne Emoji-Block — Kartensymbole wie ●◆★ sind legitime Fachzeichen.
-const EMOJI = /[\u{1F300}-\u{1FAFF}]/u;
+// Regeln kommen aus der geteilten Quelle — dieselben Regexe laufen zur Laufzeit
+// als Qualitäts-Gate der KI-Generierung (guide-generator.ts).
+import { PRICE_IN_TEXT, FIRST_PERSON, PERSONA_NAME, BUY_ADVICE, AI_PHRASES, EMOJI } from '@/lib/content-rules';
 
 // Sammelt alle Fließtext-Felder eines Artikels (ohne die strukturierten highlight-Objekte).
 function articleTexts(article: Omit<Article, 'generatedAt'> | Article): Array<[string, string]> {
