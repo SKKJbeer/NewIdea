@@ -23,54 +23,62 @@ export default function Impressum() {
 
         <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 space-y-6 text-slate-400 text-sm leading-relaxed">
           <section>
-            <h2 className="font-bold text-slate-200 mb-2">Angaben gemäß § 5 TMG</h2>
+            <h2 className="font-bold text-slate-200 mb-2">Angaben gemäß § 5 DDG</h2>
             <p>
-              [Dein Vor- und Nachname]<br />
-              [Straße und Hausnummer]<br />
-              [PLZ Ort]
+              Steffen Karjoth<br />
+              Corelliweg 28<br />
+              70195 Stuttgart<br />
+              Deutschland
             </p>
           </section>
 
           <section>
             <h2 className="font-bold text-slate-200 mb-2">Kontakt</h2>
-            <p>E-Mail: [deine@email.de]</p>
+            <p>E-Mail: bierfinanzen@gmail.com</p>
           </section>
 
           <section>
             <h2 className="font-bold text-slate-200 mb-2">Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)</h2>
             <p>
-              [Dein Vor- und Nachname]<br />
-              [Straße und Hausnummer]<br />
-              [PLZ Ort]
+              Steffen Karjoth<br />
+              Corelliweg 28<br />
+              70195 Stuttgart
             </p>
           </section>
 
           <section>
             <h2 className="font-bold text-slate-200 mb-2">Haftungsausschluss</h2>
-            <h3 className="font-semibold mt-3 mb-1">Haftung für Inhalte</h3>
+            <h3 className="font-semibold mt-3 mb-1 text-slate-300">Haftung für Inhalte</h3>
             <p>
-              Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Die Inhalte
-              stellen keine Anlageberatung dar und ersetzen diese nicht.
+              Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die
+              Richtigkeit, Vollständigkeit und Aktualität der Inhalte — insbesondere der angezeigten
+              Marktpreise — wird keine Gewähr übernommen. Die Inhalte stellen keine Anlageberatung
+              dar und ersetzen diese nicht.
             </p>
-            <h3 className="font-semibold mt-3 mb-1">Haftung für Links</h3>
+            <h3 className="font-semibold mt-3 mb-1 text-slate-300">Haftung für Links</h3>
             <p>
               Diese Website enthält Links zu externen Websites Dritter, auf deren Inhalte wir
-              keinen Einfluss haben.
+              keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
+              Anbieter verantwortlich.
             </p>
           </section>
 
           <section>
             <h2 className="font-bold text-slate-200 mb-2">Affiliate-Hinweis</h2>
             <p>
-              Diese Website enthält Affiliate-Links. Wenn du über diese Links einkaufst, erhalten
-              wir eine kleine Provision — für dich entstehen dabei keine Mehrkosten.
+              Diese Website enthält Affiliate-Links (gekennzeichnet). Wenn du über diese Links
+              einkaufst, erhalten wir eine Provision — für dich entstehen dabei keine Mehrkosten.
             </p>
           </section>
 
-          <p className="text-xs text-slate-600 pt-4 border-t border-[#1e1e30]">
-            Bitte trage deine persönlichen Kontaktdaten in die eckigen Klammern ein,
-            bevor diese Seite live geht.
-          </p>
+          <section>
+            <h2 className="font-bold text-slate-200 mb-2">Markenhinweis</h2>
+            <p>
+              Pokémon und alle zugehörigen Namen und Abbildungen sind Marken von Nintendo,
+              Creatures Inc. und GAME FREAK Inc. Diese Website ist ein inoffizielles Fan-Projekt
+              und steht in keiner Verbindung zu diesen Unternehmen.
+            </p>
+          </section>
         </div>
       </div>
     </div>

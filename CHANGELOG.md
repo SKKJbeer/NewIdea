@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.14.1] — 2026-07-18 · Impressum & Datenschutz: rechtssicher mit echten Daten
+
+### Geändert
+- **Impressum** mit echten Betreiberdaten befüllt, auf § 5 DDG aktualisiert (löste 2024 das TMG ab), Haftungs-, Affiliate- und Markenhinweis ergänzt
+- **Datenschutzerklärung komplett neu geschrieben** — beschreibt jetzt den echten Datenfluss: Vercel Hosting + cookieloses Web Analytics, technisch notwendige Speicherungen (Sprach-Cookie, Portfolio/Merkliste nur lokal im Browser), externe Kartenbilder, Affiliate-Links, Betroffenenrechte inkl. zuständiger Aufsichtsbehörde (LfDI BW)
+- Veraltete Abschnitte entfernt (Newsletter existiert nicht mehr, "keine Analysedienste" stimmte seit Vercel Analytics nicht mehr)
+
+---
+
 ## [2.14.0] — 2026-07-18 · Phase 0: Vercel Analytics + globaler Site-Footer
 
 ### Neu

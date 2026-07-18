@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.14.1',
+    date: '18. Juli 2026',
+    label: 'Impressum & Datenschutz: rechtssicher',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Impressum mit Betreiberdaten befüllt, auf § 5 DDG aktualisiert, Markenhinweis ergänzt' },
+      { type: 'changed', text: 'Datenschutzerklärung komplett neu — beschreibt den echten Datenfluss (cookieloses Analytics, lokale Speicher, externe Bilder)' },
+    ],
+  },
+  {
     version: '2.14.0',
     date: '18. Juli 2026',
     label: 'Vercel Analytics + globaler Site-Footer',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Vercel Analytics: Besucher und Seitenaufrufe werden ab jetzt gemessen' },
       { type: 'new',     text: 'Globaler Footer mit Navigation (Markt/Wissen/Tools/Rechtliches) auf jeder Seite' },

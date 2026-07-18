@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.14.0` · **Stand:** 18. Juli 2026 · **Branch:** `main`
+**Version:** `v2.14.1` · **Stand:** 18. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -24,7 +24,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR |
 | Reels Studio | ✅ Fertig | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
 | Design-System | ✅ Fertig | Einheitlicher Dark Mode über alle Seiten, in CLAUDE.md verankert |
-| **Impressum & Datenschutz** | 🔴 **Platzhalter** | **Eckige Klammern = akutes Rechtsrisiko — echte Daten nötig!** |
+| Impressum & Datenschutz | ✅ Fertig | Echte Daten, § 5 DDG, Datenschutz beschreibt echten Datenfluss (cookielos) |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | Marktbericht + Newsletter-Draft, CRON_SECRET ✅ |
 | Täglicher Cron (08:00 UTC) | ✅ Aktiv | Preis-Snapshots + Publish-Artikel (So/Do), verwaiste Crons entfernt |
 | Supabase Preis-Snapshots | ✅ Aktiv | Sammelt täglich echte Daten seit Inbetriebnahme |
@@ -65,9 +65,9 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ## Offene Aufgaben
 
-### Priorität 1 — Rechtliches (Pflicht in Deutschland!)
-- [ ] **Impressum** `/impressum` — alle `[Platzhalter]` mit echten Daten ersetzen
-- [ ] **Datenschutz** `/datenschutz` — alle `[Platzhalter]` mit echten Daten ersetzen
+### Priorität 1 — Rechtliches ✅ ERLEDIGT (v2.14.1)
+- [x] **Impressum** `/impressum` — echte Daten eingetragen
+- [x] **Datenschutz** `/datenschutz` — komplett neu, beschreibt echten Datenfluss
 
 ### Priorität 2 — Einnahmen aktivieren
 - [ ] **Cardmarket-Affiliate** — eigenen Link in `NEXT_PUBLIC_CARDMARKET_URL` eintragen
@@ -140,7 +140,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.12.0 | Build-Vorrendern (12 Sets + Top-20-Karten) + Shimmer-Bildplatzhalter mit weichem Einblenden |
 | v2.13.0 | Automatisierte Guide-Pipeline: 12-Themen-Queue, Di+Fr-Cron, Qualitäts-Gate, generated_guides-Tabelle |
 | v2.14.0 | Phase 0: Vercel Analytics (Messung!) + globaler Site-Footer mit Navigation, Legal-Links entdoppelt |
+| v2.14.1 | Impressum & Datenschutz rechtssicher: echte Daten, § 5 DDG, Datenschutz für echten Datenfluss |
 
 ---
 
-*Zuletzt aktualisiert: v2.14.0 — 18. Juli 2026*
+*Zuletzt aktualisiert: v2.14.1 — 18. Juli 2026*
