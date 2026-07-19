@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.18.1` · **Stand:** 19. Juli 2026 · **Branch:** `main`
+**Version:** `v2.19.0` · **Stand:** 19. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -150,7 +150,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.17.3 | Artikel-Fallbacks werden persistiert (kein Regenerieren pro Aufruf); KI-/Auto-Generierungs-Hinweise auf Content-Seiten neutralisiert (Legal bleibt) |
 | v2.18.0 | Content-System: Content-Creator-Prompt, Hero-Bild + Level-Badge (Einsteiger/Profi-Mix), Weiterlesen-Verknüpfung, Kontinuität über letzte Titel |
 | v2.18.1 | Social-Sharing: dynamische OG-Vorschaubilder (Karten mit Preis, Artikel mit Leitkarte, Startseite) via next/og |
+| v2.19.0 | Einsteiger-Seite /einsteiger (Onboarding, ikonische Karten, Guides) + „Neu hier?"-Banner auf Startseite + NavBar/Footer/Sitemap |
 
 ---
 
-*Zuletzt aktualisiert: v2.18.1 — 19. Juli 2026*
+*Zuletzt aktualisiert: v2.19.0 — 19. Juli 2026*

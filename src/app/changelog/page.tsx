@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.0',
+    date: '19. Juli 2026',
+    label: 'Einsteiger-Seite & Einsteiger-Freundlichkeit',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Neue Einsteiger-Seite /einsteiger: freundlicher Start ohne Jargon, „Was ist meine Karte wert?", 3-Schritte-Onboarding, ikonische Karten, Guides' },
+      { type: 'new', text: '„Neu hier?"-Einstieg auf der Startseite — holt Neulinge ab, ohne Fortgeschrittene zu stören' },
+      { type: 'new', text: 'Einstieg in NavBar, Footer und Sitemap verlinkt' },
+    ],
+  },
+  {
     version: '2.18.1',
     date: '19. Juli 2026',
     label: 'Social-Sharing: dynamische Vorschaubilder',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Geteilte Links (WhatsApp, Discord, X, Facebook) zeigen jetzt ein attraktives Vorschaubild statt nacktem Text' },
       { type: 'new', text: 'Karten-Vorschau mit Kartenmotiv + Preis, Artikel-Vorschau mit Titel + Leitkarte + Level' },

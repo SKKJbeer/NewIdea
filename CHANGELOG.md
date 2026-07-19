@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.0] — 2026-07-19 · Einsteiger-Seite & Einsteiger-Freundlichkeit
+
+### Neu
+- **Neue Einsteiger-Seite `/einsteiger`**: Ein freundlicher Startpunkt ohne Trading-Jargon — „Was sind deine Pokémon-Karten wert?" mit großer Suche, 3-Schritte-Onboarding (Wert prüfen → Grundlagen lernen → Sammlung im Blick), kuratierte ikonische Karten (Glurak, Pikachu, Nachtara VMAX u.a. — alle API-verifiziert) und die Einsteiger-Guides
+- **„Neu hier?"-Einstieg auf der Startseite**: dezenter Banner über dem Markt-Dashboard, der Neulinge abholt, ohne Fortgeschrittene zu stören
+- **Einstieg überall verlinkt**: NavBar (erster Punkt), Footer und Sitemap
+
+### Warum
+Die Startseite wirkt mit Marktindex und Trend-Charts auf reine Einsteiger schnell wie „nur für Investoren". Die neue Seite gibt ihnen einen einladenden, verständlichen Weg hinein — passend zum Level-Mix aus v2.18.0.
+
+---
+
 ## [2.18.1] — 2026-07-19 · Social-Sharing: dynamische Vorschaubilder (OG-Images)
 
 ### Neu

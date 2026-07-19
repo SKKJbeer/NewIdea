@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Zap, Search, BarChart3 } from 'lucide-react';
 
 const NAV_LINKS = [
+  { href: '/einsteiger',   label: 'Einsteiger'   },
   { href: '/suche',        label: 'Suche'       },
   { href: '/sets',         label: 'Sets'         },
   { href: '/marktbericht', label: 'Marktbericht' },

@@ -5,7 +5,7 @@ import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
 import Link from 'next/link';
-import { TrendingUp, TrendingDown, BarChart2, ArrowRight, Zap, BookOpen, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart2, ArrowRight, Zap, BookOpen, Activity, Sparkles } from 'lucide-react';
 import { GUIDES } from '@/lib/guides';
 import type { PriceDataPoint } from '@/types';
 import type { Metadata } from 'next';
@@ -279,6 +279,21 @@ export default async function Home() {
       )}
 
       <main className="mx-auto max-w-6xl space-y-10 px-4 pt-8 pb-20">
+
+        {/* ── EINSTEIGER ON-RAMP ──────────────────────────────────────────── */}
+        <Link
+          href="/einsteiger"
+          className="group -mb-2 flex items-center gap-3 rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-600/10 to-transparent p-4 transition-all hover:border-violet-500/40 hover:from-violet-600/20"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
+            <Sparkles size={18} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-black text-slate-100">Neu bei Pokémon-Karten?</p>
+            <p className="text-xs text-slate-500">In 3 Schritten zum Wert deiner Sammlung — ganz ohne Vorwissen.</p>
+          </div>
+          <ArrowRight size={16} className="shrink-0 text-violet-400 transition-transform group-hover:translate-x-0.5" />
+        </Link>
 
         {/* ── KPI CARDS ───────────────────────────────────────────────────── */}
         {hasData && (

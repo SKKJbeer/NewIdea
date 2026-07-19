@@ -13,6 +13,7 @@ const NAV_GROUPS: Array<{ label: string; links: Array<{ href: string; label: str
   {
     label: 'Wissen',
     links: [
+      { href: '/einsteiger', label: 'Für Einsteiger' },
       { href: '/artikel', label: 'Blog' },
       { href: '/guides', label: 'Guides' },
       { href: '/changelog', label: 'Changelog' },
