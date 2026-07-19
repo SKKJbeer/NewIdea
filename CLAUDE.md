@@ -753,6 +753,13 @@ Vor jedem Commit von Logik-/Komponenten-Code:
 - **Zu wenige Punkte (<2):** KEIN Chart. Nur aktuellen Preis + „Verlauf wird aufgebaut" zeigen. Niemals eine Beispiel-/Zufallskurve.
 - **Verboten:** eine Funktion wie das alte `generatePriceHistory` (Random-Walk) — wurde v2.19.1 entfernt. Nie wieder einführen.
 
+### Transparenz statt einer einzigen Zahl (seit v2.19.2)
+Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstigstes Angebot), die Seite zeigt aber den Trend (Marktwert) — das kann 30–100 % auseinanderliegen (echtes Beispiel: Mew ex Trend 16,63 € vs. ab 8,95 €). Deshalb:
+- Kartenseite zeigt die volle Cardmarket-Aufschlüsselung wie im Original: **Preis-Trend (Marktwert) · Günstigstes Angebot (ab) · Ø Verkauf · Ø 30 Tage** (`card.cmPrices`), plus einen Satz, was „ab" bedeutet. So gibt es keinen Widerspruch mehr zu Cardmarket.
+- **Datenstand anzeigen:** `cardmarket.updatedAt` aus der API. Die pokemontcg.io-Quelle aktualisiert NICHT täglich — viele Karten sind Monate alt. Bei >45 Tagen Hinweis „kann veraltet sein". 
+- **avg1 (Ø gestern) ist verrauscht** — nie als „aktueller Preis" nutzen; in der Historie nur, wenn kein grober Ausreißer (>3× / <⅓ des Ø7/Ø30). Ein Fake-Listing (z.B. Base-Glurak avg1 = 14.950 €) darf nichts verzerren.
+- **Echte Live-Cardmarket-Preise** (tagesaktuell, sprachspezifisch) gibt es nur mit den `CARDMARKET_*`-OAuth-Keys — noch nicht gesetzt. Bis dahin ist pokemontcg.io die Quelle (mit Datenstand-Hinweis).
+
 ## Bekannte Stolperstellen
 
 1. **Deployment geht nicht** → Fast immer: `HEAD:main` nicht gepusht. Immer beide Branches!

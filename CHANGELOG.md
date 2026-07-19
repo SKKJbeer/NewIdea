@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.2] — 2026-07-19 · Preis-Transparenz: passt jetzt zu Cardmarket
+
+### Neu
+- **Cardmarket-Preisaufschlüsselung auf jeder Kartenseite** — genau wie im Original: Preis-Trend (Marktwert), Günstigstes Angebot (ab), Ø Verkaufspreis, Ø 30 Tage. Damit gibt es keinen Widerspruch mehr: Wer auf Cardmarket „ab 8,95 €" sieht, findet dieselbe Zahl auch bei uns — sauber eingeordnet neben dem Marktwert
+- **Datenstand sichtbar**: Jede Karte zeigt, von wann die Cardmarket-Daten stammen. Bei älteren Daten (>45 Tage) ein klarer Hinweis, aktuelle Preise direkt auf Cardmarket zu prüfen
+
+### Behoben
+- **Ausreißer-Schutz**: Ein einzelnes Fake-/Ausreißer-Listing (z.B. ein absurder Tagespreis) verzerrt weder den angezeigten Preis noch den Verlauf mehr — der „Ø gestern"-Wert wird nur übernommen, wenn er plausibel ist
+
+### Hinweis zur Preisquelle
+Die Preise stammen aus der öffentlichen Pokémon-TCG-Datenbank (Cardmarket-Daten). Der angezeigte Marktpreis ist der Cardmarket-Trend (fairer Marktwert bei gutem Zustand) — nicht das billigste Einzelangebot, das oft schlechteren Zustand oder eine andere Sprache betrifft. Tagesaktuelle, sprachspezifische Live-Preise sind mit eigenen Cardmarket-API-Zugängen möglich.
+
+---
+
 ## [2.19.1] — 2026-07-19 · Preise: saubere, echte Verläufe (kein „linear" mehr)
 
 ### Behoben

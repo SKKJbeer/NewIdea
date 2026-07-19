@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.19.1` · **Stand:** 19. Juli 2026 · **Branch:** `main`
+**Version:** `v2.19.2` · **Stand:** 19. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -152,7 +152,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.18.1 | Social-Sharing: dynamische OG-Vorschaubilder (Karten mit Preis, Artikel mit Leitkarte, Startseite) via next/og |
 | v2.19.0 | Einsteiger-Seite /einsteiger (Onboarding, ikonische Karten, Guides) + „Neu hier?"-Banner auf Startseite + NavBar/Footer/Sitemap |
 | v2.19.1 | Preise: echte Zeit-Achse + nur echte Datenpunkte (Snapshots + Cardmarket-Anker), record-on-view, synthetische Kurve entfernt — kein „linear" mehr |
+| v2.19.2 | Preis-Transparenz: Cardmarket-Aufschlüsselung (Trend/ab/Ø) + Datenstand auf Kartenseite, Ausreißer-Schutz — passt zu Cardmarket |
 
 ---
 
-*Zuletzt aktualisiert: v2.19.1 — 19. Juli 2026*
+*Zuletzt aktualisiert: v2.19.2 — 19. Juli 2026*

@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.2',
+    date: '19. Juli 2026',
+    label: 'Preis-Transparenz: passt zu Cardmarket',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'Cardmarket-Aufschlüsselung auf jeder Kartenseite: Trend, günstigstes Angebot (ab), Ø Verkauf, Ø 30 Tage — kein Widerspruch mehr zu Cardmarket' },
+      { type: 'new',   text: 'Datenstand jeder Karte sichtbar; bei älteren Daten Hinweis, aktuelle Preise auf Cardmarket zu prüfen' },
+      { type: 'fixed', text: 'Ausreißer-Schutz: ein einzelnes Fake-Listing verzerrt Preis und Verlauf nicht mehr' },
+    ],
+  },
+  {
     version: '2.19.1',
     date: '19. Juli 2026',
     label: 'Preise: saubere, echte Verläufe',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Preisverläufe wirkten oft künstlich linear — jetzt echte Zeit-Achse mit proportionalen Abständen und nur echten Datenpunkten' },
       { type: 'fixed', text: 'Echte Tagespreise werden bei jedem Kartenaufruf gespeichert; der Verlauf wird Tag für Tag genauer' },

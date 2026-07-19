@@ -15,6 +15,15 @@ export interface PokemonCard {
   priceSource?: 'cardmarket' | 'tcgplayer' | 'none';
   // true, wenn Trend & Verlauf aus echten Cardmarket-Durchschnitten stammen
   realData?: boolean;
+  // Echte Cardmarket-Preisaufschlüsselung (wie auf cardmarket.com sichtbar) —
+  // für transparente Anzeige: Trend, günstigstes Angebot, Ø-Verkauf, Datenstand.
+  cmPrices?: {
+    trend?: number;
+    low?: number;
+    avgSell?: number;
+    avg30?: number;
+    updatedAt?: string;
+  };
 }
 
 export interface CardPrices {

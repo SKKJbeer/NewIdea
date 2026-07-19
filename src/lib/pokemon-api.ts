@@ -227,7 +227,10 @@ export function buildCardmarketHistory(cm: Record<string, number>): { date: stri
   };
   add(30, cm.avg30);
   add(7, cm.avg7);
-  add(1, cm.avg1);
+  // avg1 (Ø gestern) nur übernehmen, wenn es kein grober Ausreißer ggü. den
+  // stabilen Schnitten ist — ein einzelnes Fake-Listing verzerrt sonst die Kurve.
+  const ref = cm.avg7 || cm.avg30 || cm.trendPrice;
+  if (cm.avg1 > 0 && ref > 0 && cm.avg1 <= ref * 3 && cm.avg1 >= ref / 3) add(1, cm.avg1);
   add(0, cm.trendPrice || cm.averageSellPrice);
 
   if (byDate.size < 2) return [];
@@ -280,17 +283,31 @@ function mapApiCardToCard(apiCard: Record<string, unknown>): PokemonCard {
     normal: tcgNormal,
   };
 
-  // Echter Trend aus Cardmarket: aktueller Trendpreis vs. 30-Tage-Schnitt
+  // Echter Trend aus Cardmarket: aktueller Trendpreis vs. 30-Tage-Schnitt.
+  // avg1 (Ø gestern) wird NICHT als "aktuell" genutzt — ein einzelner Tag ist zu
+  // verrauscht (kann durch ein Fake-/Ausreißer-Listing komplett verzerrt sein).
   let trendPercent = 0;
   let realData = false;
   let priceHistory: PokemonCard['priceHistory'];
   if (cm && cm.avg30 > 0) {
-    const current = cm.trendPrice || cm.avg1 || cm.averageSellPrice || cm.avg30;
+    const current = cm.trendPrice || cm.averageSellPrice || cm.avg7 || cm.avg30;
     trendPercent = ((current - cm.avg30) / cm.avg30) * 100;
     realData = true;
     const hist = buildCardmarketHistory(cm);
     if (hist.length >= 2) priceHistory = hist;
   }
+
+  // Echte Cardmarket-Aufschlüsselung für transparente Anzeige (Trend / ab / Ø).
+  const cmMeta = cmRoot as Record<string, unknown> | undefined;
+  const cmPrices = cm
+    ? {
+        trend: cm.trendPrice || undefined,
+        low: cm.lowPrice || undefined,
+        avgSell: cm.averageSellPrice || undefined,
+        avg30: cm.avg30 || undefined,
+        updatedAt: (cmMeta?.updatedAt as string) || undefined,
+      }
+    : undefined;
 
   const images = apiCard.images as Record<string, string> | undefined;
   const setData = apiCard.set as Record<string, unknown> | undefined;
@@ -310,6 +327,7 @@ function mapApiCardToCard(apiCard: Record<string, unknown>): PokemonCard {
     trendPercent: Math.round(trendPercent * 10) / 10,
     priceSource: eurPrice ? 'cardmarket' : tcgMarket ? 'tcgplayer' : 'none',
     realData,
+    cmPrices,
   };
 
   card.investmentScore = calculateInvestmentScore(card);

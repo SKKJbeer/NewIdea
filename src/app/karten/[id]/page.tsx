@@ -101,6 +101,20 @@ export default async function CardDetailPage({ params }: Props) {
     displayTrend = Math.round(((stored[stored.length - 1].price - stored[0].price) / stored[0].price) * 1000) / 10;
   }
 
+  // Datenstand der Cardmarket-Preise ehrlich anzeigen — die pokemontcg.io-Quelle
+  // aktualisiert nicht täglich, manche Karten sind Monate alt.
+  let cmDataAge: string | null = null;
+  if (card.cmPrices?.updatedAt) {
+    const parsed = new Date(card.cmPrices.updatedAt.replace(/\//g, '-'));
+    if (!isNaN(parsed.getTime())) {
+      const label = parsed.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const days = Math.floor((Date.now() - parsed.getTime()) / 86400000);
+      cmDataAge = days > 45
+        ? ` Datenstand: ${label} — kann veraltet sein, aktuelle Preise bitte auf Cardmarket prüfen.`
+        : ` Datenstand: ${label}.`;
+    }
+  }
+
   const scoreColor =
     score >= 70 ? 'text-emerald-400 bg-emerald-500/10' : score >= 50 ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 bg-[#1a1a28]';
   const scoreLabel =
@@ -206,6 +220,51 @@ export default async function CardDetailPage({ params }: Props) {
                 />
               </div>
             </div>
+
+            {card.cmPrices && (card.cmPrices.trend || card.cmPrices.low) && (
+              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-bold text-slate-200">Cardmarket-Preise</h2>
+                  <a
+                    href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
+                    target="_blank" rel="noopener noreferrer sponsored"
+                    className="text-[11px] font-semibold text-violet-400 hover:text-violet-300 inline-flex items-center gap-1"
+                  >
+                    Prüfen <ExternalLink size={11} />
+                  </a>
+                </div>
+                <dl className="space-y-2 text-sm">
+                  {card.cmPrices.trend != null && (
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Preis-Trend (Marktwert)</dt>
+                      <dd className="font-bold text-white tabular-nums">{card.cmPrices.trend.toFixed(2)} €</dd>
+                    </div>
+                  )}
+                  {card.cmPrices.low != null && (
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Günstigstes Angebot (ab)</dt>
+                      <dd className="font-semibold text-emerald-400 tabular-nums">{card.cmPrices.low.toFixed(2)} €</dd>
+                    </div>
+                  )}
+                  {card.cmPrices.avgSell != null && (
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Ø Verkaufspreis</dt>
+                      <dd className="font-semibold text-slate-300 tabular-nums">{card.cmPrices.avgSell.toFixed(2)} €</dd>
+                    </div>
+                  )}
+                  {card.cmPrices.avg30 != null && (
+                    <div className="flex items-center justify-between">
+                      <dt className="text-slate-400">Ø 30 Tage</dt>
+                      <dd className="font-semibold text-slate-300 tabular-nums">{card.cmPrices.avg30.toFixed(2)} €</dd>
+                    </div>
+                  )}
+                </dl>
+                <p className="mt-3 text-[11px] leading-relaxed text-slate-600">
+                  Der angezeigte Marktpreis ist der <strong className="text-slate-500">Cardmarket-Trend</strong> (fairer Marktwert bei gutem Zustand). „Ab" ist das günstigste Einzelangebot — meist schlechterer Zustand oder andere Sprache.
+                  {cmDataAge}
+                </p>
+              </div>
+            )}
 
             <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
               <div className="flex items-center justify-between mb-3">
