@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { publishMarktbericht } from '@/app/actions';
 import { MonitoringPanel } from '@/components/MonitoringPanel';
 import { ReelsStudio } from '@/components/ReelsStudio';
+import { AutoReelPanel } from '@/components/AutoReelPanel';
 
 interface Integration {
   name: string;
@@ -307,7 +308,10 @@ export default function StudioPage() {
         {tab === 'monitoring' ? (
           <MonitoringPanel />
         ) : tab === 'reels' ? (
-          <ReelsStudio />
+          <>
+            <AutoReelPanel />
+            <ReelsStudio />
+          </>
         ) : (
           <>
             <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">

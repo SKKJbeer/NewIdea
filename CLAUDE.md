@@ -79,6 +79,30 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 
 ---
 
+## Aktueller Stand & Richtung (v2.16.0 — 19. Juli 2026)
+
+**Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
+
+**Offene Nutzer-Aufgaben (nur Steffen kann sie erledigen):**
+- Google Search Console anmelden (SEO-Basis ist bereit)
+- Amazon PartnerNet + Cardmarket-Affiliate beantragen → Env-Vars setzen
+- Supabase service_role Key rotieren (falls noch offen)
+- Vercel Analytics im Dashboard aktivieren
+
+**Aktueller Fokus (seit 19.07.2026): Social-Media-Reichweite → Website.**
+Ziel: Automatisiert Reels aus Live-Marktdaten generieren (ohne manuelles Videomaterial), Captions mit UTM-Links zur Seite, Ein-Klick-Workflow im Studio.
+
+**Umgesetzt (v2.17.0):** Auto-Reel-Generator — `src/lib/reel-generator.ts` (FFmpeg-Rendering: Intro → Top-Mover-Segmente → Outro/CTA), `/api/video/auto-reel` (Studio-Auth), `AutoReelPanel` im Reels-Tab. Caption endet mit `?utm_source=instagram&utm_medium=reel&utm_campaign=top-mover`. Reels landen in Supabase Storage `videos/auto-reels/`.
+
+**Nächste Schritte für diese Richtung:**
+- Sobald `INSTAGRAM_ACCESS_TOKEN` + `INSTAGRAM_BUSINESS_ACCOUNT_ID` (Meta Graph API, Business-Account) in Vercel gesetzt sind, ist der „Auf Instagram posten"-Button live — bis dahin greift der Download-Weg.
+- Danach: Cron-Anbindung (z.B. wöchentlich Do nach Marktanalyse) für vollautomatisches Reel + Publish.
+- Optional: TikTok/YouTube-Shorts-Publishing (gleiche MP4-Datei, andere Upload-API).
+
+Bestehende Bausteine: ReelsStudio (manueller Upload→Trim→Brand→Publish), `/api/video/*`, FFmpeg via ffmpeg-static, Supabase Storage Bucket `videos`.
+
+---
+
 ## Projekt-Kontext
 
 **Name:** PokéMarket Intelligence  

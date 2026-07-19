@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.17.0] — 2026-07-19 · Auto-Reel: Social-Media-Videos direkt aus Marktdaten
+
+### Neu
+- **Auto-Reel-Generator** (`/studio` → Reels-Tab): Ein Klick rendert ohne jedes Videomaterial ein fertiges Hochformat-Reel (1080×1920) aus den Live-Marktdaten — Intro mit Branding, ein Segment pro Top-Mover-Karte (Kartenbild mit sanftem Zoom, Name, Preis, Wochen-Trend), Outro mit Call-to-Action zur Website
+- **Reichweiten-Rückkanal**: Jede automatisch erzeugte Caption endet mit dem Website-Link inkl. UTM-Parametern (`utm_source=instagram&utm_medium=reel`) — Social-Traffic wird in Vercel Analytics messbar dem Kanal zugeordnet
+- **Ein-Klick-Workflow**: Generieren → Vorschau → Caption bearbeiten → Herunterladen oder direkt auf Instagram posten (nutzt die bestehende Instagram-Graph-API-Route). Ohne Instagram-Keys: Download-Weg mit Hinweis
+- Reel-Rendering via FFmpeg (ffmpeg-static), Segmente einzeln gerendert und per concat-Demuxer verlustfrei zusammengefügt; Ergebnis landet in Supabase Storage unter `auto-reels/`
+
+### Technik
+- `src/lib/reel-generator.ts` — Rendering-Pipeline + Caption-Builder mit UTM-Link
+- `src/app/api/video/auto-reel/route.ts` — Studio-authentifizierte Render-Route (maxDuration 300s)
+- `src/components/AutoReelPanel.tsx` — Studio-Panel mit Vorschau, editierbarer Caption, Publish
+
+---
+
 ## [2.16.0] — 2026-07-19 · SEO-Ausbau, Lucide-Icons statt Emojis, Kartenbild-Korrekturen
 
 ### Behoben

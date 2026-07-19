@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.17.0',
+    date: '19. Juli 2026',
+    label: 'Auto-Reel: Social-Media-Videos aus Marktdaten',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Auto-Reel-Generator im Studio: Ein Klick rendert ohne Videomaterial ein fertiges Hochformat-Reel aus den Top-Mover-Karten der Woche' },
+      { type: 'new',     text: 'Automatische Caption mit UTM-Link zur Website — Social-Traffic wird in Vercel Analytics messbar' },
+      { type: 'new',     text: 'Ein-Klick-Workflow: Generieren, Vorschau, Caption bearbeiten, herunterladen oder direkt auf Instagram posten' },
+    ],
+  },
+  {
     version: '2.16.0',
     date: '19. Juli 2026',
     label: 'SEO-Ausbau, Lucide-Icons, Kartenbild-Korrekturen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Falsche Kartenbilder korrigiert: 7 von 9 hardcodierten Karten-IDs zeigten andere Karten als im Text beschrieben — alle per TCG-API verifiziert' },
       { type: 'fixed',   text: 'Erfundene Karten aus Artikeln entfernt (z.B. "Pikachu ex SIR" im 151-Set existiert nicht) — ersetzt durch real existierende Karten' },
