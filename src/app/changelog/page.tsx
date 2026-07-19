@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.17.3',
+    date: '19. Juli 2026',
+    label: 'Artikel-Caching robuster, neutralere Darstellung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Artikel wurden im Vorlagen-Fall bei jedem Aufruf neu erzeugt — jetzt wird jede Datumsseite nur einmal erzeugt und dann dauerhaft aus dem Speicher bedient' },
+      { type: 'changed', text: 'Neutralere Außendarstellung: sachliche Begriffe statt Hinweisen auf automatische Generierung; rechtliche Hinweise bleiben erhalten' },
+    ],
+  },
+  {
     version: '2.17.2',
     date: '19. Juli 2026',
     label: 'Bugfix: Startseite ohne Trends',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Startseite zeigte keine Trends/Mover mehr, wenn die TCG-API beim Seitenaufbau kurz ausfiel — leere Version wurde gecacht' },
       { type: 'fixed', text: 'Neuer Fallback auf den letzten gespeicherten Marktbericht: lieber leicht ältere echte Daten als eine leere Startseite' },

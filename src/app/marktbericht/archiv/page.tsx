@@ -61,7 +61,7 @@ export default async function MarktberichtArchivPage() {
         {allMeta.length === 0 ? (
           <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-8 text-center">
             <p className="text-slate-400 text-sm">Noch keine Berichte vorhanden.</p>
-            <p className="text-slate-700 text-xs mt-1">Der erste Bericht erscheint automatisch nächsten Montag.</p>
+            <p className="text-slate-700 text-xs mt-1">Der erste Bericht erscheint nächsten Montag.</p>
           </div>
         ) : (
           years.map((year) => (

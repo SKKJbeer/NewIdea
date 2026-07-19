@@ -103,7 +103,7 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
               <Zap size={15} className="text-yellow-300 fill-yellow-300" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">KI-Marktbericht</p>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Marktbericht</p>
               <h2 className="text-sm font-black text-slate-200">Wochenüberblick KW {report.weekNumber}</h2>
             </div>
           </div>

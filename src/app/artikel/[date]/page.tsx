@@ -267,7 +267,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
         <footer className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">
           <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite · Keine Anlageberatung</p>
           <p className="text-[10px] text-amber-400/60 leading-relaxed">
-            Inhalte werden automatisch von KI generiert und dienen ausschließlich der Information.
+            Alle Inhalte dienen ausschließlich der Information und stellen keine Anlageberatung dar.
             Pokémon ist eine Marke von Nintendo / Creatures / GAME FREAK — keine Verbindung zu diesen Unternehmen.
           </p>
         </footer>

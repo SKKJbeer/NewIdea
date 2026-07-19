@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.17.3] — 2026-07-19 · Artikel-Caching robuster + neutralere Außendarstellung
+
+### Behoben
+- **Artikel wurden bei jedem Aufruf neu erzeugt, wenn die Generierung auf den Vorlagen-Text zurückfiel** (statt der KI-Fassung). Ursache: Fallback-Artikel wurden nicht gespeichert. Jetzt wird jeder Artikel nach der ersten Erzeugung dauerhaft in Supabase abgelegt — jede Datumsseite wird nur EINMAL erzeugt, danach sofort aus dem Speicher bedient (kein Ladebildschirm mehr für Folgebesucher)
+
+### Geändert
+- **Neutralere Außendarstellung**: Der Ladehinweis nennt keine „erste Generierung" mehr; auf Artikel- und Marktbericht-Seiten wurden „KI-/automatisch generiert"-Formulierungen durch sachliche Begriffe ersetzt (Marktanalyse, Marktbericht). Die rechtlichen Hinweise (keine Anlageberatung, Markenhinweis, Preise ohne Gewähr) bleiben unverändert erhalten
+
+---
+
 ## [2.17.2] — 2026-07-19 · BUGFIX: Startseite ohne Trends/Marktdaten
 
 ### Behoben

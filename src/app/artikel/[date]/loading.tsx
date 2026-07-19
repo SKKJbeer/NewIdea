@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <RouteSkeleton
       variant="article"
-      hint="Artikel wird geladen — bei der ersten Generierung kann das einen Moment dauern …"
+      hint="Artikel wird geladen …"
     />
   );
 }

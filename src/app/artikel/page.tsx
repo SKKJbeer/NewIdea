@@ -159,7 +159,7 @@ export default async function ArtikelListPage() {
         </div>
 
         <p className="text-center text-xs text-slate-700 pt-2">
-          Inhalte werden automatisch von KI generiert und stellen keine Finanzberatung dar.
+          Alle Inhalte dienen ausschließlich der Information und stellen keine Finanzberatung dar.
         </p>
       </main>
     </div>

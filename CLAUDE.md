@@ -140,6 +140,18 @@ Bestehende Bausteine: ReelsStudio (manueller Upload→Trim→Brand→Publish), `
 
 ---
 
+## Außendarstellung: keine Hinweise auf Auto-/KI-Generierung (PFLICHT)
+
+**REGEL:** Öffentliche Content-Seiten (Artikel, Marktbericht, Guides, Startseite) dürfen NICHT sichtbar machen, dass Inhalte automatisiert oder per KI erzeugt werden. Keine Labels wie „KI-Analyse", „KI-Marktbericht", „automatisch von KI generiert", „bei der ersten Generierung …". Stattdessen sachliche Begriffe: „Marktanalyse", „Marktbericht", „datenbasiert".
+
+**Was BLEIBT (rechtlich/inhaltlich Pflicht):** Disclaimer „keine Anlageberatung/Finanzberatung", „Inoffizielle Fan-Seite", Markenhinweis (Nintendo/Creatures/GAME FREAK), „Preise ohne Gewähr", Archiv-Disclaimer (`isStatic`, betrifft Preis-Aktualität — nicht KI).
+
+**Begründung:** Der Inhalt ist echte, faktengeprüfte Marktanalyse (Compliance-Gate). Wie bei jeder Redaktion ist die Produktionsweise keine Pflichtangabe — sichtbare „KI-generiert"-Labels beschädigen unnötig die Glaubwürdigkeit gegenüber Medien/Besuchern. Ausnahme: interne Seiten `/studio` + `/monitoring` (passwortgeschützt) und `/changelog` (noindex, Entwickler-Historie) dürfen die Technik benennen.
+
+**Verankert seit v2.17.3.** Betroffene Stellen bei neuen Features prüfen: Ladehinweise, Seiten-Header, Footer-Disclaimer, Empty-States, Metadaten-Descriptions.
+
+---
+
 ## Content-Wahrheitspflicht (PFLICHT — kein erfundener Inhalt!)
 
 **REGEL:** Alle Inhalte auf der Plattform — Artikel, Wochenrückblicke, Guides, Karten-Beschreibungen — dürfen **ausschließlich wahre, überprüfbare Informationen** enthalten. Nichts erfinden.

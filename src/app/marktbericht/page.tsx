@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
-import { Calendar, CalendarDays, Zap, Shield, TrendingUp, Brain, ChevronLeft, Archive, Gem, Bot } from 'lucide-react';
+import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft, Archive, Gem } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
 
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const week = report?.weekNumber ?? '—';
   return {
     title: `Marktanalyse KW ${week} — PokéMarket Intelligence`,
-    description: 'Wöchentliche KI-Marktanalyse für Pokémon-Karten-Sammler und Investoren.',
+    description: 'Wöchentliche Marktanalyse für Pokémon-Karten-Sammler und Investoren.',
   };
 }
 
@@ -45,10 +45,10 @@ export default async function MarktberichtPage() {
             Wöchentliche<br /><span className="text-violet-400">Marktanalyse</span>
           </h1>
           <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-6">
-            KI-gestützte Investment-Analyse für Pokémon-Karten-Sammler und Investoren.
+            Datenbasierte Investment-Analyse für Pokémon-Karten-Sammler und Investoren.
           </p>
           <div className="flex justify-center gap-6 text-slate-600 text-xs">
-            <div className="flex items-center gap-1.5"><Brain size={12} />KI-Analyse</div>
+            <div className="flex items-center gap-1.5"><BarChart3 size={12} />Marktanalyse</div>
             <div className="flex items-center gap-1.5"><TrendingUp size={12} />Echtzeit-Preise</div>
             <div className="flex items-center gap-1.5"><Zap size={12} />Wöchentlich neu</div>
           </div>
@@ -62,9 +62,7 @@ export default async function MarktberichtPage() {
             <div>
               <p className="font-semibold">Erster Bericht noch ausstehend</p>
               <p className="text-xs mt-1 text-amber-400/60">
-                Der erste Wochenbericht wird automatisch jeden Montag um 07:00 Uhr UTC generiert.
-                Du kannst ihn auch manuell über das{' '}
-                <a href="/studio" className="underline hover:text-amber-300">Studio</a> anstoßen.
+                Der Wochenbericht erscheint jeden Montag mit den aktuellen Marktdaten.
               </p>
             </div>
           </div>
@@ -77,7 +75,7 @@ export default async function MarktberichtPage() {
                 <Zap size={15} className="text-yellow-300 fill-yellow-300" />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">KI-Marktbericht</p>
+                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Marktbericht</p>
                 <h2 className="text-sm font-black text-slate-200">Diese Woche im Überblick</h2>
               </div>
             </div>
@@ -92,7 +90,7 @@ export default async function MarktberichtPage() {
             {[
               { label: 'Top Gewinner', value: `${report.topGainers.length}`, icon: TrendingUp },
               { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: Gem },
-              { label: 'KI-Bericht', value: 'Live', icon: Bot },
+              { label: 'Marktbericht', value: 'Live', icon: BarChart3 },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-3 sm:p-4 text-center">
                 <div className="mb-1 flex justify-center text-violet-400"><stat.icon size={20} /></div>

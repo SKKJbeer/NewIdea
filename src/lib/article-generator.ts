@@ -530,6 +530,8 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
+    // Persistieren, damit nicht bei jedem Aufruf neu erzeugt wird (kein Regenerieren pro Besuch).
+    await saveArticle(date, type, fallback).catch(() => {});
     return fallback;
   }
 
@@ -561,6 +563,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
+      await saveArticle(date, type, fallback).catch(() => {});
       return fallback;
     }
 
@@ -585,6 +588,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
+    await saveArticle(date, type, fallback).catch(() => {});
     return fallback;
   }
 }
