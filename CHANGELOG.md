@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.1] — 2026-07-19 · Preise: saubere, echte Verläufe (kein „linear" mehr)
+
+### Behoben
+- **Preisverläufe sahen oft künstlich linear aus**: Die Kurve wurde aus wenigen Cardmarket-Eckwerten linear interpoliert (30 gerade Zwischenpunkte), und die Chart-Achse ignorierte die echten Datumsabstände — dadurch wirkten alle Verläufe wie gerade Linien
+- **Fix — nur noch echte Daten**:
+  - Der Chart nutzt jetzt eine echte Zeit-Achse: die Abstände sind proportional zur tatsächlichen Zeit (ein Monat ist breiter als ein Tag)
+  - Der Verlauf besteht aus echten Punkten: täglich gespeicherte Preise + echte Cardmarket-Durchschnitte (Ø 30 / 7 / 1 Tage & Trend) — keine erfundenen Zwischenwerte mehr
+  - Echte Tagespreise werden jetzt bei jedem Kartenaufruf gespeichert — der Verlauf jeder angesehenen Karte wird Tag für Tag genauer
+  - Die synthetische Beispiel-/Zufallskurve wurde komplett entfernt. Liegen zu wenige echte Datenpunkte vor, zeigt die Karte nur den aktuellen Preis mit dem Hinweis, dass der Verlauf aufgebaut wird
+- Trend-Prozentwert richtet sich nach den echten Daten (aus den Tagespreisen, wenn vorhanden)
+- Kleiner Darstellungsfehler behoben (heller Chart-Raster auf dunklem Grund)
+
+---
+
 ## [2.19.0] — 2026-07-19 · Einsteiger-Seite & Einsteiger-Freundlichkeit
 
 ### Neu

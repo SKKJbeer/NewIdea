@@ -587,7 +587,7 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 | Entscheidung | Details |
 |---|---|
 | Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`) |
-| Preis-Historie | 3 Stufen: Supabase DB-Schnappschüsse > Cardmarket-Interpolation > Beispielkurve |
+| Preis-Historie | NUR echte Daten: Supabase-Tages-Snapshots (record-on-view + Daily-Cron) gemerged mit echten Cardmarket-Ankern (Ø 30/7/1 + Trend). KEINE Interpolation, KEINE synthetische Kurve. Zu wenig Punkte → kein Chart, nur aktueller Preis (v2.19.1) |
 | Übersetzungen | `src/lib/i18n.ts` + `getLang()` aus Cookie (`next/headers`) |
 | Autocomplete | `/api/search/suggestions?q=` — debounce 320 ms im SearchBox-Client |
 | SEO | JSON-LD auf Karten-Detailseiten (Product+Offer), ItemList auf Suchergebnissen |
@@ -739,6 +739,19 @@ Vor jedem Commit von Logik-/Komponenten-Code:
 - [ ] Keine doppelten Komponenten-Implementierungen, keine `gray-*`-Tokens
 
 ---
+
+## Preise: absolute Wahrheitspflicht (PFLICHT — Herzstück der Seite)
+
+**REGEL:** Preise und Preisverläufe sind das Wichtigste auf der Seite. Es dürfen NIEMALS erfundene, zufällige oder linear-interpolierte Preise als echte Daten dargestellt werden.
+
+- **Aktueller Preis:** Cardmarket `trendPrice` (Cardmarket-Marktpreis) > `averageSellPrice` > `avg7` > `avg30`, sonst TCGplayer. Median-Logik bei Roh-Listings (Bot-Cent-Preise verfälschen sonst).
+- **Verlauf = nur echte Quellen:**
+  1. **Supabase-Tages-Snapshots** — `recordPriceSnapshot` bei JEDEM Kartenaufruf (`after()`), plus Daily-Cron (~80 Top-Karten). Wächst zu echter Tages-Historie.
+  2. **Cardmarket-Anker** — `buildCardmarketHistory` gibt NUR die realen Ø-Felder (30/7/1 Tage + Trend) als datierte Punkte zurück. KEINE Interpolation dazwischen.
+  3. **Merge:** echte Snapshots gewinnen pro Datum gegen Anker.
+- **Chart:** `PriceChart` nutzt eine ZEIT-Achse (Timestamp, proportionale Abstände) — nie eine Kategorie-Achse (die staucht ungleiche Datumslücken zu geraden Segmenten = „linear"-Look).
+- **Zu wenige Punkte (<2):** KEIN Chart. Nur aktuellen Preis + „Verlauf wird aufgebaut" zeigen. Niemals eine Beispiel-/Zufallskurve.
+- **Verboten:** eine Funktion wie das alte `generatePriceHistory` (Random-Walk) — wurde v2.19.1 entfernt. Nie wieder einführen.
 
 ## Bekannte Stolperstellen
 

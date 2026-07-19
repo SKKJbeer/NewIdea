@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.1',
+    date: '19. Juli 2026',
+    label: 'Preise: saubere, echte Verläufe',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Preisverläufe wirkten oft künstlich linear — jetzt echte Zeit-Achse mit proportionalen Abständen und nur echten Datenpunkten' },
+      { type: 'fixed', text: 'Echte Tagespreise werden bei jedem Kartenaufruf gespeichert; der Verlauf wird Tag für Tag genauer' },
+      { type: 'fixed', text: 'Synthetische Beispielkurve komplett entfernt — bei zu wenig Daten nur aktueller Preis statt erfundener Kurve' },
+    ],
+  },
+  {
     version: '2.19.0',
     date: '19. Juli 2026',
     label: 'Einsteiger-Seite & Einsteiger-Freundlichkeit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Neue Einsteiger-Seite /einsteiger: freundlicher Start ohne Jargon, „Was ist meine Karte wert?", 3-Schritte-Onboarding, ikonische Karten, Guides' },
       { type: 'new', text: '„Neu hier?"-Einstieg auf der Startseite — holt Neulinge ab, ohne Fortgeschrittene zu stören' },

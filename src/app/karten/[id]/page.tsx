@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
-import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
+import { fetchCardById, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -77,20 +77,29 @@ export default async function CardDetailPage({ params }: Props) {
     await recordPriceSnapshot(card);
   });
 
+  // Preis-Historie ehrlich zusammensetzen:
+  // - echte Tages-Snapshots aus Supabase (record-on-view, wächst mit der Zeit)
+  // - Cardmarket-Ankerpunkte (Ø 30/7/1 Tage + Trend) als reale Referenz
+  // Bei Datumskollision gewinnt IMMER der echte Snapshot. Keine erfundenen Punkte.
   const stored = await getStoredPriceHistory(id, 90);
-  let history: { date: string; price: number }[];
-  let historyKind: 'daily' | 'cardmarket' | 'sample';
-  if (stored.length >= 2) {
-    history = stored;
-    historyKind = 'daily';
-  } else if (card.realData && card.priceHistory && card.priceHistory.length >= 2) {
-    history = card.priceHistory;
-    historyKind = 'cardmarket';
-  } else {
-    history = generatePriceHistory(price, 30);
-    historyKind = 'sample';
+  const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
+  const byDate = new Map<string, number>();
+  for (const p of anchors) byDate.set(p.date, p.price);
+  for (const p of stored) byDate.set(p.date, p.price); // echte Snapshots überschreiben Anker
+  const history = [...byDate.entries()]
+    .map(([date, p]) => ({ date, price: p }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const hasChart = history.length >= 2;
+  // 'daily' = mind. 2 echte Tages-Snapshots vorhanden, sonst Cardmarket-Referenz
+  const historyKind: 'daily' | 'cardmarket' = stored.length >= 2 ? 'daily' : 'cardmarket';
+  const realData = card.realData || stored.length > 0;
+
+  // Trend passend zum Chart: aus echten Snapshots (erster→letzter), sonst Cardmarket (ggü. Ø30).
+  let displayTrend = trend;
+  if (stored.length >= 2 && stored[0].price > 0) {
+    displayTrend = Math.round(((stored[stored.length - 1].price - stored[0].price) / stored[0].price) * 1000) / 10;
   }
-  const realData = historyKind !== 'sample';
 
   const scoreColor =
     score >= 70 ? 'text-emerald-400 bg-emerald-500/10' : score >= 50 ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 bg-[#1a1a28]';
@@ -191,7 +200,7 @@ export default async function CardDetailPage({ params }: Props) {
                   cardId={card.id}
                   cardName={card.name}
                   defaultPrice={price}
-                  trendPercent={trend}
+                  trendPercent={displayTrend}
                   realData={realData}
                   priceSource={card.priceSource}
                 />
@@ -242,36 +251,33 @@ export default async function CardDetailPage({ params }: Props) {
 
         <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 mt-6">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-            <h2 className="font-bold text-slate-200">
-              Preis-Historie ({history.length} {history.length === 1 ? 'Tag' : 'Tage'})
-            </h2>
-            {historyKind === 'daily' ? (
+            <h2 className="font-bold text-slate-200">Preis-Historie</h2>
+            {hasChart && (
               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">
-                ✓ Echte Preise · täglich erfasst
-              </span>
-            ) : historyKind === 'cardmarket' ? (
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">
-                ✓ Cardmarket-Durchschnitte
-              </span>
-            ) : (
-              <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-full">
-                Beispielhafter Verlauf
+                {historyKind === 'daily' ? '✓ Echte Tagespreise' : '✓ Cardmarket-Referenz'}
               </span>
             )}
           </div>
-          <PriceChart data={history} />
-          {historyKind === 'daily' ? (
-            <p className="text-xs text-slate-600 mt-3">
-              Echte Cardmarket-Preise — ab jetzt täglich erfasst. Der Verlauf wird mit jedem Tag dichter und genauer.
-            </p>
-          ) : historyKind === 'cardmarket' ? (
-            <p className="text-xs text-slate-600 mt-3">
-              Basierend auf realen Cardmarket-Durchschnittspreisen (Ø 1/7/30 Tage &amp; Trend), zwischen den Eckwerten interpoliert.
-            </p>
+          {hasChart ? (
+            <>
+              <PriceChart data={history} />
+              {historyKind === 'daily' ? (
+                <p className="text-xs text-slate-600 mt-3">
+                  Täglich erfasste Cardmarket-Preise für diese Karte — der Verlauf wird mit jedem Tag genauer.
+                </p>
+              ) : (
+                <p className="text-xs text-slate-600 mt-3">
+                  Echte Cardmarket-Durchschnitte (Ø 30 / 7 / 1 Tage &amp; aktueller Trend). Ab jetzt kommen täglich echte Tagespreise dazu.
+                </p>
+              )}
+            </>
           ) : (
-            <p className="text-xs text-amber-400/60 mt-3">
-              Für diese Karte liegen aktuell keine Cardmarket-Verlaufsdaten vor — die Kurve ist nur ein Beispiel.
-            </p>
+            <div className="py-6 text-center">
+              <p className="text-2xl font-black text-white">{price > 0 ? `${price.toFixed(2)} €` : '—'}</p>
+              <p className="text-xs text-slate-600 mt-1.5 max-w-xs mx-auto leading-relaxed">
+                Aktueller Marktpreis. Der Preisverlauf für diese Karte wird ab jetzt täglich aufgebaut und erscheint hier, sobald mehrere Datenpunkte vorliegen.
+              </p>
+            </div>
           )}
         </div>
 

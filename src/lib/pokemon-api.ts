@@ -199,55 +199,48 @@ export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
 // Baut einen 30-Tage-Verlauf aus den ECHTEN Cardmarket-Durchschnittspreisen.
 // Ankerpunkte: avg30 (vor 30 Tagen), avg7 (vor 7 Tagen), avg1 (gestern), trendPrice (heute).
 // Zwischen den Ankern wird linear interpoliert — die Eckwerte sind reale Marktdaten.
+/**
+ * Baut aus den echten Cardmarket-Durchschnittsfeldern ehrliche Ankerpunkte —
+ * KEINE erfundene Tagesgranularität, KEINE lineare Interpolation.
+ *
+ * Cardmarket liefert über die pokemontcg.io-API echte, zeitbezogene Durchschnitte:
+ * avg30 (Ø 30 Tage), avg7 (Ø 7 Tage), avg1 (Ø gestern) und trendPrice (aktueller
+ * Trend). Das sind die einzigen realen Verlaufsdaten, die die API kennt — also
+ * geben wir genau diese Punkte zurück (an ihrem nominalen Alter datiert). Der
+ * Chart verbindet sie auf einer ZEIT-Achse mit weicher Kurve; die echte
+ * Tages-Historie entsteht separat aus den Supabase-Snapshots (record-on-view).
+ */
 export function buildCardmarketHistory(cm: Record<string, number>): { date: string; price: number }[] {
   const today = new Date();
-  const anchors: Array<{ daysAgo: number; price: number }> = [];
-  if (cm.avg30 > 0) anchors.push({ daysAgo: 30, price: cm.avg30 });
-  if (cm.avg7 > 0) anchors.push({ daysAgo: 7, price: cm.avg7 });
-  if (cm.avg1 > 0) anchors.push({ daysAgo: 1, price: cm.avg1 });
-  const current = cm.trendPrice || cm.averageSellPrice;
-  if (current > 0) anchors.push({ daysAgo: 0, price: current });
-
-  if (anchors.length < 2) return [];
-  anchors.sort((a, b) => b.daysAgo - a.daysAgo); // ältester zuerst
-
-  const series: { date: string; price: number }[] = [];
-  const push = (daysAgo: number, price: number) => {
+  const mk = (daysAgo: number, price: number) => {
     const d = new Date(today);
-    d.setDate(d.getDate() - daysAgo);
-    series.push({ date: d.toISOString().split('T')[0], price: Math.round(price * 100) / 100 });
+    d.setUTCDate(d.getUTCDate() - daysAgo);
+    return { date: d.toISOString().split('T')[0], price: Math.round(price * 100) / 100 };
   };
-  for (let i = 0; i < anchors.length - 1; i++) {
-    const start = anchors[i];
-    const end = anchors[i + 1];
-    const span = start.daysAgo - end.daysAgo;
-    for (let step = 0; step < span; step++) {
-      const frac = step / span;
-      push(start.daysAgo - step, start.price + (end.price - start.price) * frac);
+
+  const byDate = new Map<string, number>();
+  const add = (daysAgo: number, price: number) => {
+    if (price > 0) {
+      const p = mk(daysAgo, price);
+      byDate.set(p.date, p.price); // spätere (jüngere) Punkte gewinnen bei Datumskollision
     }
-  }
-  const last = anchors[anchors.length - 1];
-  push(last.daysAgo, last.price);
-  return series;
+  };
+  add(30, cm.avg30);
+  add(7, cm.avg7);
+  add(1, cm.avg1);
+  add(0, cm.trendPrice || cm.averageSellPrice);
+
+  if (byDate.size < 2) return [];
+  return [...byDate.entries()]
+    .map(([date, price]) => ({ date, price }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-// Fallback-Verlauf, wenn keine Cardmarket-Daten vorliegen (klar als Beispiel gekennzeichnet in der UI).
-export function generatePriceHistory(basePrice: number, days = 30) {
-  const history = [];
-  let price = basePrice * 0.8;
-
-  for (let i = days; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const change = (Math.random() - 0.45) * 0.08;
-    price = Math.max(0.01, price * (1 + change));
-    history.push({
-      date: date.toISOString().split('T')[0],
-      price: Math.round(price * 100) / 100,
-    });
-  }
-  return history;
-}
+// Hinweis: Es gibt bewusst KEINE Funktion, die einen synthetischen/zufälligen
+// Preisverlauf erzeugt. Verläufe stammen ausschließlich aus echten Quellen —
+// Supabase-Tages-Snapshots und Cardmarket-Durchschnitten (buildCardmarketHistory).
+// Liegen zu wenige echte Punkte vor, zeigt die UI KEINEN Chart, sondern nur den
+// aktuellen Preis (siehe karten/[id]). Keine erfundenen Preise. (v2.19.1)
 
 export function calculateInvestmentScore(card: PokemonCard): number {
   let score = 50;
