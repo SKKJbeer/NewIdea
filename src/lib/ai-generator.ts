@@ -79,7 +79,7 @@ export async function generateNewsletterContent(
     newsletterData = JSON.parse(jsonMatch?.[0] || '{}');
   } catch {
     newsletterData = {
-      subject: '🚀 PokéMarket Weekly: Top Karten dieser Woche',
+      subject: 'PokéMarket Weekly: Top Karten dieser Woche',
       preheader: 'Deine wöchentliche Marktanalyse ist da',
       intro: summary.weeklyReport.slice(0, 300),
       cardHighlights: topCards.map((c) => ({

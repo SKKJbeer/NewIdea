@@ -258,6 +258,7 @@ Vor jedem Commit der Artikel-Inhalte (static-articles.ts, article-generator.ts, 
 - [ ] **`isStatic: true` gesetzt** bei static/fallback Pfaden (siehe Regel 5) = PFLICHT
 - [ ] **Keine Erste Person Singular** (siehe Regel 6) = STOP
 - [ ] Alle genannten Pokémon-Karten existieren wirklich (Name + Set korrekt?)
+- [ ] **Karten-IDs/Bild-URLs API-verifiziert**: Jede hardcodierte `images.pokemontcg.io/{set}/{nr}.png`-URL MUSS per `GET api.pokemontcg.io/v2/cards/{set}-{nr}` geprüft werden — stimmt `name` mit dem Text überein? (v2.16.0-Fund: 7 von 9 IDs zeigten falsche Karten — z.B. „Charizard ex" war Alakazam, „Pokéball Gold" war eine Psycho-Energie. Bild ≠ Text zerstört Glaubwürdigkeit!)
 - [ ] Alle genannten Events/Turniere/Ankündigungen sind real oder klar als hypothetisch kenntlich
 - [ ] `sources`-Array enthält mindestens eine direkte Quellenangabe
 
@@ -332,7 +333,7 @@ Kurzfassung der verbotenen KI-Muster:
 4. **Symmetrie-Zwang** (immer 3 Punkte, gleichlange Absätze) → Ungleichgewicht zulassen
 5. **Gleichförmiger Satzrhythmus** → kurze Sätze einstreuen (3–6 Wörter)
 6. **Doppelpunkt-Konstruktionen** („Der Grund: ...") → max. 1 pro Text
-7. **Emoji im Fließtext** → nur in Überschriften/Tip-Boxen
+7. **Emojis KOMPLETT verboten** → nirgendwo, auch nicht in Überschriften/Tips — visuelle Anker liefern ausschließlich Lucide-Icons (siehe UI-Design-Regeln → Icon-Regel)
 8. **Absatz-Schlusssätze die sich selbst zusammenfassen** → Absatz endet mit dem letzten Fakt
 
 **Faktendichte-Test:** Jeder Satz beantwortet Was/Wann/Wie viel/Warum/Woher — sonst streichen.
@@ -343,6 +344,26 @@ Die KI-Generierung bekommt `STYLE_RULES` (article-generator.ts) in jedem Prompt.
 ---
 
 ## UI-Design-Regeln (PFLICHT — immer einhalten!)
+
+### ⛔ Icon-Regel: NUR Lucide-Icons, NIEMALS Emojis (seit v2.16.0)
+
+**REGEL:** In der gesamten UI und in allen Inhalten (Artikel, Guides, Überschriften, Tips, Badges, Empty-States, Monitoring) sind Emojis verboten. Visuelle Anker kommen ausschließlich aus `lucide-react`.
+
+| Kontext | Umsetzung |
+|---|---|
+| Content-Datenmodelle (Guides, ARTICLE_META, GUIDE_TOPICS) | Feld `icon: string` mit Icon-Key, gerendert über `<ContentIcon name={...}>` (`src/components/ContentIcon.tsx`) — neue Keys dort zentral ergänzen |
+| Icon-Chip-Pattern (Listen/Cards) | `<div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400"><ContentIcon name={icon} size={18} /></div>` |
+| Bild-Fallbacks | `<ImageOff>` statt 🃏 |
+| Warnhinweise | `<TriangleAlert>` / `<CircleAlert>` statt ⚠️/🔴 |
+| Sentiment/Status | Farbiger Punkt (`h-5 w-5 rounded-full bg-emerald-400/amber/rose`) statt 🟢🟡🔴 |
+
+**Erlaubte Ausnahmen (KEINE Emojis im Sinne der Regel):**
+- Typografische Zeichen: `→ ← ✓ ·` 
+- Karten-Fachzeichen: `● ◆ ★` (Seltenheitssymbole)
+- Sprach-Flaggen `🇬🇧 🇩🇪 🇯🇵 🇰🇷` NUR als funktionale Sprachindikatoren (LangPicker, Preissprache)
+- Social-Media-Captions (Instagram etc.) — dort sind Emojis Plattform-Konvention
+
+**Durchsetzung:** `EMOJI`-Regex in `src/lib/content-rules.ts` gilt für ALLE Content-Felder (auch Überschriften/Tips) — `content-compliance.test.ts` bricht den Build, `validateGuide()` verwirft KI-Guides. Alte in Supabase gespeicherte Guides mit Emoji-Feld fallen in `<ContentIcon>` auf ein Default-Icon zurück.
 
 ### ⛔ Dark Mode — Bloomberg/TradingView-Design (GLOBAL BINDEND — keine Ausnahmen!)
 

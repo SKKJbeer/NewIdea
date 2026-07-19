@@ -21,7 +21,7 @@ const GUIDE_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Guide):
    - VERBOTENE Wörter: atemberaubend, revolutionär, bahnbrechend, faszinierend, spektakulär, episch
    - Keine Meta-Kommentare ("In diesem Artikel", "Zusammenfassend", "Fazit:")
    - Satzlängen variieren, kurze Sätze einstreuen. Jeder Satz trägt Information (Was/Wann/Wie/Warum)
-   - Keine Emojis im Fließtext (content). In tip-Feldern ist EIN Emoji als Präfix erlaubt.
+   - KEINE Emojis — nirgendwo, auch nicht in Überschriften oder tip-Feldern. Die Plattform rendert Icons selbst.
 6. ZIELGRUPPE: Deutsche Pokémon-Sammler, alle Erfahrungsstufen. Fachbegriffe beim ersten Auftreten in Klammern erklären.`;
 
 const GUIDE_SCHEMA = `{
@@ -30,9 +30,9 @@ const GUIDE_SCHEMA = `{
   "intro": "3-4 Sätze Einstieg — direkt mit dem stärksten Fakt oder dem Problem des Lesers, keine Floskeln",
   "sections": [
     {
-      "heading": "Emoji + konkrete Aussage als Überschrift",
+      "heading": "Konkrete Aussage als Überschrift (kein Emoji)",
       "content": "5-8 dichte Sätze. Konkrete Merkmale, Abläufe, Kriterien — alles verifizierbar.",
-      "tip": "Optional: EIN Emoji + praktischer Hinweis in 1-2 Sätzen"
+      "tip": "Optional: praktischer Hinweis in 1-2 Sätzen (kein Emoji)"
     }
   ],
   "keyPoints": ["4 kompakte Takeaways — konkret, kein Marketing"],
@@ -84,8 +84,8 @@ export function validateGuide(guide: Guide): ContentViolation[] {
     texts.push([`sections[${i}].content`, s.content]);
     if (s.tip) texts.push([`sections[${i}].tip`, s.tip]);
   }
-  // Emoji-Verbot gilt für intro + content (heading/tip nutzen Emojis als Anker)
-  return findViolations(texts, /^(intro|sections\[\d+\]\.content|keyPoints|metaDescription)/);
+  // Emoji-Verbot gilt ÜBERALL — visuelle Anker liefern Lucide-Icons (CLAUDE.md UI-Regeln)
+  return findViolations(texts);
 }
 
 /** Nächstes noch nicht generiertes Thema aus der Warteschlange. */
@@ -127,7 +127,7 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
       slug: topic.slug,
       title: topic.title,
       metaDescription: data.metaDescription || topic.brief.slice(0, 155),
-      emoji: topic.emoji,
+      icon: topic.icon,
       badge: topic.badge,
       color: topic.color,
       headerGradient: topic.headerGradient,

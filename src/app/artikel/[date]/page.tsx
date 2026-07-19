@@ -6,7 +6,8 @@ import { readArticle, generateArticle, getArticleType, ARTICLE_META } from '@/li
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { cachedImg } from '@/lib/cached-image';
-import { ArrowLeft, Clock, Calendar, Tag } from 'lucide-react';
+import { ContentIcon } from '@/components/ContentIcon';
+import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert } from 'lucide-react';
 
 import type { Metadata } from 'next';
 
@@ -101,9 +102,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
     article = await generateArticle(type, date).catch(() => null);
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+  const jsonLd = article && {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.intro.slice(0, 200),
+    datePublished: date,
+    inLanguage: 'de',
+    author: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/artikel/${date}` },
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
+      {jsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      )}
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 pt-8 pb-12 sm:py-14">
@@ -111,7 +128,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
             <ArrowLeft size={12} /> Alle Artikel
           </Link>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">{meta.emoji} {meta.category}</span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400"><ContentIcon name={meta.icon} size={11} /> {meta.category}</span>
             <span className="text-xs text-slate-600 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
             {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
           </div>
@@ -129,7 +146,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           <>
             {article.isStatic && (
               <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2.5">
-                <span className="text-amber-400 text-sm mt-0.5 shrink-0">⚠</span>
+                <TriangleAlert size={15} className="text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-400/80 leading-relaxed">
                   <strong className="text-amber-400">Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
                   <a href="https://www.cardmarket.com/en/Pokemon" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-300">Cardmarket</a>{' '}

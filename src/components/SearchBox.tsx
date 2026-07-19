@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, ImageOff } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cachedImg } from '@/lib/cached-image';
@@ -131,7 +131,7 @@ export function SearchBox({
                     {s.imageUrl ? (
                       <Image src={cachedImg(s.imageUrl)} alt={s.name} fill sizes="32px" className="object-contain" />
                     ) : (
-                      <span className="text-sm">🃏</span>
+                      <ImageOff size={14} className="text-slate-600" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">

@@ -6,6 +6,7 @@ import { loadGeneratedGuide, listGeneratedGuides } from '@/lib/guide-storage';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { cachedImg } from '@/lib/cached-image';
+import { ContentIcon } from '@/components/ContentIcon';
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
@@ -45,9 +46,22 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const allGuides = [...GUIDES, ...generated.filter((g) => !staticSlugs.has(g.slug))];
   const otherGuides = allGuides.filter((g) => g.slug !== slug).slice(0, 3);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.metaDescription,
+    inLanguage: 'de',
+    author: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/guides/${guide.slug}` },
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-3xl mx-auto px-4 pt-8 pb-14 sm:py-16">
@@ -55,7 +69,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <ArrowLeft size={12} /> Alle Guides
           </Link>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">{guide.emoji} {guide.badge}</span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400"><ContentIcon name={guide.icon} size={11} /> {guide.badge}</span>
             <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {guide.readingTimeMin} Min Lektüre</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">{guide.title}</h1>
@@ -118,7 +132,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                         )}
                       </div>
                     ) : (
-                      <span className="text-xl shrink-0 mt-1">🃏</span>
+                      <span className="shrink-0 mt-1 text-violet-400"><ContentIcon name="card" size={18} /></span>
                     )}
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-slate-200 leading-tight">{card.name}</p>
@@ -151,7 +165,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               {otherGuides.map((g) => (
                 <Link key={g.slug} href={`/guides/${g.slug}`}
                   className="flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] p-4 transition-all group">
-                  <span className="text-2xl shrink-0">{g.emoji}</span>
+                  <span className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                    <ContentIcon name={g.icon} size={18} />
+                  </span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400">{g.badge}</span>
                     <p className="text-sm font-bold text-slate-200 group-hover:text-white mt-0.5 leading-tight transition-colors">{g.title}</p>

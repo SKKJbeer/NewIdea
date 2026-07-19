@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Loader2, BarChart3, Search, X, Check } from 'lucide-react';
+import { Plus, Trash2, Loader2, BarChart3, Search, X, Check, TrendingUp, Coins, Globe, Lock } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { NavBar } from '@/components/NavBar';
 import { PortfolioChart, type ChartPoint } from '@/components/PortfolioChart';
@@ -405,11 +405,11 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       <p className="text-sm text-slate-500 max-w-xs mb-2 leading-relaxed">
         Trag deine Pokémon-Karten ein und verfolge ihren Marktwert — täglich aktuell, wie bei einer Aktien-App.
       </p>
-      <ul className="text-xs text-slate-500 mb-8 space-y-1">
-        <li>📈 Kursverlauf interaktiv mit Hover/Touch</li>
-        <li>💶 Unrealisierter Gewinn/Verlust</li>
-        <li>🇬🇧🇩🇪🇯🇵🇰🇷 Preise nach Sprache (EN/DE/JP/KR)</li>
-        <li>🔒 Lokal gespeichert, kein Login nötig</li>
+      <ul className="text-xs text-slate-500 mb-8 space-y-1.5">
+        <li className="flex items-center justify-center gap-2"><TrendingUp size={12} className="text-violet-400" /> Kursverlauf interaktiv mit Hover/Touch</li>
+        <li className="flex items-center justify-center gap-2"><Coins size={12} className="text-violet-400" /> Unrealisierter Gewinn/Verlust</li>
+        <li className="flex items-center justify-center gap-2"><Globe size={12} className="text-violet-400" /> Preise nach Sprache (EN/DE/JP/KR)</li>
+        <li className="flex items-center justify-center gap-2"><Lock size={12} className="text-violet-400" /> Lokal gespeichert, kein Login nötig</li>
       </ul>
       <button
         onClick={onAdd}

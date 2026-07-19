@@ -17,7 +17,7 @@ describe('GUIDES', () => {
       expect(guide.slug, `slug missing`).toBeTruthy();
       expect(guide.title, `${guide.slug}: title`).toBeTruthy();
       expect(guide.metaDescription, `${guide.slug}: metaDescription`).toBeTruthy();
-      expect(guide.emoji, `${guide.slug}: emoji`).toBeTruthy();
+      expect(guide.icon, `${guide.slug}: icon`).toBeTruthy();
       expect(guide.readingTimeMin, `${guide.slug}: readingTimeMin`).toBeGreaterThan(0);
       expect(guide.intro, `${guide.slug}: intro`).toBeTruthy();
       expect(Array.isArray(guide.sections), `${guide.slug}: sections must be array`).toBe(true);

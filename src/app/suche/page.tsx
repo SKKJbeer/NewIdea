@@ -2,7 +2,7 @@ import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
 import { searchCards } from '@/lib/pokemon-api';
-import { Search, SearchX } from 'lucide-react';
+import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -94,7 +94,7 @@ export default async function SearchPage({
           </div>
         ) : error ? (
           <div className="max-w-md mx-auto rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 text-center">
-            <p className="font-semibold">⚠️ Suche momentan nicht verfügbar</p>
+            <p className="font-semibold flex items-center justify-center gap-1.5"><TriangleAlert size={14} /> Suche momentan nicht verfügbar</p>
             <p className="text-sm mt-1 text-amber-400/60">Bitte versuche es später erneut.</p>
           </div>
         ) : results.length === 0 ? (

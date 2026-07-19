@@ -1,5 +1,6 @@
 import { fetchTopValueCards } from '@/lib/pokemon-api';
 import { cachedImg } from '@/lib/cached-image';
+import { ContentIcon } from '@/components/ContentIcon';
 import { SearchBox } from '@/components/SearchBox';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
@@ -149,9 +150,9 @@ export default async function Home() {
   const fearGreed = Math.round(breadthPct * 0.6 + momentumScore * 0.4);
 
   const sentiment =
-    fearGreed >= 65 ? { label: 'Bullish', emoji: '🟢' }
-    : fearGreed >= 40 ? { label: 'Neutral', emoji: '🟡' }
-    : { label: 'Bearish', emoji: '🔴' };
+    fearGreed >= 65 ? { label: 'Bullish', dotClass: 'bg-emerald-400' }
+    : fearGreed >= 40 ? { label: 'Neutral', dotClass: 'bg-amber-400' }
+    : { label: 'Bearish', dotClass: 'bg-rose-400' };
 
   // Ticker: top 10 gainers + losers interleaved
   const tickerCards = withTrend
@@ -326,9 +327,7 @@ export default async function Home() {
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Stimmung</span>
                 </div>
-                <p className="text-2xl font-black leading-none text-white">
-                  {sentiment.emoji}
-                </p>
+                <span className={`block h-5 w-5 rounded-full ${sentiment.dotClass}`} aria-hidden />
                 <p className="mt-1.5 text-[10px] text-slate-400 font-semibold">{sentiment.label}</p>
               </div>
 
@@ -617,16 +616,18 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
-              { emoji: '📊', label: 'Wochenrückblick', sub: 'Jeden Sonntag', href: '/artikel' },
-              { emoji: '🃏', label: 'Karte im Fokus', sub: 'Jeden Donnerstag', href: '/artikel' },
-              { emoji: '📈', label: 'Marktanalyse', sub: 'Jeden Donnerstag', href: '/artikel' },
+              { icon: 'refresh', label: 'Wochenrückblick', sub: 'Jeden Sonntag', href: '/artikel' },
+              { icon: 'card', label: 'Karte im Fokus', sub: 'Jeden Donnerstag', href: '/artikel' },
+              { icon: 'trending', label: 'Marktanalyse', sub: 'Jeden Donnerstag', href: '/artikel' },
             ].map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 className="group flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4 transition-all hover:border-violet-500/30 hover:bg-[#1a1a28]"
               >
-                <span className="text-2xl shrink-0">{item.emoji}</span>
+                <span className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                  <ContentIcon name={item.icon} size={18} />
+                </span>
                 <div>
                   <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">
                     {item.label}
@@ -660,7 +661,9 @@ export default async function Home() {
                 href={`/guides/${guide.slug}`}
                 className="group flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4 transition-all hover:border-violet-500/30 hover:bg-[#1a1a28]"
               >
-                <span className="text-xl shrink-0">{guide.emoji}</span>
+                <span className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+                  <ContentIcon name={guide.icon} size={16} />
+                </span>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-slate-200 group-hover:text-white leading-snug line-clamp-2">
                     {guide.title}

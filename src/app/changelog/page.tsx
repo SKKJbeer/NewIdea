@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.16.0',
+    date: '19. Juli 2026',
+    label: 'SEO-Ausbau, Lucide-Icons, Kartenbild-Korrekturen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Falsche Kartenbilder korrigiert: 7 von 9 hardcodierten Karten-IDs zeigten andere Karten als im Text beschrieben — alle per TCG-API verifiziert' },
+      { type: 'fixed',   text: 'Erfundene Karten aus Artikeln entfernt (z.B. "Pikachu ex SIR" im 151-Set existiert nicht) — ersetzt durch real existierende Karten' },
+      { type: 'fixed',   text: 'SEO: Unterseiten deklarierten fälschlich die Homepage als Canonical — jetzt eigene URL pro Seite' },
+      { type: 'changed', text: 'Emojis komplett durch professionelle Lucide-Icons ersetzt — in UI, Artikeln, Guides und Überschriften; als Regel dauerhaft verankert' },
+      { type: 'new',     text: 'JSON-LD Article-Schema auf Artikel- und Guide-Seiten, Top-40-Karten in der Sitemap' },
+    ],
+  },
+  {
     version: '2.15.0',
     date: '18. Juli 2026',
     label: 'Bilder API-unabhängig: Caching-Proxy',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Bild-Caching-Proxy /api/img: Bilder bleiben bis zu 1 Jahr aus dem CDN-Cache verfügbar, auch wenn die externen Bild-Hosts ausfallen' },
       { type: 'changed', text: 'Alle Kartenbilder, Set-Logos und Booster-Artworks laufen jetzt über den Proxy (Suche, Artikel, Guides, Portfolio, Merkliste, Startseite)' },

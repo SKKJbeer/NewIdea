@@ -82,7 +82,7 @@ export function CardLangPrice({
           <p className="mt-1.5 text-[10px] text-slate-600">
             {status === 'ok' && `✓ Cardmarket-Preis für ${LANG_LABEL[language]}-Ausgaben`}
             {status === 'fallback' &&
-              '⚠ Sprachspezifischer Preis nicht verfügbar — EN-Fallback'}
+              'Sprachspezifischer Preis nicht verfügbar — EN-Fallback'}
           </p>
         )}
       </div>

@@ -54,7 +54,10 @@ export const metadata: Metadata = {
     description: 'Echte Cardmarket-Preise & Investment-Scores für Pokémon-Karten.',
   },
   alternates: {
-    canonical: SITE_URL,
+    // Relativ ('./') → löst pro Seite auf die eigene URL auf (mit metadataBase).
+    // NIEMALS SITE_URL absolut setzen: das würde von JEDER Unterseite als
+    // "Canonical = Homepage" vererbt und Unterseiten aus dem Index drängen.
+    canonical: './',
   },
 };
 

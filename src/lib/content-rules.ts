@@ -10,8 +10,10 @@ export const BUY_ADVICE =
 // KI-Floskeln (siehe .claude/commands/schreibstil.md)
 export const AI_PHRASES =
   /atemberaubend|revolutionär|bahnbrechend|faszinierend|spektakulär|hier ein überblick|in der heutigen zeit|tauchen wir|zusammenfassend lässt sich|es ist wichtig zu beachten|abschließend lässt sich|fazit:|in diesem artikel/i;
-// Nur der moderne Emoji-Block — Kartensymbole wie ●◆★ sind legitime Fachzeichen.
-export const EMOJI = /[\u{1F300}-\u{1FAFF}]/u;
+// Moderner Emoji-Block + kuratierte Symbol-Emojis (⚠⚡⛔✅✨❌⭐ + Variation
+// Selector). Kartensymbole wie ●◆★ sind legitime Fachzeichen und bleiben erlaubt —
+// deshalb KEIN pauschaler ☀-➿-Bereich (der enthält ★ U+2605).
+export const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2B00}-\u{2BFF}\u{FE0F}\u{26A0}\u{26A1}\u{26D4}\u{2705}\u{2728}\u{274C}\u{274E}\u{2753}\u{2757}\u{2764}]/u;
 
 export interface ContentViolation {
   field: string;
@@ -21,12 +23,13 @@ export interface ContentViolation {
 
 /**
  * Prüft Fließtext-Felder gegen alle Content-Regeln.
- * `emojiFields`: Felder, in denen zusätzlich das Emoji-Verbot gilt (Fließtext,
- * nicht Überschriften/Tips — die nutzen Emojis als visuelle Anker).
+ * Das Emoji-Verbot gilt seit v2.16.0 ÜBERALL — auch in Überschriften und Tips.
+ * Visuelle Anker liefern ausschließlich Lucide-Icons (siehe CLAUDE.md UI-Regeln).
+ * `emojiFields` bleibt als Parameter für Spezialfälle, Default = alle Felder.
  */
 export function findViolations(
   texts: Array<[field: string, text: string]>,
-  emojiFields: RegExp = /^(intro|sections\[\d+\]\.content|keyPoints)/,
+  emojiFields: RegExp = /(?:)/,
 ): ContentViolation[] {
   const violations: ContentViolation[] = [];
   const rules: Array<[string, RegExp]> = [

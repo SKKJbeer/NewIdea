@@ -3,7 +3,7 @@ import { GUIDES } from '@/lib/guides';
 import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
-import { fetchRecentSets } from '@/lib/pokemon-api';
+import { fetchRecentSets, fetchTopValueCards } from '@/lib/pokemon-api';
 import { listGeneratedGuideSlugs } from '@/lib/guide-storage';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
@@ -77,5 +77,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages];
+  // Top-Karten-Detailseiten — die wertvollsten Karten sind die stärksten
+  // Such-Einstiege ("charizard ex sir preis" etc.). Falls TCG-API down: leer.
+  const topCards = await fetchTopValueCards(40).catch(() => []);
+  const cardPages: MetadataRoute.Sitemap = topCards.map((c) => ({
+    url: `${BASE_URL}/karten/${c.id}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages, ...cardPages];
 }

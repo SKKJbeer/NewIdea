@@ -40,14 +40,14 @@ describe('validateGuide (Laufzeit-Qualitäts-Gate)', () => {
       slug: 'test-guide',
       title: 'Testguide über Kartenpflege für Sammler',
       metaDescription: 'Eine sachliche Beschreibung des Guides für Suchmaschinen ohne Regelverstöße.',
-      emoji: '🛡️',
+      icon: 'shield',
       badge: 'Test',
       color: 'violet',
       headerGradient: 'from-violet-800 to-indigo-900',
       readingTimeMin: 5,
       intro: 'Karten verlieren Zustand durch Licht und Feuchtigkeit. Die Prüfzonen sind bekannt.',
       sections: [
-        { heading: '🔬 Erste Sektion', content: 'Sachlicher Inhalt ohne Verstöße gegen die Regeln.' },
+        { heading: 'Erste Sektion', content: 'Sachlicher Inhalt ohne Verstöße gegen die Regeln.' },
       ],
       keyPoints: ['Sachlicher Punkt ohne Regelverstoß'],
       tags: ['test'],
@@ -79,10 +79,19 @@ describe('validateGuide (Laufzeit-Qualitäts-Gate)', () => {
     expect(v.some((x) => x.rule === 'erste-person')).toBe(true);
   });
 
-  it('lehnt Emoji im Fließtext ab, erlaubt es in heading/tip', () => {
-    const bad = validateGuide(makeGuide({ sections: [{ heading: 'H', content: 'Text mit Emoji 🔥 im Fließtext.' }] }));
-    expect(bad.some((x) => x.rule === 'emoji-im-fliesstext')).toBe(true);
-    const ok = validateGuide(makeGuide({ sections: [{ heading: '🔥 Überschrift', content: 'Sauberer Text.', tip: '💡 Tipp mit Emoji-Präfix.' }] }));
+  it('lehnt Emojis ÜBERALL ab — auch in heading und tip (nur Lucide-Icons erlaubt)', () => {
+    const badContent = validateGuide(makeGuide({ sections: [{ heading: 'H', content: 'Text mit Emoji 🔥 im Fließtext.' }] }));
+    expect(badContent.some((x) => x.rule === 'emoji-im-fliesstext')).toBe(true);
+    const badHeading = validateGuide(makeGuide({ sections: [{ heading: '🔥 Überschrift', content: 'Sauberer Text.' }] }));
+    expect(badHeading.some((x) => x.rule === 'emoji-im-fliesstext')).toBe(true);
+    const badTip = validateGuide(makeGuide({ sections: [{ heading: 'H', content: 'Sauberer Text.', tip: '💡 Tipp mit Emoji-Präfix.' }] }));
+    expect(badTip.some((x) => x.rule === 'emoji-im-fliesstext')).toBe(true);
+    const badSymbol = validateGuide(makeGuide({ intro: 'Achtung ⚠️ vor Feuchtigkeit.' }));
+    expect(badSymbol.some((x) => x.rule === 'emoji-im-fliesstext')).toBe(true);
+  });
+
+  it('erlaubt Karten-Fachzeichen ●◆★ weiterhin', () => {
+    const ok = validateGuide(makeGuide({ sections: [{ heading: 'Seltenheit', content: 'Commons (●), Uncommons (◆) und Rares (★) bilden das Fundament.' }] }));
     expect(ok).toHaveLength(0);
   });
 });

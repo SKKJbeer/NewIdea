@@ -115,8 +115,8 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
         {/* Cards */}
         {report.topGainers.length > 0 && (
           <div className="space-y-8">
-            <CardGrid cards={report.topGainers} title="🚀 Top Investment-Karten" />
-            {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="💎 Höchste Kartenwerte" />}
+            <CardGrid cards={report.topGainers} title="Top Investment-Karten" />
+            {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="Höchste Kartenwerte" />}
           </div>
         )}
 

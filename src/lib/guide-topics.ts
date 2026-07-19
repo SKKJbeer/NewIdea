@@ -6,7 +6,8 @@
 export interface GuideTopic {
   slug: string;
   title: string;
-  emoji: string;
+  /** Icon-Key für <ContentIcon> (Lucide) — keine Emojis, siehe CLAUDE.md UI-Regeln */
+  icon: string;
   badge: string;
   color: string;
   headerGradient: string;
@@ -20,7 +21,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-karten-verkaufen-wo-und-wie',
     title: 'Pokémon Karten verkaufen — wo und wie es wirklich funktioniert',
-    emoji: '💶',
+    icon: 'coins',
     badge: 'Verkaufen',
     color: 'emerald',
     headerGradient: 'from-emerald-800 to-green-950',
@@ -30,7 +31,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'was-ist-meine-pokemon-sammlung-wert',
     title: 'Was ist meine Pokémon-Sammlung wert? So findest du es systematisch heraus',
-    emoji: '🔎',
+    icon: 'search',
     badge: 'Bewertung',
     color: 'violet',
     headerGradient: 'from-violet-800 to-indigo-900',
@@ -40,7 +41,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-erstauflage-erkennen-1st-edition',
     title: 'Erstauflage erkennen: 1st Edition, Shadowless & Unlimited unterscheiden',
-    emoji: '🏅',
+    icon: 'medal',
     badge: 'Vintage',
     color: 'amber',
     headerGradient: 'from-amber-700 to-orange-900',
@@ -50,7 +51,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'psa-vs-cgc-vs-bgs-grading-vergleich',
     title: 'PSA vs. CGC vs. BGS: Die Grading-Anbieter im sachlichen Vergleich',
-    emoji: '⚖️',
+    icon: 'scale',
     badge: 'Grading',
     color: 'blue',
     headerGradient: 'from-blue-800 to-blue-950',
@@ -60,7 +61,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'booster-box-vs-etb-vs-einzelkarten',
     title: 'Booster Box, ETB oder Einzelkarten: Was die Produktformen unterscheidet',
-    emoji: '📦',
+    icon: 'package',
     badge: 'Produkte',
     color: 'indigo',
     headerGradient: 'from-indigo-800 to-indigo-950',
@@ -70,7 +71,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-karten-zustand-bewerten-nm-bis-poor',
     title: 'Kartenzustand bewerten: Von Near Mint bis Poor — das Cardmarket-System',
-    emoji: '🔬',
+    icon: 'microscope',
     badge: 'Zustand',
     color: 'emerald',
     headerGradient: 'from-emerald-800 to-green-950',
@@ -80,7 +81,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'japanische-pokemon-karten-sammeln',
     title: 'Japanische Pokémon-Karten: Was Sammler über den JP-Markt wissen sollten',
-    emoji: '🗾',
+    icon: 'map',
     badge: 'Japan',
     color: 'rose',
     headerGradient: 'from-rose-800 to-rose-950',
@@ -90,7 +91,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-karten-fuer-kinder-sammeln-eltern-guide',
     title: 'Pokémon-Karten fürs Kind: Der Eltern-Guide ohne Fachchinesisch',
-    emoji: '👨‍👩‍👧',
+    icon: 'users',
     badge: 'Eltern',
     color: 'violet',
     headerGradient: 'from-violet-800 to-indigo-900',
@@ -100,7 +101,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-sets-rotation-standard-format',
     title: 'Set-Rotation und Standard-Format: Warum Spielkarten an Wert verlieren können',
-    emoji: '🔄',
+    icon: 'refresh',
     badge: 'Format',
     color: 'blue',
     headerGradient: 'from-blue-800 to-blue-950',
@@ -110,7 +111,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-promo-karten-verstehen',
     title: 'Promo-Karten verstehen: Black Star, Stempel und Event-Karten',
-    emoji: '⭐',
+    icon: 'sparkles',
     badge: 'Promos',
     color: 'amber',
     headerGradient: 'from-amber-700 to-orange-900',
@@ -120,7 +121,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'pokemon-karten-versichern-dokumentieren',
     title: 'Sammlung dokumentieren und absichern: Inventar, Fotos, Versicherungsfragen',
-    emoji: '🗂️',
+    icon: 'folder',
     badge: 'Absicherung',
     color: 'emerald',
     headerGradient: 'from-emerald-800 to-green-950',
@@ -130,7 +131,7 @@ export const GUIDE_TOPICS: GuideTopic[] = [
   {
     slug: 'alte-pokemon-karten-1999-wert-check',
     title: 'Alte Pokémon-Karten von früher gefunden? Der systematische Wert-Check',
-    emoji: '🕰️',
+    icon: 'clock',
     badge: 'Vintage',
     color: 'amber',
     headerGradient: 'from-amber-700 to-orange-900',

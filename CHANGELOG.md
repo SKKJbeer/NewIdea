@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.16.0] — 2026-07-19 · SEO-Ausbau, Lucide-Icons statt Emojis, Kartenbild-Korrekturen
+
+### Behoben
+- **7 von 9 hardcodierten Karten-IDs zeigten falsche Karten** (per TCG-API verifiziert): „Charizard ex SIR (151)" zeigte Alakazam ex (3×), „Pikachu ex" zeigte Mew ex, „Pokéball Gold" eine Psycho-Energie, „Charizard V (Celebrations)" Palkia, „Charizard ex (Paldea Evolved)" Farigiraf — alle IDs korrigiert bzw. Einträge auf real existierende Karten umgestellt
+- **Erfundene Karten aus Artikeln entfernt**: „Mewtu ex SIR", „Pikachu ex SIR" und „Evoli ex SIR" existieren im 151-Set nicht (die echten SIRs: Bisaflor, Glurak, Turtok, Simsala, Zapdos + 2 Trainer), „Shining Pikachu" existiert gar nicht (→ Shining Mew), „Oinkologne/Arcanine ex SIR (Paldea Evolved)" existieren nicht (→ Meowscarada ex SIR, Iono SIR)
+- **SEO-Canonical-Bug**: Das Root-Layout deklarierte die Homepage als Canonical für ALLE Unterseiten — jetzt löst jede Seite auf ihre eigene URL auf
+
+### Geändert
+- **Emojis komplett entfernt — nur noch Lucide-Icons**: Content-Datenmodelle nutzen Icon-Keys mit zentraler `<ContentIcon>`-Komponente; Sentiment-Ampel, Empty-States, Monitoring, Bild-Fallbacks und alle Überschriften/Tips auf professionelle Icons umgestellt. Emoji-Verbot gilt jetzt in ALLEN Content-Feldern (Test + Laufzeit-Gate), Regel in CLAUDE.md verankert
+- KI-Prompts (Artikel + Guides) verbieten Emojis explizit
+
+### Neu
+- **JSON-LD Article-Schema** auf Artikel- und Guide-Seiten (strukturierte Daten für Google)
+- **Top-40-Karten in der Sitemap** — die wertvollsten Karten-Detailseiten als Such-Einstiege
+- CLAUDE.md-Pflichtregel: Jede hardcodierte Karten-ID muss per TCG-API gegen den Text verifiziert werden
+
+---
+
 ## [2.15.0] — 2026-07-18 · Bild-Robustheit: Caching-Proxy macht Bilder API-unabhängig
 
 ### Neu

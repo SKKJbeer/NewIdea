@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { ContentIcon } from '@/components/ContentIcon';
 import { GUIDES } from '@/lib/guides';
 import { listGeneratedGuides } from '@/lib/guide-storage';
 import { Clock, ChevronRight, BookOpen } from 'lucide-react';
@@ -50,7 +51,9 @@ export default async function GuidesPage() {
             }`}
           >
             <div className="flex items-start gap-3">
-              <div className="text-3xl shrink-0">{guide.emoji}</div>
+              <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                <ContentIcon name={guide.icon} size={20} />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400">{guide.badge}</span>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
-import { Calendar, Zap, Shield, TrendingUp, Brain, ChevronLeft, Archive } from 'lucide-react';
+import { Calendar, CalendarDays, Zap, Shield, TrendingUp, Brain, ChevronLeft, Archive, Gem, Bot } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
 
@@ -58,7 +58,7 @@ export default async function MarktberichtPage() {
       <main className="max-w-4xl mx-auto px-4 pb-16 space-y-8 -mt-6">
         {!hasContent && (
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 flex items-start gap-3">
-            <span className="text-xl">📅</span>
+            <CalendarDays size={20} className="shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">Erster Bericht noch ausstehend</p>
               <p className="text-xs mt-1 text-amber-400/60">
@@ -90,12 +90,12 @@ export default async function MarktberichtPage() {
         {report && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Top Gewinner', value: `${report.topGainers.length}`, icon: '📈' },
-              { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: '💎' },
-              { label: 'KI-Bericht', value: 'Live', icon: '🤖' },
+              { label: 'Top Gewinner', value: `${report.topGainers.length}`, icon: TrendingUp },
+              { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: Gem },
+              { label: 'KI-Bericht', value: 'Live', icon: Bot },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-3 sm:p-4 text-center">
-                <div className="text-xl mb-1">{stat.icon}</div>
+                <div className="mb-1 flex justify-center text-violet-400"><stat.icon size={20} /></div>
                 <p className="text-lg sm:text-2xl font-black text-violet-400">{stat.value}</p>
                 <p className="text-[10px] sm:text-xs text-slate-600 mt-0.5 leading-tight">{stat.label}</p>
               </div>
@@ -105,8 +105,8 @@ export default async function MarktberichtPage() {
 
         {report && report.topGainers.length > 0 && (
           <div className="space-y-8">
-            <CardGrid cards={report.topGainers} title="🚀 Top Investment-Karten" />
-            {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="💎 Höchste Kartenwerte" />}
+            <CardGrid cards={report.topGainers} title="Top Investment-Karten" />
+            {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="Höchste Kartenwerte" />}
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { CardImage } from './CardImage';
 import { PokemonCard } from '@/types';
-import { TrendingUp, TrendingDown, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, ImageOff } from 'lucide-react';
 import { BoosterPackImage } from './BoosterPackImage';
 
 interface CardGridProps {
@@ -53,7 +53,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
                 className="object-contain group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl">🃏</div>
+              <div className="w-full h-full flex items-center justify-center text-slate-700"><ImageOff size={20} /></div>
             )}
           </div>
           <div className="p-1.5">
@@ -80,7 +80,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
               className="object-contain group-hover:scale-105 transition-transform duration-300 p-3"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-4xl">🃏</div>
+            <div className="w-full h-full flex items-center justify-center text-slate-700"><ImageOff size={32} /></div>
           )}
           <div className="absolute top-2 right-2 bg-[#13131e] border border-[#2a2a3a] rounded-full px-2 py-0.5 text-xs font-bold z-10">
             <span className={score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-slate-600'}>

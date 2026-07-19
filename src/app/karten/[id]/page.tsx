@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
-import { ArrowLeft, Star, ShoppingCart, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
 import { fetchCardById, generatePriceHistory, calculateInvestmentScore } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
@@ -146,7 +146,7 @@ export default async function CardDetailPage({ params }: Props) {
                   />
                 </div>
               ) : (
-                <div className="aspect-[3/4] flex items-center justify-center text-6xl">🃏</div>
+                <div className="aspect-[3/4] flex items-center justify-center text-slate-700"><ImageOff size={48} /></div>
               )}
             </div>
             <div className="mt-4 w-full space-y-2">

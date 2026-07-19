@@ -37,10 +37,8 @@ function expectCompliant(label: string, texts: Array<[string, string]>) {
     expect(text, `${label} → ${field}: Persona-Name verboten`).not.toMatch(PERSONA_NAME);
     expect(text, `${label} → ${field}: Kaufempfehlungs-Vokabular: "${text.match(BUY_ADVICE)?.[0]}"`).not.toMatch(BUY_ADVICE);
     expect(text, `${label} → ${field}: KI-Floskel (schreibstil.md): "${text.match(AI_PHRASES)?.[0]}"`).not.toMatch(AI_PHRASES);
-    // Emoji-Verbot gilt für Fließtext-Felder — Überschriften (heading) und Tips sind ausgenommen.
-    if (/^(intro|sections\[\d+\]\.content|keyPoints)/.test(field)) {
-      expect(text, `${label} → ${field}: Emoji im Fließtext verboten: "${text.match(EMOJI)?.[0]}"`).not.toMatch(EMOJI);
-    }
+    // Emoji-Verbot gilt ÜBERALL — auch Überschriften und Tips. Icons kommen aus Lucide (CLAUDE.md).
+    expect(text, `${label} → ${field}: Emoji verboten (nur Lucide-Icons): "${text.match(EMOJI)?.[0]}"`).not.toMatch(EMOJI);
   }
 }
 

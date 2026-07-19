@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import {
   CheckCircle2, XCircle, AlertCircle, Loader2,
-  Key, Link2, FileText, Zap, Server, RefreshCw, ExternalLink,
-  ChevronDown, ChevronUp, BookMarked, GitBranch,
+  Key, KeyRound, Link2, FileText, Zap, Server, RefreshCw, ExternalLink,
+  ChevronDown, ChevronUp, BookMarked, GitBranch, TriangleAlert, CircleAlert,
 } from 'lucide-react';
 
 interface ApiKeyStatus {
@@ -205,19 +205,19 @@ export function MonitoringPanel() {
           }`} style={{ width: `${Math.round((totalScore / totalMax) * 100)}%` }} />
         </div>
         <div className="flex flex-wrap gap-3 text-[11px] text-slate-500">
-          <span>🔑 {keysSet}/{apiKeyEntries.length} Keys</span>
-          <span>🔗 {affiliatesReal}/{affiliateEntries.length} Affiliate</span>
-          <span>📄 {legalOk}/{legalEntries.length} Rechtstexte</span>
-          <span>⚡ {featuresWorking}/{featureEntries.length} Features</span>
+          <span className="inline-flex items-center gap-1"><KeyRound size={11} /> {keysSet}/{apiKeyEntries.length} Keys</span>
+          <span className="inline-flex items-center gap-1"><Link2 size={11} /> {affiliatesReal}/{affiliateEntries.length} Affiliate</span>
+          <span className="inline-flex items-center gap-1"><FileText size={11} /> {legalOk}/{legalEntries.length} Rechtstexte</span>
+          <span className="inline-flex items-center gap-1"><Zap size={11} /> {featuresWorking}/{featureEntries.length} Features</span>
         </div>
         {data.build.siteUrlMissing && (
           <p className="mt-2 text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-            ⚠️ <code className="font-mono">NEXT_PUBLIC_SITE_URL</code> fehlt — Cron & Canonical-URLs defekt
+            <TriangleAlert size={11} className="inline mr-1" /><code className="font-mono">NEXT_PUBLIC_SITE_URL</code> fehlt — Cron & Canonical-URLs defekt
           </p>
         )}
         {requiredMissing > 0 && (
           <p className="mt-2 text-[11px] text-rose-700 bg-rose-50 rounded-lg px-3 py-2">
-            🔴 {requiredMissing} Pflicht-Key(s) fehlen — Kernfunktionen eingeschränkt
+            <CircleAlert size={11} className="inline mr-1" />{requiredMissing} Pflicht-Key(s) fehlen — Kernfunktionen eingeschränkt
           </p>
         )}
       </div>

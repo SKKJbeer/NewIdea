@@ -82,14 +82,15 @@ export function getArticleType(dateStr: string): ArticleType | null {
   return null;
 }
 
-export const ARTICLE_META: Record<ArticleType, { label: string; category: string; emoji: string; color: string }> = {
-  markt:      { label: 'Wöchentliche Marktanalyse',  category: 'Markt',      emoji: '📊', color: 'violet'  },
-  karte:      { label: 'Karte im Fokus',             category: 'Spotlight',  emoji: '🃏', color: 'blue'    },
-  strategie:  { label: 'Investment-Strategie',       category: 'Strategie',  emoji: '💡', color: 'emerald' },
-  set:        { label: 'Set-Analyse',                category: 'Analyse',    emoji: '📦', color: 'amber'   },
-  ausblick:   { label: 'Wochenend-Ausblick',         category: 'Prognose',   emoji: '🔮', color: 'rose'    },
-  guide:      { label: 'Sammler-Guide',              category: 'Guide',      emoji: '📚', color: 'indigo'  },
-  rueckblick: { label: 'Wochenrückblick',            category: 'Rückblick',  emoji: '🔄', color: 'gray'    },
+// icon = Key für <ContentIcon> (Lucide) — KEINE Emojis, siehe CLAUDE.md UI-Regeln.
+export const ARTICLE_META: Record<ArticleType, { label: string; category: string; icon: string; color: string }> = {
+  markt:      { label: 'Wöchentliche Marktanalyse',  category: 'Markt',      icon: 'chart',     color: 'violet'  },
+  karte:      { label: 'Karte im Fokus',             category: 'Spotlight',  icon: 'card',      color: 'blue'    },
+  strategie:  { label: 'Investment-Strategie',       category: 'Strategie',  icon: 'lightbulb', color: 'emerald' },
+  set:        { label: 'Set-Analyse',                category: 'Analyse',    icon: 'package',   color: 'amber'   },
+  ausblick:   { label: 'Wochenend-Ausblick',         category: 'Prognose',   icon: 'telescope', color: 'rose'    },
+  guide:      { label: 'Sammler-Guide',              category: 'Guide',      icon: 'book',      color: 'indigo'  },
+  rueckblick: { label: 'Wochenrückblick',            category: 'Rückblick',  icon: 'refresh',   color: 'gray'    },
 };
 
 const JSON_SCHEMA = `{
@@ -123,22 +124,22 @@ const RUECKBLICK_SCHEMA = `{
   ],
   "sections": [
     {
-      "heading": "🌍 Was in der Pokémon-Welt passiert ist",
+      "heading": "Was in der Pokémon-Welt passiert ist",
       "content": "Anime-News, Spiel-Ankündigungen, Turniere, Social-Media-Momente — alles was die Community bewegt hat. Locker erzählt, als wärst du dabei gewesen.",
       "cardRef": "Passende Karte zum Thema"
     },
     {
-      "heading": "📈 Die Karte der Woche: [Name eintragen]",
+      "heading": "Die Karte der Woche: [Name eintragen]",
       "content": "Eine Karte die diese Woche besonders aufgefallen ist — Preisbewegung, Grund, lustige Analogie warum sie gestiegen oder gefallen ist. Pokémon kurz beschreiben für Neulinge.",
       "cardRef": "Diese Karte"
     },
     {
-      "heading": "😅 Marktmuster der Woche",
+      "heading": "Marktmuster der Woche",
       "content": "Ein typisches, allgemein bekanntes Marktverhaltensmuster (z.B. Hype-Käufe, Ankereffekt, Panikverkäufe) — humorvoll erklärt, aber mit echtem Lernwert. KEINE erfundenen konkreten Preisbewegungen als Beispiel.",
       "cardRef": "Optionale Beispielkarte"
     },
     {
-      "heading": "🔮 Prognose: Was nächste Woche auffallen könnte",
+      "heading": "Prognose: Was nächste Woche auffallen könnte",
       "content": "1-2 sachliche Einschätzungen — ehrlich über Unsicherheiten. Eine Karte oder ein Trend auf dem Radar.",
       "cardRef": "Karte die im Fokus steht"
     }
@@ -168,7 +169,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
       sections: [
         {
           heading: 'Special Illustration Rares dominieren weiterhin',
-          content: 'SIRs (Special Illustration Rares — das sind die Karten mit dem vollflächigen Kunstwerk ohne Hintergrundbox, erkennbar am goldenen Stern-Symbol) sind seit Scarlet & Violet 2023 die gefragteste moderne Kartenklasse. Warum? Weil ihre Druckrate sehr niedrig ist und die Artworks weit über dem TCG-Standard liegen. Karten wie der Charizard ex SIR aus dem 151-Set oder Mewtu ex zeigen seit ihrem Post-Release-Tiefpunkt eine nachhaltige Erholung — aktuelle Notierungen direkt auf Cardmarket prüfen. Der Markt behandelt diese Karten zunehmend als die Klassiker der nächsten Generation.',
+          content: 'SIRs (Special Illustration Rares — das sind die Karten mit dem vollflächigen Kunstwerk ohne Hintergrundbox, erkennbar am goldenen Stern-Symbol) sind seit Scarlet & Violet 2023 die gefragteste moderne Kartenklasse. Warum? Weil ihre Druckrate sehr niedrig ist und die Artworks weit über dem TCG-Standard liegen. Karten wie der Charizard ex SIR aus dem 151-Set oder der Umbreon VMAX Alt Art aus Evolving Skies zeigen seit ihrem Post-Release-Tiefpunkt eine nachhaltige Erholung — aktuelle Notierungen direkt auf Cardmarket prüfen. Der Markt behandelt diese Karten zunehmend als die Klassiker der nächsten Generation.',
         },
         {
           heading: 'Wer gewinnt, wer verliert — und warum',
@@ -240,11 +241,11 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
       sections: [
         {
           heading: 'Was das Set so besonders macht',
-          content: 'Das 151-Set enthält ausschließlich die originalen 151 Pokémon — Bisasam, Glumanda, Schiggy bis Mewtu und Mew. Jedes ikonische Pokémon hat seine Special Illustration Rare-Version bekommen. Das bedeutet: Alle Pokémon, an die Fans mit Nostalgie denken — Glurak, Pikachu, Mewtu, Relaxo (das dicke schlafende Pokémon), Evoli und mehr — haben epische Kunstwerke auf exklusiven SIR-Karten. Diese Kombination ist im modernen TCG einmalig.',
+          content: 'Das 151-Set enthält ausschließlich die originalen 151 Pokémon — Bisasam, Glumanda, Schiggy bis Mewtu und Mew. Die Special Illustration Rares konzentrieren sich auf die Kanto-Klassiker: Bisaflor, Glurak und Turtok (die drei Starter-Endstufen), dazu Simsala, Zapdos und zwei Trainer-Karten. Ergänzt wird das durch Illustration Rares quer durch die 151 Original-Pokémon. Diese Kombination ist im modernen TCG einmalig.',
         },
         {
           heading: 'Die Top-Chase-Cards und ihre Preisbewegung',
-          content: 'Die vier wertvollsten Karten des Sets sind der Charizard ex SIR, der Mewtu ex SIR, der Pikachu ex SIR und der Evoli ex SIR (Eevee — das süße braune Basisform-Pokémon vor seinen 8 Entwicklungen) — aktuelle Notierungen direkt auf Cardmarket prüfen. Alle vier haben nach ihrem Post-Release-Tiefpunkt nachhaltig zugelegt. Das liegt daran, dass das 151-Set nicht mehr aktiv gedruckt wird — das Angebot an frischen Packs schrumpft.',
+          content: 'Die wertvollsten Karten des Sets sind der Charizard ex SIR, der Venusaur ex SIR (Bisaflor), der Blastoise ex SIR (Turtok) und die Gold-Karte Mew ex — aktuelle Notierungen direkt auf Cardmarket prüfen. Alle vier haben nach ihrem Post-Release-Tiefpunkt nachhaltig zugelegt. Das liegt daran, dass das 151-Set nicht mehr aktiv gedruckt wird — das Angebot an frischen Packs schrumpft.',
         },
         {
           heading: 'Sealed oder Einzelkarten — was zeigen die Preisdaten?',
@@ -252,8 +253,8 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
         },
       ],
       keyPoints: [
-        'Alle Original-151 als SIRs — einmalige Nostalgiepower',
-        'Top-4: Charizard, Mewtu, Pikachu, Evoli — alle mit nachhaltigem Preisanstieg',
+        'Alle Original-151 im Set, Kanto-Klassiker als SIRs — einmalige Nostalgie-Abdeckung',
+        'Top-Chase-Cards: Charizard, Venusaur, Blastoise, Mew — alle mit nachhaltigem Preisanstieg',
         'Einzelkarten statistisch effizienter als Packs öffnen; sealed für Langzeitperspektive',
       ],
       tags: ['pokémon 151', 'set analyse', 'scarlet violet', 'sv3pt5 investment'],
@@ -312,7 +313,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
       sections: [
         {
           heading: 'Was diese Woche bestätigt hat',
-          content: 'Die Datenlage bestätigt sich: SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihr Preisniveau stabil. Kein dramatischer Anstieg — aber Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise immer direkt auf Cardmarket prüfen.',
+          content: 'Die Datenlage bestätigt sich: Chase-Cards aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihr Preisniveau stabil. Kein dramatischer Anstieg — aber Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise immer direkt auf Cardmarket prüfen.',
         },
         {
           heading: 'Was diese Woche als Lehrstück diente',
@@ -359,7 +360,7 @@ const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen
 3. Keine Meta-Kommentare ("In diesem Artikel...", "Zusammenfassend...", "Fazit:"). Kein Absatz endet mit einer Zusammenfassung seiner selbst — er endet mit dem letzten Fakt.
 4. Satzlängen VARIIEREN: kurze Sätze (3-6 Wörter) einstreuen, dann längere. Nicht jeder Absatz gleich lang, nicht immer drei Beispiele.
 5. Faktendichte-Test: Jeder Satz beantwortet Was/Wann/Wie viel/Warum/Woher. Füllsätze ohne Information streichen.
-6. Sparsam: max. eine Doppelpunkt-Konstruktion ("Der Grund: ..."), max. eine rhetorische Frage, Gedankenstriche selten. Keine Emojis im Fließtext (nur in Überschriften wo das Schema sie vorgibt).
+6. Sparsam: max. eine Doppelpunkt-Konstruktion ("Der Grund: ..."), max. eine rhetorische Frage, Gedankenstriche selten. KEINE Emojis — nirgendwo, auch nicht in Überschriften oder Tipps. Die Plattform nutzt ausschließlich professionelle Icons.
 7. Aktiv statt Passiv, Verben statt Substantivierungen ("Preise steigen" statt "Preissteigerungen sind zu verzeichnen").`;
 
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {

@@ -17,13 +17,13 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Was Paldea Evolved ist und warum es Aufmerksamkeit verdient',
-        content: 'Paldea Evolved ist das zweite Set der Scarlet & Violet-Ära und führt erstmals neue Pokémon aus der Paldea-Region (aus den Videospielen Karmesin & Purpur von 2022) als Special Illustration Rares ein. Die Chase-Cards des Sets sind weniger berühmt als Glurak oder Mewtu, aber die Artworks zählen zu den auffälligsten der SV-Ära. Oinkologne ex SIR (das pinke parfümierte Pokémon — sieht aus wie eine elegante Pudeldame) und Arcanine ex SIR (der klassische Feuerhund auf einem Felsvorsprung) werden in der Community regelmäßig unter den stärksten SIR-Artworks genannt.',
-        highlight: { name: 'Oinkologne ex SIR', set: 'Paldea Evolved', setCode: 'sv2', imageUrl: '', price: 45, trend: 0, rarity: 'Special Illustration Rare' },
+        content: 'Paldea Evolved ist das zweite Set der Scarlet & Violet-Ära und bringt die Paldea-Starter (aus den Videospielen Karmesin & Purpur von 2022) erstmals als Special Illustration Rares. Die Chase-Cards des Sets sind weniger berühmt als Glurak oder Mewtu, aber die Auswahl ist breit: Die drei Starter-Entwicklungen Meowscarada ex, Skeledirge ex und Quaquaval ex, die vier "Schätze des Verderbens" (Chien-Pao, Chi-Yu, Ting-Lu, Wo-Chien) sowie Trainer-SIRs wie Iono werden in der Community regelmäßig unter den gefragtesten Karten des Sets genannt.',
+        highlight: { name: 'Meowscarada ex SIR', set: 'Paldea Evolved', setCode: 'sv2', imageUrl: '', price: 45, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: 'Die Marktstruktur: Warum das Set moderater bewertet ist',
         content: 'Die Top-SIRs aus Paldea Evolved notieren deutlich unter vergleichbaren Karten aus dem 151-Set — aktuelle Werte direkt auf Cardmarket prüfen. Der strukturelle Grund: Das Set enthält keine ikonischen Generation-1-Pokémon, die sofortige Nostalgie-Reaktionen auslösen. Das kann sich mit der Zeit ändern: Die Paldea-Pokémon gewinnen unter jungen Fans, die mit Karmesin & Purpur aufgewachsen sind, an Beliebtheit. Historisch haben Karten-Generationen an Marktwert gewonnen, sobald ihre Kindheits-Generation kaufkräftig wurde — ob sich dieses Muster hier wiederholt, ist offen.',
-        highlight: { name: 'Arcanine ex SIR', set: 'Paldea Evolved', setCode: 'sv2', imageUrl: '', price: 35, trend: 0, rarity: 'Special Illustration Rare' },
+        highlight: { name: 'Iono SIR', set: 'Paldea Evolved', setCode: 'sv2', imageUrl: '', price: 70, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: 'Sealed vs. Einzelkarten: Die Datenlage bei diesem Set',
@@ -33,7 +33,7 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     ],
     keyPoints: [
       'Paldea Evolved notiert moderater als 151 — der Nostalgie-Faktor fehlt (noch)',
-      'Oinkologne, Arcanine, Tinkaton ex SIR werden zu den Top-Artworks des Sets gezählt',
+      'Meowscarada ex, Iono und Tinkaton ex SIR zählen zu den gefragtesten Karten des Sets',
       'Einzelkarten zeigen bei diesem Set frühere Preisbewegungen als Sealed',
     ],
     tags: ['paldea evolved', 'sv2 pokemon', 'scarlet violet', 'pokemon set analyse'],
@@ -52,13 +52,13 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Was diese Woche bestätigt hat',
-        content: 'SIRs aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihre Preiszonen — kein Ausbruch nach oben, kein Druck nach unten. Stagnation bei etablierten Karten ist historisch kein Warnsignal: Sie zeigt, dass der Markt die aktuellen Niveaus akzeptiert. Werthaltige Karten zeichnen sich langfristig durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise direkt auf Cardmarket prüfen.',
+        content: 'Chase-Cards aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihre Preiszonen — kein Ausbruch nach oben, kein Druck nach unten. Stagnation bei etablierten Karten ist historisch kein Warnsignal: Sie zeigt, dass der Markt die aktuellen Niveaus akzeptiert. Werthaltige Karten zeichnen sich langfristig durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise direkt auf Cardmarket prüfen.',
         highlight: { name: 'Umbreon VMAX Alt Art', set: 'Evolving Skies', setCode: 'swsh7', imageUrl: '', price: 125, trend: 0, rarity: 'Rare Alt' },
       },
       {
         heading: 'Was diese Woche auffiel',
         content: 'Ältere Karten aus der Sun & Moon-Ära (2016–2019) rücken wieder in den Blickpunkt. Shining Legends-Karten (das kleinere Supplementset von 2017, erkennbar am glänzenden Hintergrund der Pokémon-Abbildungen) zeigen zunehmende Sammlernachfrage. Das ist ein konsistentes Marktmuster: Wenn der Hype um aktuelle Sets sich normalisiert, wandert die Aufmerksamkeit zurück zu älteren Eras — Shining Fates und Hidden Fates werden dabei in der Community besonders beobachtet.',
-        highlight: { name: 'Shining Pikachu', set: 'Shining Legends', setCode: 'sm3pt5', imageUrl: '', price: 150, trend: 0, rarity: 'Shiny' },
+        highlight: { name: 'Shining Mew', set: 'Shining Legends', setCode: 'sm35', imageUrl: '', price: 60, trend: 0, rarity: 'Rare Shining' },
       },
       {
         heading: 'Ausblick auf die kommende Woche',
@@ -87,23 +87,23 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     sections: [
       {
         heading: 'Was das Set so besonders macht',
-        content: 'Das 151-Set enthält ausschließlich die originalen 151 Pokémon — Bisasam, Glumanda, Schiggy bis Mewtu und Mew (die Pokémon aus den allerersten Videospielen Rot & Blau von 1996). Jedes ikonische Pokémon hat eine Special Illustration Rare bekommen: Glurak, Pikachu, Mewtu, Relaxo (das dicke schlafende Pokémon, das im Anime immer die Straße blockiert), Evoli und mehr — alle mit vollflächigen Kunstwerken. Diese Kombination aus kompletter Gen-1-Abdeckung und modernem SIR-Standard ist im TCG bislang einmalig.',
-        highlight: { name: 'Mewtu ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 85, trend: 0, rarity: 'Special Illustration Rare' },
+        content: 'Das 151-Set enthält ausschließlich die originalen 151 Pokémon — Bisasam, Glumanda, Schiggy bis Mewtu und Mew (die Pokémon aus den allerersten Videospielen Rot & Blau von 1996). Die Special Illustration Rares konzentrieren sich auf die Kanto-Klassiker: Bisaflor, Glurak und Turtok (die drei Starter-Endstufen), dazu Simsala, Zapdos und zwei Trainer-Karten (Erikas Einladung, Giovannis Charisma) — alle mit vollflächigen Kunstwerken. Ergänzt wird das durch Illustration Rares quer durch die 151 Original-Pokémon. Diese Kombination aus kompletter Gen-1-Abdeckung und modernem SIR-Standard ist im TCG bislang einmalig.',
+        highlight: { name: 'Blastoise ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 80, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: 'Die Top-Chase-Cards und ihre Marktstruktur',
-        content: 'Die wertvollsten Karten des Sets sind Charizard ex SIR, Mewtu ex SIR, Pikachu ex SIR und Evoli ex SIR — aktuelle Notierungen direkt auf Cardmarket prüfen. Alle vier zeigen das gleiche Muster: Nach dem Post-Release-Tiefpunkt (wenn der Markt mit frischer Ware geflutet ist) folgte eine nachhaltige Erholung. Die strukturellen Treiber: Das Set wird nicht mehr aktiv gedruckt, das Angebot an frischen Packs schrumpft, und die Nachfrage nach Gen-1-Nostalgie ist global stabil. Emotional getriebene Nachfrage — Karten als Verbindung zur eigenen Kindheit — gilt unter Marktbeobachtern als besonders beständig.',
+        content: 'Die wertvollsten Karten des Sets sind Charizard ex SIR, Venusaur ex SIR, Blastoise ex SIR und die Gold-Karte Mew ex — aktuelle Notierungen direkt auf Cardmarket prüfen. Alle vier zeigen das gleiche Muster: Nach dem Post-Release-Tiefpunkt (wenn der Markt mit frischer Ware geflutet ist) folgte eine nachhaltige Erholung. Die strukturellen Treiber: Das Set wird nicht mehr aktiv gedruckt, das Angebot an frischen Packs schrumpft, und die Nachfrage nach Gen-1-Nostalgie ist global stabil. Emotional getriebene Nachfrage — Karten als Verbindung zur eigenen Kindheit — gilt unter Marktbeobachtern als besonders beständig.',
         highlight: { name: 'Charizard ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 130, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
         heading: 'Sealed oder Einzelkarten — was zeigen die Preisdaten?',
         content: 'Wer eine bestimmte Karte sucht, findet im Direktkauf auf Cardmarket den statistisch effizienteren Weg: Die Wahrscheinlichkeit, eine bestimmte SIR aus Packs zu ziehen, ist gering — der erwartete Einsatz beim Öffnen übersteigt den Direktkaufpreis deutlich. Versiegelte Boosterboxen des 151-Sets folgen dagegen dem dokumentierten Muster von Nostalgie-Sets: Nach Produktionsende tendiert das Preisniveau aufwärts, weil das Angebot nicht mehr wächst. Beide Wege haben unterschiedliche Zeithorizonte und Risikoprofile.',
-        highlight: { name: 'Pikachu ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 60, trend: 0, rarity: 'Special Illustration Rare' },
+        highlight: { name: 'Venusaur ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 55, trend: 0, rarity: 'Special Illustration Rare' },
       },
     ],
     keyPoints: [
       'Alle Original-151 als SIRs — einmalige Nostalgie-Abdeckung im modernen TCG',
-      'Top-Chase-Cards: Charizard, Mewtu, Pikachu, Evoli — gleiches Erholungsmuster nach Release',
+      'Top-Chase-Cards: Charizard, Venusaur, Blastoise, Mew — gleiches Erholungsmuster nach Release',
       'Einzelkauf statistisch effizienter als Pack-Öffnen; Sealed folgt dem Nostalgie-Set-Muster',
     ],
     tags: ['pokémon 151', 'sv3pt5', 'scarlet violet set analyse', 'charizard ex sir'],
@@ -122,21 +122,21 @@ export const STATIC_ARTICLES: Record<string, Omit<Article, 'generatedAt'>> = {
     intro: 'KW 25 wirkte ruhig, aber im Hintergrund war Bewegung: Die Turniersaison läuft auf Hochtouren, etablierte Nostalgie-Sets bleiben gefragt — und ein klassisches Marktmuster war wieder zu beobachten. Die Marktbeobachtungen der Woche.',
     sections: [
       {
-        heading: '🌍 Was in der Pokémon-Welt passiert ist',
+        heading: 'Was in der Pokémon-Welt passiert ist',
         content: 'Die europäische Turniersaison läuft — Regional-Qualifiers für die Weltmeisterschaft sorgen dafür, dass kompetitive Spieler gezielt Karten einkaufen. Das Muster dahinter ist gut dokumentiert: Wenn Turnierspieler eine Karte brauchen, steigt der Preis innerhalb von Tagen — und wenn das Turnier vorbei ist, normalisiert er sich wieder. Turniergetriebene Nachfrage ist strukturell kurzlebig. Aktuelle Turnierdaten sind bei Limitless TCG einsehbar.',
       },
       {
-        heading: '📈 Die Karte der Woche: Charizard ex SIR aus Pokémon 151',
+        heading: 'Die Karte der Woche: Charizard ex SIR aus Pokémon 151',
         content: 'Glurak (der orange Drache, den wirklich alle kennen — selbst Leute, die noch nie eine Karte in der Hand hatten) bleibt die Referenzkarte des modernen Sammlermarkts. Der Charizard ex Special Illustration Rare aus dem 151-Set hält seine Preiszone, obwohl das Set über zwei Jahre alt ist und nicht mehr gedruckt wird. Kein viraler Moment, kein Hype-Auslöser — die Nachfrage kommt aus dem Sammlerkern. Genau diese hype-unabhängige Nachfrage unterscheidet etablierte Karten von Spekulationsobjekten.',
         highlight: { name: 'Charizard ex SIR', set: 'Pokémon 151', setCode: 'sv3pt5', imageUrl: '', price: 145, trend: 0, rarity: 'Special Illustration Rare' },
       },
       {
-        heading: '😅 Marktmuster der Woche: Der Ankereffekt',
+        heading: 'Marktmuster der Woche: Der Ankereffekt',
         content: 'Ein bekanntes Verhaltensmuster im Sammlermarkt: Wer einen bestimmten Preis einmal gesehen hat, nimmt ihn als Anker — und empfindet jede spätere Notierung darüber als "zu teuer". Der Markt orientiert sich aber nicht an individuellen Ankern, sondern an Angebot und Nachfrage. Historisch haben sich Preiszonen etablierter Karten unabhängig davon weiterentwickelt, ob einzelne Beobachter auf eine Rückkehr zu früheren Niveaus gewartet haben. Ein Muster, das in der Verhaltensökonomie als Ankerheuristik gut beschrieben ist.',
       },
       {
-        heading: '🔮 Beobachtung für die kommende Woche',
-        content: 'Surging Sparks (SV8, das Pikachu-Themen-Set von November 2024) zeigt eine interessante Konstellation: Der Pikachu ex SIR daraus wird in der Community häufig mit der 151-Version verglichen — bei ähnlicher Artwork-Qualität, aber unterschiedlicher Set-Historie. Das Angebotsniveau auf Cardmarket verdient Beobachtung: Sinkendes Angebot bei stabiler Nachfrage wäre ein klassisches Signal. Keine Prognose — eine Beobachtungsnotiz.',
+        heading: 'Beobachtung für die kommende Woche',
+        content: 'Surging Sparks (SV8, das Pikachu-Themen-Set von November 2024) zeigt eine interessante Konstellation: Der Pikachu ex SIR daraus wird in der Community häufig mit den Gen-1-SIRs aus dem 151-Set verglichen — bei ähnlicher Artwork-Qualität, aber unterschiedlicher Set-Historie. Das Angebotsniveau auf Cardmarket verdient Beobachtung: Sinkendes Angebot bei stabiler Nachfrage wäre ein klassisches Signal. Keine Prognose — eine Beobachtungsnotiz.',
         highlight: { name: 'Pikachu ex SIR', set: 'Surging Sparks', setCode: 'sv8', imageUrl: '', price: 45, trend: 0, rarity: 'Special Illustration Rare' },
       },
     ],

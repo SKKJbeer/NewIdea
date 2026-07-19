@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { ContentIcon } from '@/components/ContentIcon';
 import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, PUBLISH_DAYS, getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { GUIDES } from '@/lib/guides';
@@ -73,7 +74,9 @@ export default async function ArtikelListPage() {
               className="block rounded-2xl border border-violet-500/30 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 hover:from-violet-600/30 hover:to-indigo-600/30 transition-all group p-5"
             >
               <div className="flex items-start gap-3">
-                <div className="text-3xl shrink-0">{meta.emoji}</div>
+                <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/20 text-violet-400">
+                  <ContentIcon name={meta.icon} size={20} />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400">{meta.category}</span>
@@ -103,7 +106,9 @@ export default async function ArtikelListPage() {
               className="block rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] transition-all group p-4"
             >
               <div className="flex items-start gap-3">
-                <div className="text-2xl shrink-0">{meta.emoji}</div>
+                <div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                  <ContentIcon name={meta.icon} size={18} />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400">{meta.category}</span>
@@ -138,7 +143,9 @@ export default async function ArtikelListPage() {
                 href={`/guides/${guide.slug}`}
                 className="flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] p-3.5 transition-all group"
               >
-                <span className="text-xl shrink-0">{guide.emoji}</span>
+                <span className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+                  <ContentIcon name={guide.icon} size={16} />
+                </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-slate-200 group-hover:text-white leading-snug line-clamp-1 transition-colors">{guide.title}</p>
                   <p className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">

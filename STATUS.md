@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.15.0` · **Stand:** 18. Juli 2026 · **Branch:** `main`
+**Version:** `v2.16.0` · **Stand:** 19. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -143,7 +143,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.14.1 | Impressum & Datenschutz rechtssicher: echte Daten, § 5 DDG, Datenschutz für echten Datenfluss |
 | v2.14.2 | 404-Bug behoben: API-Fehler nie mehr als notFound, ApiErrorState mit Retry, Build-Vorrendern entfernt |
 | v2.15.0 | Bild-Robustheit: Caching-Proxy /api/img (stale-if-error bis 1 Jahr), cachedImg()-Helper, alle Bild-Konsumenten umgestellt |
+| v2.16.0 | SEO-Ausbau (Canonical-Fix, JSON-LD, Sitemap-Karten), Lucide-Icons statt Emojis überall, 7 falsche Karten-IDs korrigiert + erfundene Karten entfernt |
 
 ---
 
-*Zuletzt aktualisiert: v2.15.0 — 18. Juli 2026*
+*Zuletzt aktualisiert: v2.16.0 — 19. Juli 2026*

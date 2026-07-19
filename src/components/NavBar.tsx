@@ -101,7 +101,7 @@ export function NavBar() {
               href="/studio"
               className="hidden sm:block text-xs font-semibold text-slate-700 hover:text-violet-400 transition-colors px-2 py-1.5 ml-1"
             >
-              Studio ⚙
+              Studio
             </Link>
           </div>
         </div>

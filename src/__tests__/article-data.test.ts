@@ -53,7 +53,7 @@ describe('ARTICLE_META', () => {
     for (const [type, meta] of Object.entries(ARTICLE_META)) {
       expect(meta.label, `${type}.label`).toBeTruthy();
       expect(meta.category, `${type}.category`).toBeTruthy();
-      expect(meta.emoji, `${type}.emoji`).toBeTruthy();
+      expect(meta.icon, `${type}.icon`).toBeTruthy();
       expect(VALID_COLORS, `${type}.color "${meta.color}" is invalid`).toContain(meta.color);
     }
   });
