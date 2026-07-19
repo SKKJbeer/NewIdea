@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.18.1] — 2026-07-19 · Social-Sharing: dynamische Vorschaubilder (OG-Images)
+
+### Neu
+- **Dynamische Vorschaubilder für geteilte Links** (Open Graph / Twitter): Wird ein Link auf WhatsApp, Discord, X oder Facebook geteilt, erscheint jetzt ein attraktives Vorschaubild statt nacktem Text
+  - **Karten**: Kartenmotiv + Name + aktueller Marktpreis
+  - **Artikel**: Titel + Leitkarte + Level-Badge
+  - **Startseite**: Branding + Claim
+- Automatisch in die Meta-Tags verdrahtet — jeder geteilte Link (auch aus den Auto-Reels) sieht ab jetzt hochwertig aus
+
+---
+
 ## [2.18.0] — 2026-07-19 · Content-System: professioneller, moderner, mit Einsteiger-Mix
 
 ### Neu

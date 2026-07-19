@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.18.1',
+    date: '19. Juli 2026',
+    label: 'Social-Sharing: dynamische Vorschaubilder',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Geteilte Links (WhatsApp, Discord, X, Facebook) zeigen jetzt ein attraktives Vorschaubild statt nacktem Text' },
+      { type: 'new', text: 'Karten-Vorschau mit Kartenmotiv + Preis, Artikel-Vorschau mit Titel + Leitkarte + Level' },
+    ],
+  },
+  {
     version: '2.18.0',
     date: '19. Juli 2026',
     label: 'Content-System: moderner, mit Einsteiger-Mix',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Modernes bild-reiches Artikel-Layout mit Hero-Bild der Leitkarte — visuell einladend statt reiner Text' },
       { type: 'new',     text: 'Level-Badge (Einstieg / Fortgeschritten / Profi) auf jedem Artikel — Neulinge finden sofort passende Beiträge' },
