@@ -172,24 +172,8 @@ export default async function CardDetailPage({ params }: Props) {
                 <div className="aspect-[3/4] flex items-center justify-center text-slate-700"><ImageOff size={48} /></div>
               )}
             </div>
-            <div className="mt-4 w-full space-y-2">
-              <a
-                href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="flex items-center justify-center gap-2 w-full bg-violet-600 hover:bg-violet-700 text-white rounded-xl py-3 font-semibold transition-colors"
-              >
-                <ShoppingCart size={18} />Auf Cardmarket kaufen<ExternalLink size={14} className="opacity-70" />
-              </a>
-              <a
-                href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.name} Karte`)}`}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-gray-900 rounded-xl py-2.5 font-semibold text-sm transition-colors"
-              >
-                Amazon<ExternalLink size={12} className="opacity-70" />
-              </a>
-              <p className="text-xs text-slate-700 text-center">* Affiliate-Links</p>
+            <div className="mt-4 w-full space-y-3">
+              {/* Primäre Funktion: Karte merken */}
               <WatchButton
                 cardId={card.id}
                 cardName={card.name}
@@ -198,6 +182,30 @@ export default async function CardDetailPage({ params }: Props) {
                 imageUrl={card.imageUrl}
                 price={price}
               />
+
+              {/* Sekundär & dezent: Kauf-Links */}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2 text-center">Kaufen bei</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-[#2a2a3a] bg-[#1a1a28] hover:border-violet-500/40 hover:bg-[#20202e] text-slate-300 hover:text-white text-xs font-semibold py-2 transition-colors"
+                  >
+                    <ShoppingCart size={13} /> Cardmarket <ExternalLink size={10} className="opacity-40" />
+                  </a>
+                  <a
+                    href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.name} Karte`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-[#2a2a3a] bg-[#1a1a28] hover:border-amber-500/40 hover:bg-[#20202e] text-slate-300 hover:text-white text-xs font-semibold py-2 transition-colors"
+                  >
+                    Amazon <ExternalLink size={10} className="opacity-40" />
+                  </a>
+                </div>
+                <p className="text-[10px] text-slate-700 text-center mt-1.5">* Affiliate-Links</p>
+              </div>
             </div>
           </div>
 

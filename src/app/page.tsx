@@ -283,7 +283,7 @@ export default async function Home() {
         {/* ── EINSTEIGER ON-RAMP ──────────────────────────────────────────── */}
         <Link
           href="/einsteiger"
-          className="group -mb-2 flex items-center gap-3 rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-600/10 to-transparent p-4 transition-all hover:border-violet-500/40 hover:from-violet-600/20"
+          className="group flex items-center gap-3 rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-600/10 to-transparent p-4 transition-all hover:border-violet-500/40 hover:from-violet-600/20"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300">
             <Sparkles size={18} />

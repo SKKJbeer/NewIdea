@@ -45,10 +45,10 @@ export function WatchButton({ cardId, cardName, setName, setCode, imageUrl, pric
     <button
       onClick={toggle}
       disabled={!mounted}
-      className={`flex items-center justify-center gap-2 w-full rounded-xl py-2.5 font-semibold text-sm transition-all border ${
+      className={`flex items-center justify-center gap-2 w-full rounded-xl py-3 font-bold text-sm transition-all border ${
         watched
           ? 'border-violet-500/40 bg-violet-500/15 text-violet-300 hover:bg-violet-500/25'
-          : 'border-[#2a2a3a] bg-[#13131e] text-slate-400 hover:border-violet-500/30 hover:text-violet-400'
+          : 'border-violet-600 bg-violet-600 text-white hover:bg-violet-500'
       }`}
     >
       <Star size={15} className={watched ? 'fill-violet-400 text-violet-400' : ''} />

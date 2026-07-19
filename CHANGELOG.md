@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.3] — 2026-07-19 · UI: Einsteiger-Banner & Karten-Detailseite aufgeräumt
+
+### Behoben
+- **Einsteiger-Banner auf der Startseite** überlappte mit dem Dashboard (Negativabstand) — jetzt sauber eingepasst
+
+### Geändert
+- **Karten-Detailseite professioneller**: Die Funktion steht jetzt im Vordergrund. „Auf die Merkliste" ist die primäre Aktion (klarer Button ganz oben), die Kauf-Links (Cardmarket, Amazon) sind zu dezenten, kleineren Sekundär-Buttons zusammengefasst — die Seite wirkt wie ein Werkzeug, nicht wie eine Verkaufsseite
+
+---
+
 ## [2.19.2] — 2026-07-19 · Preis-Transparenz: passt jetzt zu Cardmarket
 
 ### Neu

@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.3',
+    date: '19. Juli 2026',
+    label: 'UI: Einsteiger-Banner & Kartenseite aufgeräumt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Einsteiger-Banner auf der Startseite überlappte mit dem Dashboard — jetzt sauber eingepasst' },
+      { type: 'changed', text: 'Karten-Detailseite: „Merken" ist die primäre Aktion, Kauf-Links dezent und klein — Funktion im Vordergrund statt großer Affiliate-Buttons' },
+    ],
+  },
+  {
     version: '2.19.2',
     date: '19. Juli 2026',
     label: 'Preis-Transparenz: passt zu Cardmarket',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'Cardmarket-Aufschlüsselung auf jeder Kartenseite: Trend, günstigstes Angebot (ab), Ø Verkauf, Ø 30 Tage — kein Widerspruch mehr zu Cardmarket' },
       { type: 'new',   text: 'Datenstand jeder Karte sichtbar; bei älteren Daten Hinweis, aktuelle Preise auf Cardmarket zu prüfen' },
