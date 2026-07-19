@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.17.1] — 2026-07-19 · BUGFIX: Kartenbilder luden nicht (Proxy ≠ next/image)
+
+### Behoben
+- **Kartenbilder blieben leer (grauer Platzhalter)** — auf der Karten-Detailseite, im Such-Dropdown und im Artikel-Highlight. Ursache: Der in v2.15.0 eingeführte Bild-Proxy (`/api/img`) wurde auch bei `next/image`-Komponenten eingesetzt, aber der Next-Image-Optimizer lehnt lokale Proxy-URLs mit verschachteltem Query mit HTTP 400 ab
+- **Fix**: `cachedImg()` (Proxy) nur noch bei einfachen `<img>`-Tags; `next/image`-Komponenten laden wieder die rohe Upstream-URL (in `remotePatterns`, Optimizer-Cache 31 Tage). Der Proxy bleibt für alle `<img>`-Stellen aktiv (Robustheit gegen API-Ausfälle)
+- Regel in CLAUDE.md verankert (Stolperstelle 18)
+
+---
+
 ## [2.17.0] — 2026-07-19 · Auto-Reel: Social-Media-Videos direkt aus Marktdaten
 
 ### Neu

@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.17.1',
+    date: '19. Juli 2026',
+    label: 'Bugfix: Kartenbilder luden nicht',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kartenbilder blieben leer (Detailseite, Suche, Artikel-Highlight): der Bild-Proxy vertrug sich nicht mit dem next/image-Optimizer' },
+      { type: 'fixed', text: 'Proxy jetzt nur noch bei einfachen Bildern; optimierte Bilder laden wieder direkt — Robustheit bleibt erhalten' },
+    ],
+  },
+  {
     version: '2.17.0',
     date: '19. Juli 2026',
     label: 'Auto-Reel: Social-Media-Videos aus Marktdaten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Auto-Reel-Generator im Studio: Ein Klick rendert ohne Videomaterial ein fertiges Hochformat-Reel aus den Top-Mover-Karten der Woche' },
       { type: 'new',     text: 'Automatische Caption mit UTM-Link zur Website — Social-Traffic wird in Vercel Analytics messbar' },

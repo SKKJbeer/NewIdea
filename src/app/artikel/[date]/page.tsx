@@ -5,7 +5,6 @@ import { NavBar } from '@/components/NavBar';
 import { readArticle, generateArticle, getArticleType, ARTICLE_META } from '@/lib/article-generator';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
-import { cachedImg } from '@/lib/cached-image';
 import { ContentIcon } from '@/components/ContentIcon';
 import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert } from 'lucide-react';
 
@@ -198,7 +197,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                     <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-3">
                       {section.highlight.imageUrl && (
                         <Image
-                          src={cachedImg(section.highlight.imageUrl)}
+                          src={section.highlight.imageUrl}
                           alt={section.highlight.name}
                           width={60}
                           height={80}

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { cachedImg } from '@/lib/cached-image';
 
 interface CardImageProps {
   src: string;
@@ -24,7 +23,7 @@ export function CardImage({ src, alt, sizes, className = '', priority = false }:
     <>
       {!loaded && <div className="shimmer absolute inset-0 rounded-[inherit]" aria-hidden />}
       <Image
-        src={cachedImg(src)}
+        src={src}
         alt={alt}
         fill
         sizes={sizes}

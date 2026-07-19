@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, ImageOff } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cachedImg } from '@/lib/cached-image';
 
 interface Suggestion {
   id: string;
@@ -129,7 +128,7 @@ export function SearchBox({
                 >
                   <div className="relative flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1a1a28]">
                     {s.imageUrl ? (
-                      <Image src={cachedImg(s.imageUrl)} alt={s.name} fill sizes="32px" className="object-contain" />
+                      <Image src={s.imageUrl} alt={s.name} fill sizes="32px" className="object-contain" />
                     ) : (
                       <ImageOff size={14} className="text-slate-600" />
                     )}
