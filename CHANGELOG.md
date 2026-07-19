@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.17.2] — 2026-07-19 · BUGFIX: Startseite ohne Trends/Marktdaten
+
+### Behoben
+- **Startseite zeigte keine Trends/Mover mehr** (leere Gewinner-/Verlierer-Listen). Ursache: Fällt der TCG-API-Abruf beim Generieren der Seite aus (Rate-Limit/Timeout — z.B. während eines Deploys), wurde die leere Seite per ISR bis zu 1 Stunde gecacht
+- **Fix**: Neue robuste Datenquelle `getHomepageCards()` — bei leerem/fehlgeschlagenem Live-Abruf greift ein Fallback auf den letzten in Supabase gespeicherten Marktbericht (echte Karten mit Bild + Trend, vom Wochen-Cron befüllt). Lieber leicht ältere echte Daten als eine leere Startseite
+- Regel in CLAUDE.md verankert (Stolperstelle 19)
+
+---
+
 ## [2.17.1] — 2026-07-19 · BUGFIX: Kartenbilder luden nicht (Proxy ≠ next/image)
 
 ### Behoben

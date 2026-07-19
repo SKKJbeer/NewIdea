@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.17.1` · **Stand:** 19. Juli 2026 · **Branch:** `main`
+**Version:** `v2.17.2` · **Stand:** 19. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -146,7 +146,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.16.0 | SEO-Ausbau (Canonical-Fix, JSON-LD, Sitemap-Karten), Lucide-Icons statt Emojis überall, 7 falsche Karten-IDs korrigiert + erfundene Karten entfernt |
 | v2.17.0 | Auto-Reel-Generator: Social-Media-Videos direkt aus Marktdaten (FFmpeg), Caption mit UTM-Link, Ein-Klick-Publish im Studio |
 | v2.17.1 | BUGFIX: Kartenbilder luden nicht — Proxy war nicht mit next/image-Optimizer kompatibel, cachedImg nur noch bei plain img |
+| v2.17.2 | BUGFIX: Startseite ohne Trends — getHomepageCards mit Fallback auf letzten Supabase-Marktbericht, verhindert leer-gecachte Startseite |
 
 ---
 
-*Zuletzt aktualisiert: v2.17.1 — 19. Juli 2026*
+*Zuletzt aktualisiert: v2.17.2 — 19. Juli 2026*

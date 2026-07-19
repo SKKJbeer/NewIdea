@@ -1,4 +1,4 @@
-import { fetchTopValueCards } from '@/lib/pokemon-api';
+import { getHomepageCards } from '@/lib/homepage-data';
 import { cachedImg } from '@/lib/cached-image';
 import { ContentIcon } from '@/components/ContentIcon';
 import { SearchBox } from '@/components/SearchBox';
@@ -112,13 +112,9 @@ function fmtPct(pct: number | undefined): string {
 }
 
 export default async function Home() {
-  let cards: Awaited<ReturnType<typeof fetchTopValueCards>> = [];
-
-  try {
-    cards = await fetchTopValueCards(50);
-  } catch {
-    // API-Ausfall — Seite lädt ohne Kartendaten
-  }
+  // Robust: Live-TCG-Daten mit Fallback auf den letzten Supabase-Marktbericht,
+  // damit die Startseite bei einem API-Ausfall nicht LEER gecacht wird (Stolperstelle 19).
+  const cards = await getHomepageCards(50);
 
   // --- Derived metrics ---
   const withTrend = cards.filter((c) => typeof c.trendPercent === 'number');
