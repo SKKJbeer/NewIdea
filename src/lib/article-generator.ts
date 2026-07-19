@@ -1,10 +1,32 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
-import { loadArticle, saveArticle } from './article-storage';
+import { loadArticle, saveArticle, listSavedArticleMeta } from './article-storage';
 import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
+
+// Leserlevel — steuert den Einsteiger/Profi-Mix und den sichtbaren Badge.
+export type ArticleLevel = 'einsteiger' | 'fortgeschritten' | 'profi';
+
+// Default-Level je Artikeltyp — sorgt für einen natürlichen Mix über die Woche,
+// leicht in Richtung zugänglich. Dient als Fallback, wenn die Generierung kein
+// level liefert (alte Supabase-Einträge).
+export const ARTICLE_LEVEL: Record<ArticleType, ArticleLevel> = {
+  markt:      'fortgeschritten',
+  karte:      'einsteiger',
+  strategie:  'fortgeschritten',
+  set:        'fortgeschritten',
+  ausblick:   'profi',
+  guide:      'einsteiger',
+  rueckblick: 'einsteiger',
+};
+
+export const LEVEL_LABEL: Record<ArticleLevel, string> = {
+  einsteiger:      'Einstieg',
+  fortgeschritten: 'Fortgeschritten',
+  profi:           'Profi',
+};
 
 export interface FeaturedCard {
   name: string;
@@ -19,6 +41,7 @@ export interface FeaturedCard {
 export interface Article {
   title: string;
   intro: string;
+  level?: ArticleLevel;
   featuredCards?: FeaturedCard[];
   sections: Array<{ heading: string; content: string; highlight?: FeaturedCard }>;
   keyPoints: string[];
@@ -27,6 +50,11 @@ export interface Article {
   readingTimeMin: number;
   generatedAt: string;
   isStatic?: boolean;
+}
+
+/** Level eines Artikels bestimmen — explizit gesetzt oder Default aus dem Typ. */
+export function articleLevel(article: Pick<Article, 'level'>, type: ArticleType): ArticleLevel {
+  return article.level ?? ARTICLE_LEVEL[type];
 }
 
 // Static preview titles shown in the blog listing (without date params)
@@ -95,6 +123,7 @@ export const ARTICLE_META: Record<ArticleType, { label: string; category: string
 
 const JSON_SCHEMA = `{
   "title": "SEO-Titel (60-80 Zeichen, Pokémon-Keyword enthalten)",
+  "level": "einsteiger | fortgeschritten | profi — ehrliche Einschätzung, für wen der Artikel primär ist",
   "intro": "2-3 packende Eröffnungssätze — starte mit einer überraschenden Zahl oder Aussage",
   "featuredCards": [
     {"name": "Exakter englischer Kartenname aus TCG-Datenbank"},
@@ -116,6 +145,7 @@ const JSON_SCHEMA = `{
 // Spezielles Schema für den Wochenrückblick — reichhaltiger, unterhaltsamer
 const RUECKBLICK_SCHEMA = `{
   "title": "Wochenrückblick [KW X]: Lustiger, einprägsamer Titel mit Pokémon-Bezug",
+  "level": "einsteiger",
   "intro": "2-3 humorvolle Sätze die die Woche zusammenfassen — wie ein Freund der dir davon erzählt",
   "featuredCards": [
     {"name": "Die Karte der Woche — exakter englischer Name"},
@@ -338,6 +368,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
   return {
     ...a,
     title: a.title || meta.label,
+    level: ARTICLE_LEVEL[type],
     readingTimeMin: Math.max(3, Math.ceil(wordCount / 200)),
     generatedAt: new Date().toISOString(),
     isStatic: true,
@@ -363,12 +394,25 @@ const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen
 6. Sparsam: max. eine Doppelpunkt-Konstruktion ("Der Grund: ..."), max. eine rhetorische Frage, Gedankenstriche selten. KEINE Emojis — nirgendwo, auch nicht in Überschriften oder Tipps. Die Plattform nutzt ausschließlich professionelle Icons.
 7. Aktiv statt Passiv, Verben statt Substantivierungen ("Preise steigen" statt "Preissteigerungen sind zu verzeichnen").`;
 
-function buildPrompt(type: ArticleType, cards: string, dateLabel: string): string {
+// Content-Creator-Regeln — heben den Text von "korrekt" auf "will man lesen".
+const CREATOR_RULES = `ALS CONTENT-CREATOR (Text soll Lust machen, gelesen zu werden):
+1. HOOK: Der erste Satz macht sofort neugierig — eine konkrete Beobachtung, ein überraschender Kontrast oder eine echte Zahl aus den Marktdaten. Kein Aufwärmen, kein allgemeiner Einstieg.
+2. RELEVANZ / WARUM JETZT: Beziehe dich auf das, was AKTUELL in den gelieferten Daten sichtbar ist — die Bewegung dieser Woche. Der Leser soll spüren, dass der Artikel heute geschrieben wurde, nicht vor einem Jahr.
+3. EINSTIEGS-FREUNDLICH: Mindestens ein Gedanke pro Artikel holt einen Neuling ab — ein Fachbegriff kurz erklärt, warum etwas für Sammler zählt. Nie belehrend, nie von oben herab. Fortgeschrittene bekommen Tiefe (Marktmechanik, Muster, Vergleich).
+4. ROTER FADEN: Absätze bauen aufeinander auf, jeder trägt den Gedanken weiter. Eine klare Linie vom Hook bis zum letzten Fakt.
+5. KONKRETE BILDER: Nenne echte Karten aus den Daten als Anker (die kommen als Bilder in featuredCards/highlight). Beschreibe unbekannte Pokémon in Klammern, damit auch Neulinge folgen können.
+6. ANKNÜPFEN (optional): Wenn thematisch sinnvoll und in "Zuletzt erschienen" ein passender Beitrag steht, darfst du natürlich darauf verweisen ("wie schon bei der Set-Analyse zu sehen war"). Kein Zwang, nie erzwungen wirken lassen.`;
+
+function buildPrompt(type: ArticleType, cards: string, dateLabel: string, recentTitles: string[] = []): string {
   const isRueckblick = type === 'rueckblick';
 
   const persona = isRueckblick
-    ? `Du bist ein Pokémon-TCG-Marktanalyst der einen wöchentlichen Rückblick auf Deutsch schreibt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Kein Finanz-Geschwätz, klare sachliche Aussagen. Alle Altersgruppen ab 10 Jahren — alles jugendfrei.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
-    : `Du bist ein Pokémon-TCG-Marktanalyst der Artikel auf Deutsch verfasst — klar, faktenbasiert und leicht verständlich. Fachbegriffe immer kurz erklären. Wenn du ein Pokémon erwähnst das nicht jeder kennt, beschreibe es kurz in Klammern (z.B. "Umbreon VMAX (das schwarze Nacht-Pokémon mit den gelben Ringen)"). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
+    ? `Du bist erfahrener Content-Creator und Autor für eine deutschsprachige Pokémon-TCG-Plattform und schreibst den wöchentlichen Rückblick. Du lebst die Szene und weißt, was Sammler gerade bewegt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Klare sachliche Aussagen, alles jugendfrei ab 10 Jahren.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\n${CREATOR_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
+    : `Du bist erfahrener Content-Creator und Autor für eine deutschsprachige Pokémon-TCG-Plattform — jemand, der die Szene lebt und weiß, was Sammler gerade bewegt. Du schreibst Artikel, die man WIRKLICH lesen will: starker Einstieg, roter Faden, konkrete Beispiele mit echten Karten. Du holst Einsteiger ab (Fachbegriffe beim ersten Auftreten kurz erklären, unbekannte Pokémon in Klammern beschreiben) UND Fortgeschrittene (Tiefe, Marktmechanik, Muster). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\n${CREATOR_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
+
+  const continuity = recentTitles.length > 0
+    ? `\n\nZuletzt erschienen (nur bei thematischem Bezug natürlich darauf anspielen — kein Zwang):\n${recentTitles.map((t) => `- ${t}`).join('\n')}`
+    : '';
 
   const contexts: Record<ArticleType, string> = {
     markt:      `Schreibe eine Marktanalyse für ${dateLabel}. Starte mit der auffälligsten Preisveränderung AUS DEN GELIEFERTEN DATEN. Analysiere Trends, nenne Gewinner und Verlierer aus den Daten. Füge 3-4 konkrete Karten in featuredCards ein.\n\nAktuelle Marktdaten:\n${cards}`,
@@ -380,7 +424,7 @@ function buildPrompt(type: ArticleType, cards: string, dateLabel: string): strin
     rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Analysiere was die GELIEFERTEN MARKTDATEN diese Woche zeigen: Welche Karte fällt auf? Welches allgemeine Marktmuster war sichtbar? Was verdient nächste Woche Beobachtung? WICHTIG: Erfinde keine Turnierergebnisse, News oder Ankündigungen — wenn du über die Pokémon-Welt schreibst, nur zeitlose, verifizierbare Fakten (z.B. dass Turniersaisons Nachfrage verschieben). Locker erzählt, Zahlen nur aus den Daten. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
   };
 
-  return `${persona}\n\n${contexts[type]}`;
+  return `${persona}\n\n${contexts[type]}${continuity}`;
 }
 
 function toFeaturedCard(c: PokemonCard): FeaturedCard {
@@ -523,6 +567,11 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
       .join('\n');
   } catch {}
 
+  // Titel der letzten Artikel für optionale Anknüpfung (natürlicher roter Faden).
+  const recentTitles = await listSavedArticleMeta()
+    .then((m) => m.filter((a) => a.date !== date).slice(0, 5).map((a) => a.title).filter(Boolean))
+    .catch(() => [] as string[]);
+
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
@@ -537,6 +586,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
 
   interface ArticleData {
     title: string;
+    level?: string;
     intro: string;
     featuredCards?: Array<{ name: string }>;
     sections: Array<{ heading: string; content: string; cardRef?: string }>;
@@ -550,7 +600,7 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     const message = await client.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
       max_tokens: 2048,
-      messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel) }],
+      messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel, recentTitles) }],
     });
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
@@ -568,8 +618,13 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     }
 
     const wordCount = [data.intro, ...(data.sections || []).map((s) => s.content)].join(' ').split(' ').length;
+    const validLevels: ArticleLevel[] = ['einsteiger', 'fortgeschritten', 'profi'];
+    const level = validLevels.includes(data.level as ArticleLevel)
+      ? (data.level as ArticleLevel)
+      : ARTICLE_LEVEL[type];
     const article: Article = {
       title: data.title,
+      level,
       intro: data.intro || '',
       featuredCards: matchFeaturedCards(data.featuredCards || [], trendingCards),
       sections: matchSectionHighlights(data.sections || [], trendingCards),

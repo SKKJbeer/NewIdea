@@ -2,11 +2,19 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NavBar } from '@/components/NavBar';
-import { readArticle, generateArticle, getArticleType, ARTICLE_META } from '@/lib/article-generator';
+import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL } from '@/lib/article-generator';
+import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ContentIcon } from '@/components/ContentIcon';
-import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert, ChevronRight, GraduationCap } from 'lucide-react';
+
+// Level-Badge-Stil je Leserlevel — sichtbarer Einsteiger/Profi-Mix.
+const LEVEL_STYLE: Record<string, string> = {
+  einsteiger:      'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  fortgeschritten: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  profi:           'bg-violet-500/10 text-violet-400 border-violet-500/20',
+};
 
 import type { Metadata } from 'next';
 
@@ -101,6 +109,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
     article = await generateArticle(type, date).catch(() => null);
   }
 
+  const level = article ? articleLevel(article, type) : null;
+  const heroCard = article?.featuredCards?.find((c) => c.imageUrl) ?? null;
+
+  // Verwandte Artikel für die natürliche Verknüpfung am Ende (echte gespeicherte Beiträge).
+  const relatedRaw = await listSavedArticleMeta().catch(() => [] as Awaited<ReturnType<typeof listSavedArticleMeta>>);
+  const related = relatedRaw.filter((m) => m.date !== date).slice(0, 3);
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
   const jsonLd = article && {
     '@context': 'https://schema.org',
@@ -121,17 +136,41 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-12 sm:py-14">
+      <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
+        {/* Ambient-Glow — moderner Farbschimmer hinter dem Header */}
+        <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px]" />
+        <div className="relative max-w-3xl mx-auto px-4 pt-8 pb-10 sm:py-14">
           <Link href="/artikel" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
             <ArrowLeft size={12} /> Alle Artikel
           </Link>
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400"><ContentIcon name={meta.icon} size={11} /> {meta.category}</span>
-            <span className="text-xs text-slate-600 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
-            {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
+          <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400"><ContentIcon name={meta.icon} size={11} /> {meta.category}</span>
+                {level && (
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full border ${LEVEL_STYLE[level]}`}>
+                    <GraduationCap size={11} /> {LEVEL_LABEL[level]}
+                  </span>
+                )}
+                <span className="text-xs text-slate-600 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
+                {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
+              </div>
+              <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white text-balance">{article?.title || meta.label}</h1>
+            </div>
+            {heroCard && (
+              <div className="relative mx-auto shrink-0 sm:mx-0">
+                <div aria-hidden className="absolute inset-0 -z-10 rounded-2xl bg-violet-500/20 blur-2xl" />
+                <Image
+                  src={heroCard.imageUrl}
+                  alt={heroCard.name}
+                  width={220}
+                  height={307}
+                  priority
+                  className="w-36 sm:w-44 h-auto rounded-xl drop-shadow-2xl -rotate-2 transition-transform"
+                />
+              </div>
+            )}
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">{article?.title || meta.label}</h1>
         </div>
       </header>
 
@@ -255,6 +294,37 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
               </section>
             )}
           </>
+        )}
+
+        {/* Weiterlesen — natürliche Verknüpfung zu anderen Beiträgen */}
+        {related.length > 0 && (
+          <section className="pt-2">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Weiterlesen</span>
+              <span className="h-px flex-1 bg-[#1e1e30]" />
+            </div>
+            <div className="space-y-2">
+              {related.map((r) => {
+                const rMeta = ARTICLE_META[r.type as keyof typeof ARTICLE_META] ?? ARTICLE_META.markt;
+                return (
+                  <Link
+                    key={r.date}
+                    href={`/artikel/${r.date}`}
+                    className="flex items-center gap-3 rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28] p-3.5 transition-all group"
+                  >
+                    <span className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                      <ContentIcon name={rMeta.icon} size={18} />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">{rMeta.category}</p>
+                      <p className="text-sm font-bold text-slate-200 group-hover:text-white leading-snug line-clamp-1 transition-colors">{r.title}</p>
+                    </div>
+                    <ChevronRight size={15} className="text-slate-700 group-hover:text-violet-400 shrink-0 transition-colors" />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
         )}
 
         <div className="flex justify-between items-center pt-2">

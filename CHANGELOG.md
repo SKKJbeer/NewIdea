@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.18.0] — 2026-07-19 · Content-System: professioneller, moderner, mit Einsteiger-Mix
+
+### Neu
+- **Modernes bild-reiches Artikel-Layout**: Jeder Artikel öffnet mit einem Hero-Bild der Leitkarte (großes Kartenmotiv mit Farbschimmer und leichter Neigung) — visuell einladend statt reiner Textwüste
+- **Einsteiger/Profi-Mix sichtbar**: Jeder Artikel trägt ein Level (Einstieg / Fortgeschritten / Profi) als farbigen Badge — in der Übersicht und auf der Detailseite. So finden auch Neulinge sofort passende Beiträge
+- **„Weiterlesen"-Sektion**: Am Ende jedes Artikels führen verwandte Beiträge weiter — natürliche Verknüpfung zwischen den Inhalten, gut für Verweildauer und SEO
+
+### Geändert
+- **Autoren-Upgrade der Text-Erstellung**: Die Generierung schreibt jetzt als professioneller Content-Creator — starker Einstieg (Hook), klarer Bezug zur aktuellen Marktlage, Neulinge werden abgeholt ohne Fortgeschrittene zu langweilen, roter Faden von Anfang bis Ende
+- **Kontinuität**: Bei der Erstellung fließen die Titel der letzten Beiträge ein — thematisch passende Artikel können natürlich aneinander anknüpfen (kein Zwang)
+- Schreibstil-Anleitung (`/schreibstil`) um einen Content-Creator-Teil erweitert (Hook, Relevanz, Einsteiger-Mix, Anknüpfen, bildhafte Darstellung)
+
+---
+
 ## [2.17.3] — 2026-07-19 · Artikel-Caching robuster + neutralere Außendarstellung
 
 ### Behoben

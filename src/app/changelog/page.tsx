@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.18.0',
+    date: '19. Juli 2026',
+    label: 'Content-System: moderner, mit Einsteiger-Mix',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Modernes bild-reiches Artikel-Layout mit Hero-Bild der Leitkarte — visuell einladend statt reiner Text' },
+      { type: 'new',     text: 'Level-Badge (Einstieg / Fortgeschritten / Profi) auf jedem Artikel — Neulinge finden sofort passende Beiträge' },
+      { type: 'new',     text: '„Weiterlesen"-Sektion mit verwandten Beiträgen am Artikelende — natürliche Verknüpfung der Inhalte' },
+      { type: 'changed', text: 'Texte werden als professioneller Content-Creator geschrieben: starker Einstieg, aktueller Bezug, roter Faden, Anknüpfung an frühere Beiträge' },
+    ],
+  },
+  {
     version: '2.17.3',
     date: '19. Juli 2026',
     label: 'Artikel-Caching robuster, neutralere Darstellung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Artikel wurden im Vorlagen-Fall bei jedem Aufruf neu erzeugt — jetzt wird jede Datumsseite nur einmal erzeugt und dann dauerhaft aus dem Speicher bedient' },
       { type: 'changed', text: 'Neutralere Außendarstellung: sachliche Begriffe statt Hinweisen auf automatische Generierung; rechtliche Hinweise bleiben erhalten' },

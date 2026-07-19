@@ -1,13 +1,20 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { ContentIcon } from '@/components/ContentIcon';
-import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, PUBLISH_DAYS, getArticleType } from '@/lib/article-generator';
+import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, PUBLISH_DAYS, getArticleType, ARTICLE_LEVEL, LEVEL_LABEL } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { GUIDES } from '@/lib/guides';
 import { Calendar, Clock, ChevronRight, BookOpen } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
+
+// Level-Badge-Stil je Leserlevel (identisch zur Artikel-Detailseite).
+const LEVEL_STYLE: Record<string, string> = {
+  einsteiger:      'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  fortgeschritten: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  profi:           'bg-violet-500/10 text-violet-400 border-violet-500/20',
+};
 
 export const metadata: Metadata = {
   title: 'Pokémon Investment Blog — PokéMarket Intelligence',
@@ -80,6 +87,7 @@ export default async function ArtikelListPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400">{meta.category}</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${LEVEL_STYLE[ARTICLE_LEVEL[type]]}`}>{LEVEL_LABEL[ARTICLE_LEVEL[type]]}</span>
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-yellow-400 text-yellow-900">Heute neu</span>
                   </div>
                   <h2 className="text-base font-black text-white group-hover:text-violet-300 leading-snug transition-colors">
@@ -112,6 +120,7 @@ export default async function ArtikelListPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400">{meta.category}</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${LEVEL_STYLE[ARTICLE_LEVEL[type]]}`}>{LEVEL_LABEL[ARTICLE_LEVEL[type]]}</span>
                     <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={10} /> ~3 Min</span>
                   </div>
                   <h2 className="text-sm font-bold text-slate-200 group-hover:text-white leading-snug transition-colors">

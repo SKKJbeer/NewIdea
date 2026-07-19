@@ -109,4 +109,44 @@ Nie mit einer Definition, nie mit einer Begrüßung, nie mit einem Panorama („
    - [ ] Satzlängen variieren (mindestens ein Satz unter 6 Wörtern)?
    - [ ] Max. 1 Doppelpunkt-Konstruktion, max. 1 rhetorische Frage, „—" sparsam?
    - [ ] Kein Absatz endet mit einer Selbst-Zusammenfassung?
-   - [ ] Emojis nur in Überschriften/Tips?
+   - [ ] KEINE Emojis — nirgendwo (auch nicht in Überschriften/Tips)? Visuelle Anker = Lucide-Icons.
+
+---
+
+## Teil 4 — Als professioneller Content-Creator & Autor (seit v2.18.0)
+
+Die Regeln oben verhindern KI-Klang. Dieser Teil hebt den Text von „korrekt" auf „will man
+wirklich lesen". Ziel: Beiträge, die aktuell sind, Lust aufs Lesen machen und sowohl Neulinge
+als auch erfahrene Sammler abholen.
+
+### 1. Der Hook (erster Satz)
+Der erste Satz entscheidet, ob weitergelesen wird. Er macht sofort neugierig — durch eine
+konkrete Beobachtung, einen überraschenden Kontrast oder eine echte Zahl aus den Marktdaten.
+Kein Aufwärmen, kein allgemeiner Einstieg, keine Definition als Opener.
+
+- **Schwach:** „Der Pokémon-Kartenmarkt ist ein spannendes Feld mit vielen Facetten."
+- **Stark:** „Drei der fünf teuersten Karten dieser Woche stammen aus einem Set, das offiziell gar nicht mehr gedruckt wird."
+
+### 2. Relevanz — warum genau jetzt
+Jeder Beitrag knüpft an das an, was AKTUELL in den Daten oder der Szene sichtbar ist. Der Leser
+soll spüren: das wurde heute geschrieben, nicht vor einem Jahr. Zeitlose Prinzipien immer an eine
+aktuelle Beobachtung koppeln, nie im Leerlauf erklären.
+
+### 3. Der Einsteiger/Profi-Mix (Level)
+Jeder Artikel bekommt ein Level (`einsteiger` / `fortgeschritten` / `profi`) — sichtbar als Badge.
+Über die Woche entsteht so ein natürlicher Mix. Konkret im Text:
+- **Für Neulinge:** mindestens ein Gedanke, der abholt — ein Fachbegriff beim ersten Auftreten
+  kurz erklärt, ein unbekanntes Pokémon in Klammern beschrieben, warum etwas für Sammler zählt.
+- **Für Erfahrene:** Tiefe — Marktmechanik, historische Muster, Vergleiche zwischen Sets/Karten.
+- Nie belehrend, nie von oben herab. Erklären, ohne den Lesefluss zu bremsen.
+
+### 4. Roter Faden & Anknüpfen
+Absätze bauen aufeinander auf, jeder trägt den Gedanken weiter — eine klare Linie vom Hook bis
+zum letzten Fakt. Wo thematisch sinnvoll, darf natürlich an frühere Beiträge angeknüpft und
+verlinkt werden („wie schon bei der Set-Analyse letzte Woche"). Kein Zwang, nie erzwungen — es
+soll ein natürliches Gesamtbild über die Beiträge hinweg entstehen.
+
+### 5. Bild & Darstellung
+Texte werden bild-reich präsentiert: Ein Lead-Kartenbild als Hero, Karten-Highlights in den
+Abschnitten, Booster-Artwork. Beim Schreiben deshalb echte Karten aus den Daten als Anker nennen
+(sie werden zu Bildern) — das macht den Beitrag visuell und konkret zugleich.
