@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ImageOff } from 'lucide-react';
 import { cachedImg } from '@/lib/cached-image';
 
 // Maps pokemontcg.io setId (lowercase) → Pokémon Company CDN capitalization
@@ -23,21 +24,50 @@ interface Props {
   setCode: string;
   setName: string;
   className?: string;
+  /**
+   * Echte Logo-URL aus der TCG-API (set.images.logo) — falls vorhanden, der
+   * verlässlichste Fallback. Ohne sie wird die Logo-URL aus dem Set-Code geraten.
+   */
+  logoUrl?: string;
 }
 
-export function BoosterPackImage({ setCode, setName, className = '' }: Props) {
-  const [src, setSrc] = useState(() => cachedImg(getPackUrl(setCode)));
-  const logo = cachedImg(`https://images.pokemontcg.io/${setCode}/logo.png`);
+/**
+ * Zeigt das Boosterpack-Produktbild eines Sets. Robuste Fallback-Kette, damit
+ * NIE ein kaputtes Bild-Icon erscheint (z.B. bei Preview-/Zukunfts-Sets ohne
+ * Artwork): Booster-Pack → echtes API-Logo → geratenes Logo → sauberer
+ * Platzhalter (ImageOff-Icon, kein Emoji).
+ */
+export function BoosterPackImage({ setCode, setName, className = '', logoUrl }: Props) {
+  // Kandidaten in Prioritätsreihenfolge, leere Einträge fallen raus.
+  const sources = [
+    cachedImg(getPackUrl(setCode)),
+    logoUrl ? cachedImg(logoUrl) : '',
+    cachedImg(`https://images.pokemontcg.io/${setCode}/logo.png`),
+  ].filter(Boolean);
+
+  const [idx, setIdx] = useState(0);
+
+  // Alle Quellen erschöpft → sauberer Platzhalter statt kaputtem Bild-Icon.
+  if (idx >= sources.length) {
+    return (
+      <div
+        className={`flex items-center justify-center rounded-lg bg-[#1a1a28] text-slate-600 ${className}`}
+        role="img"
+        aria-label={`${setName} — kein Set-Bild verfügbar`}
+      >
+        <ImageOff size={18} />
+      </div>
+    );
+  }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      key={sources[idx]}
+      src={sources[idx]}
       alt={`${setName} Boosterpack`}
       className={className}
-      onError={() => {
-        if (src !== logo) setSrc(logo);
-      }}
+      onError={() => setIdx((i) => i + 1)}
       loading="lazy"
     />
   );

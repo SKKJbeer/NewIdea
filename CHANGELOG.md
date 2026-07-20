@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.7] — 2026-07-20 · Set-Übersicht: professionelles Raster + verlässliche Logos
+
+### Behoben
+- **Kaputte Bild-Platzhalter auf der Set-Übersicht**: Bei Preview-/Zukunfts-Sets ohne Artwork (z.B. noch unveröffentlichte Erweiterungen) zeigte das Raster ein defektes Bild-Icon. Jetzt greift eine verlässliche Fallback-Kette (Booster-Pack → echtes Set-Logo aus der API → geratenes Logo → sauberer Platzhalter mit Icon) — nie wieder ein kaputtes Bild
+- Das echte Logo aus der TCG-API (`set.images.logo`) wird jetzt direkt genutzt, statt die URL nur zu raten — deutlich mehr Sets zeigen ihr Logo
+
+### Geändert
+- **Set-Karten komplett neu gestaltet**: einheitliches Raster mit fester Logo-Fläche (alle Logos gleich groß, sauber zentriert, dezenter Zoom beim Hovern), klare Typo-Hierarchie und aufgeräumte Meta-Pillen für Erscheinungsdatum und Kartenzahl. Die Übersicht wirkt jetzt wie ein Katalog, nicht wie eine Liste
+
+---
+
 ## [2.19.6] — 2026-07-20 · BUGFIX: Auto-Reel — FFmpeg-Binary fehlte im Bundle
 
 ### Behoben

@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.7',
+    date: '20. Juli 2026',
+    label: 'Set-Übersicht: professionelles Raster + verlässliche Logos',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kaputte Bild-Platzhalter auf der Set-Übersicht behoben — verlässliche Fallback-Kette bis zum sauberen Icon-Platzhalter, nie wieder ein defektes Bild' },
+      { type: 'fixed', text: 'Echtes Set-Logo aus der TCG-API statt geratener URL — deutlich mehr Sets zeigen ihr Logo' },
+      { type: 'changed', text: 'Set-Karten neu gestaltet: einheitliche Logo-Fläche, klare Typo-Hierarchie, aufgeräumte Meta-Pillen (Datum, Kartenzahl)' },
+    ],
+  },
+  {
     version: '2.19.6',
     date: '20. Juli 2026',
     label: 'Bugfix: Auto-Reel — FFmpeg-Binary fehlte im Bundle',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auto-Reel scheiterte mit „spawn ffmpeg ENOENT" — die FFmpeg-Binary wurde nicht ins serverlose Bundle gepackt. Sie wird jetzt erzwungen mitgebündelt und robust ausführbar gemacht' },
     ],

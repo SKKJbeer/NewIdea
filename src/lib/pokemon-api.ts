@@ -173,6 +173,8 @@ export interface SetMeta {
   series: string;
   releaseDate: string;
   total: number;
+  logoUrl: string;
+  symbolUrl: string;
 }
 
 export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
@@ -187,13 +189,18 @@ export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
     timeout: 8000,
   });
 
-  return (response.data.data as Array<Record<string, unknown>>).map((set) => ({
-    id: set.id as string,
-    name: set.name as string,
-    series: (set.series as string) || '',
-    releaseDate: (set.releaseDate as string) || '',
-    total: (set.total as number) || 0,
-  }));
+  return (response.data.data as Array<Record<string, unknown>>).map((set) => {
+    const images = (set.images as { logo?: string; symbol?: string } | undefined) ?? {};
+    return {
+      id: set.id as string,
+      name: set.name as string,
+      series: (set.series as string) || '',
+      releaseDate: (set.releaseDate as string) || '',
+      total: (set.total as number) || 0,
+      logoUrl: images.logo || '',
+      symbolUrl: images.symbol || '',
+    };
+  });
 }
 
 // Baut einen 30-Tage-Verlauf aus den ECHTEN Cardmarket-Durchschnittspreisen.

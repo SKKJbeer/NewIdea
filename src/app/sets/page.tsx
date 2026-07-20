@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
-import { Package, ChevronRight, Calendar } from 'lucide-react';
+import { Package, Calendar, Layers } from 'lucide-react';
 import { fetchRecentSets } from '@/lib/pokemon-api';
 import type { Metadata } from 'next';
 
@@ -48,30 +48,46 @@ export default async function SetsPage() {
             <p className="text-sm mt-1 text-amber-400/60">Bitte später erneut versuchen.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sets.map((set) => (
               <Link
                 key={set.id}
                 href={`/sets/${set.id}`}
-                className="flex items-center gap-4 rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4 hover:border-violet-500/30 hover:bg-[#1a1a28] transition-all group"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/40 hover:bg-[#161622] transition-all"
               >
-                <BoosterPackImage
-                  setCode={set.id}
-                  setName={set.name}
-                  className="h-20 w-auto shrink-0 object-contain drop-shadow-sm"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-slate-200 group-hover:text-white leading-snug transition-colors">
-                    {set.name}
-                  </p>
-                  <p className="text-[11px] text-slate-600 mt-0.5">{set.series}</p>
-                  <p className="text-[11px] text-slate-600 mt-1.5 flex items-center gap-1">
-                    <Calendar size={10} />
-                    {formatReleaseDate(set.releaseDate)}
-                    {set.total > 0 && <span className="text-slate-700"> · {set.total} Karten</span>}
-                  </p>
+                {/* Logo-Well: einheitliche Höhe, Logo zentriert — ein konsistentes Raster */}
+                <div className="relative flex h-28 items-center justify-center border-b border-[#1e1e30] bg-gradient-to-b from-[#191926] to-[#101018] px-6">
+                  <BoosterPackImage
+                    setCode={set.id}
+                    setName={set.name}
+                    logoUrl={set.logoUrl}
+                    className="max-h-16 w-auto max-w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-[1.04]"
+                  />
                 </div>
-                <ChevronRight size={15} className="text-slate-700 group-hover:text-violet-400 shrink-0 transition-colors" />
+
+                {/* Metadaten: klare Hierarchie, dezente Meta-Pillen */}
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  <div>
+                    <p className="truncate text-[15px] font-bold text-white">{set.name}</p>
+                    {set.series && (
+                      <p className="mt-0.5 truncate text-xs text-slate-500">{set.series}</p>
+                    )}
+                  </div>
+                  <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
+                    {formatReleaseDate(set.releaseDate) && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-[#2a2a3a] bg-[#0d0d18] px-2 py-0.5 text-[11px] text-slate-400">
+                        <Calendar size={10} className="text-slate-500" />
+                        {formatReleaseDate(set.releaseDate)}
+                      </span>
+                    )}
+                    {set.total > 0 && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-[#2a2a3a] bg-[#0d0d18] px-2 py-0.5 text-[11px] text-slate-400">
+                        <Layers size={10} className="text-slate-500" />
+                        {set.total} Karten
+                      </span>
+                    )}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
