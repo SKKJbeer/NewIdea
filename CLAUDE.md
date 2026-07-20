@@ -508,6 +508,33 @@ NavBar ist permanent dunkel: `bg-[#0d0d18]/95 border-[#1e1e30]`. Aktive Links: `
 
 ---
 
+### ⛔ Rich-Content-Render-Ebene (PFLICHT für ALLE Lese-Inhalte — seit v2.20.0)
+
+**REGEL:** Content-Seiten (Artikel, Guides, Marktberichte — und jede künftige Lese-Fläche)
+dürfen NICHT steril/nüchtern wirken. Sie sollen zum Lesen einladen: großzügige Typo,
+visuelle Anker, Bilder, dezente Animationen. Das erreichen wir NICHT durch Handarbeit pro
+Beitrag, sondern über eine gemeinsame Render-Ebene — dadurch bekommt auch jeder
+**automatisch generierte** Beitrag dieselbe Anmutung, ohne dass die Text-Erzeugung etwas
+davon wissen muss.
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| `<Prose>` | `src/components/Prose.tsx` | Rohtext → großzügige Absätze, optionaler Drop-Cap (`dropcap`), Aufzählungen mit Punkten, hervorgehobene Kennzahlen (€/%). **Fließtext IMMER durch `<Prose>` rendern**, nie als nacktes `<p>{text}</p>` oder `whitespace-pre-wrap`. |
+| `<Reveal>` | `src/components/Reveal.tsx` | Sanftes Einblenden beim Scrollen (Fade + Aufsteigen). Sektions-Karten in `<Reveal>` wrappen. Robust: ohne JS / bei Reduced-Motion sofort sichtbar (Text nie versteckt). |
+| `<ReadingProgress>` | `src/components/ReadingProgress.tsx` | Lesefortschritts-Balken oben. Auf jeder langen Lese-Seite direkt nach `<NavBar>` einsetzen. |
+
+**Pflicht-Muster pro Content-Seite:**
+- Header mit Ambient-Glow (`animate-floaty`-Blob) + großem Icon-Medaillon als visuellem Anker
+- Intro als `<Prose … dropcap>` (Magazin-Initial)
+- Jede Sektion in `<Reveal>`, mit Gradient-Accent-Bar (`from-violet-600 via-fuchsia-500`) + nummeriertem/ikonischem Medaillon
+- Karten/Set-Bilder wo immer möglich (siehe `BoosterPackImage`-Regel unten)
+
+**Durchsetzung:** Neue Content-Flächen NIE mit rohem `<p>`/`whitespace-pre-wrap` bauen —
+immer die drei Bausteine oben verwenden. So bleibt „lädt zum Lesen ein" der Default, nicht
+die Ausnahme.
+
+---
+
 ### Boosterpack-Bild überall dort wo Karten erwähnt werden
 
 **REGEL:** Jedes Mal wenn eine Pokémon-Karte in der UI angezeigt oder erwähnt wird, MUSS das zugehörige Boosterpack-Produktbild (wie man es im Laden sieht) ebenfalls angezeigt werden — damit Nutzer sofort erkennen, aus welchem Set die Karte stammt und wo sie sie kaufen können.

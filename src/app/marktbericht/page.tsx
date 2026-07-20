@@ -4,6 +4,9 @@ import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
 import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft, Archive, Gem } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
+import { Reveal } from '@/components/Reveal';
+import { Prose } from '@/components/Prose';
+import { ReadingProgress } from '@/components/ReadingProgress';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -34,9 +37,11 @@ export default async function MarktberichtPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
+      <ReadingProgress />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-4xl mx-auto px-4 pt-10 pb-16 sm:py-20 text-center">
+      <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
+        <div aria-hidden className="pointer-events-none absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[110px] animate-floaty" />
+        <div className="relative max-w-4xl mx-auto px-4 pt-10 pb-16 sm:py-20 text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1.5 text-violet-400 text-xs">
             <Calendar size={12} />
             {report ? `KW ${report.weekNumber} · ${formatWeekDate(report.weekStart)}` : 'Wöchentlich aktualisiert'}
@@ -69,7 +74,7 @@ export default async function MarktberichtPage() {
         )}
 
         {report?.reportText && (
-          <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+          <Reveal className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
             <div className="bg-[#1a1a28] px-5 py-4 border-b border-[#1e1e30] flex items-center gap-3">
               <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shrink-0">
                 <Zap size={15} className="text-yellow-300 fill-yellow-300" />
@@ -79,10 +84,10 @@ export default async function MarktberichtPage() {
                 <h2 className="text-sm font-black text-slate-200">Diese Woche im Überblick</h2>
               </div>
             </div>
-            <div className="p-5 sm:p-6">
-              <p className="text-slate-400 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
+            <div className="p-5 sm:p-7">
+              <Prose text={report.reportText} dropcap />
             </div>
-          </section>
+          </Reveal>
         )}
 
         {report && (

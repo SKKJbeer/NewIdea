@@ -7,6 +7,9 @@ import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ContentIcon } from '@/components/ContentIcon';
+import { Reveal } from '@/components/Reveal';
+import { Prose } from '@/components/Prose';
+import { ReadingProgress } from '@/components/ReadingProgress';
 import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert, ChevronRight, GraduationCap } from 'lucide-react';
 
 // Level-Badge-Stil je Leserlevel — sichtbarer Einsteiger/Profi-Mix.
@@ -132,6 +135,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
+      <ReadingProgress />
       {jsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       )}
@@ -196,8 +200,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
             {/* Intro */}
             <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
               <div className={`h-1 ${accent}`} />
-              <div className="p-5 sm:p-6">
-                <p className="text-slate-300 text-base leading-relaxed">{article.intro}</p>
+              <div className="p-5 sm:p-7">
+                <Prose text={article.intro} dropcap />
               </div>
             </section>
 
@@ -223,7 +227,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
 
             {/* Sections */}
             {article.sections.map((section, i) => (
-              <section key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6">
+              <Reveal key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6">
                 <div className="flex items-start gap-3 mb-4">
                   <span className={`flex-shrink-0 w-6 h-6 ${accent} rounded-full text-white text-[10px] font-black flex items-center justify-center mt-0.5`}>
                     {i + 1}
@@ -260,7 +264,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                     </div>
                   )}
                 </div>
-              </section>
+              </Reveal>
             ))}
 
             {/* Tags */}

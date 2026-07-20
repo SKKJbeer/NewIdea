@@ -43,3 +43,19 @@ body {
     transform: translateX(100%);
   }
 }
+
+/* Dezente Bewegung für Deko-Elemente (Header-Glow) — macht Seiten „lebendig",
+   ohne aufdringlich zu sein. Respektiert die Reduced-Motion-Präferenz. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes floaty {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, -16px); }
+  }
+  .animate-floaty { animation: floaty 8s ease-in-out infinite; }
+
+  @keyframes floaty-slow {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+  .animate-floaty-slow { animation: floaty-slow 10s ease-in-out infinite; }
+}

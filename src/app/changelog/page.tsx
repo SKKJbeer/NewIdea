@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.20.0',
+    date: '20. Juli 2026',
+    label: 'Rich-Content: Guides & Berichte laden zum Lesen ein',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Neue Content-Darstellung: großzügige Typo mit Initialbuchstaben, hervorgehobene Kennzahlen, sanft einblendende Abschnitte und Lesefortschritts-Balken' },
+      { type: 'changed', text: 'Guides magazinartig aufgewertet: Icon-Medaillon, Farbverlauf-Akzente, nummerierte Abschnitte — statt nüchterner Absätze' },
+      { type: 'changed', text: 'Marktbericht und Artikel im gleichen lebendigen Look; gilt automatisch auch für künftig generierte Beiträge' },
+    ],
+  },
+  {
     version: '2.19.8',
     date: '20. Juli 2026',
     label: 'Bugfix: Mobil-Navigation — fehlende Menüpunkte',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auf dem Handy fehlten die meisten Menüpunkte (u.a. Sets, Einsteiger, Marktbericht, Merkliste) — sie waren fest auf Desktop-Breite ausgeblendet' },
       { type: 'fixed', text: 'Neues aufklappbares Mobil-Menü (Hamburger) mit allen Navigationspunkten, schließt automatisch beim Seitenwechsel' },

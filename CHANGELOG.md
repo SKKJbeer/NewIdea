@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.20.0] — 2026-07-20 · Rich-Content: Guides & Berichte laden zum Lesen ein
+
+### Neu
+- **Gemeinsame Rich-Content-Render-Ebene** für alle Lese-Inhalte — dadurch wirkt auch jeder künftig automatisch generierte Beitrag lebendig, ohne Handarbeit:
+  - `<Prose>`: verwandelt Rohtext in großzügig gesetzte Absätze mit Magazin-Initialbuchstaben, Aufzählungen mit Punkten und farblich hervorgehobenen Kennzahlen (Preise/Prozente)
+  - `<Reveal>`: blendet Abschnitte beim Hereinscrollen sanft ein (respektiert „Reduced Motion", Text ist nie versteckt)
+  - `<ReadingProgress>`: schmaler Lesefortschritts-Balken am oberen Rand
+
+### Geändert
+- **Guides komplett aufgewertet**: großes Icon-Medaillon im Header mit Ambient-Glow, Intro mit Initialbuchstaben, Abschnitte mit Farbverlauf-Akzent und nummerierten Medaillons, Kennzahlen hervorgehoben — statt nüchterner Absätze eine magazinartige Lektüre
+- **Marktbericht**: der Berichtstext wird jetzt großzügig gesetzt (Initialbuchstabe, hervorgehobene Preise) statt als sterile Textwand; Header mit bewegtem Glow
+- **Artikel**: Lesefortschritt, Intro mit Initialbuchstabe, sanft einblendende Abschnitte — konsistent zum neuen Content-Look
+
+---
+
 ## [2.19.8] — 2026-07-20 · BUGFIX: Mobil-Navigation — fehlende Menüpunkte
 
 ### Behoben

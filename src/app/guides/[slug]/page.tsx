@@ -7,6 +7,9 @@ import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { cachedImg } from '@/lib/cached-image';
 import { ContentIcon } from '@/components/ContentIcon';
+import { Reveal } from '@/components/Reveal';
+import { Prose } from '@/components/Prose';
+import { ReadingProgress } from '@/components/ReadingProgress';
 import type { Metadata } from 'next';
 
 export const revalidate = 86400;
@@ -61,45 +64,61 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
+      <ReadingProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-14 sm:py-16">
-          <Link href="/guides" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
+      <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
+        {/* Ambient-Glow — dezenter, sich bewegender Farbschimmer hinter dem Header */}
+        <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px] animate-floaty" />
+        <div className="relative max-w-3xl mx-auto px-4 pt-8 pb-14 sm:py-16">
+          <Link href="/guides" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-6 transition-colors">
             <ArrowLeft size={12} /> Alle Guides
           </Link>
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400"><ContentIcon name={guide.icon} size={11} /> {guide.badge}</span>
-            <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {guide.readingTimeMin} Min Lektüre</span>
+          <div className="flex items-start gap-4 sm:gap-5">
+            {/* Großes Icon-Medaillon — sofortiger visueller Anker */}
+            <div className="shrink-0 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-lg shadow-violet-900/40 ring-1 ring-white/10">
+              <ContentIcon name={guide.icon} size={28} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">{guide.badge}</span>
+                <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {guide.readingTimeMin} Min Lektüre</span>
+              </div>
+              <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white text-balance">{guide.title}</h1>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white">{guide.title}</h1>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 pb-16 -mt-4 space-y-5">
-        {/* Intro */}
-        <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6">
-          <p className="text-slate-300 text-base leading-relaxed font-medium">{guide.intro}</p>
-        </section>
+        {/* Intro — mit Initialbuchstaben, wie in einem Magazin */}
+        <Reveal className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-7">
+          <Prose text={guide.intro} dropcap />
+        </Reveal>
 
         {/* Key Points */}
-        <section className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-5">
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3 text-violet-400">Das Wichtigste auf einen Blick</p>
-          <ul className="space-y-2.5">
+        <Reveal className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 p-5 sm:p-6">
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3.5 text-violet-400">Das Wichtigste auf einen Blick</p>
+          <ul className="space-y-3">
             {guide.keyPoints.map((point, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-sm text-slate-300">
-                <span className="w-5 h-5 bg-violet-600 rounded-full text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+              <li key={i} className="flex items-start gap-3 text-[15px] text-slate-200">
+                <span className="w-6 h-6 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-lg text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-violet-900/40">{i + 1}</span>
                 {point}
               </li>
             ))}
           </ul>
-        </section>
+        </Reveal>
 
         {/* Sections */}
         {guide.sections.map((section, i) => (
-          <section key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 sm:p-6 space-y-3">
-            <h2 className="text-base font-black text-slate-200">{section.heading}</h2>
-            <p className="text-slate-400 text-sm leading-relaxed">{section.content}</p>
+          <Reveal key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600" />
+            <div className="p-5 sm:p-7 space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white text-sm font-black shadow-md shadow-violet-900/40">{i + 1}</span>
+                <h2 className="text-lg font-black text-white leading-snug">{section.heading}</h2>
+              </div>
+              <Prose text={section.content} />
 
             {section.tip && (
               <div className="flex items-start gap-2.5 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3.5">
@@ -143,7 +162,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </div>
             )}
-          </section>
+            </div>
+          </Reveal>
         ))}
 
         {/* Tags */}
