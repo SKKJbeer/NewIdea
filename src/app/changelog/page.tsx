@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.8',
+    date: '20. Juli 2026',
+    label: 'Bugfix: Mobil-Navigation — fehlende Menüpunkte',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auf dem Handy fehlten die meisten Menüpunkte (u.a. Sets, Einsteiger, Marktbericht, Merkliste) — sie waren fest auf Desktop-Breite ausgeblendet' },
+      { type: 'fixed', text: 'Neues aufklappbares Mobil-Menü (Hamburger) mit allen Navigationspunkten, schließt automatisch beim Seitenwechsel' },
+    ],
+  },
+  {
     version: '2.19.7',
     date: '20. Juli 2026',
     label: 'Set-Übersicht: professionelles Raster + verlässliche Logos',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Kaputte Bild-Platzhalter auf der Set-Übersicht behoben — verlässliche Fallback-Kette bis zum sauberen Icon-Platzhalter, nie wieder ein defektes Bild' },
       { type: 'fixed', text: 'Echtes Set-Logo aus der TCG-API statt geratener URL — deutlich mehr Sets zeigen ihr Logo' },

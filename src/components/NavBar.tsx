@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Search, BarChart3 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Zap, Search, Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { href: '/einsteiger',   label: 'Einsteiger'   },
@@ -17,6 +18,14 @@ const NAV_LINKS = [
 
 export function NavBar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+
+  // Menü bei Seitenwechsel schließen
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <div className="sticky top-0 z-50">
@@ -41,71 +50,80 @@ export function NavBar() {
             </span>
           </Link>
 
-          {/* Nav links */}
-          <div className="flex items-center gap-0.5">
-            {/* Search icon on mobile */}
+          {/* Desktop: alle Links inline */}
+          <div className="hidden sm:flex items-center gap-0.5">
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`text-xs font-semibold px-3 py-2 rounded-lg transition-colors ${
+                  isActive(href)
+                    ? 'text-violet-400 bg-violet-500/10'
+                    : 'text-slate-500 hover:text-violet-400 hover:bg-[#1a1a28]'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+            <Link
+              href="/studio"
+              className="text-xs font-semibold text-slate-700 hover:text-violet-400 transition-colors px-2 py-1.5 ml-1"
+            >
+              Studio
+            </Link>
+          </div>
+
+          {/* Mobil: Suche + Hamburger */}
+          <div className="flex sm:hidden items-center gap-1">
             <Link
               href="/suche"
               aria-label="Suche"
-              className={`sm:hidden p-2 rounded-lg transition-colors ${
+              className={`p-2 rounded-lg transition-colors ${
                 pathname.startsWith('/suche') ? 'text-violet-400' : 'text-slate-500 hover:text-violet-400'
               }`}
             >
               <Search size={18} />
             </Link>
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? 'Menü schließen' : 'Menü öffnen'}
+              aria-expanded={open}
+              className={`p-2 rounded-lg transition-colors ${
+                open ? 'text-violet-400 bg-violet-500/10' : 'text-slate-400 hover:text-violet-400'
+              }`}
+            >
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
 
-            {/* Blog + Guides + Portfolio text on mobile */}
-            <Link
-              href="/artikel"
-              className={`sm:hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
-                pathname.startsWith('/artikel') ? 'text-violet-400 bg-violet-500/10' : 'text-slate-500 hover:text-violet-400'
-              }`}
-            >
-              Blog
-            </Link>
-            <Link
-              href="/guides"
-              className={`sm:hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
-                pathname.startsWith('/guides') ? 'text-violet-400 bg-violet-500/10' : 'text-slate-500 hover:text-violet-400'
-              }`}
-            >
-              Guides
-            </Link>
-            <Link
-              href="/portfolio"
-              className={`sm:hidden flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
-                pathname.startsWith('/portfolio') ? 'text-violet-400 bg-violet-500/10' : 'text-slate-500 hover:text-violet-400'
-              }`}
-            >
-              <BarChart3 size={12} />Portfolio
-            </Link>
-
-            {/* Desktop: all links */}
-            {NAV_LINKS.map(({ href, label }) => {
-              const active = pathname === href || pathname.startsWith(href + '/');
-              return (
+        {/* Mobil: aufklappbares Menü mit ALLEN Links */}
+        {open && (
+          <div className="sm:hidden border-t border-[#1e1e30] bg-[#0d0d18]/98 backdrop-blur-md">
+            <div className="max-w-5xl mx-auto px-3 py-2 grid grid-cols-2 gap-1">
+              {NAV_LINKS.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
-                  className={`hidden sm:block text-xs font-semibold px-3 py-2 rounded-lg transition-colors ${
-                    active
+                  className={`text-sm font-semibold px-3 py-2.5 rounded-lg transition-colors ${
+                    isActive(href)
                       ? 'text-violet-400 bg-violet-500/10'
-                      : 'text-slate-500 hover:text-violet-400 hover:bg-[#1a1a28]'
+                      : 'text-slate-300 hover:text-violet-400 hover:bg-[#1a1a28]'
                   }`}
                 >
                   {label}
                 </Link>
-              );
-            })}
-
-            <Link
-              href="/studio"
-              className="hidden sm:block text-xs font-semibold text-slate-700 hover:text-violet-400 transition-colors px-2 py-1.5 ml-1"
-            >
-              Studio
-            </Link>
+              ))}
+              <Link
+                href="/studio"
+                className="col-span-2 text-xs font-semibold text-slate-600 hover:text-violet-400 transition-colors px-3 py-2 mt-1 border-t border-[#1e1e30]"
+              >
+                Studio
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </nav>
     </div>
   );

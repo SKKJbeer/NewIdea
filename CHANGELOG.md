@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.8] — 2026-07-20 · BUGFIX: Mobil-Navigation — fehlende Menüpunkte
+
+### Behoben
+- **Auf dem Handy fehlten die meisten Navigationspunkte** (u.a. Sets, Einsteiger, Marktbericht, Merkliste). Die Leiste zeigte mobil nur eine handverlesene Auswahl (Blog, Guides, Portfolio, Suche); alle übrigen Links waren fest auf Desktop-Breite ausgeblendet, ohne Menü, um sie zu erreichen
+- **Fix**: Echtes aufklappbares Mobil-Menü (Hamburger) mit ALLEN Navigationspunkten. Öffnet als 2-spaltiges Raster unter der Leiste, schließt automatisch beim Seitenwechsel, aktiver Punkt hervorgehoben. Nichts ist mehr nur auf dem Desktop erreichbar
+
+---
+
 ## [2.19.7] — 2026-07-20 · Set-Übersicht: professionelles Raster + verlässliche Logos
 
 ### Behoben

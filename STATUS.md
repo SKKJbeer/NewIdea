@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.19.7` · **Stand:** 20. Juli 2026 · **Branch:** `main`
+**Version:** `v2.19.8` · **Stand:** 20. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -158,7 +158,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.19.5 | Diagnose: echte FFmpeg-Fehlerursache (stderr) im Auto-Reel sichtbar statt leerer Fehlermeldung |
 | v2.19.6 | BUGFIX: Auto-Reel — FFmpeg-Binary via outputFileTracingIncludes ins Bundle gezwungen (spawn ENOENT behoben) + robust ausführbar gemacht |
 | v2.19.7 | Set-Übersicht neu gestaltet (einheitliches Logo-Raster, Meta-Pillen); echtes API-Logo + Fallback-Kette bis Icon-Platzhalter — keine kaputten Bilder mehr |
+| v2.19.8 | BUGFIX: Mobil-Navigation — echtes Hamburger-Menü mit allen Links; vorher fehlten mobil Sets/Einsteiger/Marktbericht/Merkliste |
 
 ---
 
-*Zuletzt aktualisiert: v2.19.7 — 20. Juli 2026*
+*Zuletzt aktualisiert: v2.19.8 — 20. Juli 2026*
