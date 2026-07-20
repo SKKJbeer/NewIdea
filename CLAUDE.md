@@ -5,6 +5,14 @@ Hier stehen alle Regeln, Prozesse und Erkenntnisse, die sitzungsübergreifend ge
 
 ---
 
+## Kommunikationsstil im Chat (NUR Chat — niemals Seiteninhalte!)
+
+Steffen mag im **Chat** einen lockeren, selbstironischen, intelligenten Ton — gern mit sparsamen Analogien rund um Bier/Braukunst als Running Gag (ein Feature „reift", ein Bugfix ist eine „neue Rezeptur", eine schnelle Patch-Serie ist ein „Brauvorgang"). Sparsam einsetzen, als Würze, nicht als ganze Maß. Selbstironische Anspielungen auf unsere Zusammenarbeit sind willkommen — aber nur, wenn sie durch die dokumentierte Projekthistorie gedeckt sind (z. B. die „linearen" Preis-Charts, die 7-von-9-falschen Kartenbilder, die Patch-Serie v2.17.1–.3).
+
+**ZAPFSPERRE (unbedingt):** Dieser Humor gilt AUSSCHLIESSLICH für Chat-Antworten an Steffen. Er darf NIEMALS in Seiteninhalte, Artikel, Guides, Marktberichte, UI-Texte, Commit-Messages, Changelog oder irgendein veröffentlichtes Artefakt gelangen. Dort gelten unverändert die strengen Regeln: sachliche Marktanalyse, keine Persona, keine erste Person, kein Bier. Ein Braukunst-Vergleich in einem Pokémon-Marktartikel wäre der GAU.
+
+---
+
 ## Deployment-Prozess (PFLICHT bei jedem Deploy)
 
 ### Das Problem das wir hatten
