@@ -19,6 +19,13 @@ import { displayPrice } from '@/lib/pokemon-api';
 
 if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
 
+// Mitgelieferte Schriftart — Vercels serverlose Umgebung hat KEINE System-Fonts,
+// deshalb scheitert drawtext sonst ("Cannot find a valid font"). Wird via
+// outputFileTracingIncludes (next.config.ts) mit ins Function-Bundle gepackt.
+const FONT = join(process.cwd(), 'src/assets/fonts/reel-font.ttf');
+// Baut einen drawtext-Filter mit fest gesetzter fontfile.
+const dt = (opts: string) => `drawtext=fontfile=${FONT}:${opts}`;
+
 const W = 1080;
 const H = 1920;
 const FPS = 30;
@@ -69,10 +76,10 @@ async function renderIntro(title: string, dateLabel: string, outPath: string): P
     .input(`color=c=${BG}:s=${W}x${H}:d=${INTRO_SECONDS}:r=${FPS}`)
     .inputFormat('lavfi')
     .videoFilters([
-      `drawtext=text='${esc('POKÉMARKET')}':fontsize=88:fontcolor=white:x=(w-text_w)/2:y=700`,
-      `drawtext=text='${esc('INTELLIGENCE')}':fontsize=88:fontcolor=#a78bfa:x=(w-text_w)/2:y=810`,
-      `drawtext=text='${esc(title)}':fontsize=54:fontcolor=#e2e8f0:x=(w-text_w)/2:y=1010`,
-      `drawtext=text='${esc(dateLabel)}':fontsize=38:fontcolor=#64748b:x=(w-text_w)/2:y=1100`,
+      dt(`text='${esc('POKÉMARKET')}':fontsize=88:fontcolor=white:x=(w-text_w)/2:y=700`),
+      dt(`text='${esc('INTELLIGENCE')}':fontsize=88:fontcolor=#a78bfa:x=(w-text_w)/2:y=810`),
+      dt(`text='${esc(title)}':fontsize=54:fontcolor=#e2e8f0:x=(w-text_w)/2:y=1010`),
+      dt(`text='${esc(dateLabel)}':fontsize=38:fontcolor=#64748b:x=(w-text_w)/2:y=1100`),
     ])
     .videoCodec('libx264')
     .outputOptions(['-t', String(INTRO_SECONDS), '-crf 22', '-preset fast', '-pix_fmt yuv420p', '-an']);
@@ -94,11 +101,11 @@ async function renderCardSegment(card: ReelCard, rank: number, imgPath: string, 
       `scale=${W * 2}:-1`,
       `zoompan=z='min(zoom+0.0009,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${Math.round(W * 1.396)}:fps=${FPS}`,
       `pad=${W}:${H}:0:(oh-ih)/2:color=${BG}`,
-      `drawtext=text='${esc(`#${rank}  TOP-MOVER DER WOCHE`)}':fontsize=42:fontcolor=#a78bfa:x=(w-text_w)/2:y=150`,
-      `drawtext=text='${esc(card.name)}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=h-360`,
-      `drawtext=text='${esc(formatEurText(card.price))}':fontsize=54:fontcolor=#e2e8f0:x=(w-text_w)/2:y=h-270`,
-      `drawtext=text='${trendText}':fontsize=54:fontcolor=${trendColor}:x=(w-text_w)/2:y=h-190`,
-      `drawtext=text='${esc(SITE_LABEL)}':fontsize=30:fontcolor=#475569:x=(w-text_w)/2:y=h-90`,
+      dt(`text='${esc(`#${rank}  TOP-MOVER DER WOCHE`)}':fontsize=42:fontcolor=#a78bfa:x=(w-text_w)/2:y=150`),
+      dt(`text='${esc(card.name)}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=h-360`),
+      dt(`text='${esc(formatEurText(card.price))}':fontsize=54:fontcolor=#e2e8f0:x=(w-text_w)/2:y=h-270`),
+      dt(`text='${trendText}':fontsize=54:fontcolor=${trendColor}:x=(w-text_w)/2:y=h-190`),
+      dt(`text='${esc(SITE_LABEL)}':fontsize=30:fontcolor=#475569:x=(w-text_w)/2:y=h-90`),
     ])
     .videoCodec('libx264')
     .outputOptions(['-t', String(SEG_SECONDS), '-crf 22', '-preset fast', '-pix_fmt yuv420p', '-an']);
@@ -111,9 +118,9 @@ async function renderOutro(outPath: string): Promise<void> {
     .input(`color=c=${BG}:s=${W}x${H}:d=${OUTRO_SECONDS}:r=${FPS}`)
     .inputFormat('lavfi')
     .videoFilters([
-      `drawtext=text='${esc('Alle Preise täglich aktuell')}':fontsize=56:fontcolor=white:x=(w-text_w)/2:y=800`,
-      `drawtext=text='${esc('Kostenlos & auf Deutsch')}':fontsize=44:fontcolor=#94a3b8:x=(w-text_w)/2:y=900`,
-      `drawtext=text='${esc('Link in der Bio')}':fontsize=54:fontcolor=#a78bfa:x=(w-text_w)/2:y=1040`,
+      dt(`text='${esc('Alle Preise täglich aktuell')}':fontsize=56:fontcolor=white:x=(w-text_w)/2:y=800`),
+      dt(`text='${esc('Kostenlos & auf Deutsch')}':fontsize=44:fontcolor=#94a3b8:x=(w-text_w)/2:y=900`),
+      dt(`text='${esc('Link in der Bio')}':fontsize=54:fontcolor=#a78bfa:x=(w-text_w)/2:y=1040`),
     ])
     .videoCodec('libx264')
     .outputOptions(['-t', String(OUTRO_SECONDS), '-crf 22', '-preset fast', '-pix_fmt yuv420p', '-an']);

@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.4] — 2026-07-20 · BUGFIX: Auto-Reel-Generierung (Schriftart fehlte)
+
+### Behoben
+- **Auto-Reel-Generierung im Studio schlug mit „internal_error" fehl**. Ursache: FFmpeg braucht für die Texteinblendungen (Titel, Kartenname, Preis, Trend) eine Schriftdatei — und Vercels serverlose Umgebung hat keine System-Schriftarten. Jede Texteinblendung scheiterte, das Rendering brach ab
+- **Fix**: Eine frei lizenzierte Schriftart (Liberation Sans) wird jetzt mitgeliefert und in alle Texteinblendungen fest eingebunden — sowohl im Auto-Reel als auch im manuellen Reel-Schnitt
+- Die Fehlermeldung im Studio zeigt bei Problemen jetzt die echte Ursache statt eines generischen Hinweises (der Endpunkt ist passwortgeschützt)
+
+---
+
 ## [2.19.3] — 2026-07-19 · UI: Einsteiger-Banner & Karten-Detailseite aufgeräumt
 
 ### Behoben

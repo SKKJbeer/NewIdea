@@ -58,6 +58,8 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('[auto-reel] Rendering fehlgeschlagen:', error);
-    return NextResponse.json({ error: 'internal_error' }, { status: 500 });
+    // Studio-Endpunkt (auth-geschützt): echte Fehlermeldung zur Diagnose zeigen.
+    const detail = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: detail.slice(0, 400) || 'internal_error' }, { status: 500 });
   }
 }

@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.4',
+    date: '20. Juli 2026',
+    label: 'Bugfix: Auto-Reel-Generierung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auto-Reel-Generierung schlug fehl, weil FFmpeg auf Vercel keine Schriftart für die Texteinblendungen fand' },
+      { type: 'fixed', text: 'Schriftart wird jetzt mitgeliefert — Auto-Reel und manueller Reel-Schnitt funktionieren' },
+    ],
+  },
+  {
     version: '2.19.3',
     date: '19. Juli 2026',
     label: 'UI: Einsteiger-Banner & Kartenseite aufgeräumt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Einsteiger-Banner auf der Startseite überlappte mit dem Dashboard — jetzt sauber eingepasst' },
       { type: 'changed', text: 'Karten-Detailseite: „Merken" ist die primäre Aktion, Kauf-Links dezent und klein — Funktion im Vordergrund statt großer Affiliate-Buttons' },

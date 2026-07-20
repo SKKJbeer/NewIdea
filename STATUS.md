@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.19.3` · **Stand:** 19. Juli 2026 · **Branch:** `main`
+**Version:** `v2.19.4` · **Stand:** 20. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -154,7 +154,8 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.19.1 | Preise: echte Zeit-Achse + nur echte Datenpunkte (Snapshots + Cardmarket-Anker), record-on-view, synthetische Kurve entfernt — kein „linear" mehr |
 | v2.19.2 | Preis-Transparenz: Cardmarket-Aufschlüsselung (Trend/ab/Ø) + Datenstand auf Kartenseite, Ausreißer-Schutz — passt zu Cardmarket |
 | v2.19.3 | UI: Einsteiger-Banner-Überlappung behoben; Kartenseite professioneller (Merken primär, Kauf-Links dezent/klein) |
+| v2.19.4 | BUGFIX: Auto-Reel — Schriftart (Liberation Sans) mitgeliefert, drawtext-fontfile gesetzt; Vercel hat keine System-Fonts |
 
 ---
 
-*Zuletzt aktualisiert: v2.19.3 — 19. Juli 2026*
+*Zuletzt aktualisiert: v2.19.4 — 20. Juli 2026*

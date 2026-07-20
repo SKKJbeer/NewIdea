@@ -13,6 +13,9 @@ export const maxDuration = 300;
 
 if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
 
+// Mitgelieferte Schriftart für drawtext — Vercel hat keine System-Fonts.
+const FONT = join(process.cwd(), 'src/assets/fonts/reel-font.ttf');
+
 function processVideo(inputPath: string, outputPath: string, clipDuration: number, startTime?: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const cmd = ffmpeg(inputPath);
@@ -29,7 +32,7 @@ function processVideo(inputPath: string, outputPath: string, clipDuration: numbe
       .videoFilters([
         'crop=ih*9/16:ih:(iw-ih*9/16)/2:0',
         'scale=1080:1920:flags=lanczos',
-        "drawtext=text='PokéMarket Intel':fontsize=38:x=(w-text_w)/2:y=h-70:fontcolor=white:shadowcolor=black@0.8:shadowx=2:shadowy=2",
+        `drawtext=fontfile=${FONT}:text='PokéMarket Intel':fontsize=38:x=(w-text_w)/2:y=h-70:fontcolor=white:shadowcolor=black@0.8:shadowx=2:shadowy=2`,
       ])
       .videoCodec('libx264')
       .audioCodec('aac')

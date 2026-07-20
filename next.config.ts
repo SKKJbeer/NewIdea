@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: version,
   },
+  // Die Reel-Schriftart (drawtext) mit in die Video-Function-Bundles packen —
+  // sonst fehlt sie zur Laufzeit auf Vercel und FFmpeg-drawtext schlägt fehl.
+  outputFileTracingIncludes: {
+    '/api/video/auto-reel': ['./src/assets/fonts/**'],
+    '/api/video/process': ['./src/assets/fonts/**'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.pokemontcg.io' },
