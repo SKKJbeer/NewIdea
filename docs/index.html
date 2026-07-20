@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>PokéMarket Intelligence — Gebraut mit Claude Code</title>
+<meta name="description" content="Wie ein privates Hobbyprojekt in einem Monat zur Vertrauensfrage wurde — eine interaktive Reise durch die echte Entwicklungshistorie. Gebraut mit Claude Code." />
+<style>
+  :root{
+    --bg:#08080c; --bg2:#0d0d16; --ink:#ececf6; --mut:#8f8fa8; --mut2:#5f5f77;
+    --vio:#8b5cf6; --vio2:#a78bfa; --eme:#34d399; --ros:#fb7185; --amb:#fbbf24;
+    --glass:rgba(255,255,255,.045); --glass2:rgba(255,255,255,.07); --bord:rgba(255,255,255,.09);
+    --maxw:1080px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter var',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    line-height:1.5; overflow-x:hidden; letter-spacing:-.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* animated mesh background */
+  .mesh{position:fixed; inset:-20% -20% -20% -20%; z-index:-2; filter:blur(60px); opacity:.55; pointer-events:none}
+  .mesh span{position:absolute; border-radius:50%; mix-blend-mode:screen; animation:float 22s var(--ease) infinite alternate}
+  .m1{width:52vw;height:52vw;left:-6vw;top:-8vw;background:radial-gradient(circle,#6d28d9,transparent 62%)}
+  .m2{width:46vw;height:46vw;right:-8vw;top:12vw;background:radial-gradient(circle,#0ea5e9,transparent 62%);animation-delay:-6s}
+  .m3{width:40vw;height:40vw;left:22vw;bottom:-10vw;background:radial-gradient(circle,#10b981,transparent 64%);animation-delay:-12s}
+  @keyframes float{to{transform:translate3d(6vw,4vw,0) scale(1.15)}}
+  .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  @media (prefers-reduced-motion:reduce){.mesh span{animation:none}}
+
+  /* cursor glow */
+  .glow{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:0;
+    background:radial-gradient(circle,rgba(139,92,246,.10),transparent 60%);transform:translate(-50%,-50%);transition:opacity .4s}
+
+  section{position:relative;z-index:1;padding:clamp(90px,14vh,180px) 24px;max-width:var(--maxw);margin:0 auto}
+  .kick{font-size:12px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--vio2);
+    display:inline-flex;align-items:center;gap:10px;margin-bottom:22px}
+  .kick::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--vio),transparent)}
+  h1{font-size:clamp(38px,8.2vw,104px);font-weight:800;line-height:.98;letter-spacing:-.04em}
+  h2{font-size:clamp(30px,5.4vw,60px);font-weight:800;line-height:1.02;letter-spacing:-.035em}
+  h3{font-size:clamp(19px,2.4vw,26px);font-weight:700;letter-spacing:-.02em}
+  .lead{font-size:clamp(17px,2.1vw,22px);color:var(--mut);max-width:60ch;margin-top:22px;line-height:1.55}
+  .grad{background:linear-gradient(100deg,#c4b5fd,#8b5cf6 40%,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .em{color:var(--eme)} .ro{color:var(--ros)} .am{color:var(--amb)} .vi{color:var(--vio2)}
+  .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,monospace}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+  .rv.in{opacity:1;transform:none}
+  .rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}
+
+  /* progress beer */
+  .beer{position:fixed;right:22px;bottom:22px;z-index:40;width:52px;height:66px;cursor:pointer;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+  .beer .glassbody{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.5);stroke-width:2}
+  .beer .liq{fill:url(#beerg)}
+  .beer .foam{fill:#fef3c7}
+  .beer small{position:absolute;inset:auto 0 -18px;text-align:center;font-size:10px;color:var(--mut2);letter-spacing:.1em}
+
+  /* nav dots */
+  .dots{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:14px}
+  .dots a{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);transition:.3s var(--ease);position:relative}
+  .dots a.on{background:var(--vio2);box-shadow:0 0 0 4px rgba(139,92,246,.18);transform:scale(1.25)}
+  .dots a span{position:absolute;left:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;color:var(--mut);
+    opacity:0;pointer-events:none;transition:.25s;background:var(--glass);border:1px solid var(--bord);padding:3px 9px;border-radius:8px;backdrop-filter:blur(8px)}
+  .dots a:hover span{opacity:1}
+  @media(max-width:820px){.dots{display:none}}
+
+  /* hero */
+  #hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:0;padding-bottom:0}
+  .badge{display:inline-flex;gap:8px;align-items:center;padding:7px 15px;border-radius:999px;border:1px solid var(--bord);
+    background:var(--glass);backdrop-filter:blur(10px);font-size:12.5px;font-weight:600;color:var(--vio2);margin-bottom:30px;width:max-content}
+  .badge b{color:var(--ink);font-weight:700}
+  .scrollcue{position:absolute;left:24px;bottom:30px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--mut2);display:flex;align-items:center;gap:10px}
+  .scrollcue i{width:1px;height:34px;background:linear-gradient(var(--vio2),transparent);animation:cue 1.8s var(--ease) infinite}
+  @keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+  /* floating cards in hero */
+  .floaters{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+  .floaters b{position:absolute;width:78px;height:108px;border-radius:11px;border:1px solid var(--bord);
+    background:linear-gradient(160deg,var(--glass2),transparent);backdrop-filter:blur(4px);animation:drift 16s var(--ease) infinite alternate}
+  .floaters b::after{content:"";position:absolute;inset:9px;border-radius:6px;background:linear-gradient(160deg,rgba(139,92,246,.18),rgba(52,211,153,.1))}
+  @keyframes drift{to{transform:translateY(-30px) rotate(6deg)}}
+
+  /* stat morph */
+  .morph{font-size:clamp(56px,15vw,150px);font-weight:800;letter-spacing:-.05em;line-height:1}
+  .morph .a{color:var(--ink)} .morph .b{color:var(--ros)}
+
+  /* stack constellation */
+  .stack{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
+  .chip{padding:11px 17px;border-radius:13px;border:1px solid var(--bord);background:var(--glass);backdrop-filter:blur(8px);
+    font-size:14px;font-weight:600;color:#d7d7e6;transition:.35s var(--ease)}
+  .chip:hover{border-color:rgba(139,92,246,.5);background:var(--glass2);transform:translateY(-3px)}
+  .chip small{color:var(--mut2);font-weight:500}
+
+  /* timeline */
+  .tl{position:relative;margin-top:56px;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--vio),transparent)}
+  .tlitem{position:relative;padding:0 0 34px 26px}
+  .tlitem::before{content:"";position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--vio2);transition:.4s}
+  .tlitem.bad::before{border-color:var(--ros)} .tlitem.good::before{border-color:var(--eme)}
+  .tlitem .v{font-size:12px;font-weight:700;color:var(--vio2);letter-spacing:.05em;font-family:ui-monospace,monospace}
+  .tlitem.bad .v{color:var(--ros)} .tlitem.good .v{color:var(--eme)}
+  .tlitem p{font-size:clamp(16px,2.2vw,20px);font-weight:600;margin-top:4px;color:#dcdce8}
+  .tlitem em{font-style:normal;color:var(--mut2);font-size:13px}
+
+  /* disaster grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:48px}
+  .flip{perspective:1400px;height:230px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:100%;transition:transform .8s var(--ease);transform-style:preserve-3d}
+  .flip.on .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:18px;border:1px solid var(--bord);background:var(--glass);backdrop-filter:blur(12px);
+    padding:22px;backface-visibility:hidden;display:flex;flex-direction:column;overflow:hidden}
+  .face.back{transform:rotateY(180deg);background:linear-gradient(160deg,rgba(52,211,153,.08),var(--glass))}
+  .face .no{font-family:ui-monospace,monospace;font-size:12px;color:var(--mut2)}
+  .face h3{margin-top:8px}
+  .face .desc{margin-top:12px;font-size:14px;color:var(--mut);line-height:1.5}
+  .face .tag{margin-top:auto;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ros);font-weight:700}
+  .face.back .tag{color:var(--eme)}
+  .face .fix{margin-top:12px;font-size:14px;color:#d7d7e6;line-height:1.5}
+  .face .hint{position:absolute;right:16px;top:16px;font-size:11px;color:var(--mut2)}
+  .flip:hover .face.front{border-color:rgba(251,113,133,.4)}
+
+  /* code block (Reinheitsgebot) */
+  .code{margin-top:40px;border-radius:18px;border:1px solid var(--bord);background:rgba(4,4,9,.6);backdrop-filter:blur(12px);overflow:hidden;font-family:ui-monospace,monospace;font-size:13.5px}
+  .code .bar{display:flex;gap:7px;padding:13px 16px;border-bottom:1px solid var(--bord);align-items:center}
+  .code .bar i{width:11px;height:11px;border-radius:50%;background:#333}
+  .code .bar i:nth-child(1){background:#ff5f57}.code .bar i:nth-child(2){background:#febc2e}.code .bar i:nth-child(3){background:#28c840}
+  .code .bar span{margin-left:10px;color:var(--mut2);font-size:12px}
+  .code pre{padding:20px;overflow-x:auto;line-height:1.75;color:#c9c9de}
+  .code .c{color:var(--mut2)} .code .k{color:var(--vio2)} .code .s{color:var(--eme)} .code .f{color:var(--amb)}
+  .runline{display:flex;align-items:center;gap:12px;padding:15px 20px;border-top:1px solid var(--bord);font-size:13px;color:var(--mut)}
+  .runline .ok{color:var(--eme);font-weight:700}
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:48px}
+  .stat{border:1px solid var(--bord);background:var(--glass);backdrop-filter:blur(8px);border-radius:16px;padding:24px}
+  .stat b{font-size:clamp(34px,5vw,52px);font-weight:800;letter-spacing:-.03em;display:block;background:linear-gradient(120deg,#c4b5fd,#5eead4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat span{font-size:13px;color:var(--mut);margin-top:6px;display:block}
+
+  /* built list */
+  .built{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:44px}
+  .bcard{border:1px solid var(--bord);background:var(--glass);backdrop-filter:blur(10px);border-radius:18px;padding:22px;transition:.4s var(--ease)}
+  .bcard:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.4);background:var(--glass2)}
+  .bcard .ic{width:40px;height:40px;border-radius:12px;background:rgba(139,92,246,.14);display:flex;align-items:center;justify-content:center;color:var(--vio2);margin-bottom:14px}
+  .bcard h3{font-size:16px} .bcard p{font-size:13.5px;color:var(--mut);margin-top:7px;line-height:1.5}
+
+  /* learnings */
+  .learn{margin-top:44px;display:flex;flex-direction:column;gap:2px}
+  .lrow{padding:26px 0;border-top:1px solid var(--bord);display:flex;gap:24px;align-items:baseline;flex-wrap:wrap}
+  .lrow .n{font-family:ui-monospace,monospace;font-size:13px;color:var(--vio2);width:40px;flex-shrink:0}
+  .lrow .t{font-size:clamp(20px,3vw,30px);font-weight:700;letter-spacing:-.02em}
+  .lrow .s{font-size:14px;color:var(--mut);width:100%;padding-left:64px}
+
+  /* finale */
+  #end{min-height:100svh;display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center}
+  .prost{margin-top:40px;font-size:15px;color:var(--mut);display:inline-flex;gap:10px;align-items:center}
+  .cheers{cursor:pointer;font-size:38px;transition:.3s var(--ease);user-select:none}
+  .cheers:active{transform:scale(1.4) rotate(-8deg)}
+  .foot{margin-top:70px;font-size:12px;color:var(--mut2);letter-spacing:.04em}
+
+  ::selection{background:rgba(139,92,246,.35);color:#fff}
+</style>
+</head>
+<body>
+<div class="mesh"><span class="m1"></span><span class="m2"></span><span class="m3"></span></div>
+<div class="grain"></div>
+<div class="glow" id="glow"></div>
+
+<!-- progress beer -->
+<div class="beer" id="beer" title="Brau-Fortschritt (zum Nachschenken klicken)">
+  <svg viewBox="0 0 52 66" width="52" height="66">
+    <defs>
+      <linearGradient id="beerg" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#d97706"/><stop offset="1" stop-color="#fbbf24"/>
+      </linearGradient>
+      <clipPath id="bc"><rect x="8" y="6" width="30" height="54" rx="5"/></clipPath>
+    </defs>
+    <g clip-path="url(#bc)">
+      <rect id="liq" class="liq" x="8" y="60" width="30" height="0"/>
+      <rect id="foam" class="foam" x="8" y="60" width="30" height="5" opacity="0"/>
+    </g>
+    <rect class="glassbody" x="8" y="6" width="30" height="54" rx="5"/>
+    <path d="M38 16 q10 0 10 12 t-10 12" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+  </svg>
+  <small id="brewpct">0%</small>
+</div>
+
+<nav class="dots" id="dots"></nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="floaters" id="floaters"></div>
+  <div class="badge rv in">🍺 <b>AI Teamday</b> · Showcase — gebraut mit Claude Code</div>
+  <h1 class="rv in">Ein Hobby.<br>Ein Monat.<br><span class="grad">Eine Vertrauensfrage.</span></h1>
+  <p class="lead rv in d2">Die echte Entwicklungshistorie von <b style="color:var(--ink)">PokéMarket Intelligence</b> — einer Pokémon-Marktdaten-Plattform. Kein Deck. Keine Bulletpoints. Eine Reise durch das, was wirklich passiert ist. Scroll runter.</p>
+  <div class="scrollcue"><i></i> Scrollen</div>
+</section>
+
+<!-- 01 IDEA -->
+<section id="s1" data-name="Die Idee">
+  <div class="kick rv">Kapitel 01 · Die Idee</div>
+  <h2 class="rv d1">Echtzeit-Preise für den<br>Pokémon-Kartenmarkt. <span class="vi">Auf Deutsch.</span></h2>
+  <p class="lead rv d2">Ein Solo-Entwickler. Ein Feierabend-Gedanke. Und ein Pairing-Partner, der nicht müde wird. Der ganze Stack wurde mit Claude Code gebaut, deployed und immer wieder repariert — von der ersten Zeile bis zum letzten Preis-Chart.</p>
+  <div class="stack rv d3" id="stack"></div>
+</section>
+
+<!-- 02 TIMELINE -->
+<section id="s2" data-name="Der Brauprozess">
+  <div class="kick rv">Kapitel 02 · Der Brauprozess</div>
+  <h2 class="rv d1">Von <span class="mono" style="font-size:.7em">v0.1.0</span> bis <span class="mono" style="font-size:.7em">v2.19.3</span></h2>
+  <p class="lead rv d2">Kein großer Wurf am Anfang. Sondern Sud um Sud. Jede Version eine kleine Rezeptur-Änderung — manche gelungen, manche zurück in den Ausguss. Ein Auszug aus der echten Version-Historie:</p>
+  <div class="tl rv d2" id="timeline"></div>
+</section>
+
+<!-- 03 DISASTERS -->
+<section id="s3" data-name="Als das Bier umkippte">
+  <div class="kick rv">Kapitel 03 · Als das Bier umkippte</div>
+  <h2 class="rv d1">Sechs Mal ging etwas <span class="ro">gründlich</span> daneben.</h2>
+  <p class="lead rv d2">Das Beste an diesem Projekt sind nicht die Features. Es sind die Katastrophen — jede einzelne dokumentiert, seziert und als Regel verewigt. Karte antippen: vorne der Fehler, hinten die Rettung.</p>
+  <div class="grid rv d2" id="disasters"></div>
+</section>
+
+<!-- 04 REINHEITSGEBOT -->
+<section id="s4" data-name="Das Reinheitsgebot">
+  <div class="kick rv">Kapitel 04 · Das Reinheitsgebot</div>
+  <h2 class="rv d1">Die KI durfte alles.<br><span class="em">Außer lügen.</span></h2>
+  <p class="lead rv d2">Bei einem Produkt über Preise ist Erfundenes Gift. Also bekam der Content ein Reinheitsgebot — nicht als Bitte an das Modell, sondern als Test, der den Build bricht. Keine erfundenen Preise. Keine Persona. Keine Emojis. Keine „KI-generiert"-Etiketten. Quellen Pflicht.</p>
+  <div class="code rv d2">
+    <div class="bar"><i></i><i></i><i></i><span>content-compliance.test.ts</span></div>
+    <pre><span class="c">// Eine Quelle der Wahrheit — Build-Test UND Laufzeit-Gate</span>
+<span class="k">export const</span> <span class="f">PRICE_IN_TEXT</span> = /\d+(?:[.,]\d+)?\s*(?:€|EUR|\$)/;   <span class="c">// keine erfundenen Preise</span>
+<span class="k">export const</span> <span class="f">FIRST_PERSON</span>  = /\b(?:ich|Ich)\b/;                 <span class="c">// keine Persona</span>
+<span class="k">export const</span> <span class="f">EMOJI</span>        = /[\u{1F300}-\u{1FAFF}]/u;          <span class="c">// nur Lucide-Icons</span>
+<span class="k">export const</span> <span class="f">BUY_ADVICE</span>   = /kaufenswert|pflichtkauf|.../i;      <span class="c">// keine Anlageberatung</span>
+
+<span class="k">if</span> (findViolations(text).length) <span class="k">throw</span> <span class="s">"Build gestoppt."</span></pre>
+    <div class="runline"><span class="mono">$ npm test</span> → <span class="ok">✓ 110 Tests grün</span> · Verstoß = rotes Licht = kein Deploy.</div>
+  </div>
+</section>
+
+<!-- 05 BUILT -->
+<section id="s5" data-name="Was im Glas landete">
+  <div class="kick rv">Kapitel 05 · Was im Glas landete</div>
+  <h2 class="rv d1">Was am Ende <span class="vi">wirklich</span> lief.</h2>
+  <div class="built rv d2" id="built"></div>
+</section>
+
+<!-- STATS -->
+<section id="s5b">
+  <div class="stats">
+    <div class="stat rv"><b>1</b><span>Monat, von der Idee zu v2.19.3</span></div>
+    <div class="stat rv d1"><b>110</b><span>Tests, die den Build hüten</span></div>
+    <div class="stat rv d2"><b>19</b><span>dokumentierte Stolperstellen</span></div>
+    <div class="stat rv d3"><b>1&#8239;+&#8239;1</b><span>Entwickler + Claude Code</span></div>
+  </div>
+</section>
+
+<!-- 06 LEARNINGS -->
+<section id="s6" data-name="Was hängen blieb">
+  <div class="kick rv">Kapitel 06 · Was hängen blieb</div>
+  <h2 class="rv d1">Fünf Erkenntnisse,<br>die keiner im Voraus glaubt.</h2>
+  <div class="learn rv d2" id="learn"></div>
+</section>
+
+<!-- FINALE -->
+<section id="end" data-name="Prost">
+  <div class="kick rv" style="justify-content:center">Prost</div>
+  <h1 class="rv d1" style="font-size:clamp(40px,9vw,110px)">Gebraut mit<br><span class="grad">Claude Code.</span></h1>
+  <p class="lead rv d2" style="margin-left:auto;margin-right:auto;text-align:center">Kein Team. Kein Budget. Ein Monat, ein Feierabend nach dem anderen — und ein Pairing-Partner, der Katastrophen in Regeln verwandelt. Wenn ein Hobby so weit kommt: Was baust <b style="color:var(--ink)">du</b> als Nächstes?</p>
+  <div class="prost rv d3"><span class="cheers" id="cheers" title="Prost">🍺</span> Zum Nachbrauen: einfach anfangen.</div>
+  <div class="foot rv d4">PokéMarket Intelligence · echte Historie, nichts erfunden · Next.js · Vercel · Supabase · FFmpeg · Claude Code</div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ---- data (nur dokumentierte Fakten) ---- */
+  var stack = [
+    ['Next.js 16','App Router'],['TypeScript',''],['Tailwind v4',''],['Vercel','Hosting'],
+    ['Supabase','Snapshots'],['Anthropic','Claude'],['FFmpeg','Auto-Reels'],['Recharts','Charts']
+  ];
+  var timeline = [
+    ['v0.1.0','','Grundsystem: Homepage, Studio, Cron, KI, Video','20. Juni'],
+    ['v0.5.2','bad','Kompletter Style-Verlust — ein JSON-Import zerlegte den Build','21. Juni'],
+    ['v0.9.1','bad','Bottom-Tab-Navigation wieder rausgeworfen — Layout zerstört','21. Juni'],
+    ['v2.5.0','good','Bloomberg/TradingView Dark-Redesign — PMI & Fear&Greed','Juni'],
+    ['v2.7.0','good','Code-Review: timing-safe Auth, Median-Preise, Fetch-Timeouts',''],
+    ['v2.16.0','bad','7 von 9 hardcodierten Kartenbildern zeigten die falsche Karte',''],
+    ['v2.17.0','good','Auto-Reels — Social-Videos direkt aus Live-Marktdaten',''],
+    ['v2.17.1','bad','Der Caching-Proxy fraß die Kartenbilder',''],
+    ['v2.17.2','bad','Leere Startseite — eine Stunde lang gecacht',''],
+    ['v2.18.1','good','Dynamische OG-Vorschaubilder für geteilte Links',''],
+    ['v2.19.1','good','Die „linearen" Preis-Charts entlarvt & durch echte Daten ersetzt',''],
+    ['v2.19.2','good','5 € vs. 2 € — die Preis-Transparenz-Frage gelöst',''],
+    ['v2.19.3','','Heute. Und der Sud köchelt weiter.','19. Juli']
+  ];
+  var disasters = [
+    ['01','Der unsichtbare Stil','Ein <span class="mono">import x from "./package.json"</span> in der Next-Config ließ Vercels Turbopack-Build abstürzen — Ergebnis: die komplette Seite ohne eine einzige CSS-Datei.','CSS-Katastrophe',
+     'Version über <span class="mono">process.env.npm_package_version</span> lesen. npm setzt sie ohnehin bei jedem Build. (Stolperstelle 6)'],
+    ['02','Das Deployment-Paradox','Push auf den Feature-Branch — sauber. Nur: Vercel beobachtet <span class="mono">main</span>. Wochenlang der Klassiker: „Warum deployt nichts?"','Deploy-Geist',
+     'Immer beide pushen: Feature-Branch <b>und</b> <span class="mono">HEAD:main</span>. Steht heute als Regel Nr. 1 im Projektgedächtnis.'],
+    ['03','Charizard war Alakazam','Sieben von neun hardcodierten Karten-IDs zeigten das falsche Motiv. „Glurak ex" war ein Simsala. Die „Pokéball-Gold-Karte" eine Psycho-Energie.','Identitätskrise',
+     'Jede einzelne ID gegen die TCG-API verifiziert — Bild muss zum Text passen. Als Pflicht-Check verankert. (v2.16.0)'],
+    ['04','Der Proxy, der Bilder auffraß','Ein Bild-Caching-Proxy sollte robuster machen — und vertrug sich nicht mit dem next/image-Optimizer. HTTP 400. Graue Kästen statt Karten.','Overengineering',
+     'Proxy nur noch für einfache <span class="mono">&lt;img&gt;</span>-Tags; next/image lädt direkt. (Stolperstelle 18)'],
+    ['05','Die leere Startseite','Die TCG-API war genau während eines Deploys rate-limited. Ergebnis: leere Trend-Listen — und die leere Seite eine Stunde lang gecacht.','Timing',
+     'Fallback auf den letzten in Supabase gespeicherten Marktbericht. Lieber echte alte Daten als eine leere Seite. (Stolperstelle 19)'],
+    ['06','Die lineare Lüge','Die Preis-Charts sahen aus wie mit dem Lineal gezogen — weil sie linear zwischen wenigen Eckwerten interpoliert waren. Sah echt aus. War es nicht.','Ehrlichkeit',
+     'Nur noch echte Datenpunkte, echte Zeit-Achse. Zu wenig Daten? Dann kein Chart — statt einer schönen Lüge. (v2.19.1)']
+  ];
+  var built = [
+    ['📊','Echtzeit-Marktdashboard','PMI-Index, Fear & Greed, Ticker, Top-Mover — alles aus echten Cardmarket-Daten.'],
+    ['📈','Ehrliche Preis-Charts','Zeit-Achse, echte Snapshots, kein interpoliertes Wunschdenken.'],
+    ['🎬','Auto-Reels','FFmpeg rendert Social-Videos direkt aus den Marktdaten — ohne Videomaterial.'],
+    ['🖼️','Bilder ohne API-Angst','Ein Caching-Proxy hält Kartenbilder auch bei Ausfall der Quelle am Leben.'],
+    ['🔗','Dynamische OG-Bilder','Jeder geteilte Link bekommt ein eigenes Vorschaubild — Karte, Preis, Branding.'],
+    ['🌱','Einsteiger-Onboarding','Ein sanfter Weg hinein für alle, die kein Trading-Dashboard erwarten.']
+  ];
+  var learn = [
+    ['01','Bei Daten & Geld ist Vertrauen das Produkt.','Nicht die Feature-Liste entscheidet — sondern ob die Zahl stimmt.'],
+    ['02','Verifiziere gegen die Quelle, nicht gegen dein Gedächtnis.','Charizard lässt grüßen.'],
+    ['03','Ehrlich schlägt hübsch.','Eine leere Stelle ist besser als eine schöne Erfindung.'],
+    ['04','Lass die Maschine die Regeln durchsetzen.','Ein Test, der den Build bricht, vergisst nie.'],
+    ['05','Push auf main. Immer.','Manche Lektionen brauchen mehrere Sude.']
+  ];
+
+  /* ---- render ---- */
+  function el(html){var d=document.createElement('div');d.innerHTML=html.trim();return d.firstChild;}
+  var $stack=document.getElementById('stack');
+  stack.forEach(function(s){$stack.appendChild(el('<div class="chip">'+s[0]+(s[1]?' <small>'+s[1]+'</small>':'')+'</div>'));});
+
+  var $tl=document.getElementById('timeline');
+  timeline.forEach(function(t){
+    $tl.appendChild(el('<div class="tlitem '+t[1]+'"><span class="v">'+t[0]+'</span><p>'+t[2]+'</p>'+(t[3]?'<em>'+t[3]+'</em>':'')+'</div>'));
+  });
+
+  var $d=document.getElementById('disasters');
+  disasters.forEach(function(x){
+    var f=el('<div class="flip"><div class="inner">'
+      +'<div class="face front"><span class="hint">tippen ›</span><span class="no">'+x[0]+'</span><h3>'+x[1]+'</h3><p class="desc">'+x[2]+'</p><span class="tag">'+x[3]+'</span></div>'
+      +'<div class="face back"><span class="no">'+x[0]+' · Fix</span><p class="fix">'+x[4]+'</p><span class="tag">gelöst ✓</span></div>'
+      +'</div></div>');
+    f.addEventListener('click',function(){f.classList.toggle('on');});
+    $d.appendChild(f);
+  });
+
+  var $b=document.getElementById('built');
+  built.forEach(function(b){$b.appendChild(el('<div class="bcard"><div class="ic" style="font-size:19px">'+b[0]+'</div><h3>'+b[1]+'</h3><p>'+b[2]+'</p></div>'));});
+
+  var $l=document.getElementById('learn');
+  learn.forEach(function(l){$l.appendChild(el('<div class="lrow"><span class="n">'+l[0]+'</span><span class="t">'+l[1]+'</span><span class="s">'+l[2]+'</span></div>'));});
+
+  /* floaters */
+  var ff=document.getElementById('floaters');
+  for(var i=0;i<7;i++){var b=document.createElement('b');
+    b.style.left=(8+Math.random()*84)+'%';b.style.top=(6+Math.random()*80)+'%';
+    b.style.animationDelay=(-Math.random()*16)+'s';b.style.opacity=(.25+Math.random()*.4);
+    b.style.transform='scale('+(.6+Math.random()*.9)+') rotate('+(-14+Math.random()*28)+'deg)';ff.appendChild(b);}
+
+  /* nav dots */
+  var secs=[].slice.call(document.querySelectorAll('section[data-name]'));
+  var $dots=document.getElementById('dots');
+  secs.forEach(function(s){var a=el('<a href="#'+s.id+'"><span>'+s.dataset.name+'</span></a>');$dots.appendChild(a);});
+  var dotEls=[].slice.call($dots.children);
+
+  /* reveal observer */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in');});},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(function(n){if(!n.classList.contains('in'))io.observe(n);});
+
+  /* section spy */
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){var idx=secs.indexOf(e.target);dotEls.forEach(function(d,i){d.classList.toggle('on',i===idx);});}
+  });},{threshold:.5});
+  secs.forEach(function(s){spy.observe(s);});
+
+  /* beer progress */
+  var liq=document.getElementById('liq'),foam=document.getElementById('foam'),pct=document.getElementById('brewpct');
+  function scroll(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    var p=h>0?Math.min(1,Math.max(0,window.scrollY/h)):0;
+    var fill=p*(reduce?54:52);
+    liq.setAttribute('height',fill);liq.setAttribute('y',60-fill);
+    foam.setAttribute('y',Math.max(6,60-fill-4));foam.setAttribute('opacity',p>.04?1:0);
+    pct.textContent=Math.round(p*100)+'%';
+  }
+  window.addEventListener('scroll',scroll,{passive:true});scroll();
+
+  /* nachschenken easter egg */
+  var topped=false;
+  document.getElementById('beer').addEventListener('click',function(){
+    if(topped)return;topped=true;
+    foam.setAttribute('opacity',1);pct.textContent='Prost!';
+    setTimeout(function(){topped=false;scroll();},1400);
+  });
+
+  /* cursor glow */
+  var glow=document.getElementById('glow');
+  if(!matchMedia('(pointer:coarse)').matches){
+    window.addEventListener('mousemove',function(e){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';},{passive:true});
+  } else {glow.style.opacity=0;}
+
+  /* cheers */
+  document.getElementById('cheers').addEventListener('click',function(){
+    var c=this;c.textContent='🍻';setTimeout(function(){c.textContent='🍺';},700);
+  });
+})();
+</script>
+</body>
+</html>
