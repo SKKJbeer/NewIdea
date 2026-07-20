@@ -66,7 +66,15 @@ function formatEurText(v: number): string {
 
 function run(cmd: ffmpeg.FfmpegCommand, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    cmd.on('end', () => resolve()).on('error', (err) => reject(err)).save(outputPath);
+    cmd
+      .on('end', () => resolve())
+      // WICHTIG: Die echte FFmpeg-Ursache steht im stderr, nicht in err.message.
+      // Ohne stderr bekommt man nur „ffmpeg exited with code 1" ohne den Grund.
+      .on('error', (err: Error, _stdout: string | null, stderr: string | null) => {
+        const tail = stderr ? String(stderr).trim().split('\n').slice(-3).join(' | ') : '';
+        reject(new Error(`ffmpeg: ${err?.message || 'error'}${tail ? ' :: ' + tail : ''}`));
+      })
+      .save(outputPath);
   });
 }
 

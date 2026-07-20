@@ -58,8 +58,14 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('[auto-reel] Rendering fehlgeschlagen:', error);
-    // Studio-Endpunkt (auth-geschützt): echte Fehlermeldung zur Diagnose zeigen.
-    const detail = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ error: detail.slice(0, 400) || 'internal_error' }, { status: 500 });
+    // Studio-Endpunkt (auth-geschützt): volle Diagnose zeigen — Name, Message,
+    // erster Stack-Frame. So bekommen wir immer etwas Verwertbares.
+    const e = error as { name?: string; message?: string; stack?: string };
+    const detail = [
+      e?.name,
+      e?.message,
+      (e?.stack || '').split('\n')[1]?.trim(),
+    ].filter(Boolean).join(' | ') || (() => { try { return JSON.stringify(error); } catch { return String(error); } })();
+    return NextResponse.json({ error: detail.slice(0, 600) || 'unknown_error' }, { status: 500 });
   }
 }

@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.5',
+    date: '20. Juli 2026',
+    label: 'Diagnose: echte Reel-Fehlerursache',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auto-Reel zeigt bei Problemen jetzt die echte FFmpeg-Ursache (stderr) statt einer leeren Fehlermeldung' },
+    ],
+  },
+  {
     version: '2.19.4',
     date: '20. Juli 2026',
     label: 'Bugfix: Auto-Reel-Generierung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auto-Reel-Generierung schlug fehl, weil FFmpeg auf Vercel keine Schriftart für die Texteinblendungen fand' },
       { type: 'fixed', text: 'Schriftart wird jetzt mitgeliefert — Auto-Reel und manueller Reel-Schnitt funktionieren' },

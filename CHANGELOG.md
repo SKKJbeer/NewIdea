@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.5] — 2026-07-20 · Diagnose: echte FFmpeg-Fehlerursache sichtbar
+
+### Behoben / Diagnose
+- Der Auto-Reel zeigte weiter „internal_error", weil die eigentliche FFmpeg-Ursache im stderr steckt — der bisher verworfen wurde. Jetzt wird der stderr eingefangen und die konkrete Meldung angezeigt (Studio ist passwortgeschützt). Damit lässt sich der Reel-Fehler jetzt exakt einordnen.
+
+---
+
 ## [2.19.4] — 2026-07-20 · BUGFIX: Auto-Reel-Generierung (Schriftart fehlte)
 
 ### Behoben

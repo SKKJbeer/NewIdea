@@ -42,7 +42,10 @@ function processVideo(inputPath: string, outputPath: string, clipDuration: numbe
         '-crf 23', '-preset fast', '-movflags +faststart', '-pix_fmt yuv420p',
       ])
       .on('end', () => resolve())
-      .on('error', (err) => reject(err))
+      .on('error', (err: Error, _stdout: string | null, stderr: string | null) => {
+        const tail = stderr ? String(stderr).trim().split('\n').slice(-3).join(' | ') : '';
+        reject(new Error(`ffmpeg: ${err?.message || 'error'}${tail ? ' :: ' + tail : ''}`));
+      })
       .save(outputPath);
   });
 }
