@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.19.6] — 2026-07-20 · BUGFIX: Auto-Reel — FFmpeg-Binary fehlte im Bundle
+
+### Behoben
+- **Auto-Reel scheiterte mit `spawn .../ffmpeg-static/ffmpeg ENOENT`**. Ursache: Next.js hat die FFmpeg-Binary (aus `ffmpeg-static`) nicht ins serverlose Function-Bundle gepackt, weil sie nur über einen Laufzeit-Pfad geladen wird — im Bundle war sie schlicht nicht vorhanden
+- **Fix**: Die Binary wird jetzt via `outputFileTracingIncludes` erzwungen mitgebündelt. Zusätzlich sorgt ein zentraler Helper (`ensureFfmpeg`) dafür, dass die Binary ausführbar ist — fehlt das Ausführbar-Bit auf dem read-only Bundle-Pfad, wird sie einmalig nach `/tmp` kopiert und dort ausführbar gemacht (verhindert den Folgefehler `EACCES`)
+- Betrifft beide Video-Routen: Auto-Reel (`/api/video/auto-reel`) und den manuellen Reel-Schnitt (`/api/video/process`)
+
+---
+
 ## [2.19.5] — 2026-07-20 · Diagnose: echte FFmpeg-Fehlerursache sichtbar
 
 ### Behoben / Diagnose

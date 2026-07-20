@@ -2,16 +2,16 @@ import { NextResponse } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { getSupabase } from '@/lib/supabase';
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegPath from 'ffmpeg-static';
 import { writeFile, unlink, readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import { ensureFfmpeg } from '@/lib/ffmpeg-setup';
 
 export const maxDuration = 300;
 
-if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
+ensureFfmpeg();
 
 // Mitgelieferte Schriftart für drawtext — Vercel hat keine System-Fonts.
 const FONT = join(process.cwd(), 'src/assets/fonts/reel-font.ttf');

@@ -9,15 +9,15 @@
 // — Vercel Analytics weist die Besucher damit dem Kanal zu.
 
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegPath from 'ffmpeg-static';
 import { writeFile, unlink, readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import type { PokemonCard } from '@/types';
 import { displayPrice } from '@/lib/pokemon-api';
+import { ensureFfmpeg } from '@/lib/ffmpeg-setup';
 
-if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
+ensureFfmpeg();
 
 // Mitgelieferte Schriftart — Vercels serverlose Umgebung hat KEINE System-Fonts,
 // deshalb scheitert drawtext sonst ("Cannot find a valid font"). Wird via

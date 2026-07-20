@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.19.6',
+    date: '20. Juli 2026',
+    label: 'Bugfix: Auto-Reel — FFmpeg-Binary fehlte im Bundle',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auto-Reel scheiterte mit „spawn ffmpeg ENOENT" — die FFmpeg-Binary wurde nicht ins serverlose Bundle gepackt. Sie wird jetzt erzwungen mitgebündelt und robust ausführbar gemacht' },
+    ],
+  },
+  {
     version: '2.19.5',
     date: '20. Juli 2026',
     label: 'Diagnose: echte Reel-Fehlerursache',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auto-Reel zeigt bei Problemen jetzt die echte FFmpeg-Ursache (stderr) statt einer leeren Fehlermeldung' },
     ],

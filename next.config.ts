@@ -7,11 +7,12 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: version,
   },
-  // Die Reel-Schriftart (drawtext) mit in die Video-Function-Bundles packen —
-  // sonst fehlt sie zur Laufzeit auf Vercel und FFmpeg-drawtext schlägt fehl.
+  // Für die Video-Routen ins Function-Bundle zwingen:
+  // - die ffmpeg-static-Binary (wird sonst nicht getracet → spawn ENOENT)
+  // - die Reel-Schriftart (Vercel hat keine System-Fonts → drawtext scheitert)
   outputFileTracingIncludes: {
-    '/api/video/auto-reel': ['./src/assets/fonts/**'],
-    '/api/video/process': ['./src/assets/fonts/**'],
+    '/api/video/auto-reel': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
+    '/api/video/process': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
   },
   images: {
     remotePatterns: [

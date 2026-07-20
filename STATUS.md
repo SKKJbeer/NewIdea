@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.19.5` · **Stand:** 20. Juli 2026 · **Branch:** `main`
+**Version:** `v2.19.6` · **Stand:** 20. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -155,7 +155,9 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.19.2 | Preis-Transparenz: Cardmarket-Aufschlüsselung (Trend/ab/Ø) + Datenstand auf Kartenseite, Ausreißer-Schutz — passt zu Cardmarket |
 | v2.19.3 | UI: Einsteiger-Banner-Überlappung behoben; Kartenseite professioneller (Merken primär, Kauf-Links dezent/klein) |
 | v2.19.4 | BUGFIX: Auto-Reel — Schriftart (Liberation Sans) mitgeliefert, drawtext-fontfile gesetzt; Vercel hat keine System-Fonts |
+| v2.19.5 | Diagnose: echte FFmpeg-Fehlerursache (stderr) im Auto-Reel sichtbar statt leerer Fehlermeldung |
+| v2.19.6 | BUGFIX: Auto-Reel — FFmpeg-Binary via outputFileTracingIncludes ins Bundle gezwungen (spawn ENOENT behoben) + robust ausführbar gemacht |
 
 ---
 
-*Zuletzt aktualisiert: v2.19.5 — 20. Juli 2026*
+*Zuletzt aktualisiert: v2.19.6 — 20. Juli 2026*
