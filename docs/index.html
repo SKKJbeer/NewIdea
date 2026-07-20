@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>PokéMarket Intelligence — Gebraut mit Claude Code</title>
-<meta name="description" content="Wie ein privates Hobbyprojekt in einem Monat zur Vertrauensfrage wurde — eine interaktive Reise durch die echte Entwicklungshistorie. Gebraut mit Claude Code." />
+<title>PokéMarket Intelligence — Brewed with Claude Code</title>
+<meta name="description" content="How a private hobby project became a question of trust in a single month — an interactive journey through the real development history. Brewed with Claude Code." />
 <style>
   :root{
     --bg:#08080c; --bg2:#0d0d16; --ink:#ececf6; --mut:#8f8fa8; --mut2:#5f5f77;
@@ -83,10 +83,6 @@
     background:linear-gradient(160deg,var(--glass2),transparent);backdrop-filter:blur(4px);animation:drift 16s var(--ease) infinite alternate}
   .floaters b::after{content:"";position:absolute;inset:9px;border-radius:6px;background:linear-gradient(160deg,rgba(139,92,246,.18),rgba(52,211,153,.1))}
   @keyframes drift{to{transform:translateY(-30px) rotate(6deg)}}
-
-  /* stat morph */
-  .morph{font-size:clamp(56px,15vw,150px);font-weight:800;letter-spacing:-.05em;line-height:1}
-  .morph .a{color:var(--ink)} .morph .b{color:var(--ros)}
 
   /* stack constellation */
   .stack{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
@@ -170,7 +166,7 @@
 <div class="glow" id="glow"></div>
 
 <!-- progress beer -->
-<div class="beer" id="beer" title="Brau-Fortschritt (zum Nachschenken klicken)">
+<div class="beer" id="beer" title="Brewing progress (click for a refill)">
   <svg viewBox="0 0 52 66" width="52" height="66">
     <defs>
       <linearGradient id="beerg" x1="0" y1="1" x2="0" y2="0">
@@ -193,85 +189,85 @@
 <!-- HERO -->
 <section id="hero">
   <div class="floaters" id="floaters"></div>
-  <div class="badge rv in">🍺 <b>AI Teamday</b> · Showcase — gebraut mit Claude Code</div>
-  <h1 class="rv in">Ein Hobby.<br>Ein Monat.<br><span class="grad">Eine Vertrauensfrage.</span></h1>
-  <p class="lead rv in d2">Die echte Entwicklungshistorie von <b style="color:var(--ink)">PokéMarket Intelligence</b> — einer Pokémon-Marktdaten-Plattform. Kein Deck. Keine Bulletpoints. Eine Reise durch das, was wirklich passiert ist. Scroll runter.</p>
-  <div class="scrollcue"><i></i> Scrollen</div>
+  <div class="badge rv in">🍺 <b>AI Teamday</b> · Showcase — brewed with Claude Code</div>
+  <h1 class="rv in">One hobby.<br>One month.<br><span class="grad">One question of trust.</span></h1>
+  <p class="lead rv in d2">The real development history of <b style="color:var(--ink)">PokéMarket Intelligence</b> — a Pokémon card-market data platform. No deck. No bullet points. A journey through what actually happened. Scroll down.</p>
+  <div class="scrollcue"><i></i> Scroll</div>
 </section>
 
 <!-- 01 IDEA -->
-<section id="s1" data-name="Die Idee">
-  <div class="kick rv">Kapitel 01 · Die Idee</div>
-  <h2 class="rv d1">Echtzeit-Preise für den<br>Pokémon-Kartenmarkt. <span class="vi">Auf Deutsch.</span></h2>
-  <p class="lead rv d2">Ein Solo-Entwickler. Ein Feierabend-Gedanke. Und ein Pairing-Partner, der nicht müde wird. Der ganze Stack wurde mit Claude Code gebaut, deployed und immer wieder repariert — von der ersten Zeile bis zum letzten Preis-Chart.</p>
+<section id="s1" data-name="The Idea">
+  <div class="kick rv">Chapter 01 · The Idea</div>
+  <h2 class="rv d1">Real-time prices for the<br>Pokémon card market. <span class="vi">In German.</span></h2>
+  <p class="lead rv d2">One solo developer. One after-work idea. And a pairing partner that never gets tired. The entire stack was built, deployed and repeatedly rescued with Claude Code — from the first line to the last price chart.</p>
   <div class="stack rv d3" id="stack"></div>
 </section>
 
 <!-- 02 TIMELINE -->
-<section id="s2" data-name="Der Brauprozess">
-  <div class="kick rv">Kapitel 02 · Der Brauprozess</div>
-  <h2 class="rv d1">Von <span class="mono" style="font-size:.7em">v0.1.0</span> bis <span class="mono" style="font-size:.7em">v2.19.3</span></h2>
-  <p class="lead rv d2">Kein großer Wurf am Anfang. Sondern Sud um Sud. Jede Version eine kleine Rezeptur-Änderung — manche gelungen, manche zurück in den Ausguss. Ein Auszug aus der echten Version-Historie:</p>
+<section id="s2" data-name="The Brewing Process">
+  <div class="kick rv">Chapter 02 · The Brewing Process</div>
+  <h2 class="rv d1">From <span class="mono" style="font-size:.7em">v0.1.0</span> to <span class="mono" style="font-size:.7em">v2.19.3</span></h2>
+  <p class="lead rv d2">No grand launch up front. Batch after batch instead. Every version a small recipe tweak — some good, some poured back down the drain. A slice of the real version history:</p>
   <div class="tl rv d2" id="timeline"></div>
 </section>
 
 <!-- 03 DISASTERS -->
-<section id="s3" data-name="Als das Bier umkippte">
-  <div class="kick rv">Kapitel 03 · Als das Bier umkippte</div>
-  <h2 class="rv d1">Sechs Mal ging etwas <span class="ro">gründlich</span> daneben.</h2>
-  <p class="lead rv d2">Das Beste an diesem Projekt sind nicht die Features. Es sind die Katastrophen — jede einzelne dokumentiert, seziert und als Regel verewigt. Karte antippen: vorne der Fehler, hinten die Rettung.</p>
+<section id="s3" data-name="When the Brew Turned">
+  <div class="kick rv">Chapter 03 · When the Brew Turned</div>
+  <h2 class="rv d1">Six times something went <span class="ro">badly</span> wrong.</h2>
+  <p class="lead rv d2">The best part of this project isn't the features. It's the disasters — each one documented, dissected and immortalized as a rule. Tap a card: the failure on the front, the rescue on the back.</p>
   <div class="grid rv d2" id="disasters"></div>
 </section>
 
 <!-- 04 REINHEITSGEBOT -->
-<section id="s4" data-name="Das Reinheitsgebot">
-  <div class="kick rv">Kapitel 04 · Das Reinheitsgebot</div>
-  <h2 class="rv d1">Die KI durfte alles.<br><span class="em">Außer lügen.</span></h2>
-  <p class="lead rv d2">Bei einem Produkt über Preise ist Erfundenes Gift. Also bekam der Content ein Reinheitsgebot — nicht als Bitte an das Modell, sondern als Test, der den Build bricht. Keine erfundenen Preise. Keine Persona. Keine Emojis. Keine „KI-generiert"-Etiketten. Quellen Pflicht.</p>
+<section id="s4" data-name="The Reinheitsgebot">
+  <div class="kick rv">Chapter 04 · The Reinheitsgebot</div>
+  <h2 class="rv d1">The AI was allowed everything.<br><span class="em">Except to lie.</span></h2>
+  <p class="lead rv d2">For a product about prices, invented data is poison. So the content got a <span class="vi">Reinheitsgebot</span> — Germany's beer-purity law, but for content. Not a polite request to the model, but a test that breaks the build. No invented prices. No persona. No emojis. No "AI-generated" labels. Sources mandatory.</p>
   <div class="code rv d2">
     <div class="bar"><i></i><i></i><i></i><span>content-compliance.test.ts</span></div>
-    <pre><span class="c">// Eine Quelle der Wahrheit — Build-Test UND Laufzeit-Gate</span>
-<span class="k">export const</span> <span class="f">PRICE_IN_TEXT</span> = /\d+(?:[.,]\d+)?\s*(?:€|EUR|\$)/;   <span class="c">// keine erfundenen Preise</span>
-<span class="k">export const</span> <span class="f">FIRST_PERSON</span>  = /\b(?:ich|Ich)\b/;                 <span class="c">// keine Persona</span>
-<span class="k">export const</span> <span class="f">EMOJI</span>        = /[\u{1F300}-\u{1FAFF}]/u;          <span class="c">// nur Lucide-Icons</span>
-<span class="k">export const</span> <span class="f">BUY_ADVICE</span>   = /kaufenswert|pflichtkauf|.../i;      <span class="c">// keine Anlageberatung</span>
+    <pre><span class="c">// One source of truth — build test AND runtime gate</span>
+<span class="k">export const</span> <span class="f">PRICE_IN_TEXT</span> = /\d+(?:[.,]\d+)?\s*(?:€|EUR|\$)/;   <span class="c">// no invented prices</span>
+<span class="k">export const</span> <span class="f">FIRST_PERSON</span>  = /\b(?:ich|Ich)\b/;                 <span class="c">// no persona</span>
+<span class="k">export const</span> <span class="f">EMOJI</span>        = /[\u{1F300}-\u{1FAFF}]/u;          <span class="c">// icons only</span>
+<span class="k">export const</span> <span class="f">BUY_ADVICE</span>   = /kaufenswert|pflichtkauf|.../i;      <span class="c">// no financial advice</span>
 
-<span class="k">if</span> (findViolations(text).length) <span class="k">throw</span> <span class="s">"Build gestoppt."</span></pre>
-    <div class="runline"><span class="mono">$ npm test</span> → <span class="ok">✓ 110 Tests grün</span> · Verstoß = rotes Licht = kein Deploy.</div>
+<span class="k">if</span> (findViolations(text).length) <span class="k">throw</span> <span class="s">"Build stopped."</span></pre>
+    <div class="runline"><span class="mono">$ npm test</span> → <span class="ok">✓ 110 tests green</span> · A violation = red light = no deploy.</div>
   </div>
 </section>
 
 <!-- 05 BUILT -->
-<section id="s5" data-name="Was im Glas landete">
-  <div class="kick rv">Kapitel 05 · Was im Glas landete</div>
-  <h2 class="rv d1">Was am Ende <span class="vi">wirklich</span> lief.</h2>
+<section id="s5" data-name="What's in the Glass">
+  <div class="kick rv">Chapter 05 · What Ended Up in the Glass</div>
+  <h2 class="rv d1">What <span class="vi">actually</span> shipped.</h2>
   <div class="built rv d2" id="built"></div>
 </section>
 
 <!-- STATS -->
 <section id="s5b">
   <div class="stats">
-    <div class="stat rv"><b>1</b><span>Monat, von der Idee zu v2.19.3</span></div>
-    <div class="stat rv d1"><b>110</b><span>Tests, die den Build hüten</span></div>
-    <div class="stat rv d2"><b>19</b><span>dokumentierte Stolperstellen</span></div>
-    <div class="stat rv d3"><b>1&#8239;+&#8239;1</b><span>Entwickler + Claude Code</span></div>
+    <div class="stat rv"><b>1</b><span>month, from idea to v2.19.3</span></div>
+    <div class="stat rv d1"><b>110</b><span>tests guarding the build</span></div>
+    <div class="stat rv d2"><b>19</b><span>documented pitfalls</span></div>
+    <div class="stat rv d3"><b>1&#8239;+&#8239;1</b><span>developer + Claude Code</span></div>
   </div>
 </section>
 
 <!-- 06 LEARNINGS -->
-<section id="s6" data-name="Was hängen blieb">
-  <div class="kick rv">Kapitel 06 · Was hängen blieb</div>
-  <h2 class="rv d1">Fünf Erkenntnisse,<br>die keiner im Voraus glaubt.</h2>
+<section id="s6" data-name="What Stuck">
+  <div class="kick rv">Chapter 06 · What Stuck</div>
+  <h2 class="rv d1">Five lessons<br>nobody believes upfront.</h2>
   <div class="learn rv d2" id="learn"></div>
 </section>
 
 <!-- FINALE -->
-<section id="end" data-name="Prost">
-  <div class="kick rv" style="justify-content:center">Prost</div>
-  <h1 class="rv d1" style="font-size:clamp(40px,9vw,110px)">Gebraut mit<br><span class="grad">Claude Code.</span></h1>
-  <p class="lead rv d2" style="margin-left:auto;margin-right:auto;text-align:center">Kein Team. Kein Budget. Ein Monat, ein Feierabend nach dem anderen — und ein Pairing-Partner, der Katastrophen in Regeln verwandelt. Wenn ein Hobby so weit kommt: Was baust <b style="color:var(--ink)">du</b> als Nächstes?</p>
-  <div class="prost rv d3"><span class="cheers" id="cheers" title="Prost">🍺</span> Zum Nachbrauen: einfach anfangen.</div>
-  <div class="foot rv d4">PokéMarket Intelligence · echte Historie, nichts erfunden · Next.js · Vercel · Supabase · FFmpeg · Claude Code</div>
+<section id="end" data-name="Cheers">
+  <div class="kick rv" style="justify-content:center">Cheers</div>
+  <h1 class="rv d1" style="font-size:clamp(40px,9vw,110px)">Brewed with<br><span class="grad">Claude Code.</span></h1>
+  <p class="lead rv d2" style="margin-left:auto;margin-right:auto;text-align:center">No team. No budget. One month, one after-work session at a time — and a pairing partner that turns disasters into rules. If a hobby gets this far: what will <b style="color:var(--ink)">you</b> build next?</p>
+  <div class="prost rv d3"><span class="cheers" id="cheers" title="Cheers">🍺</span> To brew your own: just start.</div>
+  <div class="foot rv d4">PokéMarket Intelligence · real history, nothing invented · Next.js · Vercel · Supabase · FFmpeg · Claude Code</div>
 </section>
 
 <script>
@@ -279,54 +275,54 @@
   "use strict";
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-  /* ---- data (nur dokumentierte Fakten) ---- */
+  /* ---- data (documented facts only) ---- */
   var stack = [
     ['Next.js 16','App Router'],['TypeScript',''],['Tailwind v4',''],['Vercel','Hosting'],
     ['Supabase','Snapshots'],['Anthropic','Claude'],['FFmpeg','Auto-Reels'],['Recharts','Charts']
   ];
   var timeline = [
-    ['v0.1.0','','Grundsystem: Homepage, Studio, Cron, KI, Video','20. Juni'],
-    ['v0.5.2','bad','Kompletter Style-Verlust — ein JSON-Import zerlegte den Build','21. Juni'],
-    ['v0.9.1','bad','Bottom-Tab-Navigation wieder rausgeworfen — Layout zerstört','21. Juni'],
-    ['v2.5.0','good','Bloomberg/TradingView Dark-Redesign — PMI & Fear&Greed','Juni'],
-    ['v2.7.0','good','Code-Review: timing-safe Auth, Median-Preise, Fetch-Timeouts',''],
-    ['v2.16.0','bad','7 von 9 hardcodierten Kartenbildern zeigten die falsche Karte',''],
-    ['v2.17.0','good','Auto-Reels — Social-Videos direkt aus Live-Marktdaten',''],
-    ['v2.17.1','bad','Der Caching-Proxy fraß die Kartenbilder',''],
-    ['v2.17.2','bad','Leere Startseite — eine Stunde lang gecacht',''],
-    ['v2.18.1','good','Dynamische OG-Vorschaubilder für geteilte Links',''],
-    ['v2.19.1','good','Die „linearen" Preis-Charts entlarvt & durch echte Daten ersetzt',''],
-    ['v2.19.2','good','5 € vs. 2 € — die Preis-Transparenz-Frage gelöst',''],
-    ['v2.19.3','','Heute. Und der Sud köchelt weiter.','19. Juli']
+    ['v0.1.0','','Foundation: homepage, studio, cron, AI, video','Jun 20'],
+    ['v0.5.2','bad','Total style loss — one JSON import wrecked the build','Jun 21'],
+    ['v0.9.1','bad','Bottom-tab navigation ripped back out — broke the layout','Jun 21'],
+    ['v2.5.0','good','Bloomberg/TradingView dark redesign — PMI & Fear & Greed','June'],
+    ['v2.7.0','good','Code review: timing-safe auth, median prices, fetch timeouts',''],
+    ['v2.16.0','bad','7 of 9 hardcoded card images showed the wrong card',''],
+    ['v2.17.0','good','Auto-reels — social videos straight from live market data',''],
+    ['v2.17.1','bad','The caching proxy ate the card images',''],
+    ['v2.17.2','bad','Blank homepage — cached for a full hour',''],
+    ['v2.18.1','good','Dynamic OG preview images for shared links',''],
+    ['v2.19.1','good','The "linear" price charts exposed & replaced with real data',''],
+    ['v2.19.2','good','€5 vs €2 — the price-transparency question, solved',''],
+    ['v2.19.3','','Today. And the brew keeps simmering.','Jul 19']
   ];
   var disasters = [
-    ['01','Der unsichtbare Stil','Ein <span class="mono">import x from "./package.json"</span> in der Next-Config ließ Vercels Turbopack-Build abstürzen — Ergebnis: die komplette Seite ohne eine einzige CSS-Datei.','CSS-Katastrophe',
-     'Version über <span class="mono">process.env.npm_package_version</span> lesen. npm setzt sie ohnehin bei jedem Build. (Stolperstelle 6)'],
-    ['02','Das Deployment-Paradox','Push auf den Feature-Branch — sauber. Nur: Vercel beobachtet <span class="mono">main</span>. Wochenlang der Klassiker: „Warum deployt nichts?"','Deploy-Geist',
-     'Immer beide pushen: Feature-Branch <b>und</b> <span class="mono">HEAD:main</span>. Steht heute als Regel Nr. 1 im Projektgedächtnis.'],
-    ['03','Charizard war Alakazam','Sieben von neun hardcodierten Karten-IDs zeigten das falsche Motiv. „Glurak ex" war ein Simsala. Die „Pokéball-Gold-Karte" eine Psycho-Energie.','Identitätskrise',
-     'Jede einzelne ID gegen die TCG-API verifiziert — Bild muss zum Text passen. Als Pflicht-Check verankert. (v2.16.0)'],
-    ['04','Der Proxy, der Bilder auffraß','Ein Bild-Caching-Proxy sollte robuster machen — und vertrug sich nicht mit dem next/image-Optimizer. HTTP 400. Graue Kästen statt Karten.','Overengineering',
-     'Proxy nur noch für einfache <span class="mono">&lt;img&gt;</span>-Tags; next/image lädt direkt. (Stolperstelle 18)'],
-    ['05','Die leere Startseite','Die TCG-API war genau während eines Deploys rate-limited. Ergebnis: leere Trend-Listen — und die leere Seite eine Stunde lang gecacht.','Timing',
-     'Fallback auf den letzten in Supabase gespeicherten Marktbericht. Lieber echte alte Daten als eine leere Seite. (Stolperstelle 19)'],
-    ['06','Die lineare Lüge','Die Preis-Charts sahen aus wie mit dem Lineal gezogen — weil sie linear zwischen wenigen Eckwerten interpoliert waren. Sah echt aus. War es nicht.','Ehrlichkeit',
-     'Nur noch echte Datenpunkte, echte Zeit-Achse. Zu wenig Daten? Dann kein Chart — statt einer schönen Lüge. (v2.19.1)']
+    ['01','The Invisible Stylesheet','An <span class="mono">import x from "./package.json"</span> in the Next config crashed Vercel\'s Turbopack build — result: the whole site without a single CSS file.','CSS wipeout',
+     'Read the version via <span class="mono">process.env.npm_package_version</span>. npm sets it on every build anyway. (Pitfall 6)'],
+    ['02','The Deployment Paradox','Push to the feature branch — clean. Except: Vercel watches <span class="mono">main</span>. For weeks, the classic: "Why is nothing deploying?"','Deploy ghost',
+     'Always push both: feature branch <b>and</b> <span class="mono">HEAD:main</span>. Now rule #1 in the project memory.'],
+    ['03','Charizard was Alakazam','Seven of nine hardcoded card IDs showed the wrong art. "Charizard ex" was an Alakazam. The "gold Poké Ball card" a Psychic Energy.','Identity crisis',
+     'Verified every single ID against the TCG API — image must match the text. Locked in as a mandatory check. (v2.16.0)'],
+    ['04','The Proxy That Ate Images','A caching proxy was meant to add resilience — and didn\'t get along with the next/image optimizer. HTTP 400. Grey boxes instead of cards.','Overengineering',
+     'Proxy for plain <span class="mono">&lt;img&gt;</span> tags only; next/image loads directly. (Pitfall 18)'],
+    ['05','The Empty Homepage','The TCG API was rate-limited right during a deploy. Result: empty trend lists — and the empty page cached for an hour.','Timing',
+     'Fall back to the last market report stored in Supabase. Real old data beats an empty page. (Pitfall 19)'],
+    ['06','The Linear Lie','The price charts looked drawn with a ruler — because they were linearly interpolated between a few anchor values. Looked real. Wasn\'t.','Honesty',
+     'Real data points only, real time axis. Too little data? Then no chart — instead of a pretty lie. (v2.19.1)']
   ];
   var built = [
-    ['📊','Echtzeit-Marktdashboard','PMI-Index, Fear & Greed, Ticker, Top-Mover — alles aus echten Cardmarket-Daten.'],
-    ['📈','Ehrliche Preis-Charts','Zeit-Achse, echte Snapshots, kein interpoliertes Wunschdenken.'],
-    ['🎬','Auto-Reels','FFmpeg rendert Social-Videos direkt aus den Marktdaten — ohne Videomaterial.'],
-    ['🖼️','Bilder ohne API-Angst','Ein Caching-Proxy hält Kartenbilder auch bei Ausfall der Quelle am Leben.'],
-    ['🔗','Dynamische OG-Bilder','Jeder geteilte Link bekommt ein eigenes Vorschaubild — Karte, Preis, Branding.'],
-    ['🌱','Einsteiger-Onboarding','Ein sanfter Weg hinein für alle, die kein Trading-Dashboard erwarten.']
+    ['📊','Real-time market dashboard','PMI index, Fear & Greed, ticker, top movers — all from real Cardmarket data.'],
+    ['📈','Honest price charts','Time axis, real snapshots, no interpolated wishful thinking.'],
+    ['🎬','Auto-reels','FFmpeg renders social videos straight from market data — no footage needed.'],
+    ['🖼️','Images without API anxiety','A caching proxy keeps card images alive even when the source is down.'],
+    ['🔗','Dynamic OG images','Every shared link gets its own preview — card, price, branding.'],
+    ['🌱','Beginner onboarding','A gentle way in for anyone not expecting a trading dashboard.']
   ];
   var learn = [
-    ['01','Bei Daten & Geld ist Vertrauen das Produkt.','Nicht die Feature-Liste entscheidet — sondern ob die Zahl stimmt.'],
-    ['02','Verifiziere gegen die Quelle, nicht gegen dein Gedächtnis.','Charizard lässt grüßen.'],
-    ['03','Ehrlich schlägt hübsch.','Eine leere Stelle ist besser als eine schöne Erfindung.'],
-    ['04','Lass die Maschine die Regeln durchsetzen.','Ein Test, der den Build bricht, vergisst nie.'],
-    ['05','Push auf main. Immer.','Manche Lektionen brauchen mehrere Sude.']
+    ['01','With data & money, trust is the product.','It\'s not the feature list that decides — it\'s whether the number is right.'],
+    ['02','Verify against the source, not your memory.','Charizard says hi.'],
+    ['03','Honest beats pretty.','An empty spot beats a beautiful fabrication.'],
+    ['04','Let the machine enforce the rules.','A test that breaks the build never forgets.'],
+    ['05','Push to main. Always.','Some lessons take a few batches.']
   ];
 
   /* ---- render ---- */
@@ -342,8 +338,8 @@
   var $d=document.getElementById('disasters');
   disasters.forEach(function(x){
     var f=el('<div class="flip"><div class="inner">'
-      +'<div class="face front"><span class="hint">tippen ›</span><span class="no">'+x[0]+'</span><h3>'+x[1]+'</h3><p class="desc">'+x[2]+'</p><span class="tag">'+x[3]+'</span></div>'
-      +'<div class="face back"><span class="no">'+x[0]+' · Fix</span><p class="fix">'+x[4]+'</p><span class="tag">gelöst ✓</span></div>'
+      +'<div class="face front"><span class="hint">tap ›</span><span class="no">'+x[0]+'</span><h3>'+x[1]+'</h3><p class="desc">'+x[2]+'</p><span class="tag">'+x[3]+'</span></div>'
+      +'<div class="face back"><span class="no">'+x[0]+' · Fix</span><p class="fix">'+x[4]+'</p><span class="tag">solved ✓</span></div>'
       +'</div></div>');
     f.addEventListener('click',function(){f.classList.toggle('on');});
     $d.appendChild(f);
@@ -390,11 +386,11 @@
   }
   window.addEventListener('scroll',scroll,{passive:true});scroll();
 
-  /* nachschenken easter egg */
+  /* refill easter egg */
   var topped=false;
   document.getElementById('beer').addEventListener('click',function(){
     if(topped)return;topped=true;
-    foam.setAttribute('opacity',1);pct.textContent='Prost!';
+    foam.setAttribute('opacity',1);pct.textContent='Cheers!';
     setTimeout(function(){topped=false;scroll();},1400);
   });
 
