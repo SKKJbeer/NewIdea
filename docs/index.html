@@ -158,6 +158,27 @@
   .foot{margin-top:70px;font-size:12px;color:var(--mut2);letter-spacing:.04em}
 
   ::selection{background:rgba(139,92,246,.35);color:#fff}
+
+  /* ---- system diagram (flywheel) ---- */
+  .diagram{margin-top:44px;border:1px solid var(--bord);background:rgba(8,8,14,.55);backdrop-filter:blur(10px);border-radius:22px;padding:20px;overflow-x:auto}
+  .diagram svg{display:block;min-width:760px;width:100%;height:auto}
+  .flow{fill:none;stroke:rgba(255,255,255,.14);stroke-width:2}
+  .flow.anim{stroke-dasharray:6 9;animation:dash 1.1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-30}}
+  .nrect{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.13);stroke-width:1.4}
+  .ntitle{fill:#f0f0f8;font-weight:700;font-size:15.5px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+  .nsub{fill:#8f8fa8;font-size:11px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+  .rlabel{fill:#a78bfa;font-size:12.5px;font-weight:600;font-family:ui-sans-serif,system-ui,sans-serif}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-size:12px;color:var(--mut)}
+  .legend b{display:inline-flex;align-items:center;gap:7px;font-weight:500}
+  .legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  /* vision pillars */
+  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:44px}
+  .pill{border:1px solid var(--bord);background:var(--glass);backdrop-filter:blur(10px);border-radius:18px;padding:24px;transition:.4s var(--ease)}
+  .pill:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.4)}
+  .pill .pn{font-family:ui-monospace,monospace;font-size:12px;color:var(--vio2)}
+  .pill h3{font-size:18px;margin-top:10px} .pill p{font-size:13.5px;color:var(--mut);margin-top:8px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -199,13 +220,65 @@
 <section id="s1" data-name="The Idea">
   <div class="kick rv">Chapter 01 · The Idea</div>
   <h2 class="rv d1">Real-time prices for the<br>Pokémon card market. <span class="vi">In German.</span></h2>
-  <p class="lead rv d2">One solo developer. One after-work idea. And a pairing partner that never gets tired. The entire stack was built, deployed and repeatedly rescued with Claude Code — from the first line to the last price chart.</p>
+  <p class="lead rv d2">Think a Bloomberg terminal, but for Pokémon cards: live prices, trend charts, a market index, portfolios and a watchlist — plus a content engine that writes the market commentary itself. One solo developer. One after-work idea. And a pairing partner that never gets tired. The entire stack was built, deployed and repeatedly rescued with Claude Code.</p>
   <div class="stack rv d3" id="stack"></div>
+</section>
+
+<!-- 02 THE SYSTEM -->
+<section id="ssys" data-name="The System">
+  <div class="kick rv">Chapter 02 · The System</div>
+  <h2 class="rv d1">One loop that <span class="vi">feeds itself.</span></h2>
+  <p class="lead rv d2">Live market data flows in. The dashboard turns it into signals. An AI engine turns those into articles and market reports — and into vertical videos posted to Instagram with links back. New visitors arrive, and the loop starts again. A reach flywheel — and every number in it is machine-checked for truth.</p>
+  <div class="diagram rv d2">
+    <svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Architecture flywheel diagram">
+      <defs>
+        <linearGradient id="fv" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#38bdf8"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#fb7185"/>
+        </linearGradient>
+        <marker id="arw" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#a78bfa"/></marker>
+        <marker id="arwr" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#38bdf8"/></marker>
+      </defs>
+
+      <!-- connectors (behind) -->
+      <path id="c1" class="flow anim" style="stroke:#38bdf8" marker-end="url(#arw)" d="M290,86 L354,86"/>
+      <path id="c2" class="flow anim" style="stroke:#34d399" marker-end="url(#arw)" d="M420,132 C300,190 210,196 132,246"/>
+      <path id="c3" class="flow anim" style="stroke:#a78bfa" marker-end="url(#arw)" d="M230,296 L274,296"/>
+      <path id="c4" class="flow anim" style="stroke:#8b5cf6" marker-end="url(#arw)" d="M480,296 L524,296"/>
+      <path id="c5" class="flow anim" style="stroke:#fbbf24" marker-end="url(#arw)" d="M730,296 L774,296"/>
+      <path id="c6" class="flow anim" style="stroke:#fb7185" marker-end="url(#arw)" d="M880,342 L880,444"/>
+      <path id="c7" class="flow" style="stroke:rgba(56,189,248,.4);stroke-dasharray:2 7" marker-end="url(#arwr)" d="M786,504 C420,600 150,570 132,348"/>
+
+      <!-- traveling pulses -->
+      <circle r="4.5" fill="#a78bfa"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath xlink:href="#c3"/></animateMotion></circle>
+      <circle r="4.5" fill="#8b5cf6"><animateMotion dur="2.6s" begin="-.6s" repeatCount="indefinite"><mpath xlink:href="#c4"/></animateMotion></circle>
+      <circle r="4.5" fill="#fbbf24"><animateMotion dur="2.6s" begin="-1.2s" repeatCount="indefinite"><mpath xlink:href="#c5"/></animateMotion></circle>
+      <circle r="4.5" fill="#fb7185"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath xlink:href="#c6"/></animateMotion></circle>
+      <circle r="5" fill="#38bdf8"><animateMotion dur="5s" repeatCount="indefinite"><mpath xlink:href="#c7"/></animateMotion></circle>
+
+      <!-- return label -->
+      <text class="rlabel" x="360" y="600">The flywheel — reach flows back to the site</text>
+
+      <!-- nodes -->
+      <g><rect class="nrect" x="90" y="40" width="200" height="92" rx="15"/><circle cx="114" cy="66" r="7" fill="#38bdf8"/><text class="ntitle" x="132" y="71">Market Data</text><text class="nsub" x="110" y="98">Cardmarket · TCG API</text><text class="nsub" x="110" y="114">real EUR prices</text></g>
+      <g><rect class="nrect" x="360" y="40" width="200" height="92" rx="15"/><circle cx="384" cy="66" r="7" fill="#34d399"/><text class="ntitle" x="402" y="71">Supabase</text><text class="nsub" x="380" y="98">daily snapshots</text><text class="nsub" x="380" y="114">real price history</text></g>
+      <g><rect class="nrect" x="30" y="250" width="200" height="92" rx="15"/><circle cx="54" cy="276" r="7" fill="#a78bfa"/><text class="ntitle" x="72" y="281">Dashboard</text><text class="nsub" x="50" y="308">live prices · PMI</text><text class="nsub" x="50" y="324">Fear &amp; Greed · movers</text></g>
+      <g><rect class="nrect" x="280" y="250" width="200" height="92" rx="15"/><circle cx="304" cy="276" r="7" fill="#8b5cf6"/><text class="ntitle" x="322" y="281">AI Content Engine</text><text class="nsub" x="300" y="308">articles · guides</text><text class="nsub" x="300" y="324">market reports</text></g>
+      <g><rect class="nrect" x="530" y="250" width="200" height="92" rx="15"/><circle cx="554" cy="276" r="7" fill="#fbbf24"/><text class="ntitle" x="572" y="281">Auto-Reels</text><text class="nsub" x="550" y="308">FFmpeg video</text><text class="nsub" x="550" y="324">from top movers</text></g>
+      <g><rect class="nrect" x="780" y="250" width="200" height="92" rx="15"/><circle cx="804" cy="276" r="7" fill="#fb7185"/><text class="ntitle" x="822" y="281">Instagram</text><text class="nsub" x="800" y="308">posted with</text><text class="nsub" x="800" y="324">UTM links back</text></g>
+      <g><rect class="nrect" x="780" y="450" width="200" height="92" rx="15"/><circle cx="804" cy="476" r="7" fill="#38bdf8"/><text class="ntitle" x="822" y="481">New Visitors</text><text class="nsub" x="800" y="508">traffic returns</text><text class="nsub" x="800" y="524">→ affiliate = revenue</text></g>
+    </svg>
+    <div class="legend">
+      <b><i style="background:#34d399"></i> real data</b>
+      <b><i style="background:#a78bfa"></i> AI content (Reinheitsgebot-gated)</b>
+      <b><i style="background:#fb7185"></i> social reach</b>
+      <b><i style="background:#38bdf8"></i> the loop back</b>
+    </div>
+  </div>
 </section>
 
 <!-- 02 TIMELINE -->
 <section id="s2" data-name="The Brewing Process">
-  <div class="kick rv">Chapter 02 · The Brewing Process</div>
+  <div class="kick rv">Chapter 03 · The Brewing Process</div>
   <h2 class="rv d1">From <span class="mono" style="font-size:.7em">v0.1.0</span> to <span class="mono" style="font-size:.7em">v2.19.3</span></h2>
   <p class="lead rv d2">No grand launch up front. Batch after batch instead. Every version a small recipe tweak — some good, some poured back down the drain. A slice of the real version history:</p>
   <div class="tl rv d2" id="timeline"></div>
@@ -213,7 +286,7 @@
 
 <!-- 03 DISASTERS -->
 <section id="s3" data-name="When the Brew Turned">
-  <div class="kick rv">Chapter 03 · When the Brew Turned</div>
+  <div class="kick rv">Chapter 04 · When the Brew Turned</div>
   <h2 class="rv d1">Six times something went <span class="ro">badly</span> wrong.</h2>
   <p class="lead rv d2">The best part of this project isn't the features. It's the disasters — each one documented, dissected and immortalized as a rule. Tap a card: the failure on the front, the rescue on the back.</p>
   <div class="grid rv d2" id="disasters"></div>
@@ -221,7 +294,7 @@
 
 <!-- 04 REINHEITSGEBOT -->
 <section id="s4" data-name="The Reinheitsgebot">
-  <div class="kick rv">Chapter 04 · The Reinheitsgebot</div>
+  <div class="kick rv">Chapter 05 · The Reinheitsgebot</div>
   <h2 class="rv d1">The AI was allowed everything.<br><span class="em">Except to lie.</span></h2>
   <p class="lead rv d2">For a product about prices, invented data is poison. So the content got a <span class="vi">Reinheitsgebot</span> — Germany's beer-purity law, but for content. Not a polite request to the model, but a test that breaks the build. No invented prices. No persona. No emojis. No "AI-generated" labels. Sources mandatory.</p>
   <div class="code rv d2">
@@ -239,7 +312,7 @@
 
 <!-- 05 BUILT -->
 <section id="s5" data-name="What's in the Glass">
-  <div class="kick rv">Chapter 05 · What Ended Up in the Glass</div>
+  <div class="kick rv">Chapter 06 · What Ended Up in the Glass</div>
   <h2 class="rv d1">What <span class="vi">actually</span> shipped.</h2>
   <div class="built rv d2" id="built"></div>
 </section>
@@ -254,9 +327,21 @@
   </div>
 </section>
 
-<!-- 06 LEARNINGS -->
+<!-- 07 VISION -->
+<section id="svis" data-name="The Vision">
+  <div class="kick rv">Chapter 07 · The Vision</div>
+  <h2 class="rv d1">From a hobby to a<br><span class="grad">self-running content machine.</span></h2>
+  <p class="lead rv d2">The direction is set: market data becomes content and reach on its own. Weekly market reports, twice-weekly articles, evergreen guides — written, checked and published automatically. Auto-reels carry the story to social; UTM links carry the audience back. Affiliate links turn attention into revenue. The human sets the direction — the machine runs the brewery.</p>
+  <div class="pillars rv d2">
+    <div class="pill"><span class="pn">01</span><h3>Automated content</h3><p>Articles, guides and weekly market reports generated on a schedule — every line checked against the content rules before it ships.</p></div>
+    <div class="pill"><span class="pn">02</span><h3>Reach that returns</h3><p>Auto-reels from live market data go out to social with UTM links. Traffic flows back to the site — and the loop compounds.</p></div>
+    <div class="pill"><span class="pn">03</span><h3>Truth by default</h3><p>Real prices, real sources, no invented data — enforced by tests, not by hope. Trust is the moat, not a feature.</p></div>
+  </div>
+</section>
+
+<!-- 08 LEARNINGS -->
 <section id="s6" data-name="What Stuck">
-  <div class="kick rv">Chapter 06 · What Stuck</div>
+  <div class="kick rv">Chapter 08 · What Stuck</div>
   <h2 class="rv d1">Five lessons<br>nobody believes upfront.</h2>
   <div class="learn rv d2" id="learn"></div>
 </section>
