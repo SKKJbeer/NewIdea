@@ -9,14 +9,30 @@ import type { Guide } from './guides';
 //   created_at TIMESTAMPTZ DEFAULT now()
 // );
 
-export async function saveGeneratedGuide(guide: Guide): Promise<boolean> {
+export interface SaveResult {
+  ok: boolean;
+  /** Klartext-Ursache — NIE verschlucken (siehe system-health.ts). */
+  error?: string;
+}
+
+/**
+ * Speichert einen generierten Guide.
+ *
+ * Gibt bewusst die ECHTE Fehlermeldung zurück statt nur `false`: Eine fehlende
+ * Tabelle hat die Pipeline über einen Monat lang still scheitern lassen, weil
+ * der Grund nirgends ankam.
+ */
+export async function saveGeneratedGuide(guide: Guide): Promise<SaveResult> {
   const sb = getSupabase();
-  if (!sb) return false;
+  if (!sb) return { ok: false, error: 'Supabase nicht konfiguriert (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY fehlen)' };
   const { error } = await sb.from('generated_guides').upsert(
     { slug: guide.slug, title: guide.title, content: guide },
     { onConflict: 'slug' },
   );
-  return !error;
+  if (error) {
+    return { ok: false, error: error.message || 'Unbekannter Datenbankfehler beim Speichern' };
+  }
+  return { ok: true };
 }
 
 export async function loadGeneratedGuide(slug: string): Promise<Guide | null> {

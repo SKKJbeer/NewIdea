@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   CheckCircle2, XCircle, AlertCircle, Loader2,
   Key, KeyRound, Link2, FileText, Zap, Server, RefreshCw, ExternalLink,
-  ChevronDown, ChevronUp, BookMarked, GitBranch, TriangleAlert, CircleAlert,
+  ChevronDown, ChevronUp, BookMarked, GitBranch, TriangleAlert, CircleAlert, Activity,
 } from 'lucide-react';
 
 interface ApiKeyStatus {
@@ -57,15 +57,199 @@ interface WorkflowInfo {
   trigger: string;
 }
 
+interface TableHealth {
+  table: string;
+  label: string;
+  effect: string;
+  ok: boolean;
+  missing: boolean;
+  rows: number | null;
+  latest: string | null;
+  freshness: 'ok' | 'stale' | 'empty' | 'unknown';
+  error: string | null;
+  setupSql: string | null;
+}
+
+interface SystemHealth {
+  configured: boolean;
+  tables: TableHealth[];
+  guidePipeline: {
+    generated: number;
+    staticGuides: number;
+    pendingTopics: number;
+    nextTopic: string | null;
+    stalled: boolean;
+  };
+  problems: string[];
+  checkedAt: string;
+}
+
 interface MonitoringData {
   build: { version: string; siteUrl: string | null; siteUrlMissing: boolean; nodeEnv: string };
   apiKeys: Record<string, ApiKeyStatus>;
   affiliates: Record<string, AffiliateStatus>;
   legal: Record<string, LegalStatus>;
   features: { supabaseConnected: boolean } & Record<string, FeatureStatus>;
+  health: SystemHealth | null;
   skills: SkillInfo[];
   workflows: WorkflowInfo[];
   checkedAt: string;
+}
+
+const FRESHNESS_BADGE: Record<TableHealth['freshness'], { label: string; cls: string }> = {
+  ok:      { label: 'aktuell',  cls: 'bg-emerald-500/10 text-emerald-400' },
+  stale:   { label: 'veraltet', cls: 'bg-amber-500/10 text-amber-400' },
+  empty:   { label: 'leer',     cls: 'bg-rose-500/10 text-rose-400' },
+  unknown: { label: 'unklar',   cls: 'bg-slate-500/10 text-slate-400' },
+};
+
+function formatDate(value: string | null): string {
+  if (!value) return '—';
+  const d = new Date(value.length <= 10 ? `${value}T12:00:00Z` : value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+/**
+ * Betriebszustand: zeigt, was tatsächlich passiert ist (echte Zeilen, Datenstände,
+ * Klartext-Fehler) — nicht nur, ob Schlüssel gesetzt sind. Fehlt eine Tabelle,
+ * steht hier das fertige SQL zum Anlegen.
+ */
+function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh: () => void }) {
+  const [running, setRunning] = useState(false);
+  const [runResult, setRunResult] = useState<string | null>(null);
+
+  async function runGuide() {
+    setRunning(true);
+    setRunResult(null);
+    try {
+      const res = await fetch('/api/guides/generate', { method: 'POST' });
+      const json = await res.json();
+      if (json.status === 'created') {
+        setRunResult(`Guide erstellt: ${json.title}`);
+        onRefresh();
+      } else if (json.status === 'rejected_quality') {
+        setRunResult(`Vom Qualitäts-Gate abgelehnt (${json.violations?.length ?? 0} Regelverstöße) — Text war regelwidrig, kein Speicher-Problem.`);
+      } else if (json.status === 'all_done') {
+        setRunResult('Alle Themen der Warteschlange sind bereits erzeugt.');
+      } else if (json.status === 'no_api_key') {
+        setRunResult('ANTHROPIC_API_KEY fehlt.');
+      } else {
+        setRunResult(`Fehlgeschlagen: ${json.error || 'unbekannt'}`);
+      }
+    } catch {
+      setRunResult('Aufruf fehlgeschlagen.');
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
+      <SectionTitle icon={Activity} title="Betriebszustand (was wirklich passiert)" />
+
+      {!health.configured ? (
+        <p className="text-[11px] text-amber-400 bg-amber-500/10 rounded-lg px-3 py-2">
+          <TriangleAlert size={11} className="inline mr-1" />
+          Supabase nicht konfiguriert — nichts wird dauerhaft gespeichert.
+        </p>
+      ) : (
+        <>
+          {health.problems.length > 0 ? (
+            <ul className="mb-3 space-y-1">
+              {health.problems.map((p, i) => (
+                <li key={i} className="flex items-start gap-2 text-[11px] text-rose-400 bg-rose-500/10 rounded-lg px-3 py-2">
+                  <CircleAlert size={11} className="shrink-0 mt-0.5" />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mb-3 text-[11px] text-emerald-400 bg-emerald-500/10 rounded-lg px-3 py-2">
+              <CheckCircle2 size={11} className="inline mr-1" />
+              Alle Datenbestände vorhanden und aktuell.
+            </p>
+          )}
+
+          <div className="space-y-1.5">
+            {health.tables.map((t) => {
+              const badge = FRESHNESS_BADGE[t.freshness];
+              return (
+                <div key={t.table} className="border border-[#2a2a3a] rounded-xl overflow-hidden">
+                  <div className="flex items-center gap-3 px-3 py-2.5">
+                    <StatusIcon ok={t.ok && t.freshness === 'ok'} warn={t.ok && t.freshness !== 'ok'} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-slate-200">{t.label}</p>
+                      <p className="text-[10px] text-slate-600">{t.effect}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-bold text-slate-300">
+                        {t.rows === null ? '—' : t.rows.toLocaleString('de-DE')}
+                        <span className="text-[10px] font-normal text-slate-600"> Einträge</span>
+                      </p>
+                      <span className={`inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 ${
+                        t.ok ? badge.cls : 'bg-rose-500/10 text-rose-400'
+                      }`}>
+                        {t.ok ? `${badge.label} · ${formatDate(t.latest)}` : t.missing ? 'Tabelle fehlt' : 'Fehler'}
+                      </span>
+                    </div>
+                  </div>
+                  {(t.error || t.setupSql) && (
+                    <div className="px-3 pb-3 pt-1.5 bg-[#0d0d18] border-t border-[#2a2a3a] space-y-2">
+                      {t.error && (
+                        <p className="text-[11px] text-rose-400 break-words">
+                          <span className="font-semibold">Ursache:</span> {t.error}
+                        </p>
+                      )}
+                      {t.setupSql && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-slate-400 mb-1">
+                            Im Supabase-SQL-Editor ausführen:
+                          </p>
+                          <pre className="text-[10px] font-mono text-slate-300 bg-[#13131e] border border-[#2a2a3a] rounded-lg p-2 overflow-x-auto whitespace-pre">{t.setupSql}</pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Guide-Pipeline: der stille Ausfall bekommt eine eigene Kachel */}
+          <div className="mt-3 rounded-xl border border-[#2a2a3a] bg-[#0d0d18] p-3">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <div>
+                <p className="text-xs font-semibold text-slate-200">Guide-Pipeline</p>
+                <p className="text-[10px] text-slate-600">
+                  {health.guidePipeline.staticGuides} statisch · {health.guidePipeline.generated} generiert ·{' '}
+                  {health.guidePipeline.pendingTopics} in Warteschlange
+                </p>
+              </div>
+              <button
+                onClick={runGuide}
+                disabled={running}
+                className="shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-violet-400 hover:text-violet-300 border border-violet-500/30 hover:border-violet-500/50 rounded-lg px-2.5 py-1.5 transition-colors disabled:opacity-50"
+              >
+                {running ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+                {running ? 'Läuft…' : 'Jetzt testen'}
+              </button>
+            </div>
+            {health.guidePipeline.nextTopic && (
+              <p className="text-[10px] text-slate-500">
+                Nächstes Thema: <code className="font-mono text-slate-400">{health.guidePipeline.nextTopic}</code>
+              </p>
+            )}
+            {runResult && (
+              <p className="mt-2 text-[11px] text-slate-300 bg-[#13131e] border border-[#2a2a3a] rounded-lg px-2.5 py-2 break-words">
+                {runResult}
+              </p>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 function StatusIcon({ ok, warn }: { ok: boolean; warn?: boolean }) {
@@ -221,6 +405,9 @@ export function MonitoringPanel() {
           </p>
         )}
       </div>
+
+      {/* Betriebszustand — steht bewusst ganz oben: echte Ergebnisse vor Konfiguration */}
+      {data.health && <HealthSection health={data.health} onRefresh={load} />}
 
       {/* API Keys */}
       <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">

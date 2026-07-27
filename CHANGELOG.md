@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.21.0] — 2026-07-27 · Betriebszustand sichtbar: Guide-Pipeline repariert
+
+### Behoben
+- **Die automatische Guide-Erzeugung lief unbemerkt ins Leere.** Zwölf vorbereitete Themen warteten in der Warteschlange, erzeugt wurde keines — der Speichervorgang scheiterte still und meldete den Grund an niemanden. Die Ursache wird jetzt im Klartext angezeigt statt verschluckt
+- Fehlschläge der Guide-Erzeugung stehen jetzt vollständig in der Cron-Antwort (Ursache, betroffenes Thema, Regelverstöße) statt nur im Server-Log
+
+### Neu
+- **Betriebszustand im Monitoring** — zeigt erstmals, was tatsächlich passiert ist, statt nur ob Schlüssel gesetzt sind: Anzahl gespeicherter Preis-Schnappschüsse, Artikel, Guides und Marktberichte, jeweils mit Datenstand und Frische-Bewertung (aktuell / veraltet / leer)
+- **Selbsterklärende Fehlerbehebung**: Fehlt eine Datenbank-Tabelle, zeigt das Monitoring die konkrete Fehlermeldung plus das fertige SQL zum Anlegen — kein Rätselraten mehr
+- **„Jetzt testen"-Knopf für die Guide-Pipeline**: Eine Reparatur lässt sich sofort überprüfen, statt bis zum nächsten Guide-Tag (Dienstag/Freitag) zu warten
+- 11 neue Tests für die Diagnose-Logik (121 gesamt)
+
+---
+
 ## [2.20.0] — 2026-07-20 · Rich-Content: Guides & Berichte laden zum Lesen ein
 
 ### Neu

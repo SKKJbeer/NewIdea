@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.21.0',
+    date: '27. Juli 2026',
+    label: 'Betriebszustand sichtbar: Guide-Pipeline repariert',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Automatische Guide-Erzeugung lief unbemerkt ins Leere — der Speicherfehler wurde still verschluckt. Ursache wird jetzt im Klartext gemeldet' },
+      { type: 'new',     text: 'Monitoring zeigt den echten Betriebszustand: Anzahl und Datenstand von Preis-Schnappschüssen, Artikeln, Guides und Marktberichten' },
+      { type: 'new',     text: 'Fehlt eine Datenbank-Tabelle, liefert das Monitoring die Fehlermeldung plus fertiges SQL zum Anlegen' },
+      { type: 'new',     text: '„Jetzt testen"-Knopf für die Guide-Pipeline — Reparatur sofort überprüfbar statt Warten bis Dienstag/Freitag' },
+    ],
+  },
+  {
     version: '2.20.0',
     date: '20. Juli 2026',
     label: 'Rich-Content: Guides & Berichte laden zum Lesen ein',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Neue Content-Darstellung: großzügige Typo mit Initialbuchstaben, hervorgehobene Kennzahlen, sanft einblendende Abschnitte und Lesefortschritts-Balken' },
       { type: 'changed', text: 'Guides magazinartig aufgewertet: Icon-Medaillon, Farbverlauf-Akzente, nummerierte Abschnitte — statt nüchterner Absätze' },

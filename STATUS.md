@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.19.8` · **Stand:** 20. Juli 2026 · **Branch:** `main`
+**Version:** `v2.21.0` · **Stand:** 27. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (v2.7.2)
+## Was gebaut ist (Stand v2.21.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -30,7 +30,9 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Supabase Preis-Snapshots | ✅ Aktiv | Sammelt täglich echte Daten seit Inbetriebnahme |
 | i18n DE/EN | ✅ Fertig | Cookie-basiert, NavBar-Umschalter |
 | SEO | ✅ Fertig | JSON-LD, Sitemap (inkl. Artikel/Guides/Berichte), robots.txt, OpenGraph |
-| Tests | ✅ 73 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht |
+| Tests | ✅ 121 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht, Compliance, Merkliste, System-Health |
+| Monitoring: Betriebszustand | ✅ Fertig | Echte Zeilenzahlen + Datenstände + Klartext-Fehler + Setup-SQL (`src/lib/system-health.ts`) |
+| Guide-Pipeline | ⚠️ Prüfen | Diagnose eingebaut (v2.21.0) — Betriebszustand auf `/monitoring` öffnen, ggf. fehlende Tabelle per SQL anlegen, dann „Jetzt testen" |
 | Newsletter-System (Beehiiv) | ⏸ Bereit | Code fertig — `BEEHIIV_API_KEY` noch nicht gesetzt |
 | Social-Media (Buffer) | ⏸ Bereit | Code fertig — `BUFFER_ACCESS_TOKEN` noch nicht gesetzt |
 | Affiliate-Links | ⚠️ Standard-URLs | Eigene Links in Vercel noch nicht eingetragen (0 € Provision aktiv) |
@@ -91,7 +93,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 3. **Review-Modus als Standard:** Inhalte gehen erst als Entwurf raus
 4. **Tech-Stack:** Next.js + Vercel + Claude + Remotion — 0–20 €/Monat Betriebskosten
 5. **Preis-Quelle:** Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`)
-6. **Preis-Historie:** Supabase-Snapshots (täglich) → Cardmarket-Interpolation → Beispielkurve
+6. **Preis-Historie:** NUR echte Daten — Supabase-Tages-Snapshots gemerged mit echten Cardmarket-Ankern. Keine Interpolation, keine Beispielkurve (seit v2.19.1 verboten und entfernt)
 7. **Versionierung:** Jede Änderung bekommt eine Versionsnummer im Commit-Titel
 
 ---
@@ -161,6 +163,25 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.19.8 | BUGFIX: Mobil-Navigation — echtes Hamburger-Menü mit allen Links; vorher fehlten mobil Sets/Einsteiger/Marktbericht/Merkliste |
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
+| v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+
 ---
 
-*Zuletzt aktualisiert: v2.20.0 — 20. Juli 2026*
+## Offene Befunde aus dem Gesamt-Review (27.07.2026)
+
+Vollständige Analyse siehe Chat-Verlauf. Kernbefund: Das Produkt ist gebaut, aber mehrere
+Wertschöpfungsketten sind nicht zu Ende verdrahtet.
+
+| # | Befund | Status |
+|---|---|---|
+| 1 | **Domain**: `pokemarketintelligence.com` löst nicht auf (HTTP 000), Seite lebt auf `new-idea-livid.vercel.app`. Alle 107 Sitemap-URLs, robots.txt, Canonicals und OG-Bilder zeigen auf die tote Domain → für Google unsichtbar | Bewusst zurückgestellt bis Go-Live |
+| 2 | **Canonical-Bug**: Startseite meldet `/index` statt `/` (Next.js-Eigenheit bei relativem `'./'`) | Offen — mit Befund 1 erledigen |
+| 3 | **Reel-Link tot**: Caption-URL nutzt dieselbe Variable → auch manuell gepostete Reels führen ins Leere | Offen — mit Befund 1 erledigt |
+| 4 | **Affiliate**: 26 Kauflink-Stellen ohne eigene Tracking-ID → 0 € Provision unabhängig vom Traffic | Offen (deine Aktion: Links beantragen) |
+| 5 | **Keine E-Mail-Erfassung**: Newsletter-Formular seit v2.5.4 global entfernt → jeder Besucher ist ein Einmalbesuch | Offen |
+| 6 | **Guide-Pipeline**: 12 Themen warten, 0 erzeugt | Diagnose eingebaut (v2.21.0) — Ursache jetzt sichtbar |
+| 7 | **Blindflug im Monitoring**: prüfte nur Konfiguration, nicht Ergebnisse | ✅ Behoben (v2.21.0) |
+
+---
+
+*Zuletzt aktualisiert: v2.21.0 — 27. Juli 2026*

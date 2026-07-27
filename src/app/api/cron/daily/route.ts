@@ -69,6 +69,13 @@ export async function GET(request: Request) {
   if (GUIDE_DAYS.has(dow)) {
     const guideResult = await generateNextGuide();
     results.guide = guideResult.status;
+    results.guideSlug = guideResult.slug ?? null;
+    // Ursache immer mitgeben — ein stiller Fehlschlag hat die Pipeline schon
+    // einmal über einen Monat unbemerkt lahmgelegt.
+    if (guideResult.error) results.guideError = guideResult.error;
+    if (guideResult.violations?.length) {
+      results.guideViolations = guideResult.violations.slice(0, 5);
+    }
     if (guideResult.status === 'created' && guideResult.slug) {
       results.guideTitle = guideResult.title;
       revalidatePath('/guides');
@@ -76,6 +83,8 @@ export async function GET(request: Request) {
       console.log(`✅ Guide generiert: ${guideResult.title}`);
     } else if (guideResult.status === 'rejected_quality') {
       console.error(`⛔ Guide ${guideResult.slug} vom Qualitäts-Gate abgelehnt — nächster Versuch am nächsten Guide-Tag`);
+    } else if (guideResult.status === 'failed') {
+      console.error(`⛔ Guide ${guideResult.slug} fehlgeschlagen: ${guideResult.error}`);
     }
   }
 

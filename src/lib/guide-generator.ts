@@ -69,6 +69,8 @@ export interface GuideGenerationResult {
   slug?: string;
   title?: string;
   violations?: ContentViolation[];
+  /** Klartext-Ursache bei `failed` — z.B. fehlende Supabase-Tabelle. */
+  error?: string;
 }
 
 /** Prüft einen Guide gegen alle Content-Regeln (gleiche Regexe wie die Build-Tests). */
@@ -120,7 +122,7 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
     const data: GeneratedGuideData = JSON.parse(jsonMatch?.[0] || '{}');
 
     if (!data.intro || !Array.isArray(data.sections) || data.sections.length < 3 || !Array.isArray(data.keyPoints) || data.keyPoints.length === 0) {
-      return { status: 'failed', slug: topic.slug };
+      return { status: 'failed', slug: topic.slug, error: 'KI-Antwort unvollständig (Intro/Sektionen/Key-Points fehlen)' };
     }
 
     const guide: Guide = {
@@ -146,11 +148,17 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
     }
 
     const saved = await saveGeneratedGuide(guide);
-    if (!saved) return { status: 'failed', slug: topic.slug };
+    if (!saved.ok) {
+      // Die echte Ursache muss sichtbar werden — sonst läuft die Pipeline
+      // wochenlang ins Leere, ohne dass es jemand merkt.
+      console.error(`Guide "${topic.slug}" konnte nicht gespeichert werden: ${saved.error}`);
+      return { status: 'failed', slug: topic.slug, error: saved.error };
+    }
 
     return { status: 'created', slug: guide.slug, title: guide.title };
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error(`Guide-Generierung fehlgeschlagen (${topic.slug}):`, err);
-    return { status: 'failed', slug: topic.slug };
+    return { status: 'failed', slug: topic.slug, error: message };
   }
 }

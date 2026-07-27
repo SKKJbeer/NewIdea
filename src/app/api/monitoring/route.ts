@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
+import { collectSystemHealth } from '@/lib/system-health';
 import fs from 'fs';
 import path from 'path';
 
@@ -103,6 +104,10 @@ export async function GET(request: Request) {
     }
   }
 
+  // Outcome-Monitoring: Was ist tatsächlich passiert? (echte Zeilen, Datenstände,
+  // Klartext-Fehler) — nicht nur, ob Schlüssel gesetzt sind.
+  const health = await collectSystemHealth().catch(() => null);
+
   // Test TCG API
   let tcgApiWorking = false;
   if (env('POKEMON_TCG_API_KEY')) {
@@ -197,6 +202,9 @@ export async function GET(request: Request) {
       video: { working: env('ELEVENLABS_API_KEY'), label: 'Video-Pipeline (ElevenLabs)', effect: 'Skript-Generator funktioniert, Stimme fehlt' },
       socialMedia: { working: env('BUFFER_ACCESS_TOKEN'), label: 'Social-Media-Auto-Post', effect: 'Posts werden generiert, aber nicht geplant' },
     },
+
+    // Betriebszustand: echte Ergebnisse statt nur Konfiguration
+    health,
 
     // Skills & Workflows
     skills: getSkills(),
