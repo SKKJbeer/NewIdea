@@ -29,6 +29,8 @@ const FPS = 30;
 const SEG_SECONDS = 3.6;
 const INTRO_SECONDS = 2.4;
 const OUTRO_SECONDS = 3.0;
+// Weiche Blende zwischen den Abschnitten — professionelles Tempo statt Hartschnitt.
+const FADE_SECONDS = 0.28;
 
 const BG = '#0a0a0f';
 const SITE_LABEL = 'pokemarket-intelligence';
@@ -74,21 +76,43 @@ function run(cmd: ffmpeg.FfmpegCommand, outputPath: string): Promise<void> {
  * `drawtext`-Filter nicht (486 Filter, keiner davon drawtext), weshalb der
  * frühere Aufbau nie ein Reel erzeugen konnte.
  */
-async function frameToSegment(imgPath: string, seconds: number, outPath: string, zoom = false): Promise<void> {
+async function frameToSegment(
+  imgPath: string,
+  seconds: number,
+  outPath: string,
+  { zoom = false, drift = 0 }: { zoom?: boolean; drift?: number } = {},
+): Promise<void> {
   const frames = Math.round(seconds * FPS);
-  const filters = zoom
-    ? [
-        `scale=${W * 2}:-1`,
-        `zoompan=z='min(zoom+0.0008,1.10)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${H}:fps=${FPS}`,
-      ]
-    : [`scale=${W}:${H}`, `fps=${FPS}`];
+  const filters: string[] = [];
+
+  if (zoom) {
+    // Langsames Heranfahren mit leichtem Versatz — gibt dem Standbild Leben.
+    // Der Versatz wechselt je Segment die Richtung, damit es nicht monoton wirkt.
+    const dx = drift === 0 ? "iw/2-(iw/zoom/2)" : `iw/2-(iw/zoom/2)+${drift}*on/${frames}`;
+    filters.push(
+      `scale=${W * 2}:-1`,
+      `zoompan=z='min(zoom+0.0009,1.12)':x='${dx}':y='ih/2-(ih/zoom/2)':d=${frames}:s=${W}x${H}:fps=${FPS}`,
+    );
+  } else {
+    filters.push(`scale=${W}:${H}`, `fps=${FPS}`);
+  }
+
+  // Dezente Randabdunklung — lenkt den Blick zur Mitte (Terminal-Anmutung).
+  filters.push('vignette=PI/5');
+
+  // Weiches Ein- und Ausblenden statt harter Schnitte.
+  const fadeOutStart = Math.max(0, seconds - FADE_SECONDS).toFixed(2);
+  filters.push(
+    `fade=t=in:st=0:d=${FADE_SECONDS}`,
+    `fade=t=out:st=${fadeOutStart}:d=${FADE_SECONDS}`,
+  );
 
   const cmd = ffmpeg()
     .input(imgPath)
     .inputOptions(['-loop 1'])
     .videoFilters(filters)
     .videoCodec('libx264')
-    .outputOptions(['-t', String(seconds), '-crf 22', '-preset fast', '-pix_fmt yuv420p', '-an']);
+    .outputOptions(['-t', String(seconds), '-crf 21', '-preset fast', '-pix_fmt yuv420p', '-an']);
   await run(cmd, outPath);
 }
 
@@ -124,11 +148,11 @@ export async function renderMarketReel(cards: ReelCard[], title: string, dateLab
       const raw = Buffer.from(await res.arrayBuffer());
       const dataUri = `data:image/png;base64,${raw.toString('base64')}`;
       const framePath = tmp(`frame-${i}.png`);
-      await writeFile(framePath, await cardFrame(card, i + 1, dataUri));
+      await writeFile(framePath, await cardFrame(card, i + 1, cards.length, dataUri));
       cleanup.push(framePath);
 
       const segPath = tmp(`seg-${i}.mp4`);
-      await frameToSegment(framePath, SEG_SECONDS, segPath, true);
+      await frameToSegment(framePath, SEG_SECONDS, segPath, { zoom: true, drift: i % 2 === 0 ? 60 : -60 });
       cleanup.push(segPath);
       segments.push(segPath);
     }

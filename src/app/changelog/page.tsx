@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.26.0',
+    date: '29. Juli 2026',
+    label: 'Reels im eigenen Look: lebendiger und hochwertiger',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Reels komplett neu gestaltet: Raster-Hintergrund, farbige Lichtstimmung nach Trendrichtung, Platzierung als große Ziffer, Karte mit farbigem Ring' },
+      { type: 'changed', text: 'Der Trend ist jetzt die Hauptkennzahl — groß, farbig, mit Richtungspfeil; Marktwert als eigenes Feld' },
+      { type: 'new',     text: 'Bewegung: Heranfahren mit wechselnder Richtung, weiche Blenden zwischen den Abschnitten, Fortschrittsanzeige' },
+    ],
+  },
+  {
     version: '2.25.0',
     date: '29. Juli 2026',
     label: 'Instagram-Reels funktionieren erstmals',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Die Reel-Erstellung konnte technisch nie funktionieren: Der Videosoftware fehlt die Funktion zum Einblenden von Text, über die bisher jede Zeile lief' },
       { type: 'changed', text: 'Bilder werden jetzt fertig gestaltet und nur noch zusammengefügt — erstes vollständiges Reel aus echten Marktdaten erfolgreich erstellt' },

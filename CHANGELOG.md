@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.26.0] — 2026-07-29 · Reels im eigenen Look: lebendiger und hochwertiger
+
+### Geändert
+- **Reels komplett neu gestaltet** — im Terminal-Look der Plattform statt schlichter Textfolien:
+  - Feines Raster im Hintergrund und zwei farbige Lichtquellen; die Stimmungsfarbe folgt der Trendrichtung, sodass steigende Karten grün und fallende rot leuchten — die Richtung ist erkennbar, bevor man die Zahl liest
+  - Platzierung als große Ziffer („01 / 05"), Karte mit farbigem Ring und Schlagschatten
+  - Der Trend ist jetzt die Hauptkennzahl: groß, farbig, mit Richtungspfeil. Der Marktwert sitzt als eigenes Feld darunter
+  - Fortschrittsanzeige am unteren Rand zeigt, an welcher Stelle des Reels man ist
+  - Intro und Abspann mit Verlaufsschrift und Akzentbalken
+
+### Neu
+- **Bewegung und Rhythmus**: langsames Heranfahren mit wechselnder Richtung je Abschnitt, weiche Blenden zwischen den Abschnitten statt harter Schnitte, dezente Randabdunklung für den Blickfokus
+
+---
+
 ## [2.25.0] — 2026-07-29 · Instagram-Reels funktionieren erstmals
 
 ### Behoben

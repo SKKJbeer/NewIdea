@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.25.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.26.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.25.0)
+## Was gebaut ist (Stand v2.26.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.26.0 | Reel-Design im Plattform-Look: Raster + trendfarbige Lichtstimmung, Rang-Ziffer, Karten-Ring, Trend als Hauptkennzahl mit SVG-Pfeil, Fortschrittspunkte, Blenden + Vignette + wechselnder Zoom-Versatz |
 | v2.25.0 | BUGFIX Reels: ffmpeg-static hat KEINEN drawtext-Filter (486 Filter, keiner davon) — jede Textzeile lief darüber, Reel konnte nie entstehen. Umbau auf fertig gerenderte Bilder via next/og; erstes Reel erfolgreich erzeugt |
 | v2.24.0 | GESAMT-AUDIT: Preisformat deutschlandweit falsch (toFixed statt Intl) an ~15 Stellen → zentrale format.ts; Boosterpack-CDN komplett 404 → Set-Logo als Primärquelle; TCG-API-Retry (leere Startseite, Stolperstelle 19); Startseite erfand Sentiment ohne Daten → ApiErrorState |
 | v2.23.0 | BUGFIX Marktbericht: Platzhalter („test") seit KW 26 live, Cron meldete Erfolg ohne Prüfung, Newsletter-Fehler riss den Bericht mit. Qualitätsgate + Anzeige-Filter + manueller Auslöser + entkoppelter Cron |
@@ -189,4 +190,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.25.0 — 29. Juli 2026*
+*Zuletzt aktualisiert: v2.26.0 — 29. Juli 2026*
