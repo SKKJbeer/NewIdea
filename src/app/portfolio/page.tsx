@@ -13,6 +13,8 @@ import {
 } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
 import { formatPercent } from '@/lib/format';
+import { AccountBar } from '@/components/AccountBar';
+import { mergeHoldings } from '@/lib/portfolio-sync';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -83,17 +85,84 @@ export default function PortfolioPage() {
   const [timeRange,  setTimeRange]  = useState<keyof typeof RANGE_DAYS>('1M');
   const [scrubPoint, setScrubPoint] = useState<ChartPoint | null>(null);
 
+  // Konto-Zustand. `signedIn` steuert, wohin gespeichert wird: ins Konto oder
+  // nur in diesen Browser.
+  const [signedIn,  setSignedIn]  = useState(false);
+  const [userName,  setUserName]  = useState('');
+  const [syncing,   setSyncing]   = useState(false);
+  const [syncError, setSyncError] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+
+    let lokal: PortfolioHolding[] = [];
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Array<Partial<PortfolioHolding> & { cardId: string }>;
-        setHoldings(parsed.map(normalizeHolding));
+        lokal = parsed.map(normalizeHolding);
       }
       // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     } catch {}
+    setHoldings(lokal);
+
+    // Konto-Bestand nachladen und mit dem lokalen zusammenführen. Läuft
+    // absichtlich NACH dem lokalen Setzen: Die Seite ist damit sofort
+    // benutzbar, das Konto ergänzt nur.
+    let abgebrochen = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/portfolio/sync');
+        if (!res.ok) return;
+        const daten = (await res.json()) as {
+          signedIn?: boolean;
+          user?: { name: string };
+          holdings?: Array<Partial<PortfolioHolding> & { cardId: string }>;
+          error?: string;
+        };
+        if (abgebrochen || !daten.signedIn) return;
+
+        setSignedIn(true);
+        setUserName(daten.user?.name ?? '');
+        if (daten.error) { setSyncError(true); return; }
+
+        const konto = (daten.holdings ?? []).map(normalizeHolding);
+        const zusammen = mergeHoldings(lokal, konto);
+        setHoldings(zusammen);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(zusammen)); } catch {
+          // catch erlaubt: localStorage kann gesperrt sein — das Konto bleibt die Quelle
+        }
+        // Beim ersten Login hat der Browser Positionen, die das Konto noch
+        // nicht kennt. Einmal hochschieben, damit nichts verloren geht.
+        if (zusammen.length !== konto.length) void speichereImKonto(zusammen);
+      } catch (err) {
+        // Nicht stumm: Ein dauerhaft scheiternder Abruf sähe wie „nicht
+        // angemeldet" aus und der Nutzer würde sein Konto-Portfolio vermissen.
+        console.warn('Konto-Portfolio konnte nicht geladen werden:', err);
+      }
+    })();
+    return () => { abgebrochen = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Schreibt den Bestand ins Konto. Fehler werden angezeigt, nie verschluckt. */
+  async function speichereImKonto(h: PortfolioHolding[]) {
+    setSyncing(true);
+    setSyncError(false);
+    try {
+      const res = await fetch('/api/portfolio/sync', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ holdings: h }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      console.warn('Portfolio konnte nicht ins Konto gespeichert werden:', err);
+      setSyncError(true);
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   // Refetch wenn sich die preisrelevanten Felder ändern (cardId + Sprache), nicht nur die Anzahl.
   // So löst auch ein Sprachwechsel im Edit-Modal einen neuen Preisabruf aus.
@@ -124,8 +193,18 @@ export default function PortfolioPage() {
 
   function saveHoldings(h: PortfolioHolding[]) {
     setHoldings(h);
+    // Immer auch lokal: Das Konto kann gerade nicht erreichbar sein, und der
+    // Browser ist der Rückfall.
     // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); } catch {}
+    if (signedIn) void speichereImKonto(h);
+  }
+
+  /** Nach dem Abmelden bleibt der lokale Bestand sichtbar — nichts verschwindet. */
+  function handleSignedOut() {
+    setSignedIn(false);
+    setUserName('');
+    setSyncError(false);
   }
 
   function removeHolding(cardId: string) { saveHoldings(holdings.filter((h) => h.cardId !== cardId)); }
@@ -167,6 +246,15 @@ export default function PortfolioPage() {
     return (
       <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
         <NavBar />
+        <div className="max-w-2xl mx-auto px-5 pt-5">
+          <AccountBar
+          signedIn={signedIn}
+          userName={userName}
+          syncing={syncing}
+          syncError={syncError}
+          onSignedOut={handleSignedOut}
+        />
+        </div>
         <EmptyState onAdd={() => setShowAdd(true)} />
         {showAdd && (
           <AddCardModal holdings={holdings} onAdd={saveHoldings} onClose={() => setShowAdd(false)} />
@@ -181,7 +269,15 @@ export default function PortfolioPage() {
 
       {/* ── Hero ── */}
       <div className="border-b border-[#1e1e30]">
-        <div className="max-w-2xl mx-auto px-5 pt-7 pb-5">
+        <div className="max-w-2xl mx-auto px-5 pt-5 pb-5">
+
+          <AccountBar
+          signedIn={signedIn}
+          userName={userName}
+          syncing={syncing}
+          syncError={syncError}
+          onSignedOut={handleSignedOut}
+        />
 
           {/* Header row */}
           <div className="flex items-center justify-between mb-7">

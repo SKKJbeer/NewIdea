@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.32.0] — 2026-07-29 · Portfolio-Konto: Anmeldung mit Google und Apple
+
+### Neu
+- **Portfolio dauerhaft speichern.** Wer sich anmeldet, findet sein Portfolio auf jedem Gerät wieder — bisher lag es ausschließlich im Speicher des jeweiligen Browsers und war beim Wechsel oder beim Leeren des Verlaufs weg
+- **Anmeldung mit Google und Apple** über Supabase Auth
+- **Sichtbarer Hinweis, wo die Daten liegen**: „Nur in diesem Browser gespeichert" bzw. „Im Konto gespeichert". Ohne diesen Hinweis hält man sein Portfolio für sicher, obwohl es das nicht ist
+- Beim ersten Anmelden wird der vorhandene Browser-Bestand automatisch ins Konto übernommen — nichts geht verloren
+- 45 neue Tests (409 insgesamt)
+
+### Geändert
+- Änderungen werden weiterhin **immer auch lokal** gespeichert. Ist das Konto gerade nicht erreichbar, bleibt der Browser der Rückfall — mit sichtbarem Hinweis statt stiller Datenverlust
+- Nach dem Abmelden bleibt der lokale Bestand sichtbar; es verschwindet nichts vom Bildschirm
+
+### Wichtig
+- **Ohne Einrichtung ändert sich nichts.** Sind die Zugangsdaten nicht gesetzt, erscheinen keine Anmeldeknöpfe und das Portfolio arbeitet unverändert lokal
+- Die Einrichtung braucht drei Schritte im Supabase-Dashboard, ein Google-OAuth-Konto und — für Apple — ein kostenpflichtiges Apple-Developer-Konto. Die Anleitung steht im Monitoring und in CLAUDE.md
+
+---
+
 ## [2.31.0] — 2026-07-29 · Portfolio-Tests und Newsletter-Pflichten
 
 ### Neu

@@ -704,6 +704,8 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 
 | Variable | Zweck | Was sich ändert wenn gesetzt |
 |---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ⭐ Konto-Anmeldung Portfolio | Google-/Apple-Login im Portfolio wird sichtbar |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ⭐ Konto-Anmeldung Portfolio | **anon/publishable** Key — NIEMALS der service_role Key |
 | `BEEHIIV_API_KEY` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
 | `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
 | `ELEVENLABS_API_KEY` | KI-Stimme für Videos | Video-Cron aktiv |
@@ -728,6 +730,65 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 Der Supabase-Service-Role-Key wurde in einer früheren Chat-Session versehentlich
 offengelegt. Der Nutzer wurde gebeten, ihn zu **rotieren** (Supabase Dashboard →
 Settings → API → regenerate service_role key). Neuen Wert danach in Vercel aktualisieren.
+
+---
+
+## Portfolio-Konto (Google / Apple) — seit v2.32.0
+
+**Zweck:** Besucher können ihr Portfolio dauerhaft speichern statt nur im
+localStorage des jeweiligen Browsers. Ohne Konto ändert sich nichts — die Seite
+arbeitet unverändert lokal weiter.
+
+### Warum Supabase Auth
+Supabase ist bereits die Datenbank. Eine zweite Anmelde-Infrastruktur (NextAuth)
+hätte eine eigene Sitzungsverwaltung neben dem `studio_session`-Cookie
+gebraucht — zwei Systeme für dasselbe Problem. Supabase Auth bringt Google und
+Apple mit und schreibt die Sitzung in Cookies, die auch der Server liest.
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| Auth-Clients | `src/lib/supabase-auth.ts` | Browser- und Server-Client, `currentUser()`, Anbieterliste |
+| Callback | `src/app/auth/callback/route.ts` | Tauscht den OAuth-Code gegen eine Sitzung; Weiterleitung NUR auf relative Pfade |
+| Konto-Route | `src/app/api/portfolio/sync/route.ts` | GET/PUT des Bestands, prüft den angemeldeten Nutzer |
+| Zusammenführung | `src/lib/portfolio-sync.ts` | Rein und testbar: lokaler + Konto-Bestand → ein Bestand |
+| Oberfläche | `src/components/AccountBar.tsx` | Drei Zustände: nicht eingerichtet / abgemeldet / angemeldet |
+
+### Zusammenführungs-Regeln (nicht verhandelbar)
+1. **Vereinigung über die Karten-ID** — niemand verliert eine Position.
+2. **Stückzahlen werden NIE addiert.** Bei derselben Karte auf beiden Seiten
+   gewinnt der zuletzt hinzugefügte Eintrag. Sonst würde das Portfolio bei
+   jedem Login wachsen.
+3. **Idempotent** — der Ablauf läuft bei JEDEM Login; ein zweiter Durchgang
+   darf nichts mehr ändern. Per Test abgesichert.
+
+### Sicherheit
+- **Row Level Security ist Pflicht**, nicht optional. Ohne sie könnte jeder
+  angemeldete Nutzer fremde Bestände lesen. Das Setup-SQL im Monitoring
+  enthält Tabelle UND Policies — beides zusammen ausführen.
+- Der Zugriffsschutz liegt doppelt: Route prüft den Nutzer, Tabelle prüft
+  `auth.uid()`. Der zweite Riegel ist der wichtigere.
+- `currentUser()` nutzt `getUser()`, **nie** `getSession()` — letzteres liest
+  das Cookie nur aus, ohne es beim Auth-Server zu prüfen.
+- Der Callback leitet ausschließlich auf relative Pfade weiter. `//host` wäre
+  protokollrelativ und damit extern (offene Weiterleitung).
+- In der Oberfläche steht **immer sichtbar, wo die Daten liegen**. Ohne diesen
+  Hinweis glaubt jemand, sein Portfolio sei sicher, und verliert es beim
+  Leeren des Browsers.
+
+### Einrichtung (nur der Nutzer kann das)
+1. **Supabase → Authentication → Providers → Google** aktivieren.
+   Client-ID/Secret aus der Google Cloud Console (OAuth-Client, Typ Web).
+   Autorisierte Redirect-URI: `https://<projekt>.supabase.co/auth/v1/callback`
+2. **Supabase → Authentication → Providers → Apple** aktivieren.
+   Braucht ein **kostenpflichtiges Apple-Developer-Konto** (99 $/Jahr):
+   Services ID, Team ID, Key ID, private Key.
+3. **Supabase → Authentication → URL Configuration**: Site-URL und
+   `https://<domain>/auth/callback` als Redirect-URL eintragen.
+4. **Tabelle + Policies anlegen** — SQL steht im Monitoring unter
+   Betriebszustand → Konto-Portfolios.
+5. **Vercel:** `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   setzen. Der anon-Key ist zum Veröffentlichen gedacht — die Absicherung
+   macht RLS, nicht die Geheimhaltung.
 
 ---
 

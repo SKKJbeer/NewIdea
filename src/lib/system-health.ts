@@ -115,6 +115,34 @@ const SETUP_SQL: Record<string, string> = {
   top_value   JSONB,
   created_at  TIMESTAMPTZ DEFAULT now()
 );`,
+  // Konto-Portfolios. Row Level Security ist hier NICHT optional: Ohne sie
+  // könnte jeder angemeldete Nutzer die Bestände aller anderen lesen.
+  portfolio_holdings: `CREATE TABLE IF NOT EXISTS portfolio_holdings (
+  user_id        UUID NOT NULL REFERENCES auth.users (id) ON DELETE CASCADE,
+  card_id        TEXT NOT NULL,
+  card_name      TEXT NOT NULL DEFAULT '',
+  set_name       TEXT NOT NULL DEFAULT '',
+  set_code       TEXT NOT NULL DEFAULT '',
+  image_url      TEXT NOT NULL DEFAULT '',
+  quantity       INT NOT NULL DEFAULT 1,
+  purchase_price NUMERIC NOT NULL DEFAULT 0,
+  purchase_date  DATE,
+  language       TEXT NOT NULL DEFAULT 'EN',
+  added_at       TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (user_id, card_id)
+);
+
+ALTER TABLE portfolio_holdings ENABLE ROW LEVEL SECURITY;
+
+-- Jeder sieht und ändert ausschließlich seine eigenen Positionen.
+CREATE POLICY "eigene Positionen lesen"   ON portfolio_holdings
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "eigene Positionen anlegen" ON portfolio_holdings
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "eigene Positionen ändern"  ON portfolio_holdings
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "eigene Positionen löschen" ON portfolio_holdings
+  FOR DELETE USING (auth.uid() = user_id);`,
 };
 
 interface ProbeSpec {
@@ -153,6 +181,15 @@ const PROBES: ProbeSpec[] = [
     effect: 'Wochenanalyse + Startseiten-Fallback',
     dateColumn: 'created_at',
     maxAgeDays: 10,
+  },
+  {
+    table: 'portfolio_holdings',
+    label: 'Konto-Portfolios',
+    effect: 'Gespeicherte Portfolios angemeldeter Besucher',
+    dateColumn: 'added_at',
+    // Kein Cron füllt diese Tabelle — sie wächst nur, wenn jemand etwas
+    // einträgt. Ein alter Datenstand ist deshalb kein Fehler.
+    maxAgeDays: 3650,
   },
 ];
 

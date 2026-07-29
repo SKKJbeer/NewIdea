@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.32.0',
+    date: '29. Juli 2026',
+    label: 'Portfolio-Konto: Anmeldung mit Google und Apple',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Portfolio lässt sich mit Google oder Apple anmelden und bleibt dann dauerhaft erhalten — auch auf anderen Geräten' },
+      { type: 'new',     text: 'Sichtbarer Hinweis, wo die Daten liegen: „Nur in diesem Browser“ oder „Im Konto gespeichert“' },
+      { type: 'new',     text: 'Beim ersten Anmelden wird der vorhandene Browser-Bestand automatisch übernommen' },
+      { type: 'changed', text: 'Änderungen werden weiterhin immer auch lokal gespeichert — ist das Konto nicht erreichbar, bleibt der Browser der Rückfall' },
+    ],
+  },
+  {
     version: '2.31.0',
     date: '29. Juli 2026',
     label: 'Portfolio-Tests und Newsletter-Pflichten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Portfolio tiefer abgesichert: 33 neue Prüfungen plus 18 Funktionstests der Preis-API — 364 statt 284 Tests' },
       { type: 'fixed',   text: 'Beschädigte gespeicherte Daten führten zu „NaN“ im Portfolio-Gesamtwert' },
