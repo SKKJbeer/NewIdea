@@ -12,6 +12,7 @@ import {
   type PortfolioHolding, type LiveCardData, type CardLanguage,
 } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
+import { formatPercent } from '@/lib/format';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -212,7 +213,7 @@ export default function PortfolioPage() {
               {displayUp ? '+' : ''}{formatEur(displayPnl)}
             </span>
             <span className={`text-sm font-semibold tabular-nums ${displayUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              ({displayUp ? '+' : ''}{displayPnlPct.toFixed(2)}%)
+              ({formatPercent(displayPnlPct, { digits: 2 })})
             </span>
           </div>
           <p className="text-xs text-slate-600 mb-6 tabular-nums">
@@ -335,7 +336,7 @@ export default function PortfolioPage() {
                       {pos ? '+' : ''}{formatEur(pnlH)}
                     </p>
                     <p className={`text-[10px] tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {pos ? '+' : ''}{pct.toFixed(1)}%
+                      {formatPercent(pct)}
                     </p>
                   </div>
 

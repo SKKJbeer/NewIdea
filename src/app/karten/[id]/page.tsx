@@ -12,6 +12,7 @@ import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
+import { formatEur } from '@/lib/format';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -36,17 +37,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!card) return { title: 'Pokémon Karte' };
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
-  const priceStr = price > 0 ? ` — ${price.toFixed(2)} €` : '';
+  const priceStr = price > 0 ? ` — ${formatEur(price)}` : '';
   const nameStr = card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase()
     ? `${card.name} (${card.nameDe})`
     : card.name;
 
   return {
     title: `${nameStr}${priceStr} Pokémon Karte Preis`,
-    description: `${card.name} aus ${card.set} — Cardmarket Preis: ${price > 0 ? price.toFixed(2) + ' €' : 'k. A.'}, Seltenheit: ${card.rarity}. Investment-Score & 30-Tage-Preisverlauf kostenlos ansehen.`,
+    description: `${card.name} aus ${card.set} — Cardmarket Preis: ${price > 0 ? formatEur(price) : 'k. A.'}, Seltenheit: ${card.rarity}. Investment-Score & 30-Tage-Preisverlauf kostenlos ansehen.`,
     openGraph: {
       title: `${card.name} — Pokémon Karte Preis`,
-      description: `Aktueller Cardmarket-Preis für ${card.name} (${card.set}): ${price > 0 ? price.toFixed(2) + ' €' : 'k. A.'}.`,
+      description: `Aktueller Cardmarket-Preis für ${card.name} (${card.set}): ${price > 0 ? formatEur(price) : 'k. A.'}.`,
       images: card.imageUrlHiRes ? [{ url: card.imageUrlHiRes, alt: card.name }] : undefined,
       type: 'article',
     },
@@ -245,25 +246,25 @@ export default async function CardDetailPage({ params }: Props) {
                   {card.cmPrices.trend != null && (
                     <div className="flex items-center justify-between">
                       <dt className="text-slate-400">Preis-Trend (Marktwert)</dt>
-                      <dd className="font-bold text-white tabular-nums">{card.cmPrices.trend.toFixed(2)} €</dd>
+                      <dd className="font-bold text-white tabular-nums">{formatEur(card.cmPrices.trend)}</dd>
                     </div>
                   )}
                   {card.cmPrices.low != null && (
                     <div className="flex items-center justify-between">
                       <dt className="text-slate-400">Günstigstes Angebot (ab)</dt>
-                      <dd className="font-semibold text-emerald-400 tabular-nums">{card.cmPrices.low.toFixed(2)} €</dd>
+                      <dd className="font-semibold text-emerald-400 tabular-nums">{formatEur(card.cmPrices.low)}</dd>
                     </div>
                   )}
                   {card.cmPrices.avgSell != null && (
                     <div className="flex items-center justify-between">
                       <dt className="text-slate-400">Ø Verkaufspreis</dt>
-                      <dd className="font-semibold text-slate-300 tabular-nums">{card.cmPrices.avgSell.toFixed(2)} €</dd>
+                      <dd className="font-semibold text-slate-300 tabular-nums">{formatEur(card.cmPrices.avgSell)}</dd>
                     </div>
                   )}
                   {card.cmPrices.avg30 != null && (
                     <div className="flex items-center justify-between">
                       <dt className="text-slate-400">Ø 30 Tage</dt>
-                      <dd className="font-semibold text-slate-300 tabular-nums">{card.cmPrices.avg30.toFixed(2)} €</dd>
+                      <dd className="font-semibold text-slate-300 tabular-nums">{formatEur(card.cmPrices.avg30)}</dd>
                     </div>
                   )}
                 </dl>
@@ -340,7 +341,7 @@ export default async function CardDetailPage({ params }: Props) {
             </>
           ) : (
             <div className="py-6 text-center">
-              <p className="text-2xl font-black text-white">{price > 0 ? `${price.toFixed(2)} €` : '—'}</p>
+              <p className="text-2xl font-black text-white">{price > 0 ? formatEur(price) : '—'}</p>
               <p className="text-xs text-slate-600 mt-1.5 max-w-xs mx-auto leading-relaxed">
                 Aktueller Marktpreis. Der Preisverlauf für diese Karte wird ab jetzt täglich aufgebaut und erscheint hier, sobald mehrere Datenpunkte vorliegen.
               </p>

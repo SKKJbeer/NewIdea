@@ -9,6 +9,8 @@ import { TrendingUp, TrendingDown, BarChart2, ArrowRight, Zap, BookOpen, Activit
 import { GUIDES } from '@/lib/guides';
 import type { PriceDataPoint } from '@/types';
 import type { Metadata } from 'next';
+import { formatEur, formatEurRounded, formatPercent } from '@/lib/format';
+import { ApiErrorState } from '@/components/ApiErrorState';
 
 export const revalidate = 3600;
 
@@ -101,20 +103,29 @@ function FearGreedBar({ value }: { value: number }) {
 
 function fmt(price: number | undefined): string {
   if (!price || price <= 0) return '–';
-  return price >= 100
-    ? `${price.toFixed(0)} €`
-    : `${price.toFixed(2)} €`;
+  // Ab 100 € ohne Nachkommastellen (kompakter im Raster), aber MIT deutschem
+  // Tausenderpunkt — sonst steht dort „4185 €" statt „4.185 €".
+  return price >= 100 ? formatEurRounded(price) : formatEur(price);
 }
 
 function fmtPct(pct: number | undefined): string {
   if (pct == null) return '–';
-  return `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+  return formatPercent(pct);
 }
 
 export default async function Home() {
   // Robust: Live-TCG-Daten mit Fallback auf den letzten Supabase-Marktbericht,
   // damit die Startseite bei einem API-Ausfall nicht LEER gecacht wird (Stolperstelle 19).
   const cards = await getHomepageCards(50);
+
+  // Ohne Kartendaten KEINE erfundene Marktlage: Die Kennzahlen unten (PMI,
+  // Marktbreite, Fear & Greed) würden aus einem leeren Datensatz trotzdem
+  // Werte erzeugen — ein Sentiment, das auf nichts beruht. Das verstößt gegen
+  // die Wahrheitspflicht (CLAUDE.md → Preise: absolute Wahrheitspflicht).
+  // Stattdessen ein ehrlicher Zustand statt einer stumm leeren Seite.
+  if (cards.length === 0) {
+    return <ApiErrorState backHref="/suche" backLabel="Zur Kartensuche" />;
+  }
 
   // --- Derived metrics ---
   const withTrend = cards.filter((c) => typeof c.trendPercent === 'number');
@@ -311,7 +322,7 @@ export default async function Home() {
                 <p
                   className={`text-2xl font-black tabular-nums leading-none ${pmiNum >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
                 >
-                  {pmiNum >= 0 ? '+' : ''}{pmiNum.toFixed(1)}%
+                  {formatPercent(pmiNum)}
                 </p>
                 <p className="mt-1.5 text-[10px] text-slate-600">Gewichteter Markttrend</p>
               </div>

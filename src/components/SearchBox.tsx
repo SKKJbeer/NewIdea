@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, ImageOff } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatEur } from '@/lib/format';
 
 interface Suggestion {
   id: string;
@@ -141,7 +142,7 @@ export function SearchBox({
                   </div>
                   {s.price > 0 && (
                     <span className="shrink-0 text-sm font-bold text-slate-300 tabular-nums">
-                      {s.price.toFixed(2)} €
+                      {formatEur(s.price)}
                     </span>
                   )}
                 </Link>

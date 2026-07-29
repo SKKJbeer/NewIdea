@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.24.0',
+    date: '29. Juli 2026',
+    label: 'Gesamt-Audit: Preisdarstellung, Bilder, Ausfallsicherheit',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Preise erschienen im englischen Format („235.71 €" statt „235,71 €", ohne Tausenderpunkt) — an rund 15 Stellen quer über die Seite korrigiert' },
+      { type: 'fixed',   text: 'Die Boosterpack-Bildquelle existiert nicht mehr und schlug bei jedem Kartenbild fehl — das Set-Logo ist jetzt die direkte Quelle' },
+      { type: 'fixed',   text: 'Leere Startseite ohne Karten und Trends: Abrufe zur Kartendatenbank wiederholen jetzt automatisch und weichen auf andere Sets aus' },
+      { type: 'fixed',   text: 'Ohne Datenlage wurde trotzdem eine Marktstimmung errechnet — jetzt erscheint ein ehrlicher Hinweis statt erfundener Kennzahlen' },
+      { type: 'changed', text: 'Zahlenformatierung zentral an einer Stelle; doppelte Umsetzung aufgelöst' },
+    ],
+  },
+  {
     version: '2.23.0',
     date: '29. Juli 2026',
     label: 'Marktbericht: Platzhalter entfernt, Erzeugung repariert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Als Wochenanalyse stand ein Platzhalter aus Kalenderwoche 26 online — solche Texte werden jetzt weder angezeigt noch gespeichert' },
       { type: 'fixed',   text: 'Der Wochen-Cron meldete Erfolg, ohne das Speichern zu prüfen; die Ursache kommt jetzt im Klartext zurück' },

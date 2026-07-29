@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import type { FeaturedCard } from '@/lib/article-generator';
 import { BoosterPackImage } from './BoosterPackImage';
 import { cachedImg } from '@/lib/cached-image';
+import { formatEur, formatPercent } from '@/lib/format';
 
 const ACCENT: Record<string, string> = {
   violet:  '#7c3aed',
@@ -20,7 +21,7 @@ function TrendBadge({ trend }: { trend: number }) {
   const up = trend > 0;
   return (
     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${up ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
-      {up ? '+' : ''}{trend.toFixed(1)}%
+      {formatPercent(trend)}
     </span>
   );
 }
@@ -70,7 +71,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
               )}
               <div className="flex items-center justify-center gap-1 mt-0.5">
                 {card.price > 0 && (
-                  <span className="text-[10px] font-bold text-slate-400">{card.price.toFixed(2)}€</span>
+                  <span className="text-[10px] font-bold text-slate-400">{formatEur(card.price)}</span>
                 )}
                 <TrendBadge trend={card.trend} />
               </div>
@@ -99,7 +100,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
               />
               <Tooltip
                 contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #2a2a3a', background: '#13131e', color: '#cbd5e1' }}
-                formatter={(v) => [`${Number(v).toFixed(2)}€`, 'Preis']}
+                formatter={(v) => [formatEur(Number(v)), 'Preis']}
               />
               <Bar dataKey="price" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, i) => (

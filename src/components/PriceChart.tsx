@@ -1,4 +1,5 @@
 'use client';
+import { formatEur } from '@/lib/format';
 
 import {
   ResponsiveContainer,
@@ -34,7 +35,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return (
     <div className="bg-[#13131e] border border-[#2a2a3a] rounded-xl shadow-lg px-3 py-2 text-sm">
       <p className="text-slate-500 text-xs">{fmtDate(payload[0].payload.ts)}</p>
-      <p className="font-bold text-slate-200">{payload[0].value.toFixed(2)} €</p>
+      <p className="font-bold text-slate-200">{formatEur(payload[0].value)}</p>
     </div>
   );
 }

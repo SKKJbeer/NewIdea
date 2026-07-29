@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.24.0] — 2026-07-29 · Gesamt-Audit: Preisdarstellung, Bilder, Ausfallsicherheit
+
+### Behoben
+- **Preise wurden im englischen Zahlenformat angezeigt** — „235.71 €" statt „235,71 €", bei teuren Karten sogar „4184.60 €" ohne Tausenderpunkt. Betroffen waren rund 15 Stellen quer über die Seite: Kartendetails, Suche, Kartenraster, Diagramme, Artikel, Startseite, Merkliste und Portfolio. Jetzt durchgehend deutsche Schreibweise mit Tausenderpunkt („4.184,60 €") aus einer zentralen Quelle
+- **Die Boosterpack-Bilder existierten nicht mehr.** Die hinterlegte Bildquelle liefert für jedes geprüfte Set einen Fehler — bei jedem Kartenbild lief also eine zwecklose Anfrage, bevor auf das Set-Logo zurückgefallen wurde. Das Set-Logo ist jetzt die direkte Quelle, die Beschriftung entsprechend ehrlich
+- **Die Startseite war leer** — ohne Karten, Trends und Preise. Ursache: Die Kartendatenbank antwortet zeitweise unzuverlässig; fiel sie genau beim Erzeugen der Seite aus, wurde die leere Fassung stundenlang ausgeliefert. Abrufe wiederholen jetzt automatisch und weichen auf andere Sets aus
+- **Die Startseite errechnete aus fehlenden Daten trotzdem eine Marktstimmung** (Marktindex, Angst-und-Gier-Wert). Bei leerer Datenlage erscheint jetzt ein ehrlicher Hinweis statt erfundener Kennzahlen
+
+### Geändert
+- Zahlenformatierung liegt zentral in `src/lib/format.ts`; die zweite, abweichende Umsetzung im Portfolio wurde aufgelöst
+- 12 neue Tests sichern die deutsche Schreibweise projektweit ab (145 gesamt)
+
+---
+
 ## [2.23.0] — 2026-07-29 · Marktbericht: Platzhalter entfernt, Erzeugung repariert
 
 ### Behoben

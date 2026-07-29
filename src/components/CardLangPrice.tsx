@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import { LangPicker } from './LangPicker';
 import type { CardLanguage } from '@/lib/portfolio';
+import { formatEur, formatPercent } from '@/lib/format';
 
 const LANG_LABEL: Record<CardLanguage, string> = {
   EN: 'EN',
@@ -102,7 +103,7 @@ export function CardLangPrice({
               </div>
             ) : (
               <p className="text-3xl font-black text-white">
-                {price > 0 ? `${price.toFixed(2)} €` : 'N/A'}
+                {price > 0 ? formatEur(price) : 'N/A'}
               </p>
             )}
           </div>
@@ -116,7 +117,7 @@ export function CardLangPrice({
           >
             {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             {isPositive ? '+' : ''}
-            {trendPercent.toFixed(1)}% (30d)
+            {formatPercent(trendPercent, { withSign: false })} (30d)
           </div>
         )}
       </div>

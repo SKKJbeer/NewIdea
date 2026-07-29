@@ -20,6 +20,7 @@ const LEVEL_STYLE: Record<string, string> = {
 };
 
 import type { Metadata } from 'next';
+import { formatEur } from '@/lib/format';
 
 export const revalidate = 86400;
 
@@ -258,7 +259,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                           />
                         )}
                         {section.highlight.price > 0 && (
-                          <p className="text-sm font-bold text-violet-400 mt-0.5">{section.highlight.price.toFixed(2)} €</p>
+                          <p className="text-sm font-bold text-violet-400 mt-0.5">{formatEur(section.highlight.price)}</p>
                         )}
                       </div>
                     </div>

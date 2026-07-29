@@ -7,6 +7,7 @@ import { NavBar } from '@/components/NavBar';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { formatEur } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
+import { formatPercent } from '@/lib/format';
 import {
   WATCHLIST_KEY, parseWatchlist, watchChange,
   type WatchlistItem,
@@ -157,7 +158,7 @@ export default function MerklistePage() {
                               {pos ? '+' : ''}{formatEur(change.abs)}
                             </p>
                             <p className={`text-[10px] tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {pos ? '+' : ''}{change.pct.toFixed(1)}%
+                              {formatPercent(change.pct)}
                             </p>
                           </>
                         ) : (

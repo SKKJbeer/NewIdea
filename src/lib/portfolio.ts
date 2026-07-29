@@ -176,17 +176,10 @@ export function median(values: number[]): number | null {
     : sorted[mid];
 }
 
-export function formatEur(n: number): string {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency', currency: 'EUR',
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
-  }).format(n);
-}
-
-export function shortEur(v: number): string {
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}k€`;
-  return `${v.toFixed(0)}€`;
-}
+// Formatierung liegt zentral in @/lib/format — hier nur re-exportiert, damit
+// bestehende Importe weiter funktionieren und es KEINE zweite Umsetzung gibt
+// (CLAUDE.md, Code-Regel 10: keine doppelten Implementierungen).
+export { formatEur, formatCompactEur as shortEur } from './format';
 
 export function formatShortDate(dateStr: string): string {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('de-DE', {

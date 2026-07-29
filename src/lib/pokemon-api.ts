@@ -11,6 +11,46 @@ function tcgHeaders(): Record<string, string> {
   return key ? { 'X-Api-Key': key } : {};
 }
 
+/**
+ * Listen-Abfrage an die TCG-API mit einem Wiederholungsversuch.
+ *
+ * Hintergrund: Die API antwortet spürbar unzuverlässig — bei zwei Läufen kurz
+ * hintereinander scheiterten jeweils ANDERE Abfragen (HTTP 500, leere Antwort).
+ * Für Seiten mit ISR ist das besonders teuer: Fällt der Abruf genau während der
+ * Neu-Erzeugung aus, wird die LEERE Seite gecacht und stundenlang ausgeliefert
+ * (siehe CLAUDE.md, Stolperstelle 19 — genau so war die Startseite ohne Karten).
+ * Ein kurzer zweiter Versuch fängt die meisten dieser Aussetzer ab.
+ */
+async function tcgList(
+  params: Record<string, string | number>,
+  { retries = 1, timeout = 8000 } = {},
+): Promise<unknown[]> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(`${TCG_API_BASE}/cards`, {
+        headers: { ...tcgHeaders() },
+        params,
+        timeout,
+      });
+      const data = response.data?.data;
+      if (Array.isArray(data) && data.length > 0) return data;
+      lastError = new Error('leere Antwort');
+    } catch (err) {
+      lastError = err;
+    }
+    // Kurz warten — die Aussetzer sind meist sehr kurzlebig.
+    if (attempt < retries) await new Promise((r) => setTimeout(r, 400));
+  }
+  if (lastError) {
+    console.warn(
+      `TCG-Abfrage ohne Ergebnis (${JSON.stringify(params).slice(0, 80)}):`,
+      lastError instanceof Error ? lastError.message : lastError,
+    );
+  }
+  return [];
+}
+
 /** Der in der UI angezeigte Marktpreis einer Karte (EUR Cardmarket > TCGplayer Holo > 0). */
 export function displayPrice(card: PokemonCard): number {
   return card.prices.market || card.prices.holofoil?.market || 0;
@@ -48,18 +88,21 @@ function weeklySetIndex(count: number): number {
 
 export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
   const sets = ['sv8', 'sv7', 'sv6', 'sv5', 'sv4', 'sv3pt5'];
-  const selectedSet = sets[weeklySetIndex(sets.length)];
+  const start = weeklySetIndex(sets.length);
 
-  const response = await axios.get(`${TCG_API_BASE}/cards`, {
-    headers: { ...tcgHeaders() },
-    params: {
+  // Vorher: eine einzige Abfrage OHNE Fehlerbehandlung — schlug sie fehl, warf
+  // die Funktion und riss Artikel-Erzeugung, Marktbericht und Reels mit. Jetzt
+  // mit Wiederholungsversuch und Durchrotieren der übrigen Sets.
+  for (let i = 0; i < sets.length; i++) {
+    const selectedSet = sets[(start + i) % sets.length];
+    const data = await tcgList({
       q: `set.id:${selectedSet} (rarity:"Rare Holo" OR rarity:"Rare Ultra" OR rarity:"Special Illustration Rare")`,
       pageSize: limit,
-    },
-    timeout: 8000,
-  });
-
-  return mapAndFilter(response.data.data).sort(byPriceDesc);
+    });
+    const cards = mapAndFilter(data);
+    if (cards.length > 0) return cards.sort(byPriceDesc);
+  }
+  return [];
 }
 
 // Gültige Set-Codes: nur Kleinbuchstaben/Ziffern/Punkt (z.B. sv3pt5, swsh7, cel25).
@@ -91,20 +134,12 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
     'set.id:sv8',
   ];
 
+  // Jede Abfrage mit Wiederholungsversuch — und erst aufgeben, wenn ALLE
+  // Varianten leer bleiben. Eine leere Startseite ist der teuerste Ausgang.
   for (const q of queries) {
-    try {
-      const response = await axios.get(`${TCG_API_BASE}/cards`, {
-        headers: { ...tcgHeaders() },
-        params: { q, pageSize: limit },
-        timeout: 8000,
-      });
-      const cards = mapAndFilter(response.data.data);
-      if (cards.length > 0) {
-        return cards.sort(byPriceDesc);
-      }
-    } catch {
-      // Try next query
-    }
+    const data = await tcgList({ q, pageSize: limit });
+    const cards = mapAndFilter(data);
+    if (cards.length > 0) return cards.sort(byPriceDesc);
   }
   return [];
 }

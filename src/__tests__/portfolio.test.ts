@@ -373,17 +373,20 @@ describe('formatEur', () => {
 
 // ─── shortEur ────────────────────────────────────────────────────────────────
 
-describe('shortEur', () => {
-  it('shows plain value below 1000', () => {
-    expect(shortEur(520)).toBe('520€');
-    expect(shortEur(0)).toBe('0€');
-    expect(shortEur(999)).toBe('999€');
+// Hinweis: Die Erwartungen wurden auf deutsche Schreibweise korrigiert. Zuvor
+// prüfte der Test das englische Format („1.0k€"), das auf einer deutschen Seite
+// schlicht falsch ist — der Test hat den Fehler abgesichert statt ihn zu finden.
+describe('shortEur (deutsche Kurzform)', () => {
+  it('zeigt den Betrag unter 1000 ungekürzt', () => {
+    expect(shortEur(520)).toBe('520 €');
+    expect(shortEur(0)).toBe('0 €');
+    expect(shortEur(999)).toBe('999 €');
   });
 
-  it('uses k suffix for 1000 and above', () => {
-    expect(shortEur(1000)).toBe('1.0k€');
-    expect(shortEur(2500)).toBe('2.5k€');
-    expect(shortEur(12000)).toBe('12.0k€');
+  it('kürzt ab 1000 mit k und deutschem Dezimalkomma', () => {
+    expect(shortEur(1000)).toBe('1k €');
+    expect(shortEur(2500)).toBe('2,5k €');
+    expect(shortEur(12000)).toBe('12k €');
   });
 });
 
