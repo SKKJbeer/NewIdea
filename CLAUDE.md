@@ -704,7 +704,8 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 
 | Variable | Zweck | Was sich ändert wenn gesetzt |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ⭐ Konto-Anmeldung Portfolio | Google-/Apple-Login im Portfolio wird sichtbar |
+| `NEXT_PUBLIC_PORTFOLIO_LOGIN` | ⭐ Freischalter der Anmeldung | Wert `on` — erst damit erscheinen die Anmeldeknöpfe |
+| `NEXT_PUBLIC_SUPABASE_URL` | ⭐ Konto-Anmeldung Portfolio | Zugangsdaten für die Anmeldung |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ⭐ Konto-Anmeldung Portfolio | **anon/publishable** Key — NIEMALS der service_role Key |
 | `BEEHIIV_API_KEY` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
 | `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
@@ -789,6 +790,11 @@ Apple mit und schreibt die Sitzung in Cookies, die auch der Server liest.
 5. **Vercel:** `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    setzen. Der anon-Key ist zum Veröffentlichen gedacht — die Absicherung
    macht RLS, nicht die Geheimhaltung.
+6. **Zuletzt `NEXT_PUBLIC_PORTFOLIO_LOGIN=on` setzen.** Dieser Schalter ist
+   bewusst von den Zugangsdaten getrennt: So lässt sich Supabase einrichten
+   und prüfen, ohne dass Besucher schon eine halb fertige Anmeldung sehen.
+   Er ist opt-in — ein vergessener Schalter bedeutet, dass ein Feature NICHT
+   erscheint, nicht dass eines versehentlich erscheint.
 
 ---
 

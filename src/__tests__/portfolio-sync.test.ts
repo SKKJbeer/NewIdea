@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mergeHoldings, rowToHolding, holdingToRow, removedIds } from '@/lib/portfolio-sync';
 import { normalizeHolding, type PortfolioHolding } from '@/lib/portfolio';
-import { displayName, isAuthConfigured, AUTH_PROVIDERS, PROVIDER_LABEL } from '@/lib/supabase-auth';
+import { displayName, isAuthConfigured, isLoginEnabled, AUTH_PROVIDERS, PROVIDER_LABEL } from '@/lib/supabase-auth';
 
 // Die Zusammenführung läuft bei JEDEM Login. Geht sie schief, verliert jemand
 // sein Portfolio oder besitzt plötzlich doppelt so viele Karten — beides
@@ -189,10 +189,40 @@ describe('Anmeldung — Konfiguration und Anzeige', () => {
   it('gilt ohne öffentliche Zugangsdaten als nicht eingerichtet', () => {
     // Die Portfolio-Seite muss dann unverändert mit dem Browser-Speicher
     // funktionieren — keine toten Anmeldeknöpfe.
-    const alt = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    delete (process.env as Record<string, string | undefined>).NEXT_PUBLIC_SUPABASE_URL;
+    const env = process.env as Record<string, string | undefined>;
+    const alt = { url: env.NEXT_PUBLIC_SUPABASE_URL, flag: env.NEXT_PUBLIC_PORTFOLIO_LOGIN };
+    env.NEXT_PUBLIC_PORTFOLIO_LOGIN = 'on';
+    delete env.NEXT_PUBLIC_SUPABASE_URL;
     expect(isAuthConfigured()).toBe(false);
-    if (alt) process.env.NEXT_PUBLIC_SUPABASE_URL = alt;
+    env.NEXT_PUBLIC_SUPABASE_URL = alt.url;
+    env.NEXT_PUBLIC_PORTFOLIO_LOGIN = alt.flag;
+  });
+
+  it('bleibt ohne Freischaltung aus, auch wenn die Zugangsdaten stimmen', () => {
+    // Der Schalter ist bewusst opt-in: Ein vergessener Schalter bedeutet, dass
+    // ein Feature NICHT erscheint — nicht, dass eines versehentlich erscheint.
+    const env = process.env as Record<string, string | undefined>;
+    const alt = {
+      url: env.NEXT_PUBLIC_SUPABASE_URL,
+      key: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      flag: env.NEXT_PUBLIC_PORTFOLIO_LOGIN,
+    };
+    env.NEXT_PUBLIC_SUPABASE_URL = 'https://projekt.supabase.co';
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon-key';
+
+    delete env.NEXT_PUBLIC_PORTFOLIO_LOGIN;
+    expect(isLoginEnabled()).toBe(false);
+    expect(isAuthConfigured()).toBe(false);
+
+    env.NEXT_PUBLIC_PORTFOLIO_LOGIN = 'off';
+    expect(isAuthConfigured()).toBe(false);
+
+    env.NEXT_PUBLIC_PORTFOLIO_LOGIN = 'on';
+    expect(isAuthConfigured()).toBe(true);
+
+    env.NEXT_PUBLIC_SUPABASE_URL = alt.url;
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY = alt.key;
+    env.NEXT_PUBLIC_PORTFOLIO_LOGIN = alt.flag;
   });
 
   it('bietet Google und Apple an', () => {

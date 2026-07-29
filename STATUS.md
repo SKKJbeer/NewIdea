@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.32.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.32.1` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.32.0)
+## Was gebaut ist (Stand v2.32.1)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -165,7 +165,10 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
-| v2.32.0 | Portfolio-Konto via Supabase Auth (Google + Apple): supabase-auth.ts, /auth/callback (nur relative Weiterleitung), /api/portfolio/sync (GET/PUT, Nutzerpruefung), portfolio-sync.ts (idempotente Zusammenfuehrung, Stueckzahlen nie addieren), AccountBar mit sichtbarem Speicherort. Tabelle portfolio_holdings mit RLS im Monitoring-Setup-SQL. 409 Tests |\n| v2.31.0 | Portfolio-Tests (portfolio-edge 33, portfolio-api 18 Funktionstests der Preis-Route, newsletter-watchlist 29) — 364 Tests. Behoben: normalizeHolding erzeugte NaN bei null/undefined-Feldern; Newsletter ohne rel=sponsored, mit toten Footer-Links, Kaufaufforderung und Emojis, ohne CONTENT_RULES im Prompt; 5 fetch-Aufrufe (Cardmarket, Instagram) ohne Timeout — Regel war zu eng gefasst |\n| v2.30.0 | Test-Offensive: 284 statt 149 Tests (7 neue Dateien: studio-auth, price-truth, reel-concepts, homepage-data, cached-image, i18n-names, code-rules). Gefundene Fehler behoben: 6× englisches Zahlenformat zurück, Newsletter an format.ts vorbei, Prozent-Umbruch (NBSP), Reel-Rotation wechselte mitten in der Woche, 2× String(error) nach außen, 3× stilles catch + zu knappe Token-Limits, Monitoring-fetch ohne Timeout, helle Boxen im Studio |\n| v2.29.0 | Monitoring-Auslöser für Marktbericht + Artikel (bisher nur per curl mit Studio-Passwort — Grund für den monatelangen Bericht-Ausfall); Artikel-Lauf clientseitig über die letzten 8 Termine, ersetzt nur Ersatztexte; `publish-days.ts` als einzige Quelle der Veröffentlichungstermine |
+| v2.32.0 | Portfolio-Konto via Supabase Auth (Google + Apple): supabase-auth.ts, /auth/callback (nur relative Weiterleitung), /api/portfolio/sync (GET/PUT, Nutzerpruefung), portfolio-sync.ts (idempotente Zusammenfuehrung, Stueckzahlen nie addieren), AccountBar mit sichtbarem Speicherort. Tabelle portfolio_holdings mit RLS im Monitoring-Setup-SQL. 409 Tests |
+| v2.31.0 | Portfolio-Tests (portfolio-edge 33, portfolio-api 18 Funktionstests der Preis-Route, newsletter-watchlist 29) — 364 Tests. Behoben: normalizeHolding erzeugte NaN bei null/undefined-Feldern; Newsletter ohne rel=sponsored, mit toten Footer-Links, Kaufaufforderung und Emojis, ohne CONTENT_RULES im Prompt; 5 fetch-Aufrufe (Cardmarket, Instagram) ohne Timeout — Regel war zu eng gefasst |
+| v2.30.0 | Test-Offensive: 284 statt 149 Tests (7 neue Dateien: studio-auth, price-truth, reel-concepts, homepage-data, cached-image, i18n-names, code-rules). Gefundene Fehler behoben: 6× englisches Zahlenformat zurück, Newsletter an format.ts vorbei, Prozent-Umbruch (NBSP), Reel-Rotation wechselte mitten in der Woche, 2× String(error) nach außen, 3× stilles catch + zu knappe Token-Limits, Monitoring-fetch ohne Timeout, helle Boxen im Studio |
+| v2.29.0 | Monitoring-Auslöser für Marktbericht + Artikel (bisher nur per curl mit Studio-Passwort — Grund für den monatelangen Bericht-Ausfall); Artikel-Lauf clientseitig über die letzten 8 Termine, ersetzt nur Ersatztexte; `publish-days.ts` als einzige Quelle der Veröffentlichungstermine |
 | v2.28.0 | Reel-Optik: Kartenbild als unscharfe, wandernde Hintergrundebene (FFmpeg-Zweilagen-Komposition, Unschärfe in kleiner Auflösung gerechnet) — jedes Segment in der Farbe SEINER Karte; angedeutetes Sammel-Motiv + Streuelemente; geneigte Karte, Verlaufs-Ziffer, Ober-/Unterkanten-Abdunklung; BUGFIX doppelte Abspann-Aussage |
 | v2.27.0 | Instagram-Konzept: 4 Formate (top-mover, preis-check, teuerste-im-set, dreissig-tage) mit Wochen-Rotation + Dramaturgie (Haken zuerst, Einordnung, Marke zuletzt) in reel-concepts.ts; Generator formatunabhängig |
 | v2.26.0 | Reel-Design im Plattform-Look: Raster + trendfarbige Lichtstimmung, Rang-Ziffer, Karten-Ring, Trend als Hauptkennzahl mit SVG-Pfeil, Fortschrittspunkte, Blenden + Vignette + wechselnder Zoom-Versatz |
@@ -188,9 +191,11 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 | 3 | **Reel-Link tot**: Caption-URL nutzt dieselbe Variable → auch manuell gepostete Reels führen ins Leere | Offen — mit Befund 1 erledigt |
 | 4 | **Affiliate**: 26 Kauflink-Stellen ohne eigene Tracking-ID → 0 € Provision unabhängig vom Traffic | Offen (deine Aktion: Links beantragen) |
 | 5 | **Keine E-Mail-Erfassung**: Newsletter-Formular seit v2.5.4 global entfernt → jeder Besucher ist ein Einmalbesuch | Offen |
+| 8 | **Kein echter Inhalt live**: Marktbericht nie erzeugt, alle Artikel sind Ersatztexte, 0 von 12 Guides erstellt | Auslöser seit v2.29.0 im Monitoring — deine Aktion: drei Klicks |
+| 9 | **Portfolio-Konto gebaut, aber abgeschaltet**: Code vollständig (v2.32.0), Anmeldung per `NEXT_PUBLIC_PORTFOLIO_LOGIN=on` freizuschalten | Bewusst zurückgestellt |
 | 6 | **Guide-Pipeline**: 12 Themen warten, 0 erzeugt | Diagnose eingebaut (v2.21.0) — Ursache jetzt sichtbar |
 | 7 | **Blindflug im Monitoring**: prüfte nur Konfiguration, nicht Ergebnisse | ✅ Behoben (v2.21.0) |
 
 ---
 
-*Zuletzt aktualisiert: v2.32.0 — 29. Juli 2026*
+*Zuletzt aktualisiert: v2.32.1 — 29. Juli 2026*

@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.32.1',
+    date: '29. Juli 2026',
+    label: 'Anmeldung vorerst abgeschaltet',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Die Anmeldeknöpfe erscheinen erst nach expliziter Freischaltung — so lässt sich Supabase in Ruhe einrichten, ohne dass Besucher eine halb fertige Anmeldung sehen' },
+    ],
+  },
+  {
     version: '2.32.0',
     date: '29. Juli 2026',
     label: 'Portfolio-Konto: Anmeldung mit Google und Apple',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Portfolio lässt sich mit Google oder Apple anmelden und bleibt dann dauerhaft erhalten — auch auf anderen Geräten' },
       { type: 'new',     text: 'Sichtbarer Hinweis, wo die Daten liegen: „Nur in diesem Browser“ oder „Im Konto gespeichert“' },

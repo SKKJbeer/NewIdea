@@ -31,10 +31,25 @@ export const PROVIDER_LABEL: Record<AuthProvider, string> = {
  * Geheimhaltung des Schlüssels. Der service_role-Key darf hier NIEMALS stehen.
  */
 export function authConfig(): { url: string; anonKey: string } | null {
+  if (!isLoginEnabled()) return null;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) return null;
   return { url, anonKey };
+}
+
+/**
+ * Sichtbarkeits-Schalter für die Anmeldung.
+ *
+ * Getrennt von den Zugangsdaten, damit sich Supabase einrichten und prüfen
+ * lässt, OHNE dass Besucher schon eine halb fertige Anmeldung sehen. Erst
+ * `NEXT_PUBLIC_PORTFOLIO_LOGIN=on` schaltet sie frei.
+ *
+ * Bewusst „opt-in": Ein vergessener Schalter bedeutet, dass ein Feature nicht
+ * erscheint — nicht, dass eines versehentlich erscheint.
+ */
+export function isLoginEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_PORTFOLIO_LOGIN === 'on';
 }
 
 export function isAuthConfigured(): boolean {

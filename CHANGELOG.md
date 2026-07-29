@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.32.1] — 2026-07-29 · Anmeldung vorerst abgeschaltet
+
+### Geändert
+- **Die Anmeldeknöpfe erscheinen erst, wenn `NEXT_PUBLIC_PORTFOLIO_LOGIN=on` gesetzt ist.** Der Schalter ist bewusst von den Zugangsdaten getrennt: So lässt sich Supabase in Ruhe einrichten und prüfen, ohne dass Besucher schon eine halb fertige Anmeldung sehen
+- Der Schalter ist opt-in — vergisst man ihn, erscheint ein Feature nicht, statt versehentlich zu erscheinen
+
+### Behoben
+- Vier Zeilen der Versionstabelle in `STATUS.md` waren zu einer verschmolzen
+
+---
+
 ## [2.32.0] — 2026-07-29 · Portfolio-Konto: Anmeldung mit Google und Apple
 
 ### Neu
