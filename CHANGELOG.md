@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.31.0] — 2026-07-29 · Portfolio-Tests und Newsletter-Pflichten
+
+### Neu
+- **Portfolio tiefer abgesichert**: 33 zusätzliche Prüfungen für beschädigte gespeicherte Daten, Geschenke ohne Kaufpreis, Kaufdatum in der Zukunft, Jahres-Deckelung der Grafik und das Zusammenspiel aller Schritte von den Rohdaten bis zur gefilterten Kurve
+- **Funktionstests der Portfolio-Preis-API** (18 Prüfungen): Sprachpreise, altes Anfrageformat, Kappung auf 50 Karten, und vor allem das Verhalten bei ausfallenden Kartenabrufen — eine kaputte Karte darf nicht das ganze Portfolio ohne Live-Preise dastehen lassen
+- **Newsletter-Vorlage und Merkliste** erstmals getestet (29 Prüfungen)
+- Insgesamt 364 statt 284 Tests
+
+### Behoben
+- **Beschädigte Portfolio-Daten führten zu „NaN" im Gesamtwert**: Die Normalisierung überschrieb ihre eigenen Vorgabewerte, sobald ein Feld ausdrücklich auf `undefined` oder `null` stand. Jedes Feld wird jetzt einzeln geprüft; ein Kaufpreis von 0 bleibt dabei erhalten
+- **Newsletter ohne Affiliate-Kennzeichnung**: Die Kauflinks trugen kein `rel="sponsored"` — gesetzlich vorgeschrieben
+- **Abmelden, Datenschutz und Impressum im Newsletter waren tote Links** (`href="#"`). Sie zeigen jetzt auf die echten Seiten — ein funktionierender Abmeldeweg ist Pflicht
+- **Newsletter forderte zum Kauf auf** („Jetzt die besten Deals sichern") und enthielt Emojis; außerdem verlangte der Prompt ausdrücklich ein Emoji im Betreff
+- **Der Newsletter war der einzige veröffentlichte Text ohne Inhalts- und Stilregeln** im Prompt
+- **Beide Cardmarket-Aufrufe und drei Instagram-Aufrufe liefen ohne Zeitlimit** — die Regel dafür griff nicht, weil sie nur nach direkt notierten Adressen suchte und nicht nach `fetch(url, …)`
+- Cardmarket-Sprachpreise verschluckten ihren Fehlergrund
+
+---
+
 ## [2.30.0] — 2026-07-29 · Tiefere Tests: 135 neue Prüfungen, sieben gefundene Fehler
 
 ### Neu

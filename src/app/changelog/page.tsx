@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.31.0',
+    date: '29. Juli 2026',
+    label: 'Portfolio-Tests und Newsletter-Pflichten',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Portfolio tiefer abgesichert: 33 neue Prüfungen plus 18 Funktionstests der Preis-API — 364 statt 284 Tests' },
+      { type: 'fixed',   text: 'Beschädigte gespeicherte Daten führten zu „NaN“ im Portfolio-Gesamtwert' },
+      { type: 'fixed',   text: 'Newsletter: fehlende Affiliate-Kennzeichnung, tote Links für Abmelden/Datenschutz/Impressum, Kaufaufforderung und Emojis' },
+      { type: 'fixed',   text: 'Cardmarket- und Instagram-Aufrufe liefen ohne Zeitlimit' },
+    ],
+  },
+  {
     version: '2.30.0',
     date: '29. Juli 2026',
     label: 'Tiefere Tests: 135 neue Prüfungen, sieben gefundene Fehler',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Sieben neue Testdateien für Studio-Zugang, Preis-Wahrheitspflicht, Reel-Formate, Startseiten-Absicherung, Bild-Proxy und Übersetzungen — 284 statt 149 Tests' },
       { type: 'new',     text: 'Architektur-Regeln werden automatisch durchgesetzt: Zahlenformat, Dark-Mode-Farben, Auth auf Inhalts-Auslösern, keine internen Fehlerdetails nach außen' },

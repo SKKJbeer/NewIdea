@@ -20,6 +20,9 @@ export function buildNewsletterHtml(data: NewsletterData, cards: PokemonCard[]):
   const week = formatWeek();
   const cardmarket = process.env.NEXT_PUBLIC_CARDMARKET_URL || 'https://www.cardmarket.com/en/Pokemon';
   const amazon = process.env.NEXT_PUBLIC_AMAZON_URL || 'https://www.amazon.de/s?k=pokemon+booster';
+  // Fußzeilen-Links müssen auf echte Seiten zeigen. Ein totes „Abmelden" ist
+  // nicht nur unhöflich, sondern verletzt die Pflicht zum Widerspruch.
+  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarket-intelligence.vercel.app';
 
   const cardRows = data.cardHighlights
     .map((card, i) => {
@@ -70,28 +73,28 @@ export function buildNewsletterHtml(data: NewsletterData, cards: PokemonCard[]):
           <p style="margin:8px 0 0; font-size:15px; line-height:1.7; color:#374151;">${data.intro}</p>
         </td></tr>
         <tr><td style="background:#ffffff; padding:0 32px 24px;">
-          <p style="margin:0 0 16px; font-size:11px; font-weight:700; letter-spacing:2px; color:#7c3aed; text-transform:uppercase;">🚀 Top Investment-Karten</p>
+          <p style="margin:0 0 16px; font-size:11px; font-weight:700; letter-spacing:2px; color:#7c3aed; text-transform:uppercase;">Karten im Fokus</p>
           <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #f3f4f6; border-radius:12px; overflow:hidden;">${cardRows}</table>
         </td></tr>
         <tr><td style="background:#ffffff; padding:0 32px 28px;">
           <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg, #faf5ff, #ede9fe); border-radius:12px; border-left:4px solid #7c3aed;">
             <tr><td style="padding:20px 24px;">
-              <p style="margin:0 0 8px; font-size:11px; font-weight:700; letter-spacing:2px; color:#7c3aed; text-transform:uppercase;">⚡ ${data.tipTitle || 'Investment-Tipp der Woche'}</p>
+              <p style="margin:0 0 8px; font-size:11px; font-weight:700; letter-spacing:2px; color:#7c3aed; text-transform:uppercase;">${data.tipTitle || 'Beobachtung der Woche'}</p>
               <p style="margin:0; font-size:14px; line-height:1.7; color:#374151;">${data.tip}</p>
             </td></tr>
           </table>
         </td></tr>
         <tr><td style="background:#ffffff; padding:0 32px 32px; text-align:center;">
-          <p style="margin:0 0 16px; font-size:13px; color:#6b7280;">${data.ctaText || 'Jetzt die besten Deals sichern:'}</p>
-          <a href="${cardmarket}" style="display:inline-block; background:#7c3aed; color:#ffffff; font-size:14px; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; margin:0 6px 12px;">🃏 Auf Cardmarket kaufen</a>
-          <a href="${amazon}" style="display:inline-block; background:#f59e0b; color:#111827; font-size:14px; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; margin:0 6px 12px;">📦 Amazon Booster</a>
+          <p style="margin:0 0 16px; font-size:13px; color:#6b7280;">${data.ctaText || 'Alle Preise und Verläufe auf der Seite:'}</p>
+          <a href="${cardmarket}" rel="noopener noreferrer sponsored" style="display:inline-block; background:#7c3aed; color:#ffffff; font-size:14px; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; margin:0 6px 12px;">Auf Cardmarket ansehen</a>
+          <a href="${amazon}" rel="noopener noreferrer sponsored" style="display:inline-block; background:#f59e0b; color:#111827; font-size:14px; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; margin:0 6px 12px;">Booster auf Amazon</a>
           <p style="margin:16px 0 0; font-size:11px; color:#9ca3af;">* Affiliate-Links</p>
         </td></tr>
         <tr><td style="background:#ffffff; border-radius:0 0 16px 16px; padding:20px 32px; text-align:center;">
           <p style="margin:0; font-size:11px; color:#9ca3af;">
-            <a href="#" style="color:#7c3aed; text-decoration:none;">Abmelden</a> ·
-            <a href="#" style="color:#7c3aed; text-decoration:none;">Datenschutz</a> ·
-            <a href="#" style="color:#7c3aed; text-decoration:none;">Impressum</a>
+            <a href="${site}/newsletter" style="color:#7c3aed; text-decoration:none;">Abmelden</a> ·
+            <a href="${site}/datenschutz" style="color:#7c3aed; text-decoration:none;">Datenschutz</a> ·
+            <a href="${site}/impressum" style="color:#7c3aed; text-decoration:none;">Impressum</a>
           </p>
           <p style="margin:12px 0 0; font-size:11px; color:#d1d5db;">PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr.</p>
         </td></tr>

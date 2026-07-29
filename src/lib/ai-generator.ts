@@ -99,7 +99,28 @@ export async function generateNewsletterContent(
     messages: [
       {
         role: 'user',
-        content: `Du bist der Autor des "PokéMarket Intelligence" Newsletters.\n\nMarktbericht:\n${summary.weeklyReport}\n\nTop-Investment-Karten:\n${cardDetails}\n\nErstelle Newsletter-Inhalte auf Deutsch. Antworte NUR mit validem JSON:\n{\n  "subject": "Betreff (max. 60 Zeichen, neugierig machend, mit Emoji)",\n  "preheader": "Vorschautext (max. 90 Zeichen)",\n  "intro": "Einleitungstext (2-3 Sätze)",\n  "cardHighlights": [{"name": "...", "set": "...", "price": "0.00 €", "trend": "+X.X%", "score": 85, "reason": "..."}],\n  "tip": "Investment-Tipp der Woche",\n  "tipTitle": "Kurzer Titel",\n  "ctaText": "Handlungsaufforderung"\n}`,
+        content: `Du schreibst den Newsletter von "PokéMarket Intelligence".
+
+${CONTENT_RULES}
+
+${STYLE_RULES}
+
+Marktbericht:
+${summary.weeklyReport}
+
+Karten mit den größten Bewegungen:
+${cardDetails}
+
+Antworte NUR mit validem JSON:
+{
+  "subject": "Betreff (max. 60 Zeichen, neugierig machend, OHNE Emoji, keine Kaufaufforderung)",
+  "preheader": "Vorschautext (max. 90 Zeichen)",
+  "intro": "Einleitungstext (2-3 Sätze)",
+  "cardHighlights": [{"name": "...", "set": "...", "price": "0,00 €", "trend": "+0,0 %", "score": 85, "reason": "Sachliche Beobachtung, keine Empfehlung"}],
+  "tip": "Marktbeobachtung der Woche — ein belegbares Muster, keine Handlungsempfehlung",
+  "tipTitle": "Kurzer Titel",
+  "ctaText": "Neutraler Hinweis auf die Seite, KEINE Kaufaufforderung"
+}`,
       },
     ],
   });

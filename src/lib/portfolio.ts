@@ -36,22 +36,37 @@ export interface ChartPoint {
   value: number;
 }
 
-/** Fills in missing fields from persisted data — handles old localStorage entries without `language`. */
+/**
+ * Fills in missing fields from persisted data — handles old localStorage entries
+ * without `language`.
+ *
+ * Wichtig: Ein reiner Spread reicht NICHT. `{...{ quantity: undefined }}` setzt
+ * den Schlüssel auf `undefined` und überschreibt damit den Vorgabewert; aus
+ * `purchasePrice * quantity` wird dann `NaN` und der Portfoliowert zeigt nichts
+ * mehr an. Gespeicherte Daten können außerdem `null` enthalten (JSON kennt kein
+ * `undefined`) oder `NaN`, wenn eine Eingabe nicht parsebar war. Deshalb wird
+ * jedes Feld einzeln geprüft.
+ */
+function firstValid<T>(value: unknown, fallback: T): T {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'number' && !Number.isFinite(value)) return fallback;
+  return value as T;
+}
+
 export function normalizeHolding(
   h: Partial<PortfolioHolding> & { cardId: string },
 ): PortfolioHolding {
   return {
-    language: 'EN',
-    purchaseDate: '',
-    setCode: '',
-    addedAt: '',
-    quantity: 1,
-    purchasePrice: 0,
-    cardName: '',
-    setName: '',
-    imageUrl: '',
-    ...h,
     cardId: h.cardId,
+    cardName: firstValid(h.cardName, ''),
+    setName: firstValid(h.setName, ''),
+    setCode: firstValid(h.setCode, ''),
+    imageUrl: firstValid(h.imageUrl, ''),
+    quantity: firstValid(h.quantity, 1),
+    purchasePrice: firstValid(h.purchasePrice, 0),
+    purchaseDate: firstValid(h.purchaseDate, ''),
+    language: firstValid(h.language, 'EN'),
+    addedAt: firstValid(h.addedAt, ''),
   };
 }
 

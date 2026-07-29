@@ -5,12 +5,24 @@ export const maxDuration = 120;
 
 const GRAPH = 'https://graph.facebook.com/v19.0';
 
+// Jeder Aufruf zur Graph-API bekommt ein Zeitlimit: Ohne das hängt die
+// Funktion bis zum Vercel-Hardlimit, wenn Meta nicht antwortet.
+const GRAPH_TIMEOUT_MS = 15000;
+
 async function pollContainerStatus(containerId: string, token: string): Promise<string> {
   for (let i = 0; i < 18; i++) {
     await new Promise((r) => setTimeout(r, 5000));
-    const res = await fetch(`${GRAPH}/${containerId}?fields=status_code&access_token=${token}`);
-    const data = await res.json() as { status_code?: string };
-    if (data.status_code && data.status_code !== 'IN_PROGRESS') return data.status_code;
+    try {
+      const res = await fetch(`${GRAPH}/${containerId}?fields=status_code&access_token=${token}`, {
+        signal: AbortSignal.timeout(GRAPH_TIMEOUT_MS),
+      });
+      const data = (await res.json()) as { status_code?: string };
+      if (data.status_code && data.status_code !== 'IN_PROGRESS') return data.status_code;
+    } catch (err) {
+      // Eine einzelne fehlgeschlagene Abfrage beendet das Warten nicht —
+      // das Video kann trotzdem fertig werden.
+      console.warn('Instagram: Statusabfrage fehlgeschlagen, weiter warten:', err);
+    }
   }
   return 'TIMEOUT';
 }
@@ -39,6 +51,7 @@ export async function POST(request: Request) {
   const containerRes = await fetch(`${GRAPH}/${accountId}/media`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(GRAPH_TIMEOUT_MS),
     body: JSON.stringify({ media_type: 'REELS', video_url: videoUrl, caption, access_token: token }),
   });
   const containerData = await containerRes.json() as { id?: string; error?: { message: string } };
@@ -57,6 +70,7 @@ export async function POST(request: Request) {
   const publishRes = await fetch(`${GRAPH}/${accountId}/media_publish`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(GRAPH_TIMEOUT_MS),
     body: JSON.stringify({ creation_id: containerId, access_token: token }),
   });
   const publishData = await publishRes.json() as { id?: string; error?: { message: string } };

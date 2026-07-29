@@ -71,6 +71,9 @@ async function findCMProductId(cardName: string): Promise<number | null> {
 
   const res = await fetch(url, {
     headers: { Authorization: auth },
+    // Ohne Zeitlimit blockiert eine hängende Cardmarket-API die Portfolio-Route
+    // bis zum Vercel-Hardlimit.
+    signal: AbortSignal.timeout(8000),
     next: { revalidate: 3600 },
   });
   if (!res.ok) return null;
@@ -99,6 +102,7 @@ export async function fetchCMLanguagePrice(
 
     const res = await fetch(url, {
       headers: { Authorization: auth },
+      signal: AbortSignal.timeout(8000),
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
@@ -114,7 +118,10 @@ export async function fetchCMLanguagePrice(
     if (m === null) return null;
 
     return Math.round(m * 100) / 100;
-  } catch {
+  } catch (err) {
+    // Nicht stumm: Ein dauerhaft fehlschlagender Sprachpreis sieht im
+    // Portfolio wie „kein Cardmarket-Zugang" aus und bliebe sonst unbemerkt.
+    console.warn(`Cardmarket-Sprachpreis für "${cardName}" (${language}) fehlgeschlagen:`, err);
     return null;
   }
 }

@@ -222,14 +222,20 @@ describe('Stolperstellen 21/22 — keine stillen Fehler', () => {
 
 describe('Externe Aufrufe haben ein Zeitlimit', () => {
   it('begrenzt jeden fetch zu einer fremden Adresse', () => {
-    // Ohne Timeout hängt die Funktion bis zum Vercel-Hardlimit.
+    // Ohne Zeitlimit hängt die Funktion bis zum Vercel-Hardlimit.
+    //
+    // Die Prüfung erfasst bewusst AUCH `fetch(url, …)` mit einer Variablen:
+    // Die erste Fassung suchte nur nach `fetch('https://…')` und übersah
+    // deshalb beide Cardmarket-Aufrufe, die ihre URL vorher zusammenbauen.
+    // Ausgenommen sind nur eigene Endpunkte (`fetch('/api/…')`).
     const verstoesse: string[] = [];
-    for (const file of sourceFiles('src/{lib,app}/**/*.ts')) {
-      const src = read(file);
-      const lines = src.split('\n');
+    for (const file of sourceFiles('src/{lib,app}/**/*.{ts,tsx}')) {
+      const lines = read(file).split('\n');
       lines.forEach((line, i) => {
-        if (!/\bfetch\(\s*[`'"]https?:/.test(line)) return;
-        // Das Zeitlimit darf irgendwo im Optionsobjekt des Aufrufs stehen.
+        const m = line.match(/\bfetch\(\s*(.)/);
+        if (!m) return;
+        // Eigene Route (relativer Pfad) — läuft im Browser gegen die eigene Domain.
+        if (/\bfetch\(\s*[`'"]\//.test(line)) return;
         const umfeld = lines.slice(i, i + 10).join(' ');
         if (/AbortSignal\.timeout|signal:|withTimeout|Promise\.race/.test(umfeld)) return;
         verstoesse.push(`${file}:${i + 1}  ${line.trim()}`);
