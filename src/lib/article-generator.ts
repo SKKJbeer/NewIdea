@@ -57,6 +57,19 @@ export function articleLevel(article: Pick<Article, 'level'>, type: ArticleType)
   return article.level ?? ARTICLE_LEVEL[type];
 }
 
+/**
+ * Lesezeit in Minuten — robust auch für ältere gespeicherte Artikel, bei denen
+ * das Feld noch fehlt (sonst steht auf der Seite nur „Min Lektüre" ohne Zahl).
+ */
+export function readingTime(article: Pick<Article, 'readingTimeMin' | 'intro' | 'sections'>): number {
+  if (article.readingTimeMin && article.readingTimeMin > 0) return article.readingTimeMin;
+  const words = [article.intro ?? '', ...(article.sections ?? []).map((s) => s.content ?? '')]
+    .join(' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 // Static preview titles shown in the blog listing (without date params)
 export const ARTICLE_PREVIEW_TITLES: Record<ArticleType, string> = {
   markt:      'Pokémon-Markt im Überblick: Preisbewegungen und Trends der Woche',
@@ -338,26 +351,30 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
       tags: ['pokemon fälschungen erkennen', 'fake pokemon karten', 'pokemon karten prüfen', 'cardmarket sicher kaufen'],
     },
     rueckblick: {
-      title: 'Wochenrückblick: Was der Markt diese Woche gezeigt hat',
-      intro: 'Jede Woche im Pokémon-Kartenmarkt ist ein Lehrstück in Marktpsychologie, Angebot und Nachfrage. Die Muster wiederholen sich — wer sie kennt, sieht klarer. Hier die wichtigsten Marktbeobachtungen der vergangenen Woche.',
+      // WICHTIG: Dieser Text ist ein Evergreen-Fallback ohne Wochendaten. Er darf
+      // deshalb KEINE wochenspezifische Beobachtung behaupten („Was diese Woche
+      // gezeigt hat") — das wäre eine Aussage über einen Zeitraum, den niemand
+      // ausgewertet hat. Rahmung bleibt bewusst zeitlos.
+      title: 'Marktmuster im Pokémon-TCG: Was sich immer wieder zeigt',
+      intro: 'Der Pokémon-Kartenmarkt folgt wiederkehrenden Mustern aus Angebot, Nachfrage und Sammlerpsychologie. Wer diese Muster kennt, ordnet einzelne Preisbewegungen deutlich besser ein. Die drei stabilsten davon im Überblick.',
       sections: [
         {
-          heading: 'Was diese Woche bestätigt hat',
-          content: 'Die Datenlage bestätigt sich: Chase-Cards aus ausgelaufenen Sets wie Evolving Skies und dem 151-Set zeigen keine Schwäche. Umbreon VMAX Alt Art und Charizard ex SIR halten ihr Preisniveau stabil. Kein dramatischer Anstieg — aber Qualitätsinvestments zeichnen sich durch Konstanz aus, nicht durch Volatilität. Aktuelle Preise immer direkt auf Cardmarket prüfen.',
+          heading: 'Ausgelaufene Sets verhalten sich anders als aktuelle',
+          content: 'Sobald ein Set nicht mehr gedruckt wird, wächst das Angebot nicht mehr nach — es schrumpft nur noch, weil Karten in Sammlungen wandern, beschädigt werden oder in Grading-Slabs verschwinden. Chase-Cards aus abgeschlossenen Sets wie Evolving Skies oder dem 151-Set zeigen deshalb typischerweise ein stabileres Preisniveau als Karten aus laufender Produktion. Stabilität ist hier das Merkmal, nicht der schnelle Sprung. Aktuelle Notierungen direkt auf Cardmarket prüfen.',
         },
         {
-          heading: 'Was diese Woche als Lehrstück diente',
-          content: 'Das Release-Muster bleibt das konstanteste Phänomen im TCG-Markt: Chase-Cards notieren direkt nach Set-Release auf ihrem Hype-Hoch, gefolgt von einer deutlichen Korrektur, sobald der Markt mit frischer Ware geflutet ist. Das ist kein neues Phänomen und wird sich nicht ändern — die Marktpsychologie wiederholt sich. Der erste Preis nach Release ist historisch selten der faire Preis; erst einige Wochen später bildet sich ein belastbares Niveau.',
+          heading: 'Das Release-Muster ist das konstanteste Phänomen',
+          content: 'Chase-Cards notieren direkt nach dem Set-Release auf ihrem Hype-Hoch. Danach folgt regelmäßig eine Korrektur, sobald der Markt mit frischer Ware gefüllt ist. Der erste Preis nach Release ist historisch selten der faire Preis; ein belastbares Niveau bildet sich meist erst einige Wochen später. Wer eine Karte direkt zum Release einordnen will, vergleicht sie deshalb sinnvollerweise mit dem Verlauf ähnlicher Karten aus früheren Sets statt mit ihrem eigenen Tagespreis.',
         },
         {
-          heading: 'Ausblick auf die kommende Woche',
-          content: 'Der Markt ist gerade in einem ruhigen Fahrwasser — kein ausgeprägter Aufwärts- oder Abwärtsdruck. Interessant sind SIRs die in den letzten 30 Tagen im Preis gefallen sind, ohne dass fundamentale Gründe erkennbar sind (kein gestiegenes Angebot, kein neues ähnliches Produkt). Überhastetes Handeln aus Ungeduld hat historisch selten besser abgeschnitten als das Halten bestehender Positionen.',
+          heading: 'Ruhige Phasen sind kein Stillstand',
+          content: 'Marktphasen ohne ausgeprägten Auf- oder Abwärtsdruck wirken ereignislos, sind aber die Regel und nicht die Ausnahme. Aufschlussreich sind in solchen Phasen Karten, die ohne erkennbaren fundamentalen Grund nachgeben — also ohne gestiegenes Angebot und ohne ein neues, ähnliches Produkt. Solche Abweichungen zwischen Preis und Angebotslage sind der Punkt, an dem sich genaueres Hinsehen historisch am ehesten gelohnt hat.',
         },
       ],
       keyPoints: [
-        'Geduld schlägt Hype — ausgelaufene Set-Karten zeigen das Woche für Woche',
-        'Release-Preise sind Hype-Preise — der faire Preis bildet sich historisch erst Wochen später',
-        'Ruhige Marktphasen sind historisch Vorstufen zur nächsten Preisbewegung',
+        'Ausgelaufene Sets haben ein schrumpfendes Angebot — das stabilisiert das Preisniveau',
+        'Release-Preise sind Hype-Preise — ein belastbares Niveau bildet sich erst Wochen später',
+        'Ruhige Marktphasen sind der Normalfall, nicht das Vorzeichen einer Bewegung',
       ],
       tags: ['pokemon wochenrückblick', 'tcg markt', 'pokemon investment', 'cardmarket analyse'],
     },
@@ -377,7 +394,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
 
 // Harte Wahrheits- und Neutralitätsregeln — werden JEDEM Generierungs-Prompt vorangestellt.
 // Quelle: CLAUDE.md → Content-Wahrheitspflicht + Content-Tonalität.
-const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel):
+export const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel):
 1. WAHRHEIT: Verwende Zahlen und Preise AUSSCHLIESSLICH aus den unten gelieferten Marktdaten. Erfinde NIEMALS Preise, Preisverläufe, Prozentbewegungen, Auktionsergebnisse, Turnierergebnisse, Ankündigungen, Druckraten oder Illustratoren-Namen. Wenn du eine Zahl nicht aus den Daten belegen kannst, formuliere qualitativ ("zeigt zunehmende Nachfrage", "notiert stabil").
 2. KEINE ANLAGEBERATUNG: Keine Kaufempfehlungen ("kaufenswert", "jetzt kaufen", "Pflichtkauf", "Kaufchance"), keine Budget-Aufteilungen, keine Renditeversprechen, keine Kauf-/Verkaufszeitpunkte als Handlungsanweisung. Nur Marktbeobachtungen, historische Muster und sachliche Einschätzungen.
 3. KEINE PERSONA: Keine Ich-Form, kein Erzähler-Name. Impersonale Analyse ("Der Markt zeigt", "Die Daten bestätigen").
@@ -385,7 +402,7 @@ const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel):
 
 // Schreibstil-Regeln gegen KI-Klang — Kurzform von .claude/commands/schreibstil.md.
 // Werden jedem Generierungs-Prompt vorangestellt.
-const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen, NICHT nach KI):
+export const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen, NICHT nach KI):
 1. Direkt mit einem Fakt, einer Beobachtung oder einem Kontrast einsteigen. VERBOTEN: "Hier ein Überblick", "In der heutigen Zeit", "Tauchen wir ein", Panorama-Sätze.
 2. VERBOTENE Wörter: atemberaubend, revolutionär, bahnbrechend, faszinierend, episch, spektakulär, unglaublich. Stattdessen das konkrete Detail nennen, das den Eindruck erzeugt.
 3. Keine Meta-Kommentare ("In diesem Artikel...", "Zusammenfassend...", "Fazit:"). Kein Absatz endet mit einer Zusammenfassung seiner selbst — er endet mit dem letzten Fakt.
@@ -535,8 +552,21 @@ export async function readArticle(date: string): Promise<Article | null> {
   return loadArticle(date);
 }
 
+export interface GenerateArticleOptions {
+  /**
+   * Ersetzt einen zuvor gespeicherten Fallback-Artikel durch eine echte
+   * Generierung. Nur für Cron und den manuellen Auslöser — NICHT von
+   * Seitenaufrufen setzen, sonst löst jeder Besuch einen KI-Aufruf aus.
+   */
+  replaceFallback?: boolean;
+}
+
 /** Generate + persist. For cron jobs only — never call from a user-facing page. */
-export async function generateArticle(type: ArticleType, date: string): Promise<Article> {
+export async function generateArticle(
+  type: ArticleType,
+  date: string,
+  options: GenerateArticleOptions = {},
+): Promise<Article> {
   const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -553,8 +583,10 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
   }
 
   // 2. Supabase cache — one fast DB read, previously generated articles.
+  // Ein gespeicherter Fallback (isStatic) wird auf Wunsch neu erzeugt: sonst
+  // bleibt ein einmal fehlgeschlagener Artikel für immer ein Evergreen-Text.
   const cached = await loadArticle(date);
-  if (cached) return cached;
+  if (cached && !(options.replaceFallback && cached.isStatic)) return cached;
 
   // 3. Fetch live market data only when we actually need to generate.
   let trendingCards: PokemonCard[] = [];
@@ -599,15 +631,30 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await client.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
-      max_tokens: 2048,
+      // WICHTIG: Ein vollständiger Artikel (Intro + 4-5 Abschnitte + Kernpunkte +
+      // Tags + Quellen als JSON) überschreitet 2048 Tokens deutlich. Zu knapp
+      // bemessen wird die JSON-Antwort mitten im Satz abgeschnitten, JSON.parse
+      // scheitert — und der Artikel fällt still auf den Evergreen-Fallback zurück.
+      // Genau das ist monatelang unbemerkt passiert.
+      max_tokens: 16000,
       messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel, recentTitles) }],
     });
+
+    // Abgeschnittene Antworten sichtbar machen statt sie als Parse-Fehler zu tarnen.
+    if (message.stop_reason === 'max_tokens') {
+      console.error(
+        `Artikel ${date}: Antwort wurde vom Token-Limit abgeschnitten (stop_reason=max_tokens) — max_tokens erhöhen`,
+      );
+    }
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const data: ArticleData = JSON.parse(jsonMatch?.[0] || '{}');
 
     if (!data.title || !data.sections || data.sections.length === 0) {
+      console.error(
+        `Artikel ${date}: KI-Antwort unvollständig (Titel/Abschnitte fehlen) — Fallback greift`,
+      );
       const fallback = fallbackArticle(type, dateLabel, cardSummary);
       fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
@@ -637,7 +684,13 @@ export async function generateArticle(type: ArticleType, date: string): Promise<
     // Persist so future requests are instant and the article is available historically.
     await saveArticle(date, type, article).catch(() => {});
     return article;
-  } catch {
+  } catch (err) {
+    // Ursache IMMER protokollieren — ein stiller catch hat hier monatelang
+    // verdeckt, dass gar keine echten Artikel entstehen (siehe CLAUDE.md, Stolperstelle 21).
+    console.error(
+      `Artikel-Generierung ${date} fehlgeschlagen:`,
+      err instanceof Error ? err.message : err,
+    );
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
     fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],

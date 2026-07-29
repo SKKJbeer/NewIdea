@@ -113,9 +113,16 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await client.messages.create({
       model: MODEL,
-      max_tokens: 3000,
+      // Ein vollständiger Guide (Intro + 5 Abschnitte + Kernpunkte + Tips als
+      // JSON) sprengt 3000 Tokens. Zu knapp bemessen bricht die JSON-Antwort ab
+      // und der Guide scheitert am Parser statt an der Qualität.
+      max_tokens: 16000,
       messages: [{ role: 'user', content: buildGuidePrompt(topic) }],
     });
+
+    if (message.stop_reason === 'max_tokens') {
+      console.error(`Guide ${topic.slug}: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)`);
+    }
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

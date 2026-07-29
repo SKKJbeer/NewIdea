@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.22.0] — 2026-07-27 · Echte Artikel statt Ausweichtexte
+
+### Behoben
+- **Kein einziger Blog-Beitrag wurde tatsächlich aus Marktdaten erstellt.** Das Token-Limit für die Texterzeugung war zu knapp bemessen (2.048), sodass die Antwort regelmäßig mitten im Satz abbrach, nicht mehr verarbeitet werden konnte und still auf einen allgemeinen Ausweichtext zurückfiel — bei jedem Beitrag. Limit deutlich erhöht; abgeschnittene Antworten werden jetzt ausdrücklich gemeldet statt als Formatfehler getarnt
+- Dieselbe zu knappe Bemessung betraf **Guides und den Wochen-Marktbericht** — beide ebenfalls behoben
+- **Fehlende Lesezeit**: Ältere gespeicherte Beiträge zeigten „Min Lektüre" ohne Zahl. Die Lesezeit wird jetzt bei Bedarf aus dem Text berechnet
+- **Wochenrückblick-Ausweichtext behauptete Wochen-Beobachtungen**, die er nicht enthielt („Was diese Woche gezeigt hat" ohne einen einzigen Wochenwert). Neu als zeitlose Marktmuster-Erklärung formuliert — keine Schein-Aktualität mehr
+
+### Geändert
+- **Der Wochen-Marktbericht folgt jetzt denselben Inhalts- und Stilregeln wie die Artikel** (keine Kaufempfehlungen, keine Floskeln, keine erfundenen Zahlen) — bisher galten diese Regeln für ihn nicht. Außerdem ausführlicher und in Absätze gegliedert statt auf 150 Wörter begrenzt
+- Fehlerursachen der Texterzeugung landen jetzt im Klartext im Protokoll statt verschluckt zu werden
+
+### Neu
+- **Beiträge nachträglich neu erzeugen**: Ein geschützter Auslöser ersetzt gespeicherte Ausweichtexte durch echte, datenbasierte Beiträge — nötig, weil bereits gespeicherte Beiträge sonst dauerhaft Ausweichtexte blieben
+- 4 neue Tests (125 gesamt)
+
+---
+
 ## [2.21.0] — 2026-07-27 · Betriebszustand sichtbar: Guide-Pipeline repariert
 
 ### Behoben

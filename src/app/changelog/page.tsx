@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.22.0',
+    date: '27. Juli 2026',
+    label: 'Echte Artikel statt Ausweichtexte',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Kein Blog-Beitrag wurde tatsächlich aus Marktdaten erstellt — das Token-Limit war zu knapp, die Antwort brach ab und fiel still auf einen allgemeinen Ausweichtext zurück. Behoben, ebenso bei Guides und Marktbericht' },
+      { type: 'fixed',   text: 'Lesezeit fehlte bei älteren Beiträgen („Min Lektüre" ohne Zahl) — wird jetzt bei Bedarf aus dem Text berechnet' },
+      { type: 'fixed',   text: 'Wochenrückblick-Ausweichtext behauptete Wochen-Beobachtungen ohne Wochendaten — neu als zeitlose Marktmuster-Erklärung formuliert' },
+      { type: 'changed', text: 'Der Wochen-Marktbericht folgt jetzt denselben Inhalts- und Stilregeln wie die Artikel und ist ausführlicher' },
+      { type: 'new',     text: 'Gespeicherte Ausweichtexte lassen sich nachträglich durch echte, datenbasierte Beiträge ersetzen' },
+    ],
+  },
+  {
     version: '2.21.0',
     date: '27. Juli 2026',
     label: 'Betriebszustand sichtbar: Guide-Pipeline repariert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Automatische Guide-Erzeugung lief unbemerkt ins Leere — der Speicherfehler wurde still verschluckt. Ursache wird jetzt im Klartext gemeldet' },
       { type: 'new',     text: 'Monitoring zeigt den echten Betriebszustand: Anzahl und Datenstand von Preis-Schnappschüssen, Artikeln, Guides und Marktberichten' },

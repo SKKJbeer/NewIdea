@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NavBar } from '@/components/NavBar';
-import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL } from '@/lib/article-generator';
+import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -157,7 +157,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                   </span>
                 )}
                 <span className="text-xs text-slate-600 flex items-center gap-1"><Calendar size={11} /> {dateLabel}</span>
-                {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {article.readingTimeMin} Min Lektüre</span>}
+                {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {readingTime(article)} Min Lektüre</span>}
               </div>
               <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white text-balance">{article?.title || meta.label}</h1>
             </div>

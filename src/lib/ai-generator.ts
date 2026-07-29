@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { PokemonCard, NewsletterContent, VideoScript, SocialPost, MarketSummary } from '@/types';
 import { buildNewsletterHtml } from '@/lib/newsletter-template';
+import { CONTENT_RULES, STYLE_RULES } from '@/lib/article-generator';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -21,14 +22,34 @@ export async function generateMarketSummary(
 
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 1024,
+    // Großzügig bemessen: ein abgeschnittener Marktbericht endet mitten im Satz
+    // und ist auf der Seite sofort sichtbar.
+    max_tokens: 4000,
     messages: [
       {
         role: 'user',
-        content: `Du bist ein Pokémon-Karten-Marktexperte. Analysiere diese Karten-Daten und erstelle einen prägnanten deutschen Marktbericht (max. 150 Wörter):\n\nAktuelle Karten-Preise:\n${cardData}\n\nTop-Gewinner: ${topGainers.map((c) => c.name).join(', ')}\nTop-Verlierer: ${topLosers.map((c) => c.name).join(', ')}\n\nSchreibe einen ansprechenden Marktbericht für Sammler und Investoren. Fokus auf Trends, Investmentmöglichkeiten und was diese Woche beachtet werden sollte.`,
+        content: `Du bist erfahrener Marktanalyst für eine deutschsprachige Pokémon-TCG-Plattform. Schreibe den wöchentlichen Marktbericht (300-400 Wörter, in Absätze gegliedert).
+
+Aktuelle Karten-Preise:
+${cardData}
+
+Top-Gewinner: ${topGainers.map((c) => c.name).join(', ')}
+Top-Verlierer: ${topLosers.map((c) => c.name).join(', ')}
+
+Nutze ausschließlich Zahlen und Kartennamen aus den gelieferten Daten — erfinde nichts dazu. Erkläre, WARUM sich etwas bewegt hat (Angebot, Set-Status, Nachfrage), nicht nur DASS es sich bewegt hat. Unbekannte Pokémon beim ersten Auftreten kurz in Klammern beschreiben.
+
+${CONTENT_RULES}
+
+${STYLE_RULES}
+
+Antworte NUR mit dem Berichtstext, ohne Überschrift und ohne Vorrede.`,
       },
     ],
   });
+
+  if (message.stop_reason === 'max_tokens') {
+    console.error('Marktbericht: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)');
+  }
 
   const weeklyReport = message.content[0].type === 'text' ? message.content[0].text : '';
 

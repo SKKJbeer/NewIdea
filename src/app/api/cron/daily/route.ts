@@ -46,9 +46,12 @@ export async function GET(request: Request) {
   const type = getArticleType(today);
   if (type) {
     try {
-      const article = await generateArticle(type, today);
+      // replaceFallback: Hat ein früherer Versuch heute nur den Evergreen-Fallback
+      // gespeichert, ersetzt der Cron ihn durch einen echten, datenbasierten Artikel.
+      const article = await generateArticle(type, today, { replaceFallback: true });
       results.articleGenerated = true;
       results.articleTitle = article.title;
+      results.articleIsFallback = article.isStatic === true;
       console.log(`✅ Article generated (${type}): ${article.title}`);
       // WICHTIG: auch die Detailseite revalidieren, sonst bleibt eine evtl. gecachte
       // "noch nicht verfügbar"-Version bis zum nächsten ISR-Intervall (24h) stehen.
