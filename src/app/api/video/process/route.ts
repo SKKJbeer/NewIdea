@@ -13,8 +13,10 @@ export const maxDuration = 300;
 
 ensureFfmpeg();
 
-// Mitgelieferte Schriftart für drawtext — Vercel hat keine System-Fonts.
-const FONT = join(process.cwd(), 'src/assets/fonts/reel-font.ttf');
+// HINWEIS: Der Branding-Schriftzug wurde entfernt. Die mitgelieferte
+// FFmpeg-Binary enthält den Filter `drawtext` NICHT (486 Filter, keiner davon
+// drawtext) — jeder Schnitt scheiterte deshalb an dieser einen Zeile. Für
+// Text-Overlays auf Video siehe reel-frames.tsx (Bild-Rendering statt drawtext).
 
 function processVideo(inputPath: string, outputPath: string, clipDuration: number, startTime?: number): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -32,7 +34,6 @@ function processVideo(inputPath: string, outputPath: string, clipDuration: numbe
       .videoFilters([
         'crop=ih*9/16:ih:(iw-ih*9/16)/2:0',
         'scale=1080:1920:flags=lanczos',
-        `drawtext=fontfile=${FONT}:text='PokéMarket Intel':fontsize=38:x=(w-text_w)/2:y=h-70:fontcolor=white:shadowcolor=black@0.8:shadowx=2:shadowy=2`,
       ])
       .videoCodec('libx264')
       .audioCodec('aac')

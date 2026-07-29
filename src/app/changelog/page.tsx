@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.25.0',
+    date: '29. Juli 2026',
+    label: 'Instagram-Reels funktionieren erstmals',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Die Reel-Erstellung konnte technisch nie funktionieren: Der Videosoftware fehlt die Funktion zum Einblenden von Text, über die bisher jede Zeile lief' },
+      { type: 'changed', text: 'Bilder werden jetzt fertig gestaltet und nur noch zusammengefügt — erstes vollständiges Reel aus echten Marktdaten erfolgreich erstellt' },
+      { type: 'fixed',   text: 'Preise und Trends im Reel in deutscher Schreibweise' },
+    ],
+  },
+  {
     version: '2.24.0',
     date: '29. Juli 2026',
     label: 'Gesamt-Audit: Preisdarstellung, Bilder, Ausfallsicherheit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Preise erschienen im englischen Format („235.71 €" statt „235,71 €", ohne Tausenderpunkt) — an rund 15 Stellen quer über die Seite korrigiert' },
       { type: 'fixed',   text: 'Die Boosterpack-Bildquelle existiert nicht mehr und schlug bei jedem Kartenbild fehl — das Set-Logo ist jetzt die direkte Quelle' },

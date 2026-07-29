@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.24.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.25.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.24.0)
+## Was gebaut ist (Stand v2.25.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -23,7 +23,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth (timing-safe, fail-closed), 3 Tabs |
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
 | Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR |
-| Reels Studio | ✅ Fertig | Video-Upload → Preview → Trim → FFmpeg → Instagram-Publish |
+| Reels Studio | ✅ Funktioniert | Auto-Reel lokal verifiziert (1080x1920, 23s, echte Marktdaten). Instagram-Auto-Publish wartet auf INSTAGRAM_ACCESS_TOKEN |
 | Design-System | ✅ Fertig | Einheitlicher Dark Mode über alle Seiten, in CLAUDE.md verankert |
 | Impressum & Datenschutz | ✅ Fertig | Echte Daten, § 5 DDG, Datenschutz beschreibt echten Datenfluss (cookielos) |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | Marktbericht + Newsletter-Draft, CRON_SECRET ✅ |
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.25.0 | BUGFIX Reels: ffmpeg-static hat KEINEN drawtext-Filter (486 Filter, keiner davon) — jede Textzeile lief darüber, Reel konnte nie entstehen. Umbau auf fertig gerenderte Bilder via next/og; erstes Reel erfolgreich erzeugt |
 | v2.24.0 | GESAMT-AUDIT: Preisformat deutschlandweit falsch (toFixed statt Intl) an ~15 Stellen → zentrale format.ts; Boosterpack-CDN komplett 404 → Set-Logo als Primärquelle; TCG-API-Retry (leere Startseite, Stolperstelle 19); Startseite erfand Sentiment ohne Daten → ApiErrorState |
 | v2.23.0 | BUGFIX Marktbericht: Platzhalter („test") seit KW 26 live, Cron meldete Erfolg ohne Prüfung, Newsletter-Fehler riss den Bericht mit. Qualitätsgate + Anzeige-Filter + manueller Auslöser + entkoppelter Cron |
 | v2.22.0 | BUGFIX Content: max_tokens zu knapp (2048) → jede KI-Antwort abgeschnitten → stiller Fallback bei ALLEN Artikeln. Erhöht + stop_reason-Prüfung + Klartext-Logging; Marktbericht bekommt Content-/Style-Rules; Lesezeit-Fallback; Rückblick-Fallback ehrlich zeitlos; Nach-Generierungs-Endpoint |
@@ -188,4 +189,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.24.0 — 29. Juli 2026*
+*Zuletzt aktualisiert: v2.25.0 — 29. Juli 2026*

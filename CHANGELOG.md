@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.25.0] — 2026-07-29 · Instagram-Reels funktionieren erstmals
+
+### Behoben
+- **Die Reel-Erstellung konnte technisch nie funktionieren.** Die mitgelieferte Videosoftware enthält die Funktion zum Einblenden von Text schlicht nicht — der bisherige Aufbau legte aber jede einzelne Textzeile (Titel, Kartenname, Preis, Trend, Abspann) genau darüber. Jeder Versuch scheiterte, bevor auch nur ein Kartenbild verarbeitet wurde. Auch der frühere Schriftart-Fix lief deshalb ins Leere
+- **Neuer Aufbau**: Die Bilder werden jetzt fertig gestaltet — mit derselben Technik, die auf der Seite schon die Social-Vorschaubilder erzeugt — und die Videosoftware fügt sie nur noch zusammen. Ein vollständiges Reel wurde damit erstmals erfolgreich erstellt (1080×1920, 23 Sekunden, aus echten Marktdaten)
+- Dieselbe fehlende Funktion betraf den manuellen Reel-Schnitt; der dortige Schriftzug wurde entfernt
+
+### Geändert
+- Preise und Trends im Reel erscheinen jetzt in deutscher Schreibweise („79,88 €", „-13,8 %")
+
+---
+
 ## [2.24.0] — 2026-07-29 · Gesamt-Audit: Preisdarstellung, Bilder, Ausfallsicherheit
 
 ### Behoben
