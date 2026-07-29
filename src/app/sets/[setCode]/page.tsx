@@ -6,6 +6,7 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
+import { formatEurRounded } from '@/lib/format';
 import type { Metadata } from 'next';
 
 // BEWUSST KEIN generateStaticParams: Schlägt die TCG-API während des Builds fehl,
@@ -92,13 +93,13 @@ export default async function SetDetailPage({ params }: Props) {
               </div>
               <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight">{setName}</h1>
               <p className="text-slate-500 text-sm mt-2">
-                {cards.length} handelbare Karten · Gesamtwert der Einzelkarten ca. {topValue.toFixed(0)} €
+                {cards.length} handelbare Karten · Gesamtwert der Einzelkarten ca. {formatEurRounded(topValue)}
               </p>
               <a
                 href={amazonUrl}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                className="mt-4 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 rounded-xl px-5 py-2.5 font-semibold text-sm transition-colors"
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-xl px-5 py-2.5 font-semibold text-sm transition-colors"
               >
                 <ShoppingCart size={15} /> Booster kaufen <ExternalLink size={12} />
               </a>

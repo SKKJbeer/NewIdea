@@ -318,7 +318,7 @@ export default function StudioPage() {
               <div className="px-4 py-3 border-b border-[#1e1e30] flex items-center justify-between">
                 <h2 className="font-bold text-slate-200 text-sm">System-Status</h2>
                 {status && (
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${status.requiredReady ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${status.requiredReady ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-100 text-amber-700'}`}>
                     {status.totalConfigured}/{status.totalIntegrations} verbunden
                   </span>
                 )}
@@ -329,7 +329,7 @@ export default function StudioPage() {
                   {Object.entries(status.integrations).map(([key, integration]) => (
                     <div key={key} className="flex items-center justify-between px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {integration.configured ? <CheckCircle2 size={18} className="text-green-500 shrink-0" /> : <XCircle size={18} className="text-slate-600 shrink-0" />}
+                        {integration.configured ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <XCircle size={18} className="text-slate-600 shrink-0" />}
                         <div>
                           <p className="text-sm font-medium text-slate-200">{integration.name}</p>
                           <p className="text-xs text-slate-500">{integration.purpose}</p>
@@ -337,7 +337,7 @@ export default function StudioPage() {
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {integration.required && <span className="text-[10px] font-bold uppercase bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded">Pflicht</span>}
-                        <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${integration.configured ? 'bg-green-100 text-green-700' : 'bg-[#1a1a28] text-slate-500'}`}>
+                        <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${integration.configured ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[#1a1a28] text-slate-500'}`}>
                           {integration.configured ? 'OK' : 'Fehlt'}
                         </span>
                       </div>
@@ -386,10 +386,10 @@ export default function StudioPage() {
                   <div className="space-y-2">
                     {STEPS[generating].map((step, i) => (
                       <div key={step} className="flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${i < currentStep ? 'bg-green-500' : i === currentStep ? 'bg-violet-600' : 'bg-[#2a2a3a]'}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${i < currentStep ? 'bg-emerald-500' : i === currentStep ? 'bg-violet-600' : 'bg-[#2a2a3a]'}`}>
                           {i < currentStep ? <Check size={9} className="text-white" /> : i === currentStep ? <div className="w-1.5 h-1.5 bg-[#13131e] rounded-full animate-pulse" /> : null}
                         </div>
-                        <span className={`text-xs ${i < currentStep ? 'text-green-700 line-through' : i === currentStep ? 'text-violet-800 font-medium' : 'text-slate-500'}`}>{step}</span>
+                        <span className={`text-xs ${i < currentStep ? 'text-emerald-400 line-through' : i === currentStep ? 'text-violet-800 font-medium' : 'text-slate-500'}`}>{step}</span>
                       </div>
                     ))}
                   </div>
@@ -397,7 +397,7 @@ export default function StudioPage() {
                 </div>
               )}
 
-              {error && <div className="mx-4 mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">{error}</div>}
+              {error && <div className="mx-4 mb-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl p-3 text-sm">{error}</div>}
             </section>
 
             {output && (
@@ -410,9 +410,9 @@ export default function StudioPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={copyOutput} className="flex items-center gap-1 text-xs text-slate-500 hover:text-violet-600 px-2 py-1 rounded-lg hover:bg-violet-50">
-                      {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}{copied ? 'Kopiert' : 'Kopieren'}
+                      {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}{copied ? 'Kopiert' : 'Kopieren'}
                     </button>
-                    <button onClick={clearOutput} className="flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 px-2 py-1 rounded-lg hover:bg-red-50">
+                    <button onClick={clearOutput} className="flex items-center gap-1 text-xs text-slate-500 hover:text-rose-400 px-2 py-1 rounded-lg hover:bg-rose-500/10">
                       <Trash2 size={12} /> Löschen
                     </button>
                   </div>
@@ -427,7 +427,7 @@ export default function StudioPage() {
                     </div>
                     {published ? (
                       <div className="flex items-center gap-2">
-                        <span className="flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1.5 rounded-lg"><Check size={11} /> Live!</span>
+                        <span className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-lg"><Check size={11} /> Live!</span>
                         <Link href="/marktbericht" target="_blank" className="text-xs text-violet-600 underline">Ansehen →</Link>
                       </div>
                     ) : (

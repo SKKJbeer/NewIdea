@@ -598,9 +598,14 @@ export async function generateArticle(
     trendingCards = await fetchTrendingCards(10);
     cardSummary = trendingCards
       .slice(0, 6)
+      // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
       .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
       .join('\n');
-  } catch {}
+  } catch (err) {
+    // Nie stumm: Ohne Kartendaten wird der Artikel dünner, und genau das
+    // muss im Log stehen (Stolperstelle 21).
+    console.warn('Marktdaten für die Artikel-Generierung nicht verfügbar:', err);
+  }
 
   // Titel der letzten Artikel für optionale Anknüpfung (natürlicher roter Faden).
   const recentTitles = await listSavedArticleMeta()

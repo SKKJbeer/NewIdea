@@ -91,6 +91,7 @@ export default function PortfolioPage() {
         const parsed = JSON.parse(raw) as Array<Partial<PortfolioHolding> & { cardId: string }>;
         setHoldings(parsed.map(normalizeHolding));
       }
+      // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     } catch {}
   }, []);
 
@@ -123,6 +124,7 @@ export default function PortfolioPage() {
 
   function saveHoldings(h: PortfolioHolding[]) {
     setHoldings(h);
+    // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); } catch {}
   }
 
@@ -489,6 +491,7 @@ function AddCardModal({
 
   function selectCard(s: Suggestion) {
     setSelected(s);
+    // toFixed erlaubt: Wert eines Eingabefelds, muss parsebar bleiben
     setPurchasePrice(s.price > 0 ? s.price.toFixed(2) : '');
     setQty(1);
     setPurchaseDate(new Date().toISOString().split('T')[0]);
@@ -743,6 +746,7 @@ function EditCardModal({
   onClose: () => void;
 }) {
   const [qty,           setQty]           = useState(holding.quantity);
+  // toFixed erlaubt: Startwert eines Eingabefelds, muss parsebar bleiben
   const [purchasePrice, setPurchasePrice] = useState(holding.purchasePrice.toFixed(2));
   const [purchaseDate,  setPurchaseDate]  = useState(holding.purchaseDate || '');
   const [language,      setLanguage]      = useState<CardLanguage>(holding.language || 'EN');

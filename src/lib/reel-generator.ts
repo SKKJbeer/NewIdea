@@ -1,9 +1,10 @@
 // Auto-Reel-Generator: Rendert ein fertiges 1080x1920-Reel (Instagram/TikTok/
 // Shorts) DIREKT aus Live-Marktdaten — ohne manuelles Videomaterial.
 //
-// Aufbau: Intro (Brand + Titel) → 1 Segment pro Karte (Kartenbild mit sanftem
-// Zoom, Name, Preis, Trend) → Outro (CTA zur Website). Segmente werden einzeln
-// gerendert und per concat-Demuxer verlustfrei zusammengefügt.
+// Aufbau: Der Generator kennt KEINE Formate. Er setzt die Szenen um, die
+// reel-concepts.ts liefert — Haken, Karten, Einordnung, Abspann. Jede Szene
+// wird einzeln gerendert und per concat-Demuxer verlustfrei zusammengefügt.
+// Neue Formate entstehen deshalb ausschließlich in reel-concepts.ts.
 //
 // Reichweiten-Prinzip: Jede Caption endet mit dem Site-Link inkl. UTM-Parametern
 // — Vercel Analytics weist die Besucher damit dem Kanal zu.
@@ -25,14 +26,10 @@ ensureFfmpeg();
 const W = 1080;
 const H = 1920;
 const FPS = 30;
-const SEG_SECONDS = 3.6;
-const INTRO_SECONDS = 2.4;
-const OUTRO_SECONDS = 3.0;
 // Weiche Blende zwischen den Abschnitten — professionelles Tempo statt Hartschnitt.
 const FADE_SECONDS = 0.28;
-
-const BG = '#0a0a0f';
-const SITE_LABEL = 'pokemarket-intelligence';
+// Die Dauer jeder Szene kommt aus reel-concepts.ts, nicht von hier: Ein Quiz
+// braucht eine andere Taktung als eine Kartenliste.
 
 function run(cmd: ffmpeg.FfmpegCommand, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -48,14 +45,6 @@ function run(cmd: ffmpeg.FfmpegCommand, outputPath: string): Promise<void> {
   });
 }
 
-/**
- * Ein fertiges Standbild wird zum Videosegment.
- *
- * FFmpeg zeichnet hier KEINEN Text mehr — die Bilder kommen fertig aus
- * reel-frames.tsx. Grund: Die mitgelieferte FFmpeg-Binary enthält den
- * `drawtext`-Filter nicht (486 Filter, keiner davon drawtext), weshalb der
- * frühere Aufbau nie ein Reel erzeugen konnte.
- */
 /**
  * Langsames Heranfahren mit leichtem Versatz — gibt einem Standbild Leben.
  * Der Versatz wechselt je Segment die Richtung, damit es nicht monoton wirkt.
@@ -88,6 +77,7 @@ function backdropFilters(frames: number, drift: number, { soft = false } = {}): 
   const dx =
     drift === 0
       ? 'iw/2-(iw/zoom/2)'
+      // toFixed erlaubt: FFmpeg-Filterausdruck
       : `iw/2-(iw/zoom/2)+${(drift * factor).toFixed(2)}*on/${frames}`;
   return [
     `scale=${small}:-1`,
@@ -102,6 +92,7 @@ function backdropFilters(frames: number, drift: number, { soft = false } = {}): 
 
 /** Abschluss jedes Segments: Randabdunklung und weiche Blenden. */
 function finishFilters(seconds: number): string[] {
+  // toFixed erlaubt: FFmpeg-Filterwert, muss einen Punkt als Trennzeichen haben
   const fadeOutStart = Math.max(0, seconds - FADE_SECONDS).toFixed(2);
   return [
     // Dezente Randabdunklung — lenkt den Blick zur Mitte (Terminal-Anmutung).
@@ -111,6 +102,14 @@ function finishFilters(seconds: number): string[] {
   ];
 }
 
+/**
+ * Ein fertiges Standbild wird zum Videosegment.
+ *
+ * FFmpeg zeichnet hier KEINEN Text — die Bilder kommen fertig aus
+ * reel-frames.tsx. Grund: Die mitgelieferte FFmpeg-Binary enthält den
+ * `drawtext`-Filter nicht (486 Filter, keiner davon drawtext), weshalb der
+ * frühere Aufbau nie ein Reel erzeugen konnte (Stolperstelle 30).
+ */
 async function frameToSegment(
   imgPath: string,
   seconds: number,

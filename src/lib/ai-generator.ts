@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { PokemonCard, NewsletterContent, VideoScript, SocialPost, MarketSummary } from '@/types';
 import { buildNewsletterHtml } from '@/lib/newsletter-template';
 import { CONTENT_RULES, STYLE_RULES } from '@/lib/article-generator';
+import { formatEur, formatPercent } from '@/lib/format';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -10,6 +11,21 @@ const client = new Anthropic({
 // Zentrale Model-ID mit Env-Override — bei Deprecation nur eine Stelle/Env-Var ändern.
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 
+/**
+ * Meldet, warum eine KI-Antwort nicht verwertbar war.
+ *
+ * Ein nacktes `catch {}` um JSON.parse hat wochenlang verdeckt, dass die
+ * Antwort schlicht am Token-Limit abgeschnitten war — von außen sah alles
+ * normal aus, es kam nur immer der Ersatztext (Stolperstelle 22).
+ */
+function warnUnusable(was: string, stopReason: string | null | undefined, err: unknown): void {
+  if (stopReason === 'max_tokens') {
+    console.error(`${was}: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens) — max_tokens erhöhen`);
+  } else {
+    console.error(`${was}: Antwort nicht als JSON lesbar (stop_reason=${stopReason ?? 'unbekannt'}):`, err);
+  }
+}
+
 export async function generateMarketSummary(
   cards: PokemonCard[],
   topGainers: PokemonCard[],
@@ -17,6 +33,7 @@ export async function generateMarketSummary(
 ): Promise<MarketSummary> {
   const cardData = cards
     .slice(0, 10)
+    // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
     .map((c) => `${c.name} (${c.set}): ${formatPrice(c)} | Trend: ${c.trendPercent?.toFixed(1)}%`)
     .join('\n');
 
@@ -24,7 +41,10 @@ export async function generateMarketSummary(
     model: MODEL,
     // Großzügig bemessen: ein abgeschnittener Marktbericht endet mitten im Satz
     // und ist auf der Seite sofort sichtbar.
-    max_tokens: 4000,
+    // Ein zu knappes Limit hat schon einmal JEDEN Artikel wochenlang auf den
+    // Ersatztext fallen lassen (Stolperstelle 22) — Tokens sind billiger als
+    // ein toter Beitrag.
+    max_tokens: 16000,
     messages: [
       {
         role: 'user',
@@ -68,12 +88,14 @@ export async function generateNewsletterContent(
 ): Promise<NewsletterContent> {
   const topCards = cards.slice(0, 5);
   const cardDetails = topCards
+    // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
     .map((c, i) => `${i + 1}. ${c.name} (${c.set}) — ${formatPrice(c)} | Score: ${c.investmentScore}/100 | Trend: ${c.trendPercent?.toFixed(1) || 0}%`)
     .join('\n');
 
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 2048,
+    // Langtext mit JSON-Struktur — siehe Stolperstelle 22.
+    max_tokens: 16000,
     messages: [
       {
         role: 'user',
@@ -98,7 +120,8 @@ export async function generateNewsletterContent(
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     newsletterData = JSON.parse(jsonMatch?.[0] || '{}');
-  } catch {
+  } catch (err) {
+    warnUnusable('Newsletter', message.stop_reason, err);
     newsletterData = {
       subject: 'PokéMarket Weekly: Top Karten dieser Woche',
       preheader: 'Deine wöchentliche Marktanalyse ist da',
@@ -107,7 +130,7 @@ export async function generateNewsletterContent(
         name: c.name,
         set: c.set,
         price: formatPrice(c),
-        trend: `${(c.trendPercent || 0) >= 0 ? '+' : ''}${(c.trendPercent || 0).toFixed(1)}%`,
+        trend: formatPercent(c.trendPercent || 0),
         score: c.investmentScore || 0,
         reason: 'Starke Performance diese Woche.',
       })),
@@ -139,12 +162,14 @@ export async function generateVideoScript(
 
   const topCards = cards.slice(0, isShortForm ? 3 : 5);
   const cardInfo = topCards
+    // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
     .map((c) => `${c.name} (${c.set}): ${formatPrice(c)}, Trend: ${c.trendPercent?.toFixed(1)}%`)
     .join('\n');
 
   const message = await client.messages.create({
     model: MODEL,
-    max_tokens: 2048,
+    // JSON mit Szenenliste und Voiceover — siehe Stolperstelle 22.
+    max_tokens: 16000,
     messages: [
       {
         role: 'user',
@@ -159,7 +184,8 @@ export async function generateVideoScript(
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     parsed = JSON.parse(jsonMatch?.[0] || '{}');
-  } catch {
+  } catch (err) {
+    warnUnusable('Video-Skript', message.stop_reason, err);
     parsed = { title: 'Top 5 Pokémon Investment-Karten', description: 'Wöchentliche Marktanalyse', tags: ['pokémon'], voiceoverText: '', scenes: [] };
   }
 
@@ -197,12 +223,15 @@ export async function generateSocialPosts(
   try {
     const jsonMatch = responseText.match(/\[[\s\S]*\]/);
     return JSON.parse(jsonMatch?.[0] || '[]');
-  } catch {
+  } catch (err) {
+    warnUnusable('Social-Posts', message.stop_reason, err);
     return [];
   }
 }
 
 function formatPrice(card: PokemonCard): string {
+  // Landet nicht nur im Prompt, sondern auch im Newsletter-Ersatzinhalt —
+  // also sichtbarer Text und damit Pflicht für die deutsche Schreibweise.
   const price = card.prices.market || card.prices.holofoil?.market || 0;
-  return price > 0 ? `${price.toFixed(2)} €` : 'N/A';
+  return price > 0 ? formatEur(price) : 'N/A';
 }

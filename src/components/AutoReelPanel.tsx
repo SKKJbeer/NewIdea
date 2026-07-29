@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Clapperboard, Loader2, Share2, Download, CheckCircle2, AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
+import { formatPercent } from '@/lib/format';
 
 interface AutoReelResult {
   reelUrl: string | null;
@@ -119,7 +120,7 @@ export function AutoReelPanel() {
                   <li key={c.name} className="flex items-center justify-between text-xs">
                     <span className="text-slate-300 truncate">{c.name}</span>
                     <span className={`font-bold tabular-nums ${c.trendPercent >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {c.trendPercent >= 0 ? '+' : ''}{c.trendPercent.toFixed(1).replace('.', ',')} %
+                      {formatPercent(c.trendPercent)}
                     </span>
                   </li>
                 ))}

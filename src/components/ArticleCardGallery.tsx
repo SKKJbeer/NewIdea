@@ -38,6 +38,7 @@ export function ArticleCardGallery({ cards, accentColor }: Props) {
     .filter((c) => c.price > 0)
     .map((c) => ({
       name: c.name.length > 14 ? c.name.slice(0, 13) + '…' : c.name,
+      // toFixed erlaubt: Rundung eines Chart-Datenpunkts, keine Anzeige
       price: parseFloat(c.price.toFixed(2)),
       trend: c.trend,
     }));

@@ -28,6 +28,7 @@ export default function MerklistePage() {
     setMounted(true);
     try {
       setItems(parseWatchlist(localStorage.getItem(WATCHLIST_KEY)));
+      // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     } catch {}
   }, []);
 
@@ -59,6 +60,7 @@ export default function MerklistePage() {
   function remove(cardId: string) {
     const updated = items.filter((i) => i.cardId !== cardId);
     setItems(updated);
+    // catch erlaubt: localStorage kann im privaten Modus gesperrt sein — die Seite funktioniert dann ohne gespeicherte Daten weiter
     try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(updated)); } catch {}
   }
 

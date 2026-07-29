@@ -159,7 +159,7 @@ export function ReelsStudio() {
             <div key={s} className="flex items-center gap-1">
               {i > 0 && <div className="w-6 h-px bg-[#2a2a3a]" />}
               <span className={`px-2 py-0.5 rounded-full font-semibold transition-colors ${
-                done ? 'bg-green-100 text-green-700' : active ? 'bg-violet-100 text-violet-700' : 'bg-[#1a1a28] text-slate-500'
+                done ? 'bg-emerald-500/10 text-emerald-400' : active ? 'bg-violet-100 text-violet-700' : 'bg-[#1a1a28] text-slate-500'
               }`}>
                 {labels[i]}
               </span>
@@ -385,11 +385,11 @@ export function ReelsStudio() {
           )}
 
           {published ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-              <CheckCircle2 size={20} className="text-green-600 shrink-0" />
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
+              <CheckCircle2 size={20} className="text-emerald-400 shrink-0" />
               <div>
-                <p className="text-sm font-bold text-green-800">Reel wurde gepostet!</p>
-                <p className="text-xs text-green-600 mt-0.5">Auf Instagram sichtbar in wenigen Minuten.</p>
+                <p className="text-sm font-bold text-emerald-300">Reel wurde gepostet!</p>
+                <p className="text-xs text-emerald-400 mt-0.5">Auf Instagram sichtbar in wenigen Minuten.</p>
               </div>
             </div>
           ) : (
@@ -411,17 +411,17 @@ export function ReelsStudio() {
 
       {/* Error state */}
       {step === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-5">
           <div className="flex items-start gap-3">
-            <AlertCircle size={18} className="text-red-500 shrink-0 mt-0.5" />
+            <AlertCircle size={18} className="text-rose-400 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-bold text-red-800">Fehler</p>
-              <p className="text-xs text-red-600 mt-1">{errorMsg}</p>
+              <p className="text-sm font-bold text-rose-300">Fehler</p>
+              <p className="text-xs text-rose-400 mt-1">{errorMsg}</p>
             </div>
           </div>
           <button
             onClick={reset}
-            className="mt-4 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-800 border border-red-200 rounded-xl py-2 transition-colors"
+            className="mt-4 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-rose-400 hover:text-rose-300 border border-rose-500/20 rounded-xl py-2 transition-colors"
           >
             <RefreshCw size={12} /> Nochmal versuchen
           </button>

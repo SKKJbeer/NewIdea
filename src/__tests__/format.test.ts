@@ -47,24 +47,32 @@ describe('formatAmount', () => {
 
 describe('formatPercent', () => {
   it('setzt ein Pluszeichen bei positiven Werten', () => {
-    expect(formatPercent(3.42)).toBe('+3,4 %');
+    expect(formatPercent(3.42)).toBe(`+3,4${NBSP}%`);
   });
 
   it('behält das Minus bei negativen Werten', () => {
-    expect(formatPercent(-1.25)).toBe('-1,3 %');
+    expect(formatPercent(-1.25)).toBe(`-1,3${NBSP}%`);
   });
 
   it('lässt das Vorzeichen auf Wunsch weg', () => {
     // Für Stellen, an denen Farbe oder Icon die Richtung schon zeigt.
-    expect(formatPercent(3.4, { withSign: false })).toBe('3,4 %');
+    expect(formatPercent(3.4, { withSign: false })).toBe(`3,4${NBSP}%`);
   });
 
   it('unterstützt abweichende Nachkommastellen', () => {
-    expect(formatPercent(3.456, { digits: 2 })).toBe('+3,46 %');
+    expect(formatPercent(3.456, { digits: 2 })).toBe(`+3,46${NBSP}%`);
   });
 
   it('zeigt bei null kein Pluszeichen', () => {
-    expect(formatPercent(0)).toBe('0,0 %');
+    expect(formatPercent(0)).toBe(`0,0${NBSP}%`);
+  });
+
+  it('trennt Zahl und Einheit mit einem geschützten Leerzeichen', () => {
+    // Genau wie Intl es vor dem €-Zeichen tut. Mit einem normalen Leerzeichen
+    // kann der Zeilenumbruch zwischen Zahl und Einheit fallen — in schmalen
+    // Spalten und in Reel-Captions sichtbar.
+    expect(formatPercent(12.3)).toContain(NBSP);
+    expect(formatPercent(12.3)).not.toMatch(/\d %/);
   });
 });
 

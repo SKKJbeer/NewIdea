@@ -303,10 +303,23 @@ export const CONCEPTS: Array<{ id: string; label: string; build: ConceptBuilder 
   { id: 'dreissig-tage', label: 'Preis gegen 30-Tage-Schnitt', build: dreissigTage },
 ];
 
-/** Kalenderwoche — steuert die Rotation, damit sich Formate abwechseln. */
+/**
+ * Fortlaufende Wochennummer — steuert die Rotation, damit sich Formate abwechseln.
+ *
+ * Gezählt wird ab dem MONTAG der jeweiligen Woche, nicht ab dem 1. Januar.
+ * Die frühere Rechnung („Tage seit Jahresbeginn durch sieben") verschob die
+ * Wochengrenze auf den Wochentag des 1. Januar: 2026 fiel sie auf Donnerstag,
+ * ein Reel vom Montag und eines vom Freitag derselben Woche bekamen also
+ * unterschiedliche Formate. Jetzt liefert jeder Tag einer Woche denselben Wert —
+ * dieselbe Montags-Basis wie beim Wochen-Marktbericht.
+ */
 export function weekIndex(now: Date = new Date()): number {
-  const start = Date.UTC(now.getUTCFullYear(), 0, 1);
-  return Math.floor((now.getTime() - start) / (7 * 24 * 3600 * 1000));
+  const monday = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() - ((now.getUTCDay() + 6) % 7),
+  );
+  return Math.floor(monday / (7 * 24 * 3600 * 1000));
 }
 
 /**

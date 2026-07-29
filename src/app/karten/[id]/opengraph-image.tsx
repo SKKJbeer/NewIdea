@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { fetchCardById, displayPrice } from '@/lib/pokemon-api';
+import { formatEur } from '@/lib/format';
 
 // Dynamisches OG-Bild pro Karte — Kartenmotiv + Name + Preis. Macht geteilte
 // Kartenlinks (WhatsApp/Discord/X) sofort attraktiv statt nackter Text.
@@ -14,7 +15,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const name = card?.nameDe || card?.name || 'Pokémon Karte';
   const setName = card?.set || '';
   const price = card ? displayPrice(card) : 0;
-  const priceText = price > 0 ? `${price.toFixed(2).replace('.', ',')} €` : null;
+  const priceText = price > 0 ? formatEur(price) : null;
   const img = card?.imageUrl || null;
 
   return new ImageResponse(

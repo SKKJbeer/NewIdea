@@ -5,7 +5,7 @@ import { CardImage } from './CardImage';
 import { PokemonCard } from '@/types';
 import { TrendingUp, TrendingDown, Star, ImageOff } from 'lucide-react';
 import { BoosterPackImage } from './BoosterPackImage';
-import { formatEur, formatPercent } from '@/lib/format';
+import { formatEur, formatEurRounded, formatPercent } from '@/lib/format';
 
 interface CardGridProps {
   cards: PokemonCard[];
@@ -60,7 +60,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
           <div className="p-1.5">
             <p className="text-[10px] font-semibold text-slate-300 leading-tight line-clamp-1">{card.name}</p>
             <p className="text-[10px] font-bold text-slate-400 tabular-nums">
-              {price > 0 ? `${price.toFixed(0)} €` : '—'}
+              {price > 0 ? formatEurRounded(price) : '—'}
               {priceLanguage !== 'EN' && <span className="ml-1 text-[9px] text-violet-400">{priceLanguage}</span>}
             </p>
           </div>

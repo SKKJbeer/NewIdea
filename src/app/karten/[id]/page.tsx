@@ -133,6 +133,7 @@ export default async function CardDetailPage({ params }: Props) {
       offers: {
         '@type': 'Offer',
         priceCurrency: 'EUR',
+        // toFixed erlaubt: JSON-LD, schema.org verlangt den Punkt als Trennzeichen
         price: price.toFixed(2),
         priceValidUntil: new Date(Date.now() + 86400000).toISOString().split('T')[0],
         availability: 'https://schema.org/InStock',
@@ -307,7 +308,7 @@ export default async function CardDetailPage({ params }: Props) {
                   href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.set} Booster`)}`}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-gray-900 rounded-xl py-2.5 font-semibold text-sm transition-colors"
+                  className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-xl py-2.5 font-semibold text-sm transition-colors"
                 >
                   Booster auf Amazon kaufen <ExternalLink size={13} className="opacity-70" />
                 </a>

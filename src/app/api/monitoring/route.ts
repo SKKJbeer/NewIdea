@@ -114,6 +114,10 @@ export async function GET(request: Request) {
     try {
       const res = await fetch('https://api.pokemontcg.io/v2/cards?pageSize=1', {
         headers: { 'X-Api-Key': process.env.POKEMON_TCG_API_KEY! },
+        // Ohne Zeitlimit hängt die Monitoring-Seite bis zum Vercel-Hardlimit,
+        // wenn die TCG-API klemmt — ausgerechnet die Seite, die den Ausfall
+        // anzeigen soll.
+        signal: AbortSignal.timeout(8000),
         next: { revalidate: 300 },
       });
       tcgApiWorking = res.ok;

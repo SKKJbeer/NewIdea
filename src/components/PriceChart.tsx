@@ -1,5 +1,5 @@
 'use client';
-import { formatEur } from '@/lib/format';
+import { formatEur, formatEurRounded } from '@/lib/format';
 
 import {
   ResponsiveContainer,
@@ -80,7 +80,7 @@ export function PriceChart({ data }: { data: PricePoint[] }) {
           tick={{ fontSize: 10, fill: '#64748b' }}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(v: number) => `${v.toFixed(0)}€`}
+          tickFormatter={(v: number) => formatEurRounded(v)}
           width={38}
         />
         <Tooltip content={<CustomTooltip />} />

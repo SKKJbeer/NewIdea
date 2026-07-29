@@ -7,6 +7,28 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.30.0] — 2026-07-29 · Tiefere Tests: 135 neue Prüfungen, sieben gefundene Fehler
+
+### Neu
+- **Sieben neue Testdateien** decken bisher ungeprüfte Bereiche ab: Studio-Zugang, Preis-Wahrheitspflicht, Reel-Formate, Startseiten-Absicherung, Bild-Proxy, Übersetzungen und Kartennamen
+- **Architektur-Regeln werden automatisch durchgesetzt**: Zahlenformat, Dark-Mode-Farben, Auth auf Inhalts-Auslösern, keine internen Fehlerdetails nach außen, kein stilles Verschlucken von Fehlern, Zeitlimit auf externen Aufrufen
+- Ausnahmen von diesen Regeln werden im Quelltext begründet (`// toFixed erlaubt: …`), nicht in einer Liste im Test — die Begründung steht dort, wo sie beim Lesen gebraucht wird
+- Insgesamt 284 statt 149 Tests
+
+### Behoben
+Die neuen Tests haben diese Fehler gefunden:
+- **Preise und Prozentwerte an sechs Stellen wieder in englischer Schreibweise** — Kartenraster, Preis-Chart-Achse, Set-Gesamtwert, Marktbreite auf der Startseite, Reel-Vorschau im Studio sowie das Social-Vorschaubild
+- **Newsletter-Preise und -Trends** liefen an der zentralen Formatierung vorbei
+- **Prozentwerte konnten am Zeilenende umbrechen** — zwischen Zahl und `%` steht jetzt ein geschütztes Leerzeichen, genau wie beim €-Zeichen
+- **Reel-Formate wechselten mitten in der Woche**: Die Wochenzählung lief ab dem 1. Januar statt ab Montag, dadurch konnten Montag und Freitag derselben Woche unterschiedliche Formate ergeben
+- **Zwei API-Antworten gaben interne Fehlerdetails nach außen** (Pfade, Architektur)
+- **Drei KI-Aufrufe verschluckten ihren Fehler stumm** und drei Token-Limits waren zu knapp bemessen — dasselbe Muster, das den wochenlangen Artikel-Ausfall verursacht hat
+- **Die Monitoring-Seite rief die TCG-API ohne Zeitlimit auf** — ausgerechnet die Seite, die einen Ausfall anzeigen soll, konnte daran hängenbleiben
+- **Studio und Reels-Studio hatten noch helle Boxen** aus der Zeit vor dem Dark Mode
+- Ein Kommentar behauptete, der Preisverlauf werde interpoliert — seit v2.19.1 falsch und ein Widerspruch zur Preis-Wahrheitspflicht
+
+---
+
 ## [2.29.0] — 2026-07-29 · Marktbericht und Artikel per Klick auslösen
 
 ### Neu

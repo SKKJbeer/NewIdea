@@ -56,7 +56,11 @@ export function formatPercent(value: number, { withSign = true, digits = 1 } = {
     maximumFractionDigits: digits,
   }).format(value);
   const sign = withSign && value > 0 ? '+' : '';
-  return `${sign}${formatted} %`;
+  // Geschütztes Leerzeichen (U+00A0) vor dem Prozentzeichen — genau wie Intl es
+  // vor dem €-Zeichen setzt. Mit einem normalen Leerzeichen kann der Umbruch
+  // zwischen Zahl und Einheit fallen („21,4" am Zeilenende, „%" auf der nächsten),
+  // was in schmalen Spalten und in Reel-Captions sichtbar passiert.
+  return `${sign}${formatted} %`;
 }
 
 /** Kompakter Betrag für Diagramm-Achsen: "1,2k €" ab 1000, sonst "235 €" */

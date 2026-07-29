@@ -66,6 +66,7 @@ export function PortfolioChart({ data, color, baselineValue, onScrub }: Props) {
 
   // ── SVG path helpers ──────────────────────────────────────────────────────
 
+  // toFixed erlaubt: SVG-Koordinate, keine Anzeigezahl
   function f(n: number) { return n.toFixed(2); }
 
   function buildLinePath(points: { x: number; y: number }[]): string {

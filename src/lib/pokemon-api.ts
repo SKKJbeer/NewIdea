@@ -238,9 +238,6 @@ export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
   });
 }
 
-// Baut einen 30-Tage-Verlauf aus den ECHTEN Cardmarket-Durchschnittspreisen.
-// Ankerpunkte: avg30 (vor 30 Tagen), avg7 (vor 7 Tagen), avg1 (gestern), trendPrice (heute).
-// Zwischen den Ankern wird linear interpoliert — die Eckwerte sind reale Marktdaten.
 /**
  * Baut aus den echten Cardmarket-Durchschnittsfeldern ehrliche Ankerpunkte —
  * KEINE erfundene Tagesgranularität, KEINE lineare Interpolation.

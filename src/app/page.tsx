@@ -55,7 +55,8 @@ function Sparkline({
   const range = max - min || 1;
   const pts = prices
     .map((p, i) => {
-      const x = ((i / (prices.length - 1)) * w).toFixed(1);
+      // toFixed erlaubt: SVG-Koordinaten, keine Anzeigezahlen
+    const x = ((i / (prices.length - 1)) * w).toFixed(1);
       const y = (h - ((p - min) / range) * h).toFixed(1);
       return `${x},${y}`;
     })
@@ -216,16 +217,16 @@ export default async function Home() {
     );
   }
   if (withTrend.length > 0) {
-    const pctStr = breadthPct.toFixed(0);
+    const pctStr = formatPercent(breadthPct, { withSign: false, digits: 0 });
     insights.push(
       gainCount > withTrend.length / 2
         ? `Marktbreite positiv: ${gainCount} von ${withTrend.length} analysierten Karten notieren über ihrem 30-Tages-Schnitt.`
-        : `Marktbreite negativ: Nur ${gainCount} von ${withTrend.length} Karten über ihrem 30-Tages-Schnitt (${pctStr}%).`
+        : `Marktbreite negativ: Nur ${gainCount} von ${withTrend.length} Karten über ihrem 30-Tages-Schnitt (${pctStr}).`
     );
   }
   if (topSets[0]) {
     insights.push(
-      `${topSets[0].name} — stärkstes Set im Datensatz nach Durchschnittspreis (Ø ${topSets[0].avgPrice.toFixed(0)} €, ${topSets[0].count} Karten).`
+      `${topSets[0].name} — stärkstes Set im Datensatz nach Durchschnittspreis (Ø ${formatEurRounded(topSets[0].avgPrice)}, ${topSets[0].count} Karten).`
     );
   }
 
@@ -336,7 +337,7 @@ export default async function Home() {
                   <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Marktbreite</span>
                 </div>
                 <p className={`text-2xl font-black tabular-nums leading-none ${breadthPct >= 50 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {breadthPct.toFixed(0)}%
+                  {formatPercent(breadthPct, { withSign: false, digits: 0 })}
                 </p>
                 <p className="mt-1.5 text-[10px] text-slate-600">{gainCount}/{withTrend.length} im Plus (30T)</p>
               </div>

@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.30.0',
+    date: '29. Juli 2026',
+    label: 'Tiefere Tests: 135 neue Prüfungen, sieben gefundene Fehler',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Sieben neue Testdateien für Studio-Zugang, Preis-Wahrheitspflicht, Reel-Formate, Startseiten-Absicherung, Bild-Proxy und Übersetzungen — 284 statt 149 Tests' },
+      { type: 'new',     text: 'Architektur-Regeln werden automatisch durchgesetzt: Zahlenformat, Dark-Mode-Farben, Auth auf Inhalts-Auslösern, keine internen Fehlerdetails nach außen' },
+      { type: 'fixed',   text: 'Preise und Prozentwerte an sechs Stellen wieder englisch formatiert — Kartenraster, Chart-Achse, Set-Gesamtwert, Startseite, Studio, Social-Vorschaubild' },
+      { type: 'fixed',   text: 'Reel-Formate wechselten mitten in der Woche: Die Wochenzählung lief ab 1. Januar statt ab Montag' },
+      { type: 'fixed',   text: 'Zwei API-Antworten gaben interne Fehlerdetails preis; drei KI-Aufrufe verschluckten ihren Fehler stumm' },
+    ],
+  },
+  {
     version: '2.29.0',
     date: '29. Juli 2026',
     label: 'Marktbericht und Artikel per Klick auslösen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Monitoring hat jetzt Auslöser für Marktbericht und Artikel — bisher ging beides nur per Kommandozeile mit dem Studio-Passwort' },
       { type: 'new',     text: 'Der Artikel-Lauf prüft die letzten acht Termine und ersetzt nur Ersatztexte; echte Beiträge bleiben unangetastet' },

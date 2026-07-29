@@ -13,6 +13,9 @@ export async function POST(request: Request) {
     const result = await runFullVideoPipeline(script, cards);
     return NextResponse.json({ success: result.success, script: { title: script.title, duration: script.duration, sceneCount: script.scenes.length }, pipeline: result });
   } catch (error) {
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    // Ursache server-seitig loggen, nach außen generisch antworten:
+    // String(error) verrät Pfade, Schlüssel und Architektur.
+    console.error('Video-Pipeline fehlgeschlagen:', error);
+    return NextResponse.json({ error: 'internal_error' }, { status: 500 });
   }
 }
