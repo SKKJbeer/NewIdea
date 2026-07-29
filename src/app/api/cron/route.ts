@@ -3,10 +3,17 @@ import { revalidatePath } from 'next/cache';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
 import { generateMarketSummary, generateNewsletterContent } from '@/lib/ai-generator';
 import { sendNewsletter } from '@/lib/newsletter';
-import { saveMarketReport } from '@/lib/market-report-storage';
+import { generateAndSaveMarketReport } from '@/lib/market-report-generator';
 
 // Montags 07:00 UTC: Marktbericht generieren und als Newsletter-Draft in Beehiiv anlegen.
 // Video- und Social-Media-Pipeline erfolgt manuell via /studio (erfordert separate Keys).
+//
+// WICHTIG: Bericht und Newsletter laufen in GETRENNTEN try/catch-Blöcken. Vorher
+// lag alles in einem einzigen Block — ein Fehler beim Newsletter (oder irgendwo
+// sonst) verhinderte, dass überhaupt ein Bericht entsteht, und die Antwort sagte
+// nur „internal_error".
+export const maxDuration = 300;
+
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -15,46 +22,40 @@ export async function GET(request: Request) {
 
   const results: Record<string, unknown> = {};
 
+  // 1. Marktbericht — der eigentliche Seiteninhalt. Status inkl. Ursache in die Antwort.
+  const report = await generateAndSaveMarketReport();
+  results.marketReport = report.status;
+  results.marketReportWeek = report.weekNumber ?? null;
+  if (report.reportChars !== undefined) results.marketReportChars = report.reportChars;
+  if (report.error) results.marketReportError = report.error;
+
+  if (report.status === 'created') {
+    revalidatePath('/marktbericht');
+    revalidatePath('/marktbericht/archiv');
+    revalidatePath('/');
+    console.log(`✅ Marktbericht KW ${report.weekNumber} gespeichert (${report.reportChars} Zeichen)`);
+  }
+
+  // 2. Newsletter — optional. Ein Fehler hier darf den Bericht nicht entwerten.
   try {
     const cards = await fetchTrendingCards(20);
     const sorted = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0));
-
     const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
-    results.marketSummary = 'generated';
-
-    // Persist report so /marktbericht serves cached content to all users
-    const topValue = [...cards].sort((a, b) => {
-      const pa = a.prices.market || a.prices.holofoil?.market || 0;
-      const pb = b.prices.market || b.prices.holofoil?.market || 0;
-      return pb - pa;
-    }).slice(0, 6);
-
-    const now = new Date();
-    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7)));
-    const weekNumber = Math.ceil(((monday.getTime() - new Date(Date.UTC(monday.getUTCFullYear(), 0, 1)).getTime()) / 86400000 + 1) / 7);
-
-    await saveMarketReport({
-      weekStart: monday.toISOString().split('T')[0],
-      weekNumber,
-      reportText: summary.weeklyReport,
-      topGainers: summary.topGainers.slice(0, 6),
-      topValue,
-      createdAt: new Date().toISOString(),
-    });
-    results.marketReportSaved = true;
-
     const newsletter = await generateNewsletterContent(summary, cards);
     const newsletterSent = await sendNewsletter(newsletter);
     results.newsletter = newsletterSent ? 'draft_created' : 'skipped_no_key';
-
-    revalidatePath('/marktbericht');
-    revalidatePath('/artikel');
-    results.revalidated = true;
-
-    return NextResponse.json({ success: true, timestamp: new Date().toISOString(), results });
-  } catch (error) {
-    // Detaillierte Fehler nur ins Server-Log, nicht in die Response (kein Leak interner Details/Keys).
-    console.error('Weekly cron failed:', error);
-    return NextResponse.json({ success: false, error: 'internal_error' }, { status: 500 });
+  } catch (err) {
+    results.newsletter = 'failed';
+    results.newsletterError = err instanceof Error ? err.message : 'unbekannt';
+    console.error('Newsletter-Schritt fehlgeschlagen:', err);
   }
+
+  revalidatePath('/artikel');
+
+  // Erfolg = der Bericht steht. Alles andere ist Beiwerk.
+  return NextResponse.json({
+    success: report.status === 'created',
+    timestamp: new Date().toISOString(),
+    results,
+  });
 }

@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.23.0] — 2026-07-29 · Marktbericht: Platzhalter entfernt, Erzeugung repariert
+
+### Behoben
+- **Als Wochenanalyse stand ein Platzhalter online.** Der angezeigte Bericht bestand aus einem einzigen Wort und stammte aus Kalenderwoche 26 — seither wurde kein neuer Bericht mehr erzeugt, das Archiv blieb leer. Solche Platzhalter werden jetzt gar nicht mehr angezeigt und auch nicht mehr gespeichert
+- **Der Wochen-Cron meldete Erfolg, ohne ihn zu prüfen**: Der Rückgabewert des Speichervorgangs wurde verworfen, ein fehlgeschlagenes Speichern sah deshalb wie ein Erfolg aus. Jetzt wird das Ergebnis geprüft und die Ursache im Klartext zurückgegeben
+- **Ein Fehler im Newsletter-Schritt verhinderte den ganzen Bericht**: Alles lief in einem einzigen Fehler-Block. Bericht und Newsletter sind jetzt entkoppelt — der Bericht entsteht auch dann, wenn der Newsletter scheitert
+
+### Neu
+- **Qualitätsgate für den Marktbericht**: Ein zu kurzer Text wird nicht veröffentlicht. Lieber kein neuer Bericht als ein Platzhalter auf der Startseite
+- **Bericht manuell erzeugen**: Ein geschützter Auslöser erstellt sofort einen echten Wochenbericht, statt bis Montag zu warten — mit Klartext-Rückmeldung im Fehlerfall
+- 12 neue Tests (133 gesamt)
+
+---
+
 ## [2.22.0] — 2026-07-27 · Echte Artikel statt Ausweichtexte
 
 ### Behoben

@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.22.0` · **Stand:** 27. Juli 2026 · **Branch:** `main`
+**Version:** `v2.23.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,13 +8,13 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.22.0)
+## Was gebaut ist (Stand v2.23.0)
 
 | Bereich | Status | Details |
 |---|---|---|
 | Startseite `/` | ✅ Fertig | Bloomberg/TradingView Dark Mode, PMI, Fear & Greed, Sparklines, Ticker · ISR 1h |
 | Suche `/suche` | ✅ Fertig | Autocomplete (debounce 320ms), zentrale Filterung leerer Preview-Karten, Dark Dropdown |
-| Marktbericht `/marktbericht` | ✅ Fertig | KI-Wochenanalyse, ISR 1h, Archiv `/marktbericht/archiv` + `/marktbericht/[week]` |
+| Marktbericht `/marktbericht` | ⚠️ Nachziehen | v2.23.0 behebt Erzeugung + entfernt Platzhalter. Seit KW 26 kein echter Bericht — per `POST /api/market-report/generate` sofort erzeugen |
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
 | Artikel-Erzeugung | ⚠️ Nachziehen | v2.22.0 behebt die Ursache (Token-Limit). Bestehende 8 Beiträge sind noch Fallbacks — per `POST /api/articles/generate` neu erzeugen |
 | Tagesartikel `/artikel/[date]` | ✅ Fertig | Selbstheilend (on-demand-Generierung), ISR 24h, KI + Fallback, 404-Fix |
@@ -31,7 +31,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Supabase Preis-Snapshots | ✅ Aktiv | Sammelt täglich echte Daten seit Inbetriebnahme |
 | i18n DE/EN | ✅ Fertig | Cookie-basiert, NavBar-Umschalter |
 | SEO | ✅ Fertig | JSON-LD, Sitemap (inkl. Artikel/Guides/Berichte), robots.txt, OpenGraph |
-| Tests | ✅ 125 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht, Compliance, Merkliste, System-Health |
+| Tests | ✅ 133 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht, Compliance, Merkliste, System-Health |
 | Monitoring: Betriebszustand | ✅ Fertig | Echte Zeilenzahlen + Datenstände + Klartext-Fehler + Setup-SQL (`src/lib/system-health.ts`) |
 | Guide-Pipeline | ⚠️ Prüfen | Diagnose eingebaut (v2.21.0) — Betriebszustand auf `/monitoring` öffnen, ggf. fehlende Tabelle per SQL anlegen, dann „Jetzt testen" |
 | Newsletter-System (Beehiiv) | ⏸ Bereit | Code fertig — `BEEHIIV_API_KEY` noch nicht gesetzt |
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.23.0 | BUGFIX Marktbericht: Platzhalter („test") seit KW 26 live, Cron meldete Erfolg ohne Prüfung, Newsletter-Fehler riss den Bericht mit. Qualitätsgate + Anzeige-Filter + manueller Auslöser + entkoppelter Cron |
 | v2.22.0 | BUGFIX Content: max_tokens zu knapp (2048) → jede KI-Antwort abgeschnitten → stiller Fallback bei ALLEN Artikeln. Erhöht + stop_reason-Prüfung + Klartext-Logging; Marktbericht bekommt Content-/Style-Rules; Lesezeit-Fallback; Rückblick-Fallback ehrlich zeitlos; Nach-Generierungs-Endpoint |
 
 ---
@@ -186,4 +187,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.22.0 — 27. Juli 2026*
+*Zuletzt aktualisiert: v2.23.0 — 29. Juli 2026*

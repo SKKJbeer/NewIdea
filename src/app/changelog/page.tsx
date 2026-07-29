@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.23.0',
+    date: '29. Juli 2026',
+    label: 'Marktbericht: Platzhalter entfernt, Erzeugung repariert',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Als Wochenanalyse stand ein Platzhalter aus Kalenderwoche 26 online — solche Texte werden jetzt weder angezeigt noch gespeichert' },
+      { type: 'fixed',   text: 'Der Wochen-Cron meldete Erfolg, ohne das Speichern zu prüfen; die Ursache kommt jetzt im Klartext zurück' },
+      { type: 'fixed',   text: 'Ein Fehler im Newsletter-Schritt verhinderte den ganzen Bericht — beide Schritte sind jetzt entkoppelt' },
+      { type: 'new',     text: 'Qualitätsgate: zu kurze Berichte werden nicht veröffentlicht' },
+      { type: 'new',     text: 'Wochenbericht lässt sich sofort manuell erzeugen statt auf Montag zu warten' },
+    ],
+  },
+  {
     version: '2.22.0',
     date: '27. Juli 2026',
     label: 'Echte Artikel statt Ausweichtexte',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Kein Blog-Beitrag wurde tatsächlich aus Marktdaten erstellt — das Token-Limit war zu knapp, die Antwort brach ab und fiel still auf einen allgemeinen Ausweichtext zurück. Behoben, ebenso bei Guides und Marktbericht' },
       { type: 'fixed',   text: 'Lesezeit fehlte bei älteren Beiträgen („Min Lektüre" ohne Zahl) — wird jetzt bei Bedarf aus dem Text berechnet' },

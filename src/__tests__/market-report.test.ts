@@ -20,15 +20,19 @@ describe('market-report-storage exports', () => {
     expect(result.length).toBe(0);
   });
 
-  it('saveMarketReport returns false when Supabase is not configured', async () => {
+  it('saveMarketReport meldet Misserfolg samt Ursache, wenn Supabase fehlt', async () => {
     const result = await saveMarketReport({
       weekStart: '2026-06-22',
       weekNumber: 26,
-      reportText: 'test',
+      reportText: 'Ein vollwertiger Berichtstext.',
       topGainers: [],
       topValue: [],
       createdAt: new Date().toISOString(),
     });
-    expect(result).toBe(false);
+    expect(result.ok).toBe(false);
+    // Die Ursache muss im Klartext ankommen — ein blankes `false` hat den
+    // Wochen-Cron zuvor fälschlich Erfolg melden lassen.
+    expect(result.error).toBeTruthy();
+    expect(result.error).toMatch(/Supabase/i);
   });
 });
