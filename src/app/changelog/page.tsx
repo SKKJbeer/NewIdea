@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.27.0',
+    date: '29. Juli 2026',
+    label: 'Instagram-Konzept: vier Formate mit eigener Dramaturgie',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Vier Reel-Formate, die automatisch nach Kalenderwoche rotieren: Stärkste Bewegungen, Preis-Check (Quiz), Teuerste eines Sets, Preis gegen 30-Tage-Schnitt' },
+      { type: 'new',     text: 'Durchgängige Dramaturgie: Haken zuerst, dann Karten, dann Einordnung, Marke zuletzt' },
+      { type: 'changed', text: 'Das Marken-Intro am Anfang ist entfallen — dort steht jetzt der Haken' },
+    ],
+  },
+  {
     version: '2.26.0',
     date: '29. Juli 2026',
     label: 'Reels im eigenen Look: lebendiger und hochwertiger',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Reels komplett neu gestaltet: Raster-Hintergrund, farbige Lichtstimmung nach Trendrichtung, Platzierung als große Ziffer, Karte mit farbigem Ring' },
       { type: 'changed', text: 'Der Trend ist jetzt die Hauptkennzahl — groß, farbig, mit Richtungspfeil; Marktwert als eigenes Feld' },

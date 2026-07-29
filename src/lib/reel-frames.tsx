@@ -116,46 +116,67 @@ function Progress({ current, total, color }: { current: number; total: number; c
   );
 }
 
-/** Intro: Markenbild mit Titel und Datum. */
-export function introFrame(title: string, dateLabel: string): Promise<Buffer> {
+/**
+ * Haken — das ERSTE Bild des Reels.
+ *
+ * Bewusst KEIN Marken-Intro: Die ersten Sekunden entscheiden, ob jemand bleibt.
+ * Die Marke steht am Ende (siehe reel-concepts.ts → Dramaturgie).
+ */
+export function hookFrame(
+  headline: string,
+  sub: string | undefined,
+  accent: 'violet' | 'up' | 'down' = 'violet',
+): Promise<Buffer> {
+  const color = accent === 'up' ? UP : accent === 'down' ? DOWN : VIOLET;
   return toPng(
-    <div style={{ ...stage(VIOLET, FUCHSIA), justifyContent: 'center' }}>
-      <Pill text="MARKTDATEN LIVE" color={VIOLET} />
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 70 }}>
-        <div style={{ display: 'flex', fontSize: 104, letterSpacing: -3, lineHeight: 1 }}>POKÉMARKET</div>
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 104,
-            letterSpacing: -3,
-            lineHeight: 1,
-            marginTop: 6,
-            backgroundImage: `linear-gradient(90deg, ${VIOLET}, ${FUCHSIA})`,
-            backgroundClip: 'text',
-            color: 'transparent',
-          }}
-        >
-          INTELLIGENCE
-        </div>
-      </div>
-
+    <div style={{ ...stage(color, FUCHSIA), justifyContent: 'center', padding: '0 76px' }}>
       <div
         style={{
           display: 'flex',
-          width: 260,
+          fontSize: 82,
+          lineHeight: 1.16,
+          textAlign: 'center',
+          letterSpacing: -2,
+        }}
+      >
+        {headline}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          width: 240,
           height: 8,
           borderRadius: 999,
-          backgroundImage: `linear-gradient(90deg, ${VIOLET}, ${FUCHSIA})`,
-          margin: '64px 0',
+          backgroundImage: `linear-gradient(90deg, ${color}, ${FUCHSIA})`,
+          margin: '52px 0',
         }}
       />
+      {sub ? (
+        <div style={{ display: 'flex', fontSize: 42, color: '#94a3b8', textAlign: 'center' }}>{sub}</div>
+      ) : null}
+    </div>,
+  );
+}
 
-      <div style={{ display: 'flex', fontSize: 62, color: '#e2e8f0', textAlign: 'center', padding: '0 90px' }}>
-        {title}
+/** Einordnung: was die Zahlen bedeuten — der Grund, bis zum Ende zu bleiben. */
+export function insightFrame(headline: string, body: string): Promise<Buffer> {
+  return toPng(
+    <div style={{ ...stage(VIOLET, FUCHSIA), justifyContent: 'center', padding: '0 84px' }}>
+      <Pill text="EINORDNUNG" color={VIOLET} />
+      <div style={{ display: 'flex', fontSize: 68, marginTop: 54, textAlign: 'center', lineHeight: 1.2 }}>
+        {headline}
       </div>
-      <div style={{ display: 'flex', fontSize: 36, color: MUTED, marginTop: 30, letterSpacing: 2 }}>
-        {dateLabel}
+      <div
+        style={{
+          display: 'flex',
+          fontSize: 40,
+          color: '#94a3b8',
+          marginTop: 40,
+          textAlign: 'center',
+          lineHeight: 1.45,
+        }}
+      >
+        {body}
       </div>
     </div>,
   );
@@ -171,15 +192,27 @@ export function cardFrame(
   rank: number,
   total: number,
   imageDataUri: string,
+  {
+    label = 'TOP-MOVER DER WOCHE',
+    metric = 'trend',
+    hideValue = false,
+  }: {
+    label?: string;
+    /** Welche Kennzahl im Vordergrund steht. */
+    metric?: 'trend' | 'price' | 'change30';
+    /** Quiz-Modus: Karte zeigen, Wert verdecken. */
+    hideValue?: boolean;
+  } = {},
 ): Promise<Buffer> {
   const up = card.trendPercent >= 0;
-  const accent = up ? UP : DOWN;
+  // Beim Preis-Format ist die Richtung nicht die Aussage — dann Violett.
+  const accent = metric === 'price' ? VIOLET : up ? UP : DOWN;
 
   return toPng(
     <div style={{ ...stage(accent), justifyContent: 'space-between', paddingTop: 78, paddingBottom: 74 }}>
       {/* Kopf: Platzierung + Rubrik */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Pill text="TOP-MOVER DER WOCHE" color={VIOLET} />
+        <Pill text={label} color={VIOLET} />
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 26 }}>
           <div style={{ display: 'flex', fontSize: 150, lineHeight: 1, color: '#ffffff', letterSpacing: -6 }}>
             {String(rank).padStart(2, '0')}
@@ -210,35 +243,61 @@ export function cardFrame(
           {card.name}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginTop: 26 }}>
-          {/*
-            Richtungspfeil als echtes SVG. Der CSS-Trick mit transparenten
-            Rahmen erzeugt in Satori KEIN Dreieck, sondern ein Rechteck —
-            Satori setzt Rahmen anders um als ein Browser.
-          */}
-          <svg width="54" height="46" viewBox="0 0 54 46">
-            <polygon points={up ? '27,0 54,46 0,46' : '0,0 54,0 27,46'} fill={accent} />
-          </svg>
-          <div style={{ display: 'flex', fontSize: 96, color: accent, letterSpacing: -2, lineHeight: 1 }}>
-            {formatPercent(card.trendPercent)}
+        {hideValue ? (
+          // Quiz: Wert verdeckt — der Zuschauer soll schätzen.
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 26,
+              border: `3px dashed ${VIOLET}77`,
+              borderRadius: 24,
+              padding: '26px 76px',
+            }}
+          >
+            <div style={{ display: 'flex', fontSize: 92, color: VIOLET, lineHeight: 1 }}>? ? ?</div>
           </div>
-        </div>
+        ) : metric === 'price' ? (
+          <div style={{ display: 'flex', fontSize: 96, color: '#ffffff', letterSpacing: -2, lineHeight: 1, marginTop: 26 }}>
+            {formatEur(card.price)}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginTop: 26 }}>
+            {/*
+              Richtungspfeil als echtes SVG. Der CSS-Trick mit transparenten
+              Rahmen erzeugt in Satori KEIN Dreieck, sondern ein Rechteck.
+            */}
+            <svg width="54" height="46" viewBox="0 0 54 46">
+              <polygon points={up ? '27,0 54,46 0,46' : '0,0 54,0 27,46'} fill={accent} />
+            </svg>
+            <div style={{ display: 'flex', fontSize: 96, color: accent, letterSpacing: -2, lineHeight: 1 }}>
+              {formatPercent(card.trendPercent)}
+            </div>
+          </div>
+        )}
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            marginTop: 22,
-            border: '2px solid #2a2a3a',
-            backgroundColor: '#13131ecc',
-            borderRadius: 18,
-            padding: '14px 34px',
-          }}
-        >
-          <div style={{ display: 'flex', fontSize: 26, color: MUTED, letterSpacing: 2 }}>MARKTWERT</div>
-          <div style={{ display: 'flex', fontSize: 46, color: '#e2e8f0' }}>{formatEur(card.price)}</div>
-        </div>
+        {!hideValue && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              marginTop: 22,
+              border: '2px solid #2a2a3a',
+              backgroundColor: '#13131ecc',
+              borderRadius: 18,
+              padding: '14px 34px',
+            }}
+          >
+            <div style={{ display: 'flex', fontSize: 26, color: MUTED, letterSpacing: 2 }}>
+              {metric === 'price' ? 'MARKTWERT' : metric === 'change30' ? 'GEGEN Ø 30 TAGE' : 'MARKTWERT'}
+            </div>
+            <div style={{ display: 'flex', fontSize: 46, color: '#e2e8f0' }}>
+              {metric === 'price' ? formatPercent(card.trendPercent) : formatEur(card.price)}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', marginTop: 34 }}>
           <Progress current={rank} total={total} color={accent} />
@@ -249,7 +308,7 @@ export function cardFrame(
 }
 
 /** Outro: Hinweis auf die Website. */
-export function outroFrame(): Promise<Buffer> {
+export function outroFrame(line = 'täglich aktuell'): Promise<Buffer> {
   return toPng(
     <div style={{ ...stage(FUCHSIA, VIOLET), justifyContent: 'center' }}>
       <Pill text="KOSTENLOS & AUF DEUTSCH" color={FUCHSIA} />
@@ -265,9 +324,10 @@ export function outroFrame(): Promise<Buffer> {
           backgroundImage: `linear-gradient(90deg, ${VIOLET}, ${FUCHSIA})`,
           backgroundClip: 'text',
           color: 'transparent',
+          textAlign: 'center',
         }}
       >
-        täglich aktuell
+        {line}
       </div>
 
       <div

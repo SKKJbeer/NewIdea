@@ -7,9 +7,17 @@ Hier stehen alle Regeln, Prozesse und Erkenntnisse, die sitzungsübergreifend ge
 
 ## Kommunikationsstil im Chat (NUR Chat — niemals Seiteninhalte!)
 
-Steffen mag im **Chat** einen lockeren, selbstironischen, intelligenten Ton — gern mit sparsamen Analogien rund um Bier/Braukunst als Running Gag (ein Feature „reift", ein Bugfix ist eine „neue Rezeptur", eine schnelle Patch-Serie ist ein „Brauvorgang"). Sparsam einsetzen, als Würze, nicht als ganze Maß. Selbstironische Anspielungen auf unsere Zusammenarbeit sind willkommen — aber nur, wenn sie durch die dokumentierte Projekthistorie gedeckt sind (z. B. die „linearen" Preis-Charts, die 7-von-9-falschen Kartenbilder, die Patch-Serie v2.17.1–.3).
+Steffen mag im **Chat** einen lockeren, direkten, intelligenten Ton — Klartext statt
+Marketing-Sprech, gern selbstironisch, wenn etwas schiefging. Befunde werden benannt,
+nicht beschönigt.
 
-**ZAPFSPERRE (unbedingt):** Dieser Humor gilt AUSSCHLIESSLICH für Chat-Antworten an Steffen. Er darf NIEMALS in Seiteninhalte, Artikel, Guides, Marktberichte, UI-Texte, Commit-Messages, Changelog oder irgendein veröffentlichtes Artefakt gelangen. Dort gelten unverändert die strengen Regeln: sachliche Marktanalyse, keine Persona, keine erste Person, kein Bier. Ein Braukunst-Vergleich in einem Pokémon-Marktartikel wäre der GAU.
+**Keine Running Gags.** Die frühere Bier-/Braukunst-Analogie war ausschließlich für die
+AI-Teamday-Präsentation gedacht und ist beendet — nicht wieder aufgreifen.
+
+**Weiterhin gilt:** Dieser Ton betrifft AUSSCHLIESSLICH Chat-Antworten. Er darf NIEMALS in
+Seiteninhalte, Artikel, Guides, Marktberichte, UI-Texte, Commit-Messages, Changelog oder
+irgendein veröffentlichtes Artefakt gelangen. Dort gelten unverändert die strengen Regeln:
+sachliche Marktanalyse, keine Persona, keine erste Person.
 
 ---
 
@@ -121,6 +129,49 @@ Bestehende Bausteine: ReelsStudio (manueller Upload→Trim→Brand→Publish), `
 - Production: `main` (Vercel triggered)
 
 **Sprache der UI:** Deutsch (Standard) + Englisch (via `lang`-Cookie umschaltbar)
+
+---
+
+## Instagram-Konzept & Reel-Dramaturgie (PFLICHT — bei jedem Reel anwenden)
+
+**Umsetzung im Code:** `src/lib/reel-concepts.ts` (Formate + Dramaturgie) ·
+`src/lib/reel-frames.tsx` (Bilder) · `src/lib/reel-generator.ts` (Video).
+Der Generator kennt KEINE Formate — neue Formate entstehen ausschließlich in
+`reel-concepts.ts`, ohne den Generator anzufassen.
+
+### Dramaturgie (gilt für jedes Format, nicht verhandelbar)
+
+1. **Haken zuerst.** Die ersten 1,5 Sekunden entscheiden. Eine Zahl, Frage oder
+   Behauptung — **NIEMALS ein Marken-Intro am Anfang.** (Der erste Reel-Aufbau
+   startete mit 2,4 s Logo; genau das kostet Reichweite.)
+2. **Eine Aussage pro Reel.** Nicht „der Markt allgemein", sondern ein Gedanke.
+3. **Zahlen sind der Held.** Groß, farbig, sofort lesbar. Text erklärt die Zahl,
+   nicht umgekehrt.
+4. **Einordnung statt Rohdaten.** Vorletzte Szene beantwortet „was heißt das?" —
+   sonst ist es eine Tabelle mit Musik. Das ist auch der Grund, bis zum Ende zu bleiben.
+5. **Marke zuletzt.** Wer bis zum Schluss bleibt, darf wissen, von wem es kam.
+6. **Keine Kaufaufforderung** — auch nicht in Captions (siehe Content-Tonalität).
+
+### Formate (rotieren automatisch nach Kalenderwoche)
+
+| ID | Format | Story | Datenquelle |
+|---|---|---|---|
+| `top-mover` | Stärkste Bewegungen | „5 Karten mit der stärksten Bewegung" → Karten → Einordnung | `trendPercent` |
+| `preis-check` | Quiz | „Was ist diese Karte wert?" → Karte mit `? ? ?` → Auflösung → Kommentar-Aufruf | `displayPrice` |
+| `teuerste-im-set` | Teuerste eines Sets | „Die teuersten Karten aus [Set]" → Top 5 → Warum | Preis je Set |
+| `dreissig-tage` | Preis gegen Ø 30 Tage | „Wo weicht der Markt ab?" → Abweichung je Karte | `cmPrices.avg30` vs `trend` |
+
+**Rotation:** Kalenderwoche modulo Formatanzahl. Liefert ein Format zu wenig
+Daten, wird automatisch das nächste versucht — lieber ein anderes Format als keins.
+Manuell überschreibbar per `conceptId` (Studio / `POST /api/video/auto-reel`).
+
+**Neues Format hinzufügen:** Builder-Funktion in `reel-concepts.ts` schreiben,
+in `CONCEPTS` eintragen. Er muss `null` zurückgeben, wenn die Datenlage nicht
+reicht — dann greift die Rotation weiter.
+
+**Engagement-Reihenfolge (beobachtet, nicht behauptet):** `preis-check` erzeugt
+Kommentare (Zuschauer raten mit), `teuerste-im-set` hat den größten Nachschub
+(ein Reel pro Set), `top-mover` ist der verlässliche Wochenrhythmus.
 
 ---
 

@@ -13,10 +13,9 @@ import { writeFile, unlink, readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
-import type { PokemonCard } from '@/types';
-import { displayPrice } from '@/lib/pokemon-api';
 import { ensureFfmpeg } from '@/lib/ffmpeg-setup';
-import { introFrame, cardFrame, outroFrame } from '@/lib/reel-frames';
+import { hookFrame, cardFrame, insightFrame, outroFrame } from '@/lib/reel-frames';
+import type { ReelStory } from '@/lib/reel-concepts';
 
 ensureFfmpeg();
 
@@ -34,25 +33,6 @@ const FADE_SECONDS = 0.28;
 
 const BG = '#0a0a0f';
 const SITE_LABEL = 'pokemarket-intelligence';
-
-export interface ReelCard {
-  name: string;
-  price: number;
-  trendPercent: number;
-  imageUrl: string;
-}
-
-export function toReelCards(cards: PokemonCard[], max = 5): ReelCard[] {
-  return cards
-    .filter((c) => c.imageUrl && displayPrice(c) > 0)
-    .slice(0, max)
-    .map((c) => ({
-      name: c.nameDe ?? c.name,
-      price: displayPrice(c),
-      trendPercent: c.trendPercent ?? 0,
-      imageUrl: c.imageUrl,
-    }));
-}
 
 function run(cmd: ffmpeg.FfmpegCommand, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -117,57 +97,74 @@ async function frameToSegment(
 }
 
 /**
- * Rendert das komplette Reel und liefert den MP4-Buffer.
- * Wirft bei Fehlern — der Aufrufer entscheidet über die Fehlerantwort.
+ * Rendert eine Geschichte (siehe reel-concepts.ts) zum fertigen MP4.
+ *
+ * Der Generator kennt keine Formate — er setzt nur Szenen um. Neue Formate
+ * entstehen deshalb in reel-concepts.ts, ohne dass hier etwas angefasst wird.
  */
-export async function renderMarketReel(cards: ReelCard[], title: string, dateLabel: string): Promise<Buffer> {
-  if (cards.length === 0) throw new Error('Keine Karten mit Bild + Preis für das Reel');
+export async function renderStory(story: ReelStory): Promise<Buffer> {
+  if (story.scenes.length === 0) throw new Error('Geschichte ohne Szenen');
 
   const uid = randomUUID();
   const tmp = (name: string) => join(tmpdir(), `reel-${uid}-${name}`);
   const cleanup: string[] = [];
+  const segments: string[] = [];
+
+  // Kartenbilder einmal laden und wiederverwenden (Quiz zeigt dieselbe Karte zweimal).
+  const imageCache = new Map<string, string>();
+  async function dataUri(url: string): Promise<string | null> {
+    const cached = imageCache.get(url);
+    if (cached) return cached;
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) return null;
+      const uri = `data:image/png;base64,${Buffer.from(await res.arrayBuffer()).toString('base64')}`;
+      imageCache.set(url, uri);
+      return uri;
+    } catch {
+      return null;
+    }
+  }
 
   try {
-    // 1. Kartenbilder laden (hires bevorzugt der Aufrufer via imageUrl)
-    const segments: string[] = [];
+    for (let i = 0; i < story.scenes.length; i++) {
+      const scene = story.scenes[i];
+      const imgPath = tmp(`scene-${i}.png`);
+      let zoom = false;
 
-    // Intro als fertiges Bild rendern, dann zum Segment machen
-    const introImg = tmp('intro.png');
-    await writeFile(introImg, await introFrame(title, dateLabel));
-    cleanup.push(introImg);
-    const introPath = tmp('intro.mp4');
-    await frameToSegment(introImg, INTRO_SECONDS, introPath);
-    cleanup.push(introPath);
-    segments.push(introPath);
+      if (scene.kind === 'hook') {
+        await writeFile(imgPath, await hookFrame(scene.headline, scene.sub, scene.accent));
+      } else if (scene.kind === 'insight') {
+        await writeFile(imgPath, await insightFrame(scene.headline, scene.body));
+      } else if (scene.kind === 'outro') {
+        await writeFile(imgPath, await outroFrame(scene.line));
+      } else {
+        const uri = await dataUri(scene.card.imageUrl);
+        if (!uri) continue; // Karte überspringen, Reel bleibt gültig
+        const quiz = scene.kind === 'quiz';
+        await writeFile(
+          imgPath,
+          await cardFrame(scene.card, scene.rank, scene.total, uri, {
+            label: scene.kind === 'card' ? scene.label : 'PREIS-CHECK',
+            metric: scene.kind === 'card' ? scene.metric : 'price',
+            hideValue: quiz,
+          }),
+        );
+        zoom = true;
+      }
 
-    for (let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      const res = await fetch(card.imageUrl, { signal: AbortSignal.timeout(10000) });
-      if (!res.ok) continue; // Karte überspringen, Reel bleibt gültig
-      // Kartenbild als Data-URI in den fertigen Rahmen einbetten
-      const raw = Buffer.from(await res.arrayBuffer());
-      const dataUri = `data:image/png;base64,${raw.toString('base64')}`;
-      const framePath = tmp(`frame-${i}.png`);
-      await writeFile(framePath, await cardFrame(card, i + 1, cards.length, dataUri));
-      cleanup.push(framePath);
-
+      cleanup.push(imgPath);
       const segPath = tmp(`seg-${i}.mp4`);
-      await frameToSegment(framePath, SEG_SECONDS, segPath, { zoom: true, drift: i % 2 === 0 ? 60 : -60 });
+      await frameToSegment(imgPath, scene.seconds, segPath, {
+        zoom,
+        drift: i % 2 === 0 ? 60 : -60,
+      });
       cleanup.push(segPath);
       segments.push(segPath);
     }
 
-    if (segments.length < 2) throw new Error('Kein Kartenbild konnte geladen werden');
+    if (segments.length < 2) throw new Error('Zu wenige verwertbare Szenen für ein Reel');
 
-    const outroImg = tmp('outro.png');
-    await writeFile(outroImg, await outroFrame());
-    cleanup.push(outroImg);
-    const outroPath = tmp('outro.mp4');
-    await frameToSegment(outroImg, OUTRO_SECONDS, outroPath);
-    cleanup.push(outroPath);
-    segments.push(outroPath);
-
-    // 2. Concat-Demuxer (verlustfrei, alle Segmente haben identische Parameter)
     const listPath = tmp('list.txt');
     await writeFile(listPath, segments.map((s) => `file '${s}'`).join('\n'));
     cleanup.push(listPath);
@@ -175,30 +172,11 @@ export async function renderMarketReel(cards: ReelCard[], title: string, dateLab
     const finalPath = tmp('final.mp4');
     cleanup.push(finalPath);
     await run(
-      ffmpeg()
-        .input(listPath)
-        .inputOptions(['-f concat', '-safe 0'])
-        .outputOptions(['-c copy', '-movflags +faststart']),
+      ffmpeg().input(listPath).inputOptions(['-f concat', '-safe 0']).outputOptions(['-c copy', '-movflags +faststart']),
       finalPath,
     );
-
     return await readFile(finalPath);
   } finally {
     await Promise.all(cleanup.map((f) => unlink(f).catch(() => {})));
   }
-}
-
-/** Caption mit UTM-Link — der Reichweiten-Rückkanal zur Website. */
-export function buildReelCaption(cards: ReelCard[], siteUrl: string): string {
-  const lines = cards
-    .slice(0, 3)
-    .map((c) => {
-      const up = c.trendPercent >= 0;
-      return `${c.name}: ${up ? '+' : ''}${c.trendPercent.toFixed(1).replace('.', ',')}%`;
-    })
-    .join('\n');
-
-  const utmUrl = `${siteUrl}?utm_source=instagram&utm_medium=reel&utm_campaign=top-mover`;
-
-  return `Top-Mover der Woche im Pokémon-Kartenmarkt 📈\n\n${lines}\n\nAlle Preise täglich aktuell — Link in der Bio\n${utmUrl}\n\n#Pokemon #PokemonTCG #PokemonKarten #Cardmarket #TCG #Sammelkarten #PokemonDeutschland #KartenPreise`;
 }

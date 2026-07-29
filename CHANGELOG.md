@@ -7,6 +7,23 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.27.0] — 2026-07-29 · Instagram-Konzept: vier Formate mit eigener Dramaturgie
+
+### Neu
+- **Vier Reel-Formate statt einem**, die sich automatisch nach Kalenderwoche abwechseln — niemand muss wöchentlich entscheiden, was gepostet wird:
+  - *Stärkste Bewegungen* — der verlässliche Wochenrhythmus
+  - *Preis-Check* — Quiz mit verdecktem Wert und Auflösung; fordert zum Mitraten in den Kommentaren auf
+  - *Teuerste Karten eines Sets* — praktisch unbegrenzter Nachschub, ein Beitrag pro Set
+  - *Preis gegen 30-Tage-Schnitt* — zeigt, wo der Markt gerade abweicht
+- **Durchgängige Dramaturgie**: Haken zuerst (Frage oder Zahl), dann die Karten, dann eine Einordnung, Marke zuletzt. Reicht die Datenlage für ein Format nicht, wird automatisch das nächste genommen
+- Format im Studio manuell wählbar; Bildunterschrift wird je Format passend erzeugt
+
+### Geändert
+- **Das Marken-Intro am Anfang ist entfallen.** Die ersten Sekunden entscheiden über die Reichweite — dort steht jetzt der Haken, die Marke steht am Schluss
+- Neue Formate lassen sich künftig ergänzen, ohne die Videoerzeugung anzufassen
+
+---
+
 ## [2.26.0] — 2026-07-29 · Reels im eigenen Look: lebendiger und hochwertiger
 
 ### Geändert
