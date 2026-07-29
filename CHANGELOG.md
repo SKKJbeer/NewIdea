@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.28.0] — 2026-07-29 · Reels mit Farbe: Kartenmotiv als Hintergrund
+
+### Neu
+- **Jedes Segment bekommt die Farbstimmung seiner Karte.** Das Kartenbild läuft zusätzlich als stark unscharfe, langsam wandernde Fläche im Hintergrund — der Text darüber bleibt pixelscharf. Eine Feuer-Karte gibt dem Bild Rot-Orange, eine Wasser-Karte Blau
+- **Angedeutetes Sammel-Motiv** auf Haken-, Einordnungs- und Abspann-Bild: ein sehr großer, blasser Kreisumriss mit Mittelband, über den Bildrand hinauslaufend — Atmosphäre statt Dekoration
+- **Verspielte Streuelemente**: schwebende Punkte und Ringe in der Segmentfarbe
+- Karten liegen jetzt leicht geneigt statt exakt waagerecht, Neigungsrichtung wechselt je Platzierung
+- Platzierungsziffer mit Farbverlauf in der Trendfarbe
+
+### Geändert
+- Haken, Einordnung und Abspann sind nicht mehr fast schwarz, sondern tragen die Farben der ersten Karte als abstrakte Farbfelder
+- Abdunklung an Ober- und Unterkante der Kartenbilder — die Lesbarkeit hängt damit nicht mehr davon ab, wie hell eine Karte ist
+- Fortschrittspunkte am unteren Rand aufgehellt (auf farbigem Grund waren sie unsichtbar)
+
+### Behoben
+- **Abspann zeigte eine doppelte Aussage**: Über der Formatzeile stand fest verdrahtet „Alle Preise", zusammen ergab das „Alle Preise / Preise täglich aktuell" — bei anderen Formaten sogar Unsinn wie „Alle Preise / Alle Sets auf der Seite". Der Vorspann ist entfallen, die Zeile kommt vollständig aus dem Format
+
+---
+
 ## [2.27.0] — 2026-07-29 · Instagram-Konzept: vier Formate mit eigener Dramaturgie
 
 ### Neu

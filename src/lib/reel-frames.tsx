@@ -57,14 +57,20 @@ const GRID =
  * `accent` steuert die Stimmung des Segments (Violett im Intro, Trendfarbe bei
  * Karten) — dadurch fühlt sich jeder Abschnitt eigenständig an.
  */
-function stage(accent: string, secondary = VIOLET): React.CSSProperties {
+function stage(accent: string, secondary = VIOLET, translucent: false | 'card' | 'text' = false): React.CSSProperties {
+  // Textbilder brauchen mehr Deckung als Kartenbilder: Dort steht die Schrift
+  // über der ganzen Fläche, nicht nur an Ober- und Unterkante.
+  const alpha = translucent === 'text' ? 0.7 : 0.45;
   return {
     width: '100%',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: BG,
+    // `translucent`: Der Grund bleibt teildurchlässig, damit das unscharf
+    // gerechnete Kartenbild dahinter durchschimmert (FFmpeg legt es unter).
+    // Ohne Durchsicht wäre die Karten-Atmosphäre nicht sichtbar.
+    backgroundColor: translucent ? `rgba(8,8,13,${alpha})` : BG,
     backgroundImage:
       `radial-gradient(900px 900px at 50% 8%, ${accent}2e 0%, transparent 62%),` +
       `radial-gradient(760px 760px at 12% 92%, ${secondary}24 0%, transparent 60%),` +
@@ -73,6 +79,87 @@ function stage(accent: string, secondary = VIOLET): React.CSSProperties {
     fontFamily: 'Reel',
     color: '#ffffff',
   };
+}
+
+/**
+ * Angedeutetes Sammel-Motiv: ein sehr großer, sehr blasser Umriss, der über den
+ * Bildrand hinausläuft — Kreis, Mittelband, Innenring.
+ *
+ * Bewusst eine eigene, rein geometrische Form: keine fremden Grafiken, keine
+ * Marken-Assets. Bei 4–6 % Deckkraft liest es sich als Atmosphäre, nicht als
+ * Bildmotiv, und bleibt damit auch bei kleinen Vorschaubildern ruhig.
+ */
+function Motif({
+  size,
+  top,
+  left,
+  color,
+  opacity,
+}: {
+  size: number;
+  top: number;
+  left: number;
+  color: string;
+  opacity: number;
+}) {
+  return (
+    <div style={{ display: 'flex', position: 'absolute', top, left, opacity }}>
+      <svg width={size} height={size} viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="none" stroke={color} strokeWidth="2.4" />
+        <circle cx="50" cy="50" r="15" fill="none" stroke={color} strokeWidth="2.4" />
+        <circle cx="50" cy="50" r="24" fill="none" stroke={color} strokeWidth="1.2" />
+        <line x1="4.5" y1="50" x2="35" y2="50" stroke={color} strokeWidth="2.4" />
+        <line x1="65" y1="50" x2="95.5" y2="50" stroke={color} strokeWidth="2.4" />
+      </svg>
+    </div>
+  );
+}
+
+/** Zwei versetzte Motive — oben angeschnitten, unten gegenläufig. */
+function Backdrop({ color }: { color: string }) {
+  return (
+    <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+      <Motif size={980} top={-330} left={-300} color={color} opacity={0.075} />
+      <Motif size={620} top={1420} left={720} color={color} opacity={0.06} />
+    </div>
+  );
+}
+
+/**
+ * Verspielte Streuelemente: schwebende Kreise und Ringe in der Akzentfarbe.
+ * Bewusst dezent — sie sollen Tiefe geben, nicht vom Kartenbild ablenken.
+ */
+function Confetti({ color }: { color: string }) {
+  const dots = [
+    { top: 210, left: 78, size: 22, ring: false, o: '55' },
+    { top: 330, left: 962, size: 34, ring: true, o: '44' },
+    { top: 620, left: 44, size: 14, ring: false, o: '66' },
+    { top: 980, left: 1000, size: 18, ring: false, o: '40' },
+    { top: 1310, left: 62, size: 46, ring: true, o: '33' },
+    { top: 1520, left: 950, size: 20, ring: false, o: '55' },
+    { top: 1690, left: 120, size: 12, ring: false, o: '66' },
+  ];
+  return (
+    <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+      {dots.map((d, i) => (
+        <div
+          key={i}
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            top: d.top,
+            left: d.left,
+            width: d.size,
+            height: d.size,
+            borderRadius: 999,
+            ...(d.ring
+              ? { border: `3px solid ${color}${d.o}` }
+              : { backgroundColor: `${color}${d.o}` }),
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 /** Kleines Etikett mit Rahmen — wiederkehrendes Element der Seite. */
@@ -108,7 +195,9 @@ function Progress({ current, total, color }: { current: number; total: number; c
             width: i + 1 === current ? 64 : 26,
             height: 8,
             borderRadius: 999,
-            backgroundColor: i + 1 === current ? color : '#2a2a3a',
+            // Inaktiv bewusst halbtransparent weiß statt Anthrazit: Auf dem
+            // farbigen, unscharfen Kartenhintergrund verschwindet #2a2a3a.
+            backgroundColor: i + 1 === current ? color : 'rgba(226,232,240,0.30)',
           }}
         />
       ))}
@@ -126,10 +215,19 @@ export function hookFrame(
   headline: string,
   sub: string | undefined,
   accent: 'violet' | 'up' | 'down' = 'violet',
+  translucent = false,
 ): Promise<Buffer> {
   const color = accent === 'up' ? UP : accent === 'down' ? DOWN : VIOLET;
   return toPng(
-    <div style={{ ...stage(color, FUCHSIA), justifyContent: 'center', padding: '0 76px' }}>
+    <div
+      style={{
+        ...stage(color, FUCHSIA, translucent && 'text'),
+        justifyContent: 'center',
+        padding: '0 76px',
+      }}
+    >
+      <Backdrop color={color} />
+      <Confetti color={FUCHSIA} />
       <div
         style={{
           display: 'flex',
@@ -159,9 +257,17 @@ export function hookFrame(
 }
 
 /** Einordnung: was die Zahlen bedeuten — der Grund, bis zum Ende zu bleiben. */
-export function insightFrame(headline: string, body: string): Promise<Buffer> {
+export function insightFrame(headline: string, body: string, translucent = false): Promise<Buffer> {
   return toPng(
-    <div style={{ ...stage(VIOLET, FUCHSIA), justifyContent: 'center', padding: '0 84px' }}>
+    <div
+      style={{
+        ...stage(VIOLET, FUCHSIA, translucent && 'text'),
+        justifyContent: 'center',
+        padding: '0 84px',
+      }}
+    >
+      <Backdrop color={VIOLET} />
+      <Confetti color={FUCHSIA} />
       <Pill text="EINORDNUNG" color={VIOLET} />
       <div style={{ display: 'flex', fontSize: 68, marginTop: 54, textAlign: 'center', lineHeight: 1.2 }}>
         {headline}
@@ -196,12 +302,18 @@ export function cardFrame(
     label = 'TOP-MOVER DER WOCHE',
     metric = 'trend',
     hideValue = false,
+    translucent = false,
   }: {
     label?: string;
     /** Welche Kennzahl im Vordergrund steht. */
     metric?: 'trend' | 'price' | 'change30';
     /** Quiz-Modus: Karte zeigen, Wert verdecken. */
     hideValue?: boolean;
+    /**
+     * FFmpeg legt das Kartenbild unscharf und abgedunkelt unter dieses Bild.
+     * Dann muss der Grund teildurchlässig bleiben, sonst sieht man nichts davon.
+     */
+    translucent?: boolean;
   } = {},
 ): Promise<Buffer> {
   const up = card.trendPercent >= 0;
@@ -209,12 +321,65 @@ export function cardFrame(
   const accent = metric === 'price' ? VIOLET : up ? UP : DOWN;
 
   return toPng(
-    <div style={{ ...stage(accent), justifyContent: 'space-between', paddingTop: 78, paddingBottom: 74 }}>
+    <div
+      style={{
+        ...stage(accent, VIOLET, translucent && 'card'),
+        justifyContent: 'space-between',
+        paddingTop: 78,
+        paddingBottom: 74,
+      }}
+    >
+      {/*
+        Abdunklung an Ober- und Unterkante. Ohne sie hinge die Lesbarkeit von
+        Schrift und Kennzahl davon ab, wie hell die jeweilige Karte ist — eine
+        gelbe Karte würde die weiße Schrift verschlucken.
+      */}
+      {translucent ? (
+        <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: 540,
+              backgroundImage: 'linear-gradient(to bottom, rgba(8,8,13,0.94), rgba(8,8,13,0))',
+            }}
+          />
+          <div
+            style={{
+              display: 'flex',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              height: 660,
+              backgroundImage: 'linear-gradient(to top, rgba(8,8,13,0.94), rgba(8,8,13,0))',
+            }}
+          />
+        </div>
+      ) : null}
+
+      <Confetti color={accent} />
+
       {/* Kopf: Platzierung + Rubrik */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Pill text={label} color={VIOLET} />
         <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 26 }}>
-          <div style={{ display: 'flex', fontSize: 150, lineHeight: 1, color: '#ffffff', letterSpacing: -6 }}>
+          <div
+            style={{
+              display: 'flex',
+              fontSize: 150,
+              lineHeight: 1,
+              letterSpacing: -6,
+              // Verlauf in der Trendfarbe statt flachem Weiß — die Platzierung
+              // ist das erste, was ins Auge fällt.
+              backgroundImage: `linear-gradient(160deg, #ffffff 30%, ${accent})`,
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}
+          >
             {String(rank).padStart(2, '0')}
           </div>
           <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 16, marginLeft: 12 }}>
@@ -223,18 +388,29 @@ export function cardFrame(
         </div>
       </div>
 
-      {/* Karte mit farbigem Ring und Schlagschatten */}
-      <div
-        style={{
-          display: 'flex',
-          padding: 12,
-          borderRadius: 34,
-          border: `3px solid ${accent}66`,
-          boxShadow: `0 40px 120px ${accent}44`,
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageDataUri} width={648} height={905} alt="" style={{ borderRadius: 24 }} />
+      {/*
+        Karte mit farbigem Ring und Schlagschatten. Die leichte Neigung wechselt
+        je Platzierung die Richtung — das nimmt dem Raster die Strenge und lässt
+        die Karte wie hingelegt wirken statt wie eingescannt.
+
+        Die Drehung MUSS auf einem eigenen Element ohne `boxShadow` sitzen:
+        Satori verwirft `transform`, sobald am selben Element ein Schlagschatten
+        hängt (getestet — die Karte blieb waagerecht).
+      */}
+      <div style={{ display: 'flex', transform: `rotate(${rank % 2 === 0 ? 3 : -3}deg)` }}>
+        <div
+          style={{
+            display: 'flex',
+            padding: 12,
+            borderRadius: 34,
+            border: `3px solid ${accent}88`,
+            backgroundColor: 'rgba(8,8,13,0.55)',
+            boxShadow: `0 40px 130px ${accent}55`,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageDataUri} width={648} height={905} alt="" style={{ borderRadius: 24 }} />
+        </div>
       </div>
 
       {/* Fuß: Name, Trend als Kennzahl, Preis */}
@@ -308,18 +484,24 @@ export function cardFrame(
 }
 
 /** Outro: Hinweis auf die Website. */
-export function outroFrame(line = 'täglich aktuell'): Promise<Buffer> {
+export function outroFrame(line = 'täglich aktuell', translucent = false): Promise<Buffer> {
   return toPng(
-    <div style={{ ...stage(FUCHSIA, VIOLET), justifyContent: 'center' }}>
+    <div style={{ ...stage(FUCHSIA, VIOLET, translucent && 'text'), justifyContent: 'center' }}>
+      <Backdrop color={FUCHSIA} />
+      <Confetti color={VIOLET} />
       <Pill text="KOSTENLOS & AUF DEUTSCH" color={FUCHSIA} />
 
-      <div style={{ display: 'flex', fontSize: 76, marginTop: 74, textAlign: 'center', padding: '0 80px', lineHeight: 1.2 }}>
-        Alle Preise
-      </div>
+      {/*
+        Die Zeile kommt vollständig aus dem Format (reel-concepts.ts). Früher
+        stand hier zusätzlich ein fester Vorspann „Alle Preise" — zusammen mit
+        „Preise täglich aktuell" ergab das eine doppelte, sinnlose Aussage.
+      */}
       <div
         style={{
           display: 'flex',
           fontSize: 76,
+          marginTop: 74,
+          padding: '0 80px',
           lineHeight: 1.2,
           backgroundImage: `linear-gradient(90deg, ${VIOLET}, ${FUCHSIA})`,
           backgroundClip: 'text',

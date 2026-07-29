@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.28.0',
+    date: '29. Juli 2026',
+    label: 'Reels mit Farbe: Kartenmotiv als Hintergrund',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Jedes Segment trägt die Farbstimmung seiner Karte: Das Kartenbild läuft zusätzlich stark unscharf im Hintergrund, der Text darüber bleibt scharf' },
+      { type: 'new',     text: 'Angedeutetes Sammel-Motiv und schwebende Streuelemente auf Haken-, Einordnungs- und Abspann-Bild' },
+      { type: 'changed', text: 'Karten liegen leicht geneigt, Platzierungsziffer mit Farbverlauf, Abdunklung an Ober- und Unterkante für sichere Lesbarkeit' },
+      { type: 'fixed',   text: 'Abspann zeigte eine doppelte Aussage („Alle Preise / Preise täglich aktuell") — der fest verdrahtete Vorspann ist entfallen' },
+    ],
+  },
+  {
     version: '2.27.0',
     date: '29. Juli 2026',
     label: 'Instagram-Konzept: vier Formate mit eigener Dramaturgie',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Vier Reel-Formate, die automatisch nach Kalenderwoche rotieren: Stärkste Bewegungen, Preis-Check (Quiz), Teuerste eines Sets, Preis gegen 30-Tage-Schnitt' },
       { type: 'new',     text: 'Durchgängige Dramaturgie: Haken zuerst, dann Karten, dann Einordnung, Marke zuletzt' },
