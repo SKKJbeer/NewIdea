@@ -104,7 +104,10 @@ export const DAY_TYPE: Record<number, ArticleType> = {
 };
 
 // ── Publish schedule: only Sunday (Wochenrückblick) + Thursday (rotating) ────
-export const PUBLISH_DAYS = new Set([0, 4]); // 0 = Sunday, 4 = Thursday
+// Die Termine selbst stehen in `publish-days.ts` — ein abhängigkeitsfreies
+// Modul, damit auch Client-Komponenten sie nutzen können (dieses hier zieht
+// Anthropic-SDK und Supabase mit).
+export { PUBLISH_DAYS, recentPublishDates } from './publish-days';
 
 const THURSDAY_ROTATION: ArticleType[] = ['markt', 'karte', 'strategie', 'set', 'ausblick', 'guide'];
 

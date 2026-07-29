@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { ContentIcon } from '@/components/ContentIcon';
-import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, PUBLISH_DAYS, getArticleType, ARTICLE_LEVEL, LEVEL_LABEL } from '@/lib/article-generator';
+import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, recentPublishDates, getArticleType, ARTICLE_LEVEL, LEVEL_LABEL } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { GUIDES } from '@/lib/guides';
 import { Calendar, Clock, ChevronRight, BookOpen } from 'lucide-react';
@@ -21,30 +21,8 @@ export const metadata: Metadata = {
   description: 'Wöchentlicher Wochenrückblick (sonntags) und rotierender Donnerstags-Artikel — Marktanalysen und Guides für Pokémon-Karten-Sammler.',
 };
 
-/** Returns the last `count` published dates (Sunday + Thursday only), newest first. */
-function getPublishDates(count = 8): Array<{ date: string; isToday: boolean; dateLabel: string }> {
-  const results: Array<{ date: string; isToday: boolean; dateLabel: string }> = [];
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const cursor = new Date(now);
-
-  while (results.length < count) {
-    const dow = cursor.getDay();
-    if (PUBLISH_DAYS.has(dow)) {
-      const dateStr = cursor.toISOString().split('T')[0];
-      results.push({
-        date: dateStr,
-        isToday: dateStr === todayStr,
-        dateLabel: cursor.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }),
-      });
-    }
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return results;
-}
-
 export default async function ArtikelListPage() {
-  const publishDates = getPublishDates(8);
+  const publishDates = recentPublishDates(8);
   const todayEntry = publishDates[0].isToday ? publishDates[0] : null;
   const listEntries = todayEntry ? publishDates.slice(1) : publishDates;
 

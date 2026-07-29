@@ -6,6 +6,7 @@ import {
   Key, KeyRound, Link2, FileText, Zap, Server, RefreshCw, ExternalLink,
   ChevronDown, ChevronUp, BookMarked, GitBranch, TriangleAlert, CircleAlert, Activity,
 } from 'lucide-react';
+import { recentPublishDates } from '@/lib/publish-days';
 
 interface ApiKeyStatus {
   set: boolean;
@@ -116,32 +117,105 @@ function formatDate(value: string | null): string {
  * steht hier das fertige SQL zum Anlegen.
  */
 function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh: () => void }) {
-  const [running, setRunning] = useState(false);
-  const [runResult, setRunResult] = useState<string | null>(null);
+  // Welcher Auslöser gerade läuft (nur einer gleichzeitig — alle drei rufen
+  // dieselbe KI und dieselbe Datenbank an).
+  const [busy, setBusy] = useState<null | 'guide' | 'report' | 'articles'>(null);
+  const [results, setResults] = useState<Record<string, string>>({});
+  const setResult = (key: string, text: string) => setResults((r) => ({ ...r, [key]: text }));
 
   async function runGuide() {
-    setRunning(true);
-    setRunResult(null);
+    setBusy('guide');
+    setResult('guide', '');
     try {
       const res = await fetch('/api/guides/generate', { method: 'POST' });
       const json = await res.json();
       if (json.status === 'created') {
-        setRunResult(`Guide erstellt: ${json.title}`);
+        setResult('guide', `Guide erstellt: ${json.title}`);
         onRefresh();
       } else if (json.status === 'rejected_quality') {
-        setRunResult(`Vom Qualitäts-Gate abgelehnt (${json.violations?.length ?? 0} Regelverstöße) — Text war regelwidrig, kein Speicher-Problem.`);
+        setResult('guide', `Vom Qualitäts-Gate abgelehnt (${json.violations?.length ?? 0} Regelverstöße) — Text war regelwidrig, kein Speicher-Problem.`);
       } else if (json.status === 'all_done') {
-        setRunResult('Alle Themen der Warteschlange sind bereits erzeugt.');
+        setResult('guide', 'Alle Themen der Warteschlange sind bereits erzeugt.');
       } else if (json.status === 'no_api_key') {
-        setRunResult('ANTHROPIC_API_KEY fehlt.');
+        setResult('guide', 'ANTHROPIC_API_KEY fehlt.');
       } else {
-        setRunResult(`Fehlgeschlagen: ${json.error || 'unbekannt'}`);
+        setResult('guide', `Fehlgeschlagen: ${json.error || 'unbekannt'}`);
       }
     } catch {
-      setRunResult('Aufruf fehlgeschlagen.');
+      setResult('guide', 'Aufruf fehlgeschlagen.');
     } finally {
-      setRunning(false);
+      setBusy(null);
     }
+  }
+
+  async function runMarketReport() {
+    setBusy('report');
+    setResult('report', '');
+    try {
+      const res = await fetch('/api/market-report/generate', { method: 'POST' });
+      const json = await res.json();
+      const week = json.weekNumber ? `KW ${json.weekNumber}` : 'Woche';
+      if (json.status === 'created') {
+        setResult('report', `${week} erstellt — ${json.reportChars} Zeichen, ${json.cards ?? '?'} Karten ausgewertet.`);
+        onRefresh();
+      } else if (json.status === 'no_cards') {
+        setResult('report', 'Die TCG-API hat keine Kartendaten geliefert — später erneut versuchen (Rate-Limit).');
+      } else if (json.status === 'rejected_too_short') {
+        setResult('report', `Vom Mindestmaß-Gate abgelehnt (${json.reportChars} Zeichen) — nicht gespeichert, damit kein Platzhalter live geht.`);
+      } else if (json.status === 'save_failed') {
+        setResult('report', `Text erzeugt, aber Speichern fehlgeschlagen: ${json.error || 'unbekannt'}`);
+      } else {
+        setResult('report', `Fehlgeschlagen: ${json.error || 'unbekannt'}`);
+      }
+    } catch {
+      setResult('report', 'Aufruf fehlgeschlagen.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  /**
+   * Ersetzt gespeicherte Fallback-Artikel durch echte Generierungen.
+   *
+   * Die Schleife läuft im Browser, nicht im Server: Ein einzelner Aufruf darf
+   * 300 s dauern, acht hintereinander würden die Funktion abbrechen. Artikel,
+   * die bereits echt sind, werden vom Endpunkt unverändert zurückgegeben —
+   * der Lauf ist damit gefahrlos wiederholbar.
+   */
+  async function runArticles() {
+    setBusy('articles');
+    const dates = recentPublishDates(8);
+    let replaced = 0;
+    let stillFallback = 0;
+    let failed = 0;
+
+    for (let i = 0; i < dates.length; i++) {
+      setResult('articles', `Prüfe ${dates[i].dateLabel} (${i + 1}/${dates.length})…`);
+      try {
+        const res = await fetch('/api/articles/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: dates[i].date }),
+        });
+        const json = await res.json();
+        if (!res.ok) failed++;
+        else if (json.isFallback) stillFallback++;
+        else replaced++;
+      } catch {
+        failed++;
+      }
+    }
+
+    const parts = [`${replaced} echt`];
+    if (stillFallback) parts.push(`${stillFallback} weiterhin Ersatztext`);
+    if (failed) parts.push(`${failed} fehlgeschlagen`);
+    setResult(
+      'articles',
+      `${dates.length} Termine geprüft: ${parts.join(' · ')}.` +
+        (stillFallback ? ' Ersatztexte bedeuten meist: ANTHROPIC_API_KEY fehlt oder die Generierung brach ab.' : ''),
+    );
+    setBusy(null);
+    onRefresh();
   }
 
   return (
@@ -216,38 +290,100 @@ function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh:
             })}
           </div>
 
-          {/* Guide-Pipeline: der stille Ausfall bekommt eine eigene Kachel */}
-          <div className="mt-3 rounded-xl border border-[#2a2a3a] bg-[#0d0d18] p-3">
-            <div className="flex items-center justify-between gap-3 mb-2">
-              <div>
-                <p className="text-xs font-semibold text-slate-200">Guide-Pipeline</p>
-                <p className="text-[10px] text-slate-600">
-                  {health.guidePipeline.staticGuides} statisch · {health.guidePipeline.generated} generiert ·{' '}
-                  {health.guidePipeline.pendingTopics} in Warteschlange
-                </p>
-              </div>
-              <button
-                onClick={runGuide}
-                disabled={running}
-                className="shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-violet-400 hover:text-violet-300 border border-violet-500/30 hover:border-violet-500/50 rounded-lg px-2.5 py-1.5 transition-colors disabled:opacity-50"
-              >
-                {running ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
-                {running ? 'Läuft…' : 'Jetzt testen'}
-              </button>
-            </div>
-            {health.guidePipeline.nextTopic && (
-              <p className="text-[10px] text-slate-500">
-                Nächstes Thema: <code className="font-mono text-slate-400">{health.guidePipeline.nextTopic}</code>
-              </p>
-            )}
-            {runResult && (
-              <p className="mt-2 text-[11px] text-slate-300 bg-[#13131e] border border-[#2a2a3a] rounded-lg px-2.5 py-2 break-words">
-                {runResult}
-              </p>
-            )}
+          {/*
+            Inhalte von Hand anstoßen. Bis v2.29.0 gab es das nur für Guides —
+            Marktbericht und Artikel ließen sich ausschließlich per curl mit dem
+            Studio-Passwort auslösen. Genau deshalb blieben sie nach einem
+            Ausfall wochenlang liegen.
+          */}
+          <div className="mt-3 space-y-2">
+            <PipelineTile
+              title="Marktbericht (Wochenanalyse)"
+              subtitle="Erzeugt den Bericht der laufenden Woche sofort, statt bis Montag zu warten"
+              buttonLabel="Jetzt erzeugen"
+              running={busy === 'report'}
+              disabled={busy !== null}
+              result={results.report}
+              onRun={runMarketReport}
+            />
+
+            <PipelineTile
+              title="Artikel (Sonntag + Donnerstag)"
+              subtitle="Prüft die letzten acht Termine und ersetzt Ersatztexte durch echte Beiträge"
+              buttonLabel="Prüfen & ersetzen"
+              running={busy === 'articles'}
+              disabled={busy !== null}
+              result={results.articles}
+              onRun={runArticles}
+            />
+
+            <PipelineTile
+              title="Guide-Pipeline"
+              subtitle={`${health.guidePipeline.staticGuides} statisch · ${health.guidePipeline.generated} generiert · ${health.guidePipeline.pendingTopics} in Warteschlange`}
+              note={
+                health.guidePipeline.nextTopic
+                  ? `Nächstes Thema: ${health.guidePipeline.nextTopic}`
+                  : undefined
+              }
+              buttonLabel="Jetzt testen"
+              running={busy === 'guide'}
+              disabled={busy !== null}
+              result={results.guide}
+              onRun={runGuide}
+            />
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Kachel mit Auslöser. Das Ergebnis steht immer im Klartext darunter — ein
+ * bloßes „ok" wäre genau die Sorte Rückmeldung, die den monatelangen stillen
+ * Ausfall der Guide-Pipeline verdeckt hat.
+ */
+function PipelineTile({
+  title,
+  subtitle,
+  note,
+  buttonLabel,
+  running,
+  disabled,
+  result,
+  onRun,
+}: {
+  title: string;
+  subtitle: string;
+  note?: string;
+  buttonLabel: string;
+  running: boolean;
+  disabled: boolean;
+  result?: string;
+  onRun: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-[#2a2a3a] bg-[#0d0d18] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-slate-200">{title}</p>
+          <p className="text-[10px] text-slate-600">{subtitle}</p>
+        </div>
+        <button
+          onClick={onRun}
+          disabled={disabled}
+          className="shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-violet-400 hover:text-violet-300 border border-violet-500/30 hover:border-violet-500/50 rounded-lg px-2.5 py-1.5 transition-colors disabled:opacity-40"
+        >
+          {running ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+          {running ? 'Läuft…' : buttonLabel}
+        </button>
+      </div>
+      {note && <p className="mt-2 text-[10px] text-slate-500 break-words">{note}</p>}
+      {result ? (
+        <p className="mt-2 text-[11px] text-slate-300 bg-[#13131e] border border-[#2a2a3a] rounded-lg px-2.5 py-2 break-words">
+          {result}
+        </p>
+      ) : null}
     </div>
   );
 }

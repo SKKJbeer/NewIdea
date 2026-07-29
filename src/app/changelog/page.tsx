@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.29.0',
+    date: '29. Juli 2026',
+    label: 'Marktbericht und Artikel per Klick auslösen',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Monitoring hat jetzt Auslöser für Marktbericht und Artikel — bisher ging beides nur per Kommandozeile mit dem Studio-Passwort' },
+      { type: 'new',     text: 'Der Artikel-Lauf prüft die letzten acht Termine und ersetzt nur Ersatztexte; echte Beiträge bleiben unangetastet' },
+      { type: 'changed', text: 'Jede Kachel meldet das Ergebnis im Klartext statt eines bloßen „ok“' },
+    ],
+  },
+  {
     version: '2.28.0',
     date: '29. Juli 2026',
     label: 'Reels mit Farbe: Kartenmotiv als Hintergrund',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Jedes Segment trägt die Farbstimmung seiner Karte: Das Kartenbild läuft zusätzlich stark unscharf im Hintergrund, der Text darüber bleibt scharf' },
       { type: 'new',     text: 'Angedeutetes Sammel-Motiv und schwebende Streuelemente auf Haken-, Einordnungs- und Abspann-Bild' },

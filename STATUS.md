@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.28.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.29.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.28.0)
+## Was gebaut ist (Stand v2.29.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.29.0 | Monitoring-Auslöser für Marktbericht + Artikel (bisher nur per curl mit Studio-Passwort — Grund für den monatelangen Bericht-Ausfall); Artikel-Lauf clientseitig über die letzten 8 Termine, ersetzt nur Ersatztexte; `publish-days.ts` als einzige Quelle der Veröffentlichungstermine |
 | v2.28.0 | Reel-Optik: Kartenbild als unscharfe, wandernde Hintergrundebene (FFmpeg-Zweilagen-Komposition, Unschärfe in kleiner Auflösung gerechnet) — jedes Segment in der Farbe SEINER Karte; angedeutetes Sammel-Motiv + Streuelemente; geneigte Karte, Verlaufs-Ziffer, Ober-/Unterkanten-Abdunklung; BUGFIX doppelte Abspann-Aussage |
 | v2.27.0 | Instagram-Konzept: 4 Formate (top-mover, preis-check, teuerste-im-set, dreissig-tage) mit Wochen-Rotation + Dramaturgie (Haken zuerst, Einordnung, Marke zuletzt) in reel-concepts.ts; Generator formatunabhängig |
 | v2.26.0 | Reel-Design im Plattform-Look: Raster + trendfarbige Lichtstimmung, Rang-Ziffer, Karten-Ring, Trend als Hauptkennzahl mit SVG-Pfeil, Fortschrittspunkte, Blenden + Vignette + wechselnder Zoom-Versatz |
@@ -192,4 +193,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.28.0 — 29. Juli 2026*
+*Zuletzt aktualisiert: v2.29.0 — 29. Juli 2026*

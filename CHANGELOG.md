@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.29.0] — 2026-07-29 · Marktbericht und Artikel per Klick auslösen
+
+### Neu
+- **Zwei neue Auslöser im Monitoring** unter „Betriebszustand":
+  - *Marktbericht (Wochenanalyse)* — erzeugt den Bericht der laufenden Woche sofort
+  - *Artikel (Sonntag + Donnerstag)* — prüft die letzten acht Termine und ersetzt Ersatztexte durch echte Beiträge
+- Jede Kachel meldet das Ergebnis im Klartext: Zeichenzahl, ausgewertete Karten, oder der konkrete Grund des Scheiterns
+
+### Geändert
+- Der Artikel-Lauf arbeitet die Termine einzeln ab und zeigt den Fortschritt — acht Generierungen in einem Server-Aufruf würden am Zeitlimit scheitern
+- Bereits echte Artikel bleiben unangetastet; der Lauf ist damit gefahrlos wiederholbar
+- Veröffentlichungstermine liegen jetzt in einem eigenen, abhängigkeitsfreien Modul (`publish-days.ts`) statt doppelt in Seite und Generator
+
+### Warum
+Marktbericht und Artikel ließen sich bisher **nur per Kommandozeile mit dem Studio-Passwort** auslösen. Genau deshalb blieb der Marktbericht nach dem Ausfall in KW 26 monatelang liegen: Es gab schlicht keinen Weg, ihn ohne Werkzeuge neu anzustoßen.
+
+---
+
 ## [2.28.0] — 2026-07-29 · Reels mit Farbe: Kartenmotiv als Hintergrund
 
 ### Neu
