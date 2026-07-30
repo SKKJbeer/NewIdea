@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.2',
+    date: '30. Juli 2026',
+    label: 'Preiserfassung lief nach acht Seiten ins Leere',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Erfassung blieb nach 8 von 82 Seiten stehen — der Folgeaufruf ging an die noch nicht verbundene eigene Domain statt an die Adresse, unter der sie gerade selbst lief' },
+      { type: 'fixed', text: 'Ein abgerissener Anstoß war unsichtbar: Der Stillstand sah aus wie ein langsamer Durchlauf. Er wird jetzt im Klartext vermerkt' },
+    ],
+  },
+  {
     version: '3.2.1',
     date: '30. Juli 2026',
     label: 'Preiserfassung von Hand startbar',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Knopf im Monitoring, der die Preiserfassung sofort startet statt bis zum nächsten Morgen zu warten — mit Stand und Fehlerursache im Klartext' },
     ],

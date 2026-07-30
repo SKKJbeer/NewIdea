@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.2] — 30. Juli 2026 · Preiserfassung lief nach acht Seiten ins Leere
+
+Im ersten echten Durchlauf blieb die Erfassung nach 8 von 82 Seiten stehen.
+
+### Behoben
+- **Der Folgeaufruf ging an die konfigurierte Adresse der künftigen eigenen Domain** — die noch nicht verbunden ist. Jede Fortsetzung lief damit ins Leere. Der Durchlauf ruft sich jetzt unter der Adresse auf, unter der er gerade selbst läuft; die ist zwangsläufig erreichbar
+- **Ein abgerissener Anstoß war unsichtbar.** Im Stand blieb der letzte Abruffehler stehen, und der Stillstand sah aus wie ein langsamer Durchlauf. Der Abriss wird jetzt im Klartext vermerkt
+
+---
+
 ## [3.2.1] — 30. Juli 2026 · Preiserfassung von Hand startbar
 
 ### Neu

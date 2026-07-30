@@ -118,6 +118,29 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(route).toMatch(/after\(runde\)/);
   });
 
+  it('ruft sich unter der eigenen Adresse auf', () => {
+    // BEFUND AUS DEM ERSTEN ECHTEN LAUF: Der Folgeaufruf ging an
+    // NEXT_PUBLIC_SITE_URL — dort steht die künftige eigene Domain, die noch
+    // nicht verbunden ist. Der Durchlauf blieb nach acht von 82 Seiten stehen.
+    // Nur die tatsächliche Verwendung prüfen — die Kommentare nennen die alte
+    // Variable absichtlich, damit der Grund am Code steht.
+    expect(route).toContain('const basis = url.origin;');
+    for (const datei of [
+      'src/app/api/cron/price-sweep/route.ts',
+      'src/app/api/studio/price-sweep/route.ts',
+      'src/app/api/cron/daily/route.ts',
+    ]) {
+      expect(lies(datei), datei).not.toContain('process.env.NEXT_PUBLIC_SITE_URL');
+    }
+  });
+
+  it('macht einen abgerissenen Anstoß sichtbar', () => {
+    // Sonst sieht ein Stillstand aus wie ein langsamer Durchlauf — im
+    // Monitoring stand weiter der alte Abruffehler.
+    expect(route).toContain('markChainError');
+    expect(sweep).toContain('Fortsetzung nicht angestoßen:');
+  });
+
   it('deckelt die Selbstfortsetzung', () => {
     expect(route).toMatch(/MAX_CHAIN = \d+/);
     expect(route).toContain('chain < MAX_CHAIN');

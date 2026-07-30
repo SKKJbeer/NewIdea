@@ -1,5 +1,5 @@
 import { NextResponse, after } from 'next/server';
-import { sweepChunk } from '@/lib/price-sweep';
+import { sweepChunk, markChainError } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 // FLÄCHENDECKENDE PREISERFASSUNG — Antrieb
@@ -47,7 +47,16 @@ export async function GET(request: Request) {
   // Für Prüfläufe: inline arbeiten und das echte Ergebnis zurückgeben.
   const sync = url.searchParams.get('sync') === '1';
 
-  const basis = process.env.NEXT_PUBLIC_SITE_URL || url.origin;
+  // IMMER die Adresse, unter der dieser Aufruf gerade läuft — NICHT
+  // NEXT_PUBLIC_SITE_URL.
+  //
+  // BEFUND AUS DEM ERSTEN ECHTEN LAUF: Dort stand die künftige eigene Domain,
+  // die noch nicht verbunden ist. Jeder Folgeaufruf lief damit ins Leere, und
+  // der Durchlauf blieb nach wenigen Seiten stehen — ohne Fehlermeldung, weil
+  // ein gescheiterter Anstoß bewusst abgefangen wird. Die eigene Adresse ist
+  // die einzige, die garantiert erreichbar ist: Sie hat diese Anfrage
+  // schließlich gerade beantwortet.
+  const basis = url.origin;
 
   async function runde() {
     const progress = await sweepChunk({ budgetMs: BUDGET_MS });
@@ -63,9 +72,13 @@ export async function GET(request: Request) {
           signal: AbortSignal.timeout(10_000),
         });
       } catch (err) {
-        // catch erlaubt: Bricht die Kette hier ab, beginnt der Tages-Cron
-        // morgen neu — der gespeicherte Stand geht dabei nicht verloren.
-        console.warn('[Preis-Sweep] Fortsetzung nicht angestoßen:', err);
+        // Der gespeicherte Stand geht nicht verloren — aber der Abriss MUSS
+        // sichtbar werden. Ohne diesen Vermerk sieht ein Stillstand aus wie
+        // ein langsamer Durchlauf, und genau so blieb der erste echte Lauf
+        // unbemerkt bei Seite 8 stehen.
+        const grund = err instanceof Error ? err.message : String(err);
+        console.warn('[Preis-Sweep] Fortsetzung nicht angestoßen:', grund);
+        await markChainError(grund);
       }
     }
     return progress;

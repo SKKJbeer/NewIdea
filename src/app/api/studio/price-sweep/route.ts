@@ -1,6 +1,6 @@
 import { NextResponse, after } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
-import { loadSweepState, sweepChunk, seitenGesamt, heute } from '@/lib/price-sweep';
+import { loadSweepState, sweepChunk, seitenGesamt, heute, markChainError } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 // START- UND STANDANZEIGE FÜR DIE FLÄCHENDECKENDE PREISERFASSUNG
@@ -55,7 +55,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'Supabase nicht konfiguriert' }, { status: 503 });
   }
 
-  const basis = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  // Die eigene Adresse, nicht NEXT_PUBLIC_SITE_URL: Dort steht die künftige
+  // Domain, die noch nicht verbunden ist — der Folgeaufruf lief damit ins Leere
+  // und der Durchlauf blieb nach wenigen Seiten stehen.
+  const basis = new URL(request.url).origin;
 
   // Erst eine Runde selbst arbeiten, danach an die Kette übergeben. So ist
   // schon nach dem ersten Klick sichtbar, dass wirklich etwas passiert —
@@ -71,9 +74,12 @@ export async function POST(request: Request) {
           signal: AbortSignal.timeout(10_000),
         });
       } catch (err) {
-        // catch erlaubt: Der gespeicherte Stand bleibt erhalten; der nächste
-        // Klick oder der Tages-Cron setzt genau dort fort.
-        console.warn('[Preis-Sweep] Kette nicht angestoßen:', err);
+        // Stand bleibt erhalten; der nächste Klick oder der Tages-Cron setzt
+        // dort fort. Der Abriss wird vermerkt, damit ein Stillstand nicht wie
+        // ein langsamer Durchlauf aussieht.
+        const grund = err instanceof Error ? err.message : String(err);
+        console.warn('[Preis-Sweep] Kette nicht angestoßen:', grund);
+        await markChainError(grund);
       }
     });
   }

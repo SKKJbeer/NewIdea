@@ -45,7 +45,9 @@ export async function GET(request: Request) {
     // übernimmt der Durchlauf, der sich selbst weiterreicht, bis der Tag fertig
     // ist. Er läuft absichtlich NEBENHER: Ein Fehler dort darf den Artikel
     // dieses Crons nicht mitreißen.
-    const basis = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+    // Eigene Adresse statt NEXT_PUBLIC_SITE_URL — dort steht die künftige
+    // Domain, die noch nicht verbunden ist (siehe price-sweep/route.ts).
+    const basis = new URL(request.url).origin;
     try {
       const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
         headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },

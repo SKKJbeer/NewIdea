@@ -144,6 +144,21 @@ export async function saveSweepState(state: SweepState): Promise<string | null> 
   return error ? error.message : null;
 }
 
+/**
+ * Vermerkt, dass die Selbstfortsetzung nicht angestoßen werden konnte.
+ *
+ * ANLASS: Beim ersten echten Lauf blieb der Durchlauf bei Seite 8 stehen, weil
+ * der Folgeaufruf an eine noch nicht verbundene Domain ging. Sichtbar war
+ * davon NICHTS — im Monitoring stand weiterhin der letzte API-Fehler, und der
+ * Stillstand sah aus wie ein langsamer Durchlauf. Ein abgerissener Anstoß
+ * gehört deshalb genauso in den Stand wie ein Abruffehler.
+ */
+export async function markChainError(grund: string): Promise<void> {
+  const stand = await loadSweepState();
+  if (!stand) return;
+  await saveSweepState({ ...stand, lastError: `Fortsetzung nicht angestoßen: ${grund}` });
+}
+
 // ── Ein Häppchen ────────────────────────────────────────────────────────────
 
 /** Letzte bekannte Messpunkte für eine Menge Karten — eine Abfrage statt 250. */
