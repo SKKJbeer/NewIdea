@@ -25,6 +25,21 @@ import { jsonLd } from '@/lib/json-ld';
 
 export const revalidate = 86400;
 
+// WARUM EINE LEERE LISTE UND NICHT GAR KEINE FUNKTION:
+// Ohne `generateStaticParams` stuft Next.js eine dynamische Route als
+// „bei jeder Anfrage neu rendern" ein (`ƒ`) — die `revalidate`-Angabe darüber
+// bleibt wirkungslos. Genau das war der Fall: Jeder einzelne Seitenaufruf lief
+// in die Selbstheilung unten und erzeugte einen vollständigen KI-Artikel. Drei
+// Abrufe hintereinander lieferten drei verschiedene Titel.
+//
+// Die LEERE Liste erzeugt beim Bauen nichts vor (das verbietet Stolperstelle 16,
+// weil ein API-Ausfall während des Builds sonst als 404 einbetoniert würde) —
+// sie schaltet die Route aber auf „auf Anfrage erzeugen, danach zwischenspeichern".
+// Ein Datum wird damit höchstens einmal pro `revalidate`-Fenster erzeugt.
+export async function generateStaticParams() {
+  return [];
+}
+
 function ArticleContent({ content }: { content: string }) {
   const blocks = content.split(/\n\n+/).filter((s) => s.trim());
   return (
@@ -109,7 +124,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   // Selbstheilung: Hat der Cron den Artikel (noch) nicht erzeugt, generieren wir ihn
   // jetzt on-demand. generateArticle prüft intern Static + Cache, liefert auch ohne
   // ANTHROPIC_API_KEY einen vollständigen Fallback-Artikel und persistiert das Ergebnis.
-  // Dank ISR (revalidate=86400) passiert das höchstens einmal pro Tag pro Artikel.
+  // Dank `generateStaticParams` + ISR passiert das höchstens einmal pro
+  // `revalidate`-Fenster. Vorher fehlte die Funktion — und damit die
+  // Zwischenspeicherung; siehe Kommentar oben.
   if (!article) {
     article = await generateArticle(type, date).catch(() => null);
   }

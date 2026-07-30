@@ -575,6 +575,15 @@ export interface GenerateArticleOptions {
    * wie ein Programmfehler aus, obwohl schlicht das Guthaben leer war.
    */
   onAiError?: (info: { message: string; raw: string }) => void;
+  /**
+   * Wird aufgerufen, wenn das Speichern scheitert.
+   *
+   * Das ist der teurere der beiden Fälle: Ein nicht gespeicherter Artikel wird
+   * bei JEDEM weiteren Seitenaufruf neu erzeugt. Ohne diese Meldung blieb das
+   * unsichtbar — die Tabelle stand auf 0 Zeilen, während die Erzeugung
+   * „erfolgreich" meldete.
+   */
+  onSaveError?: (message: string) => void;
 }
 
 /** Generate + persist. For cron jobs only — never call from a user-facing page. */
@@ -633,7 +642,8 @@ export async function generateArticle(
       trendingCards,
     );
     // Persistieren, damit nicht bei jedem Aufruf neu erzeugt wird (kein Regenerieren pro Besuch).
-    await saveArticle(date, type, fallback).catch(() => {});
+    const gesichert = await saveArticle(date, type, fallback);
+    if (!gesichert.ok) console.error(`Artikel ${date} nicht gespeichert: ${gesichert.error}`);
     return fallback;
   }
 
@@ -683,7 +693,8 @@ export async function generateArticle(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
-      await saveArticle(date, type, fallback).catch(() => {});
+      const gesichert = await saveArticle(date, type, fallback);
+    if (!gesichert.ok) console.error(`Artikel ${date} nicht gespeichert: ${gesichert.error}`);
       return fallback;
     }
 
@@ -705,11 +716,15 @@ export async function generateArticle(
       generatedAt: new Date().toISOString(),
     };
     // Persist so future requests are instant and the article is available historically.
-    await saveArticle(date, type, article).catch((saveErr) => {
-      // Nicht stumm: Ein Artikel, der erzeugt aber nicht gespeichert wurde,
-      // wird beim naechsten Aufruf erneut erzeugt — und kostet erneut.
-      console.error(`Artikel ${date} konnte nicht gespeichert werden:`, saveErr);
-    });
+    // Nicht stumm: Ein Artikel, der erzeugt aber nicht gespeichert wurde, wird
+    // beim nächsten Aufruf erneut erzeugt — und kostet erneut. supabase-js
+    // WIRFT dabei nicht, es LIEFERT den Fehler zurück; ein `.catch()` allein
+    // hätte das nie bemerkt.
+    const gespeichert = await saveArticle(date, type, article);
+    if (!gespeichert.ok) {
+      console.error(`Artikel ${date} konnte nicht gespeichert werden: ${gespeichert.error}`);
+      options.onSaveError?.(gespeichert.error ?? 'unbekannt');
+    }
     return article;
   } catch (err) {
     // Ursache IMMER protokollieren UND an den Aufrufer melden — ein stiller
@@ -725,9 +740,11 @@ export async function generateArticle(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
-    await saveArticle(date, type, fallback).catch((saveErr) => {
-      console.error(`Ersatzartikel ${date} konnte nicht gespeichert werden:`, saveErr);
-    });
+    const fallbackGespeichert = await saveArticle(date, type, fallback);
+    if (!fallbackGespeichert.ok) {
+      console.error(`Ersatzartikel ${date} konnte nicht gespeichert werden: ${fallbackGespeichert.error}`);
+      options.onSaveError?.(fallbackGespeichert.error ?? 'unbekannt');
+    }
     return fallback;
   }
 }

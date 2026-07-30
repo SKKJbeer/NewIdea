@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.35.1] — 30. Juli 2026 · Artikel wurden nie gespeichert — und jeder Aufruf kostete neu
+
+Beim Nachziehen der Inhalte aufgefallen: Zehn erfolgreich erzeugte Artikel, null gespeicherte Zeilen, keine einzige Fehlermeldung. Drei Abrufe derselben Artikelseite lieferten drei verschiedene Titel.
+
+### Behoben
+- **Das Speichern scheiterte still.** `saveArticle` gab nur `!error` zurück und verwarf die Ursache; die Aufrufer hingen ein `.catch()` an — das greift aber nur bei geworfenen Ausnahmen, und die Datenbankbibliothek wirft nicht, sondern liefert den Fehler zurück. Es gibt jetzt `{ ok, error }` mit der echten Meldung, und jeder Aufrufer wertet sie aus
+- **Jeder Seitenaufruf erzeugte einen neuen Artikel.** Die Artikelseite heilt sich selbst: Fehlt der Beitrag, wird er erzeugt. Das ist richtig — aber der Route fehlte `generateStaticParams`, und ohne diese Funktion stuft Next.js sie als „bei jeder Anfrage neu rendern" ein. Die `revalidate`-Angabe darüber war wirkungslos. Zusammen mit dem stillen Speicherfehler bedeutete das: ein vollständiger KI-Aufruf pro Besucher und pro Crawler
+- Die Auslöse-Route meldet jetzt `saved` und die Ursache, statt Erfolg zu behaupten
+
+### Wichtig
+Diese beiden Fehler zusammen sind die plausibelste Erklärung für das aufgebrauchte Guthaben — mehr noch als die offenen Endpunkte aus v2.34.0. Die Erfassung aus v2.34.0 macht so etwas ab sofort sichtbar.
+
+---
+
 ## [2.35.0] — 30. Juli 2026 · Sicherheitsdurchsicht: neun Befunde geschlossen
 
 Eine vollständige Durchsicht der Plattform aus Angreifersicht. Neun Befunde, alle behoben, jeder mit einer Prüfung abgesichert (74 neue Tests, insgesamt 521).

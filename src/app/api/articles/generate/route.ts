@@ -33,9 +33,11 @@ export async function POST(request: Request) {
     // kann. Ohne das meldete die Route nur „ist ein Ersatztext" — und ein
     // leeres KI-Guthaben sah damit wie ein Programmfehler aus.
     let aiError: { message: string; raw: string } | null = null;
+    let saveError: string | null = null;
     const article = await generateArticle(type, date, {
       replaceFallback: true,
       onAiError: (info) => { aiError = info; },
+      onSaveError: (message) => { saveError = message; },
     });
     revalidatePath(`/artikel/${date}`);
     revalidatePath('/artikel');
@@ -49,6 +51,10 @@ export async function POST(request: Request) {
         // Klartext-Ursache, wenn die Erzeugung nicht griff. `raw` bleibt
         // draussen — interne Details gehoeren nicht in eine Antwort.
         reason: aiError ? (aiError as { message: string }).message : undefined,
+        // Ohne diese Angabe meldete die Route Erfolg, obwohl nichts ankam —
+        // und die Seite erzeugte den Artikel bei jedem Aufruf erneut.
+        saved: saveError === null,
+        saveError: saveError ?? undefined,
         sections: article.sections.length,
         readingTimeMin: article.readingTimeMin,
       },

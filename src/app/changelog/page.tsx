@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.35.1',
+    date: '30. Juli 2026',
+    label: 'Artikel wurden nie gespeichert — und jeder Aufruf kostete neu',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Das Speichern der Artikel scheiterte still: zehn erzeugte Beiträge, null gespeicherte Zeilen, keine Meldung. Die Speicher-Funktion gibt jetzt die echte Ursache zurück' },
+      { type: 'fixed',   text: 'Jeder Seitenaufruf erzeugte den Artikel neu — der Route fehlte generateStaticParams, wodurch die Zwischenspeicherung nie griff. Drei Abrufe lieferten drei verschiedene Titel' },
+      { type: 'changed', text: 'Die Auslöse-Route meldet jetzt, ob wirklich gespeichert wurde, statt Erfolg zu behaupten' },
+    ],
+  },
+  {
     version: '2.35.0',
     date: '30. Juli 2026',
     label: 'Sicherheitsdurchsicht: neun Befunde geschlossen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Fremder Code über strukturierte Daten war möglich — JSON.stringify maskiert </script> nicht, und auf der Suchseite floss die Suchanfrage des Besuchers ungefiltert dorthin. Fünf Seiten betroffen, alle behoben' },
       { type: 'fixed',   text: 'Die Weiterleitung nach der Anmeldung ließ sich mit einem Rückstrich oder Tabulator auf eine fremde Seite umbiegen — der Baustein für Phishing' },
