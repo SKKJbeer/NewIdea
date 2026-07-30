@@ -29,7 +29,7 @@ export function ApiErrorState({ backHref = '/', backLabel = 'Zur Startseite' }: 
           </a>
           <Link
             href={backHref}
-            className="text-sm text-slate-500 hover:text-violet-400 font-semibold transition-colors"
+            className="inline-flex min-h-[32px] items-center text-sm font-semibold text-slate-500 transition-colors hover:text-violet-400"
           >
             {backLabel}
           </Link>

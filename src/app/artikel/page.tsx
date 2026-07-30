@@ -119,7 +119,7 @@ export default async function ArtikelListPage() {
             <BookOpen size={12} className="text-slate-600" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Experten-Guides</span>
             <span className="h-px flex-1 bg-[#1e1e30]" />
-            <Link href="/guides" className="text-[11px] font-semibold text-violet-500 hover:text-violet-400">
+            <Link href="/guides" className="inline-flex min-h-[32px] items-center text-[11px] font-semibold text-violet-500 hover:text-violet-400">
               Alle Guides →
             </Link>
           </div>

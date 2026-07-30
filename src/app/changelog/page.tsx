@@ -1208,7 +1208,7 @@ export default function ChangelogPage() {
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
+          <Link href="/" className="min-h-[32px] inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors">
             <ArrowLeft size={12} /> Zur Startseite
           </Link>
           <div className="flex items-center gap-3 mb-3">
@@ -1262,7 +1262,7 @@ export default function ChangelogPage() {
         ))}
 
         <p className="text-center text-xs text-slate-600 pt-2">
-          Vollständiger Verlauf: <a href="https://github.com/SKKJbeer/NewIdea/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">CHANGELOG.md auf GitHub</a>
+          Vollständiger Verlauf: <a href="https://github.com/SKKJbeer/NewIdea/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[32px] items-center text-violet-400 underline hover:text-violet-300">CHANGELOG.md auf GitHub</a>
         </p>
       </main>
     </div>

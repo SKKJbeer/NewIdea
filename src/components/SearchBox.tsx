@@ -157,7 +157,7 @@ export function SearchBox({
                   setOpen(false);
                   router.push(`/suche?q=${encodeURIComponent(value.trim())}`);
                 }}
-                className="text-xs font-semibold text-violet-400 hover:text-violet-300"
+                className="min-h-[36px] text-xs font-semibold text-violet-400 hover:text-violet-300"
               >
                 Alle Ergebnisse für „{value.trim()}" anzeigen →
               </button>

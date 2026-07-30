@@ -37,7 +37,8 @@ export function AffiliateBar() {
               href={a.url}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="inline-flex items-center gap-0.5 text-xs text-slate-500 hover:text-violet-400 transition-colors"
+              // Mindesthöhe für den Finger — die Links waren rund 16 px hoch.
+              className="inline-flex min-h-[32px] items-center gap-0.5 text-xs text-slate-500 transition-colors hover:text-violet-400"
             >
               {a.name}
               <ExternalLink size={9} className="opacity-60" />

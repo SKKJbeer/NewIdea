@@ -63,10 +63,16 @@ export function SiteFooter() {
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-3">{group.label}</p>
-              <ul className="space-y-2">
+              {/* `inline-flex min-h-[32px]` statt eines nackten Textlinks: Die
+                  Zeilen waren rund 16 px hoch und auf einem Telefon kaum zu
+                  treffen. Der Abstand zwischen den Einträgen bleibt gleich. */}
+              <ul className="-my-1 space-y-0.5">
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-xs text-slate-500 hover:text-violet-400 transition-colors">
+                    <Link
+                      href={link.href}
+                      className="inline-flex min-h-[32px] items-center text-xs text-slate-500 transition-colors hover:text-violet-400"
+                    >
                       {link.label}
                     </Link>
                   </li>

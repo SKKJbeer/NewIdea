@@ -10,7 +10,16 @@
 // ist in remotePatterns) — der Optimizer cacht selbst 31 Tage (minimumCacheTTL).
 // Siehe Stolperstelle 18.
 
-const PROXY_HOSTS = new Set(['images.pokemontcg.io', 'assets.pokemon.com']);
+// `images.scrydex.com` kam im QA-Durchlauf dazu: Die Kartendatenbank liefert
+// die Logos NEUERER Sets von diesem Host. Unbekannte Hosts reicht `cachedImg`
+// unverändert durch — die Inhaltsrichtlinie (CSP, seit v2.35.0) blockierte sie
+// dann, und auf /sets blieben vier Set-Logos leer. Über den eigenen Proxy
+// laufen sie als gleiche Herkunft und brauchen keine Aufweichung der CSP.
+const PROXY_HOSTS = new Set([
+  'images.pokemontcg.io',
+  'assets.pokemon.com',
+  'images.scrydex.com',
+]);
 
 export function cachedImg(url: string | undefined | null): string {
   if (!url) return '';

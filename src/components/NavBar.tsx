@@ -56,7 +56,11 @@ export function NavBar() {
               <Link
                 key={href}
                 href={href}
-                className={`text-xs font-semibold px-3 py-2 rounded-lg transition-colors ${
+                // Enger ab dem Umbruchpunkt, großzügig erst auf breiten
+                // Bildschirmen: Bei 768 px ragte die Leiste 18 px über den
+                // Rand hinaus und erzeugte auf JEDER Seite waagerechtes
+                // Scrollen.
+                className={`rounded-lg px-2 py-2 text-xs font-semibold transition-colors lg:px-3 ${
                   isActive(href)
                     ? 'text-violet-400 bg-violet-500/10'
                     : 'text-slate-500 hover:text-violet-400 hover:bg-[#1a1a28]'
@@ -67,7 +71,9 @@ export function NavBar() {
             ))}
             <Link
               href="/studio"
-              className="text-xs font-semibold text-slate-700 hover:text-violet-400 transition-colors px-2 py-1.5 ml-1"
+              // Interne, passwortgeschützte Seite — auf Tablet-Breite hat sie
+              // in der öffentlichen Leiste nichts zu suchen und kostet nur Platz.
+              className="ml-1 hidden px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:text-violet-400 lg:inline-flex"
             >
               Studio
             </Link>

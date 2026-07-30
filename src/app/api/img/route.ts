@@ -9,7 +9,13 @@ import { NextResponse } from 'next/server';
 // Sicherheit: strikte Host-Allowlist + nur https + nur image/*-Antworten —
 // kein offener Proxy.
 
-const ALLOWED_HOSTS = new Set(['images.pokemontcg.io', 'assets.pokemon.com']);
+// Muss mit PROXY_HOSTS in cached-image.ts übereinstimmen — sonst erzeugt die
+// eine Seite Proxy-URLs, die die andere ablehnt.
+const ALLOWED_HOSTS = new Set([
+  'images.pokemontcg.io',
+  'assets.pokemon.com',
+  'images.scrydex.com',
+]);
 
 /** Höchstens so viele Weiterleitungen — jede wird erneut geprüft. */
 const MAX_REDIRECTS = 3;

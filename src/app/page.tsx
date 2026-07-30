@@ -274,13 +274,17 @@ export default async function Home() {
               <Activity size={10} /> Live
             </span>
             {tickerCards.map((card) => {
-              const up = (card.trendPercent ?? 0) >= 0;
+              const trend = card.trendPercent ?? 0;
+              const up = trend > 0;
+              const neutral = trend === 0;
               const price = card.prices.market;
               return (
                 <Link
                   key={card.id}
                   href={`/karten/${card.id}`}
-                  className="flex items-center gap-2 shrink-0 group"
+                  // `min-h-[32px]` — die Ticker-Einträge sind Links und waren
+                  // auf einem Telefon nur rund 16 px hoch.
+                  className="group flex min-h-[32px] shrink-0 items-center gap-2"
                 >
                   <span className="text-[11px] text-slate-400 group-hover:text-slate-200 transition-colors truncate max-w-[120px]">
                     {card.nameDe ?? card.name}
@@ -289,7 +293,9 @@ export default async function Home() {
                     <span className="text-[11px] font-mono text-slate-300">{fmt(price)}</span>
                   )}
                   <span
-                    className={`text-[10px] font-semibold tabular-nums ${up ? 'text-emerald-400' : 'text-rose-400'}`}
+                    className={`text-[10px] font-semibold tabular-nums ${
+                      neutral ? 'text-slate-500' : up ? 'text-emerald-400' : 'text-rose-400'
+                    }`}
                   >
                     {fmtPct(card.trendPercent)}
                   </span>
@@ -536,7 +542,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/suche"
-                className="flex items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
+                className="inline-flex min-h-[32px] items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
               >
                 Alle Karten <ArrowRight size={11} />
               </Link>
@@ -734,7 +740,7 @@ export default async function Home() {
             </div>
             <Link
               href="/artikel"
-              className="flex items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
+              className="inline-flex min-h-[32px] items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
             >
               Alle Artikel <ArrowRight size={11} />
             </Link>
@@ -774,7 +780,7 @@ export default async function Home() {
             </div>
             <Link
               href="/guides"
-              className="flex items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
+              className="inline-flex min-h-[32px] items-center gap-1 text-[11px] font-semibold text-violet-500 hover:text-violet-400"
             >
               Alle Guides <ArrowRight size={11} />
             </Link>

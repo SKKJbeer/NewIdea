@@ -159,7 +159,7 @@ export default async function CardDetailPage({ params }: Props) {
       <NavBar />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-6 transition-colors">
+        <Link href="/" className="inline-flex min-h-[32px] items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-6 transition-colors">
           <ArrowLeft size={16} />Alle Karten
         </Link>
 
@@ -252,7 +252,7 @@ export default async function CardDetailPage({ params }: Props) {
                   <a
                     href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
                     target="_blank" rel="noopener noreferrer sponsored"
-                    className="text-[11px] font-semibold text-violet-400 hover:text-violet-300 inline-flex items-center gap-1"
+                    className="inline-flex min-h-[32px] items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300"
                   >
                     Prüfen <ExternalLink size={11} />
                   </a>

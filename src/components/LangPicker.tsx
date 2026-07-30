@@ -20,10 +20,13 @@ export function LangPicker({
           key={lang}
           type="button"
           onClick={() => onChange(lang)}
-          className={`flex items-center gap-1 rounded-lg font-bold transition-all ${
+          // `min-h-[32px]` statt reiner Innenabstände: Auf einem Telefon war
+          // die Schaltfläche nur rund 22 px hoch — unter jeder brauchbaren
+          // Trefferfläche für einen Finger.
+          className={`flex min-h-[32px] items-center gap-1 rounded-lg font-bold transition-all ${
             size === 'sm'
-              ? 'px-2 py-1 text-[11px]'
-              : 'px-2.5 py-1.5 text-xs'
+              ? 'px-2.5 py-1.5 text-[11px]'
+              : 'px-3 py-2 text-xs'
           } ${
             value === lang
               ? 'bg-violet-600 text-white shadow-sm'

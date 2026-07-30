@@ -13,7 +13,7 @@ export default function Datenschutz() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-8"
+          className="inline-flex min-h-[32px] items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-8"
         >
           <ArrowLeft size={16} />
           Zurück zur Startseite
