@@ -983,6 +983,10 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 
 42. **Ein Pflicht-Bild an der falschen Größe frisst die Seite auf** → Die Regel „Boosterpack-Bild überall dort wo Karten erwähnt werden" wurde in der Artikel-Galerie mit `h-14` unter JEDER Karte umgesetzt. Bei vier Karten aus demselben Set standen dort viermal dasselbe Logo — zusammen mehr Fläche als die Kartenbilder selbst. **Regel:** Die Pflicht ist die Herkunft, nicht die Größe. Stammen alle gezeigten Karten aus einem Set, gehört das Logo EINMAL in die Kopfzeile; sonst klein an die einzelne Karte (`h-4`). Das Kartenbild bleibt der Blickfang (`aspect-[63/88]`, echtes Kartenformat).
 
+43. **Halbtransparente Flächen über einer Kante zeigen, was darunter liegt** → Die hervorgehobene erste Guides-Kachel hatte `bg-gradient-to-r from-violet-600/20` OHNE deckende Grundfläche. Die Liste ragt per `-mt-5` bewusst über den Kopfbereich — dessen `border-b` schien deshalb mitten durch die Kachel, und es sah aus, als kreuze eine Linie die Karte. **Regel:** Jede Kachel, die über eine Kante ragt, braucht eine DECKENDE Grundfläche (`bg-[#13131e]`); getönte Verläufe kommen als eigene Ebene darüber (`absolute inset-0`, Inhalt dann `relative`). Gilt überall dort, wo `-mt-*` eine Überlappung erzeugt (Marktbericht, Artikel, Guides).
+
+44. **Eine Grafik ohne Aufbau wird überblättert** → Flache Balken auf flachem Grund wirken wie ein Standard-Plot aus einem Notebook. Was den Unterschied macht, sind wenige Mittel: vertiefte Spur (`ring-1 ring-inset`), Verlauf im Balken, farbiger Schein (`shadow-[0_0_12px_-2px_…]`), runde Enden — und vor allem der Aufbau beim Hereinscrollen (Balken von `0%` auf den Wert, Zeilen um `STUFE_MS` versetzt). **Regeln:** (a) Sichtbarkeits-Erkennung IMMER über `useInView` (`src/lib/use-in-view.ts`) — keine zweite Umsetzung; (b) ohne IntersectionObserver oder bei `prefers-reduced-motion` sofort alles sichtbar rendern, eine Grafik darf nie unsichtbar bleiben; (c) beim Hochzählen (`CountUp`) MUSS der letzte Schritt exakt der echte Wert sein, nie ein gerundeter Zwischenwert (Preis-Wahrheitspflicht).
+
 ---
 
 ## Monetisierungsstrategie & Business-Plan

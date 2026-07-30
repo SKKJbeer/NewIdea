@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.39.0] — 30. Juli 2026 · Grafiken bauen sich auf, Guides-Kachel ohne kreuzende Linie
+
+### Behoben
+- **Eine Linie kreuzte die erste Guides-Kachel.** Die hervorgehobene Kachel war nur halbtransparent, und weil die Liste bewusst über den Kopfbereich ragt, schien dessen Unterkante mitten durch die Karte. Jetzt liegt eine deckende Fläche unter dem Verlauf
+
+### Geändert
+- **Alle Datengrafiken bauen sich beim Hereinscrollen auf.** Balken wachsen von null auf ihren Wert, Zeilen setzen versetzt ein, Kennzahlen zählen hoch. Eine Zahl, die fertig dasteht, wird überblättert — eine, die sich aufbaut, wird gelesen
+- **Gestaltung deutlich aufgewertet**: Balken liegen in einer vertieften Spur, haben Farbverläufe, runde Enden und einen farbigen Schein; die Preisrangliste ist nummeriert und hat Hilfslinien als Maßstab; das Marktbild nennt, wie viele Karten im Plus liegen; die Kennzahlen-Kacheln haben einen Verlaufsrahmen und einen farbigen Akzent passend zu ihrem Wert
+- **Der Endwert ist immer der echte Wert.** Das Hochzählen ist reine Darstellung — es endet exakt auf der gemessenen Zahl, nie auf einem gerundeten Zwischenschritt
+
+### Technisch
+- Die Sichtbarkeits-Erkennung liegt jetzt an einer Stelle (`useInView`) und wird von Einblendung, Balken und Kennzahlen gemeinsam genutzt
+- Ohne JavaScript oder bei aktivierter Systemeinstellung „weniger Bewegung" steht sofort alles vollständig da — eine Grafik darf nie unsichtbar bleiben, nur weil eine Animation nicht laufen kann
+
+---
+
 ## [2.38.0] — 30. Juli 2026 · Anschaulicher: neue Datengrafiken, Kartenbilder als Blickfang
 
 ### Behoben

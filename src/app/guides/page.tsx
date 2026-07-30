@@ -44,13 +44,25 @@ export default async function GuidesPage() {
           <Link
             key={guide.slug}
             href={`/guides/${guide.slug}`}
-            className={`block rounded-2xl border transition-all group p-5 ${
+            // WICHTIG: `bg-[#13131e]` als DECKENDE Grundfläche unter dem
+            // Verlauf. Die hervorgehobene erste Karte war zuvor nur
+            // halbtransparent (`from-violet-600/20`), und weil die Liste per
+            // `-mt-5` über den Kopfbereich ragt, schien dessen Unterkante
+            // mitten durch die Karte — es sah aus, als kreuze eine Linie die
+            // Kachel. Deckend + `relative` beendet das.
+            className={`group relative block overflow-hidden rounded-2xl border bg-[#13131e] p-5 transition-all ${
               i === 0
-                ? 'border-violet-500/30 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 hover:from-violet-600/30 hover:to-indigo-600/30'
-                : 'border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/30 hover:bg-[#1a1a28]'
+                ? 'border-violet-500/30 hover:border-violet-500/50'
+                : 'border-[#2a2a3a] hover:border-violet-500/30 hover:bg-[#1a1a28]'
             }`}
           >
-            <div className="flex items-start gap-3">
+            {i === 0 && (
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 transition-colors group-hover:from-violet-600/30 group-hover:to-indigo-600/30"
+              />
+            )}
+            <div className="relative flex items-start gap-3">
               <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
                 <ContentIcon name={guide.icon} size={20} />
               </div>

@@ -78,7 +78,12 @@ describe('UI-Design-Regel — durchgehend dunkel', () => {
   it('verwendet keine hellen Tailwind-Flächen', () => {
     // Bloomberg/TradingView-Look, global bindend. Eine einzelne weiße Karte
     // fällt im dunklen Umfeld sofort auf.
-    const verboten = /className=[^>]*\b(bg-white|bg-gray-(50|100|200)|text-gray-(400|500|900))\b/;
+    // `bg-white/[0.04]` und Verwandte sind KEINE hellen Flächen, sondern
+    // Haarlinien und Lichtsäume auf dunklem Grund — das übliche Mittel, um
+    // einer dunklen Oberfläche Tiefe zu geben. Verboten bleibt die DECKENDE
+    // helle Fläche: `bg-white` ohne Deckkraftangabe (und `bg-white/90` & Co.).
+    const verboten =
+      /className=[^>]*\b(bg-white(?!\/\[?0?\.?0)|bg-gray-(50|100|200)|text-gray-(400|500|900))\b/;
     const verstoesse: string[] = [];
     for (const file of sourceFiles('src/**/*.tsx')) {
       verstoesse.push(...hits(file, verboten));

@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.39.0',
+    date: '30. Juli 2026',
+    label: 'Grafiken bauen sich beim Scrollen auf',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Eine Linie kreuzte die erste Guides-Kachel — die halbtransparente Kachel ließ die Unterkante des Kopfbereichs durchscheinen' },
+      { type: 'changed', text: 'Alle Datengrafiken bauen sich beim Hereinscrollen auf: Balken wachsen von null, Zeilen setzen versetzt ein, Kennzahlen zählen hoch' },
+      { type: 'changed', text: 'Vertiefte Spuren, Farbverläufe, runde Enden und farbiger Schein statt flacher Balken; Preisrangliste nummeriert, Kennzahlen mit Verlaufsrahmen' },
+      { type: 'changed', text: 'Das Hochzählen endet exakt auf dem gemessenen Wert — nie auf einem gerundeten Zwischenschritt' },
+      { type: 'new',     text: 'Sichtbarkeits-Erkennung an einer Stelle; ohne JavaScript oder bei „weniger Bewegung" steht sofort alles da' },
+    ],
+  },
+  {
     version: '2.38.0',
     date: '30. Juli 2026',
     label: 'Anschaulicher: neue Datengrafiken',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Das Preisdiagramm färbte einen Kursanstieg grau — die Balkenfarbe kam aus der Akzentfarbe des Artikeltyps. Steigend ist jetzt immer grün, fallend immer rot' },
       { type: 'fixed',   text: 'Kartennamen wurden auf 13 Zeichen gekürzt und der Preis stand nur im Tooltip. Die Balken liegen jetzt waagerecht, der Wert steht am Balken' },
