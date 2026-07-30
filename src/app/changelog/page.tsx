@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.1',
+    date: '30. Juli 2026',
+    label: 'Preiserfassung von Hand startbar',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Knopf im Monitoring, der die Preiserfassung sofort startet statt bis zum nächsten Morgen zu warten — mit Stand und Fehlerursache im Klartext' },
+    ],
+  },
+  {
     version: '3.2.0',
     date: '30. Juli 2026',
     label: 'Preise werden für alle Karten erfasst',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Die Preiserfassung deckt jetzt die gesamte Kartendatenbank ab (~20.500 Karten) statt nur die rund 80 des Tageslaufs plus die zufällig angeklickten' },
       { type: 'new',     text: 'Der Durchlauf arbeitet in Häppchen, merkt sich seinen Stand und setzt sich selbst fort, bis der Tag vollständig erfasst ist' },

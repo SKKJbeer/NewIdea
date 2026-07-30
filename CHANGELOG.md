@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.1] — 30. Juli 2026 · Preiserfassung von Hand startbar
+
+### Neu
+- **Knopf im Monitoring, der die Erfassung sofort startet** statt bis zum nächsten Morgen zu warten. Der Stand (Seite, geprüfte Karten, geschriebene Messpunkte, letzter Fehler) steht daneben im Klartext
+
+---
+
 ## [3.2.0] — 30. Juli 2026 · Preise werden für alle Karten erfasst
 
 Bisher entstand die Preis-Historie fast nur dort, wo jemand geklickt hat: ein Messpunkt bei jedem Kartenaufruf plus ein täglicher Lauf über rund 80 Karten. Eine Karte, die niemand aufruft, bekam nie einen Wert — und verpasste Zeit lässt sich nicht nachholen, Preise von gestern gibt es nirgends zu kaufen.

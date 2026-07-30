@@ -119,9 +119,43 @@ function formatDate(value: string | null): string {
 function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh: () => void }) {
   // Welcher Auslöser gerade läuft (nur einer gleichzeitig — alle drei rufen
   // dieselbe KI und dieselbe Datenbank an).
-  const [busy, setBusy] = useState<null | 'guide' | 'report' | 'articles'>(null);
+  const [busy, setBusy] = useState<null | 'guide' | 'report' | 'articles' | 'sweep'>(null);
   const [results, setResults] = useState<Record<string, string>>({});
   const setResult = (key: string, text: string) => setResults((r) => ({ ...r, [key]: text }));
+
+  /**
+   * Flächendeckende Preiserfassung anstoßen.
+   *
+   * WARUM DER KNOPF EXISTIERT: Der Tages-Cron startet den Durchlauf einmal
+   * täglich. Nach dem Anlegen der Tabelle oder nach einem Ausfall müsste man
+   * sonst bis zum nächsten Morgen warten — und genau solches Warten ist der
+   * Grund, warum die Preis-Historie so lange dünn geblieben ist.
+   */
+  async function runSweep() {
+    setBusy('sweep');
+    setResult('sweep', '');
+    try {
+      const res = await fetch('/api/studio/price-sweep', { method: 'POST' });
+      const json = await res.json();
+      if (json.error) {
+        setResult('sweep', `Fehlgeschlagen: ${json.error}`);
+      } else {
+        const rest = Math.max(0, (json.totalPages ?? 0) - (json.page ?? 1) + 1);
+        setResult(
+          'sweep',
+          json.done
+            ? `Heute vollständig erfasst — ${json.seenTotal} Karten geprüft, ${json.savedTotal} Messpunkte geschrieben.`
+            : `Läuft: Seite ${json.page} von ${json.totalPages || '?'} · ${json.savedTotal} Messpunkte heute. ` +
+              `Die restlichen ${rest} Seiten laufen im Hintergrund weiter — Stand hier aktualisieren.`,
+        );
+        onRefresh();
+      }
+    } catch {
+      setResult('sweep', 'Aufruf fehlgeschlagen.');
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function runGuide() {
     setBusy('guide');
@@ -297,6 +331,17 @@ function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh:
             Ausfall wochenlang liegen.
           */}
           <div className="mt-3 space-y-2">
+            <PipelineTile
+              title="Preiserfassung (alle Karten)"
+              subtitle="Erfasst die gesamte Kartendatenbank statt nur der angeklickten Karten"
+              note="Ein voller Durchlauf dauert rund 23 Minuten und setzt sich selbst fort. Er läuft täglich automatisch — dieser Knopf startet ihn sofort."
+              buttonLabel="Jetzt erfassen"
+              running={busy === 'sweep'}
+              disabled={busy !== null}
+              result={results.sweep}
+              onRun={runSweep}
+            />
+
             <PipelineTile
               title="Marktbericht (Wochenanalyse)"
               subtitle="Erzeugt den Bericht der laufenden Woche sofort, statt bis Montag zu warten"

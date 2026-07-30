@@ -137,6 +137,17 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(route).toContain('401');
   });
 
+  it('lässt sich von Hand starten, ohne auf den Cron zu warten', () => {
+    // Nach dem Anlegen der Tabelle oder nach einem Ausfall müsste man sonst bis
+    // zum nächsten Morgen warten — genau dieses Warten hat die Preis-Historie
+    // so lange dünn gehalten.
+    const studio = lies('src/app/api/studio/price-sweep/route.ts');
+    expect(studio).toContain('isStudioAuthedFromRequest');
+    // Das Cron-Geheimnis hat in einem Browser nichts verloren.
+    expect(studio).not.toMatch(/authHeader !== `Bearer/);
+    expect(lies('src/components/MonitoringPanel.tsx')).toContain('/api/studio/price-sweep');
+  });
+
   it('legt die Zustandstabelle im Monitoring als SQL bereit', () => {
     // Stolperstelle 21: Eine fehlende Tabelle legt eine Pipeline still — das
     // muss mit fertigem SQL sichtbar sein, nicht im Log verschwinden.
