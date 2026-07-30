@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
 import { fetchCardById } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@/lib/price-history';
-import { PriceChart } from '@/components/PriceChart';
+import { PriceChartLazy } from '@/components/PriceChartLazy';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
@@ -339,7 +339,7 @@ export default async function CardDetailPage({ params }: Props) {
           </div>
           {hasChart ? (
             <>
-              <PriceChart data={history} />
+              <PriceChartLazy data={history} />
               {historyKind === 'daily' ? (
                 <p className="text-xs text-slate-600 mt-3">
                   Täglich erfasste Cardmarket-Preise für diese Karte — der Verlauf wird mit jedem Tag genauer.

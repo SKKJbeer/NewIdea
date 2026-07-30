@@ -7,6 +7,26 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.1.0] — 30. Juli 2026 · QA-Durchlauf: Set-Logos, Tablet-Layout, Bedienbarkeit, Ladezeit
+
+Systematischer Durchlauf über 14 Seiten in fünf Breiten (375 / 390 / 430 / 768 / 1280 Pixel). 129 Befunde zu Beginn, 0 am Ende.
+
+### Behoben
+- **Auf der Set-Übersicht blieben vier Logos leer.** Die Kartendatenbank liefert die Logos neuerer Sets von einem weiteren Host, der weder in der Bild-Weiterleitung noch in der Inhaltsrichtlinie stand — die Richtlinie stammt aus v2.35.0, der Fehler war also selbst verursacht. Der Host läuft jetzt über die eigene Bild-Weiterleitung; die Richtlinie bleibt unverändert eng
+- **Auf Tablet-Breite (768 Pixel) ragte die Navigationsleiste 18 Pixel über den Rand** — waagerechtes Scrollen auf jeder Seite
+- **Bedienelemente waren zu klein für einen Finger**: Sprachauswahl, Fußzeilen-Links, Ticker-Einträge, Partner-Links und alle „Alle …"-Verweise lagen bei 16 bis 22 Pixel Höhe. Jetzt durchgehend mindestens 32 Pixel, bei gleichen Abständen
+- **Eine Karte mit genau 0 Prozent Veränderung wurde rot dargestellt** — im Ticker und im Kartenraster. Unverändert ist weder Gewinn noch Verlust
+- **Portfolio und Merkliste hatten keinen Seitentitel und keine Beschreibung**, standen aber in der Sitemap
+
+### Geändert
+- **Die Karten-Detailseite lädt rund 29 Prozent weniger JavaScript** (659 auf 465 Kilobyte). Die Diagramm-Bibliothek wird nachgeladen statt mitgeliefert; ein gleich hoher Platzhalter hält das Layout ruhig
+- **Einstieg ins Portfolio auf der Startseite.** Ohne ihn endete die Seite bei der Analyse — der letzte Schritt der Produktlogik fehlte
+
+### Gemessen
+Nach den Änderungen: keine Skriptfehler, keine fehlenden Bilder, kein waagerechtes Scrollen, keine leere Seite, kein Fehlerstatus. Layoutverschiebung 0 auf allen geprüften Seiten, erster sichtbarer Inhalt zwischen 136 und 220 Millisekunden.
+
+---
+
 ## [3.0.0] — 30. Juli 2026 · Professionalisierung: Datenvertrauen, Karten-Detailseite, Portfolio-Auswertung, Methodik
 
 Ein Sprint mit einem Ziel: aus dem MVP eine belastbare öffentliche Beta machen. Datenvertrauen vor Funktionsumfang.

@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.1.0',
+    date: '30. Juli 2026',
+    label: 'QA-Durchlauf: Layout, Bedienbarkeit, Ladezeit',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Auf der Set-Übersicht blieben vier Logos leer — ein weiterer Bild-Host stand nicht in der Inhaltsrichtlinie. Läuft jetzt über die eigene Bild-Weiterleitung' },
+      { type: 'fixed',   text: 'Auf Tablet-Breite ragte die Navigationsleiste über den Rand — waagerechtes Scrollen auf jeder Seite' },
+      { type: 'fixed',   text: 'Bedienelemente waren mit 16–22 Pixel zu klein für einen Finger — jetzt durchgehend mindestens 32 Pixel' },
+      { type: 'fixed',   text: 'Eine Karte mit genau 0 % Veränderung wurde rot dargestellt' },
+      { type: 'fixed',   text: 'Portfolio und Merkliste hatten keinen Seitentitel, standen aber in der Sitemap' },
+      { type: 'changed', text: 'Die Karten-Detailseite lädt 29 % weniger JavaScript — die Diagramm-Bibliothek wird nachgeladen' },
+      { type: 'new',     text: 'Einstieg ins Portfolio auf der Startseite — ohne ihn endete die Seite bei der Analyse' },
+    ],
+  },
+  {
     version: '3.0.0',
     date: '30. Juli 2026',
     label: 'Professionalisierung: Datenvertrauen & Methodik',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Die Rankings waren logisch falsch — Gewinner und Verlierer entstanden aus derselben Liste ohne Vorzeichenfilter. Bei einer gestiegenen Karte standen unter „Top Gewinner" gefallene Karten' },
       { type: 'fixed',   text: 'Der PMI wirkte belastbarer als er war: unter 20 Karten wird kein Wert mehr ausgewiesen, sonst stehen Kartenzahl, Sets, Zeitraum und Datenstand daneben' },

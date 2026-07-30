@@ -731,6 +731,36 @@ export default async function Home() {
           </section>
         )}
 
+        {/* ── EINSTIEG INS PORTFOLIO ──────────────────────────────────────── */}
+        {/* Letzter Schritt der Produktlogik: entdecken → analysieren → sammeln
+            → verfolgen. Ohne diesen Einstieg endet die Startseite bei der
+            Analyse, und das Portfolio findet nur, wer die Navigation durchsucht. */}
+        <section aria-label="Portfolio">
+          <Link
+            href="/portfolio"
+            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 transition-colors hover:border-violet-500/40"
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-violet-600/15 to-transparent"
+            />
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+              <BarChart2 size={20} />
+            </span>
+            <div className="relative min-w-0 flex-1">
+              <p className="text-sm font-black text-white">Eigene Sammlung verfolgen</p>
+              <p className="mt-0.5 text-xs leading-snug text-slate-400">
+                Karten eintragen und Wert, Entwicklung und stärkste Positionen im Blick behalten —
+                ohne Anmeldung.
+              </p>
+            </div>
+            <ArrowRight
+              size={16}
+              className="relative shrink-0 text-slate-600 transition-colors group-hover:text-violet-400"
+            />
+          </Link>
+        </section>
+
         {/* ── BLOG TEASER ─────────────────────────────────────────────────── */}
         <section aria-label="Blog">
           <div className="mb-4 flex items-center justify-between">
