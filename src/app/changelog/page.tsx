@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.40.0',
+    date: '30. Juli 2026',
+    label: 'Startseite: Set-Bilder und Messbalken',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'In der Set-Tabelle fehlten die Bilder vollständig — jede Zeile zeigt jetzt ihr Set-Logo und führt zur Set-Seite' },
+      { type: 'new',     text: 'Ø-Preis als Anteilsbalken je Set: aus einer Zahlenspalte wird eine Rangfolge, die man auf einen Blick erfasst' },
+      { type: 'new',     text: 'PMI-Index mit Messbalken um die Nulllinie und Marktbreite als geteilter Balken statt nackter Prozentzahlen' },
+      { type: 'new',     text: 'Investor Insights als Karten mit Kartenbild, großer Kennzahl und Verlinkung — statt vier Aufzählungspunkten' },
+    ],
+  },
+  {
     version: '2.39.0',
     date: '30. Juli 2026',
     label: 'Grafiken bauen sich beim Scrollen auf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Eine Linie kreuzte die erste Guides-Kachel — die halbtransparente Kachel ließ die Unterkante des Kopfbereichs durchscheinen' },
       { type: 'changed', text: 'Alle Datengrafiken bauen sich beim Hereinscrollen auf: Balken wachsen von null, Zeilen setzen versetzt ein, Kennzahlen zählen hoch' },

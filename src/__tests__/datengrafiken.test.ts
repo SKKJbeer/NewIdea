@@ -218,3 +218,67 @@ describe('Die Guides-Liste hat keine durchscheinende Kachel mehr', () => {
     expect(seite).not.toMatch(/i === 0\s*\?\s*'border-violet-500\/30 bg-gradient-to-r/);
   });
 });
+
+// ── Startseite: keine bildlose Liste, keine nackte Kennzahl ────────────────
+//
+// ANLASS: Die Set-Tabelle bestand ausschließlich aus Text — kein einziges Bild,
+// obwohl dort vier Sets aufgeführt sind. Die Kennzahlen-Kacheln zeigten reine
+// Prozentzahlen ohne jeden Maßstab, und die „Investor Insights" waren vier
+// Aufzählungspunkte.
+
+describe('Startseite zeigt Bilder und Grafiken statt reiner Tabellen', () => {
+  const seite = lies('src/app/page.tsx');
+
+  it('zeigt zu jedem Set ein Bild', () => {
+    expect(seite, 'Regel: Boosterpack-Bild überall dort wo Karten/Sets erscheinen').toContain(
+      'BoosterPackImage',
+    );
+  });
+
+  it('macht aus der Preisspalte eine sichtbare Rangfolge', () => {
+    expect(seite).toContain('RowBar');
+    expect(seite).toContain('maxSetPreis');
+  });
+
+  it('verlinkt die Set-Zeilen auf die Set-Seite', () => {
+    expect(seite).toMatch(/href=\{`\/sets\/\$\{s\.code\}`\}/);
+  });
+
+  it('gibt PMI und Marktbreite einen Maßstab', () => {
+    expect(seite).toContain('<ZeroMeter');
+    expect(seite).toContain('<RatioBar');
+  });
+
+  it('baut die Insights als Karten mit Kennzahl, nicht als Textzeilen', () => {
+    // Vorher: `const insights: string[]` und eine Liste mit ▸-Zeichen.
+    expect(seite).not.toMatch(/const insights: string\[\]/);
+    expect(seite).toMatch(/const insights: Insight\[\]/);
+    expect(seite).toContain('insight.kennzahl');
+  });
+
+  it('leitet die Insights weiterhin nur aus echten Daten ab', () => {
+    // Stolperstelle 29: keine Kennzahl ohne Datengrundlage.
+    expect(seite).toMatch(/if \(withTrend\.length > 0\)/);
+    expect(seite).toMatch(/if \(topSets\[0\]\)/);
+  });
+});
+
+describe('Die neuen Grafik-Bausteine bauen sich ebenfalls auf', () => {
+  const bars = lies('src/components/DataBars.tsx');
+
+  it.each(['ZeroMeter', 'RatioBar', 'RowBar'])('%s wächst beim Hereinscrollen', (name) => {
+    const block = bars.slice(bars.indexOf(`export function ${name}`));
+    expect(block.slice(0, 1600)).toContain('useInView');
+    expect(block.slice(0, 1600)).toMatch(/sichtbar \?/);
+  });
+
+  it('ZeroMeter verträgt einen Wert von null ohne Division durch null', () => {
+    const block = bars.slice(bars.indexOf('export function ZeroMeter'));
+    expect(block.slice(0, 900)).toMatch(/Math\.max\(Math\.abs\(value\), max, 0\.01\)/);
+  });
+
+  it('RatioBar zeigt nichts, wenn es nichts zu teilen gibt', () => {
+    const block = bars.slice(bars.indexOf('export function RatioBar'));
+    expect(block.slice(0, 700)).toMatch(/if \(total <= 0\) return null;/);
+  });
+});

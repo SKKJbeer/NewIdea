@@ -11,6 +11,8 @@ import type { PriceDataPoint } from '@/types';
 import type { Metadata } from 'next';
 import { formatEur, formatEurRounded, formatPercent } from '@/lib/format';
 import { ApiErrorState } from '@/components/ApiErrorState';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
+import { ZeroMeter, RatioBar, RowBar } from '@/components/DataBars';
 
 export const revalidate = 3600;
 
@@ -201,33 +203,68 @@ export default async function Home() {
     }))
     .sort((a, b) => b.avgPrice - a.avgPrice)
     .slice(0, 5);
+  // Maßstab für die Anteilsbalken in der Set-Tabelle.
+  const maxSetPreis = Math.max(...topSets.map((s) => s.avgPrice), 0);
 
-  // Investor Insights — purely derived, no invented content
-  const insights: string[] = [];
+  // Investor Insights — ausschließlich abgeleitet, nichts erfunden.
+  // Als reine Textzeilen gingen diese Aussagen unter; jede bekommt jetzt ein
+  // Bild und eine hervorgehobene Kennzahl, damit die Zahl den Satz trägt.
+  interface Insight {
+    kennzahl: string;
+    titel: string;
+    text: string;
+    ton: 'up' | 'down' | 'neutral';
+    imageUrl?: string;
+    setCode?: string;
+    setName?: string;
+    href?: string;
+  }
+  const insights: Insight[] = [];
   const bestGainer = gainers[0];
   const worstLoser = losers[0];
   if (bestGainer && typeof bestGainer.trendPercent === 'number') {
-    insights.push(
-      `${bestGainer.nameDe ?? bestGainer.name} führt mit ${fmtPct(bestGainer.trendPercent)} (30 Tage) — stärkster Aufwärtstrend im aktuellen Datensatz.`
-    );
+    insights.push({
+      kennzahl: fmtPct(bestGainer.trendPercent),
+      titel: bestGainer.nameDe ?? bestGainer.name,
+      text: 'Stärkster Aufwärtstrend im aktuellen Datensatz (30 Tage).',
+      ton: 'up',
+      imageUrl: bestGainer.imageUrl,
+      setCode: bestGainer.setCode,
+      setName: bestGainer.set,
+      href: `/karten/${bestGainer.id}`,
+    });
   }
   if (worstLoser && typeof worstLoser.trendPercent === 'number') {
-    insights.push(
-      `${worstLoser.nameDe ?? worstLoser.name} verzeichnet ${fmtPct(worstLoser.trendPercent)} (30 Tage) — schwächste Performance im Segment.`
-    );
+    insights.push({
+      kennzahl: fmtPct(worstLoser.trendPercent),
+      titel: worstLoser.nameDe ?? worstLoser.name,
+      text: 'Schwächste Entwicklung im Segment (30 Tage).',
+      ton: 'down',
+      imageUrl: worstLoser.imageUrl,
+      setCode: worstLoser.setCode,
+      setName: worstLoser.set,
+      href: `/karten/${worstLoser.id}`,
+    });
   }
   if (withTrend.length > 0) {
-    const pctStr = formatPercent(breadthPct, { withSign: false, digits: 0 });
-    insights.push(
-      gainCount > withTrend.length / 2
-        ? `Marktbreite positiv: ${gainCount} von ${withTrend.length} analysierten Karten notieren über ihrem 30-Tages-Schnitt.`
-        : `Marktbreite negativ: Nur ${gainCount} von ${withTrend.length} Karten über ihrem 30-Tages-Schnitt (${pctStr}).`
-    );
+    const positiv = gainCount > withTrend.length / 2;
+    insights.push({
+      kennzahl: formatPercent(breadthPct, { withSign: false, digits: 0 }),
+      titel: positiv ? 'Marktbreite positiv' : 'Marktbreite negativ',
+      text: `${gainCount} von ${withTrend.length} analysierten Karten notieren über ihrem 30-Tages-Schnitt.`,
+      ton: positiv ? 'up' : 'down',
+    });
   }
   if (topSets[0]) {
-    insights.push(
-      `${topSets[0].name} — stärkstes Set im Datensatz nach Durchschnittspreis (Ø ${formatEurRounded(topSets[0].avgPrice)}, ${topSets[0].count} Karten).`
-    );
+    insights.push({
+      kennzahl: formatEurRounded(topSets[0].avgPrice),
+      titel: topSets[0].name,
+      text: `Stärkstes Set nach Durchschnittspreis — ${topSets[0].count} Karten im Datensatz.`,
+      ton: 'neutral',
+      setCode: topSets[0].code,
+      setName: topSets[0].name,
+      href: `/sets/${topSets[0].code}`,
+    });
   }
 
   const hasData = cards.length > 0;
@@ -325,6 +362,11 @@ export default async function Home() {
                 >
                   {formatPercent(pmiNum)}
                 </p>
+                {/* Ohne Balken ist eine Prozentzahl nur eine Zahl — mit ihm
+                    sieht man sofort, ob der Ausschlag klein oder groß ist. */}
+                <div className="mt-2.5">
+                  <ZeroMeter value={pmiNum} max={10} />
+                </div>
                 <p className="mt-1.5 text-[10px] text-slate-600">Gewichteter Markttrend</p>
               </div>
 
@@ -339,6 +381,11 @@ export default async function Home() {
                 <p className={`text-2xl font-black tabular-nums leading-none ${breadthPct >= 50 ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {formatPercent(breadthPct, { withSign: false, digits: 0 })}
                 </p>
+                {/* „18 von 40 im Plus" muss man umrechnen — als geteilter
+                    Balken ist das Verhältnis unmittelbar sichtbar. */}
+                <div className="mt-2.5">
+                  <RatioBar up={gainCount} total={withTrend.length} />
+                </div>
                 <p className="mt-1.5 text-[10px] text-slate-600">{gainCount}/{withTrend.length} im Plus (30T)</p>
               </div>
 
@@ -568,19 +615,64 @@ export default async function Home() {
               </span>
               <span className="h-px flex-1 bg-[#1e1e30]" />
             </div>
-            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4 sm:p-5">
-              <ul className="space-y-3">
-                {insights.map((insight, i) => (
-                  <li key={i} className="flex gap-3 text-sm leading-relaxed text-slate-400">
-                    <span className="mt-0.5 shrink-0 text-violet-500">▸</span>
-                    <span>{insight}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 border-t border-[#1e1e30] pt-3 text-[10px] text-slate-700">
-                Alle Insights basieren ausschließlich auf Echtzeit-Cardmarket-Daten. Keine Anlageberatung.
-              </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {insights.map((insight, i) => {
+                const tonFarbe =
+                  insight.ton === 'up'
+                    ? 'text-emerald-400'
+                    : insight.ton === 'down'
+                      ? 'text-rose-400'
+                      : 'text-violet-400';
+                const inhalt = (
+                  <>
+                    {insight.imageUrl ? (
+                      <div className="aspect-[63/88] w-12 shrink-0 overflow-hidden rounded-lg border border-[#2a2a3a] bg-gradient-to-b from-[#1a1a28] to-[#0a0a0f] shadow-md shadow-black/40">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={cachedImg(insight.imageUrl)}
+                          alt={insight.titel}
+                          className="h-full w-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : insight.setCode ? (
+                      <div className="flex w-12 shrink-0 items-center justify-center">
+                        <BoosterPackImage
+                          setCode={insight.setCode}
+                          setName={insight.setName ?? ''}
+                          className="h-10 w-12 object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
+                        <Activity size={18} className="text-violet-400" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-lg font-black leading-none tabular-nums ${tonFarbe}`}>
+                        {insight.kennzahl}
+                      </p>
+                      <p className="mt-1 truncate text-xs font-bold text-slate-200">{insight.titel}</p>
+                      <p className="mt-1 text-[11px] leading-snug text-slate-500">{insight.text}</p>
+                    </div>
+                  </>
+                );
+                const klassen =
+                  'flex items-start gap-3 rounded-2xl border border-[#2a2a3a] bg-gradient-to-b from-[#16161f] to-[#101018] p-4 transition-colors';
+                return insight.href ? (
+                  <Link key={i} href={insight.href} className={`${klassen} hover:border-violet-500/30`}>
+                    {inhalt}
+                  </Link>
+                ) : (
+                  <div key={i} className={klassen}>
+                    {inhalt}
+                  </div>
+                );
+              })}
             </div>
+            <p className="mt-3 text-[10px] text-slate-700">
+              Alle Insights basieren ausschließlich auf Echtzeit-Cardmarket-Daten. Keine Anlageberatung.
+            </p>
           </section>
         )}
 
@@ -601,21 +693,40 @@ export default async function Home() {
               <div className="divide-y divide-[#1a1a28]">
                 {topSets.map((s, i) => {
                   const up = s.avgTrend >= 0;
+                  // Anteil am teuersten Set — macht aus einer Zahlenspalte eine
+                  // Rangfolge, die man auf einen Blick erfasst.
+                  const anteil = maxSetPreis > 0 ? (s.avgPrice / maxSetPreis) * 100 : 0;
                   return (
-                    <div key={s.code} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 px-4 py-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] text-slate-700 tabular-nums w-4">{i + 1}</span>
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-semibold text-slate-300">{s.name}</p>
-                          <p className="text-[10px] text-slate-700 font-mono">{s.code}</p>
+                    <Link
+                      key={s.code}
+                      href={`/sets/${s.code}`}
+                      className="group grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 px-4 py-3 transition-colors hover:bg-[#1a1a28]"
+                    >
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <span className="w-4 shrink-0 text-[10px] tabular-nums text-slate-700">{i + 1}</span>
+                        {/* Das Set-Bild fehlte hier komplett — eine Liste aus
+                            Set-Namen ohne jedes Bild ist genau das, was die
+                            Regel „Boosterpack-Bild überall" verhindern soll. */}
+                        <BoosterPackImage
+                          setCode={s.code}
+                          setName={s.name}
+                          className="h-7 w-10 shrink-0 object-contain opacity-90 transition-opacity group-hover:opacity-100"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs font-semibold text-slate-300 transition-colors group-hover:text-white">
+                            {s.name}
+                          </p>
+                          <div className="mt-1 max-w-[110px]">
+                            <RowBar pct={anteil} tone={up ? 'up' : 'down'} delay={i * 80} />
+                          </div>
                         </div>
                       </div>
-                      <span className="text-[11px] text-slate-600 text-right tabular-nums">{s.count}</span>
-                      <span className="text-[11px] font-mono text-slate-400 text-right tabular-nums">{fmt(s.avgPrice)}</span>
-                      <span className={`text-xs font-bold text-right tabular-nums ${up ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <span className="text-right text-[11px] tabular-nums text-slate-600">{s.count}</span>
+                      <span className="text-right text-[11px] font-mono tabular-nums text-slate-400">{fmt(s.avgPrice)}</span>
+                      <span className={`text-right text-xs font-bold tabular-nums ${up ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {fmtPct(s.avgTrend)}
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

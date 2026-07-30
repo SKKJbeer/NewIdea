@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.39.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v2.40.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.39.0)
+## Was gebaut ist (Stand v2.40.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.40.0 | Startseite: Set-Bilder in der Tabelle, Messbalken bei PMI/Marktbreite, Insights als Karten |
 | v2.39.0 | Grafiken bauen sich beim Scrollen auf, aufgewertete Gestaltung, kreuzende Linie auf /guides behoben |
 | v2.38.0 | Datengrafiken überarbeitet (semantische Farben, waagerechte Balken, Marktbild), Kennzahlen-Kacheln, Kartenbilder als Blickfang |
 | v2.37.0 | Portfolio: Zukäufe aus der Wertentwicklung herausgerechnet, Tages-Snapshots eingemischt, Datenlage sichtbar |
@@ -208,4 +209,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.39.0 — 30. Juli 2026*
+*Zuletzt aktualisiert: v2.40.0 — 30. Juli 2026*

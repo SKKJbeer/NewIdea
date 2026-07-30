@@ -223,3 +223,88 @@ export function TrendBars({
     </div>
   );
 }
+
+/**
+ * Einzelner Messbalken um eine Nulllinie — für Kennzahlen, die in beide
+ * Richtungen ausschlagen können (etwa ein gewichteter Markttrend).
+ *
+ * Ohne diese Darstellung ist eine Prozentzahl nur eine Zahl; mit ihr sieht man
+ * sofort, ob der Ausschlag klein oder groß ist.
+ */
+export function ZeroMeter({ value, max }: { value: number; max: number }) {
+  const [ref, sichtbar] = useInView<HTMLDivElement>();
+  const grenze = Math.max(Math.abs(value), max, 0.01);
+  const anteil = (Math.abs(value) / grenze) * 50;
+  const up = value >= 0;
+
+  return (
+    <div ref={ref} className="relative h-1.5 rounded-full bg-[#0c0c14] ring-1 ring-inset ring-white/[0.05]">
+      <div aria-hidden className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-slate-700" />
+      <div
+        className={`absolute top-0 h-full ${
+          up
+            ? 'rounded-r-full bg-gradient-to-r from-emerald-600 to-emerald-300 shadow-[0_0_10px_-2px_rgba(52,211,153,0.8)]'
+            : 'rounded-l-full bg-gradient-to-l from-rose-600 to-rose-300 shadow-[0_0_10px_-2px_rgba(251,113,133,0.8)]'
+        }`}
+        style={{
+          [up ? 'left' : 'right']: '50%',
+          width: sichtbar ? `${anteil}%` : '0%',
+          transition: `width 900ms ${EASE_OUT}`,
+        }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Verhältnis zweier Gruppen als geteilter Balken (etwa steigend gegen fallend).
+ *
+ * „18 von 40 im Plus" ist eine Zahl, die man umrechnen muss. Als geteilter
+ * Balken ist das Verhältnis unmittelbar sichtbar.
+ */
+export function RatioBar({ up, total }: { up: number; total: number }) {
+  const [ref, sichtbar] = useInView<HTMLDivElement>();
+  if (total <= 0) return null;
+  const anteil = (up / total) * 100;
+
+  return (
+    <div ref={ref} className="flex h-1.5 overflow-hidden rounded-full bg-[#0c0c14] ring-1 ring-inset ring-white/[0.05]">
+      <div
+        className="h-full bg-gradient-to-r from-emerald-600 to-emerald-300 shadow-[0_0_10px_-3px_rgba(52,211,153,0.9)]"
+        style={{ width: sichtbar ? `${anteil}%` : '0%', transition: `width 900ms ${EASE_OUT}` }}
+      />
+      <div
+        className="h-full flex-1 bg-gradient-to-r from-rose-500/70 to-rose-400/70"
+        style={{ opacity: sichtbar ? 1 : 0, transition: `opacity 900ms ${EASE_OUT}` }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Schmaler Anteilsbalken für Tabellenzeilen (etwa Ø-Preis je Set).
+ *
+ * Eine Zahlenspalte lässt sich lesen, aber nicht vergleichen. Der Balken macht
+ * aus vier Zahlen eine Rangfolge, die man auf einen Blick erfasst.
+ */
+export function RowBar({ pct, tone = 'neutral', delay = 0 }: { pct: number; tone?: 'up' | 'down' | 'neutral'; delay?: number }) {
+  const [ref, sichtbar] = useInView<HTMLDivElement>();
+  const farbe =
+    tone === 'up'
+      ? 'from-emerald-600 to-emerald-300'
+      : tone === 'down'
+        ? 'from-rose-600 to-rose-300'
+        : 'from-violet-600 to-violet-300';
+
+  return (
+    <div ref={ref} className="h-1 overflow-hidden rounded-full bg-[#0c0c14] ring-1 ring-inset ring-white/[0.04]">
+      <div
+        className={`h-full rounded-full bg-gradient-to-r ${farbe}`}
+        style={{
+          width: sichtbar ? `${Math.max(BAR_MIN_PCT, pct)}%` : '0%',
+          transition: `width 1000ms ${EASE_OUT} ${delay}ms`,
+        }}
+      />
+    </div>
+  );
+}

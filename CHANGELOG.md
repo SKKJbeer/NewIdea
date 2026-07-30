@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.40.0] — 30. Juli 2026 · Startseite: Set-Bilder, Messbalken, Insights als Karten
+
+### Behoben
+- **In der Set-Tabelle fehlten die Bilder vollständig.** Vier Sets, kein einziges Bild — genau das, was die Regel „Boosterpack-Bild überall dort wo Karten erscheinen" verhindern soll. Jede Zeile zeigt jetzt ihr Set-Logo und führt per Klick zur Set-Seite
+
+### Neu
+- **Ø-Preis als Anteilsbalken** in jeder Set-Zeile. Eine Zahlenspalte lässt sich lesen, aber nicht vergleichen — der Balken macht daraus eine Rangfolge, die man auf einen Blick erfasst
+- **PMI-Index mit Messbalken um die Nulllinie.** Ohne Maßstab ist eine Prozentzahl nur eine Zahl; mit ihm sieht man sofort, ob der Ausschlag klein oder groß ist
+- **Marktbreite als geteilter Balken.** „16 von 50 im Plus" muss man umrechnen — als Balken ist das Verhältnis unmittelbar sichtbar
+- **Investor Insights sind jetzt Karten statt Aufzählungspunkte**: Kartenbild bzw. Set-Logo, die Kennzahl groß und farbig, der Satz darunter. Verlinkt auf die jeweilige Karte oder das Set
+- Alle neuen Balken bauen sich beim Hereinscrollen auf und stehen ohne JavaScript sofort vollständig da
+
+---
+
 ## [2.39.0] — 30. Juli 2026 · Grafiken bauen sich auf, Guides-Kachel ohne kreuzende Linie
 
 ### Behoben
