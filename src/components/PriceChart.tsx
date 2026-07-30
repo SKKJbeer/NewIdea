@@ -40,6 +40,18 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   );
 }
 
+// EINHEITLICHE FARBSPRACHE
+//
+// Der Verlauf war fest violett, während Portfolio-Kurve und Balken die
+// Richtung färben. Auf einer Karte, die 11 % verloren hat, sah der Verlauf
+// deshalb genauso aus wie auf einer, die gestiegen ist — die Farbe trug keine
+// Information. Steigend ist grün, fallend ist rot, unverändert bleibt der
+// Marken-Violettton.
+function verlaufsFarbe(erster: number, letzter: number): string {
+  if (!(erster > 0) || letzter === erster) return '#7c3aed';
+  return letzter > erster ? '#34d399' : '#fb7185';
+}
+
 export function PriceChart({ data }: { data: PricePoint[] }) {
   // Echte Zeitachse: Datum → Timestamp. So sind die Abstände PROPORTIONAL zur
   // echten Zeit — ein 23-Tage-Sprung ist breiter als ein 1-Tages-Schritt. Das
@@ -53,14 +65,15 @@ export function PriceChart({ data }: { data: PricePoint[] }) {
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const padding = (maxPrice - minPrice) * 0.12 || Math.max(1, maxPrice * 0.05);
+  const farbe = verlaufsFarbe(prices[0], prices[prices.length - 1]);
 
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.28} />
-            <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+            <stop offset="5%" stopColor={farbe} stopOpacity={0.28} />
+            <stop offset="95%" stopColor={farbe} stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#1e1e30" vertical={false} />
@@ -87,11 +100,13 @@ export function PriceChart({ data }: { data: PricePoint[] }) {
         <Area
           type="monotone"
           dataKey="price"
-          stroke="#7c3aed"
-          strokeWidth={2}
+          stroke={farbe}
+          strokeWidth={2.25}
           fill="url(#priceGradient)"
-          dot={chartData.length <= 8 ? { r: 3, fill: '#7c3aed' } : false}
-          activeDot={{ r: 4, fill: '#a78bfa' }}
+          // Bei wenigen Punkten die echten Messungen zeigen — sonst liest sich
+          // eine Linie aus vier Werten wie eine lückenlose Aufzeichnung.
+          dot={chartData.length <= 12 ? { r: 3, fill: farbe, strokeWidth: 0 } : false}
+          activeDot={{ r: 5, fill: farbe, stroke: '#0a0a0f', strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>

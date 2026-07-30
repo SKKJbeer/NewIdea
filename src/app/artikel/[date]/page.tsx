@@ -5,6 +5,7 @@ import { NavBar } from '@/components/NavBar';
 import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
+import { ArticleStats } from '@/components/ArticleStats';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ContentIcon } from '@/components/ContentIcon';
 import { Reveal } from '@/components/Reveal';
@@ -223,6 +224,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                 <Prose text={article.intro} dropcap />
               </div>
             </section>
+
+            {/* Kennzahlen zuerst — sie beantworten in einem Blick, worum es geht */}
+            {article.featuredCards && article.featuredCards.length > 0 && (
+              <ArticleStats cards={article.featuredCards} />
+            )}
 
             {/* Card gallery + price chart */}
             {article.featuredCards && article.featuredCards.length > 0 && (

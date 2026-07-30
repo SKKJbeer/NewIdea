@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.38.0',
+    date: '30. Juli 2026',
+    label: 'Anschaulicher: neue Datengrafiken',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Das Preisdiagramm färbte einen Kursanstieg grau — die Balkenfarbe kam aus der Akzentfarbe des Artikeltyps. Steigend ist jetzt immer grün, fallend immer rot' },
+      { type: 'fixed',   text: 'Kartennamen wurden auf 13 Zeichen gekürzt und der Preis stand nur im Tooltip. Die Balken liegen jetzt waagerecht, der Wert steht am Balken' },
+      { type: 'fixed',   text: 'Unter jeder Karte stand dasselbe Set-Logo in voller Größe — jetzt einmal in der Kopfzeile, wenn alle aus einem Set stammen' },
+      { type: 'fixed',   text: 'Der Marktbericht zeigte Listenlängen als Kennzahlen statt echter Marktzahlen' },
+      { type: 'new',     text: 'Kennzahlen-Kacheln: stärkster Zuwachs, größter Rückgang, Preisspanne — aus echten Marktdaten, sonst gar nicht' },
+      { type: 'new',     text: 'Marktbild-Grafik: Veränderungen als Balken beidseits einer Nulllinie — wer steigt und wer fällt, in einer Sekunde erfasst' },
+      { type: 'new',     text: 'Kartenbilder im vollen Kartenformat mit Rahmen und Tiefe statt fester Höhe' },
+    ],
+  },
+  {
     version: '2.37.0',
     date: '30. Juli 2026',
     label: 'Portfolio: Zukäufe sind kein Gewinn',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Zukäufe wurden als Wertsteigerung gezählt — an einem echten Bestand wies der Jahreswert +636,90 € aus statt der tatsächlichen +216,90 €. Die Wertentwicklung ist jetzt um Zukäufe bereinigt' },
       { type: 'fixed',   text: 'Das Portfolio nutzte nur die Cardmarket-Ankerpunkte (höchstens vier je Karte) — die zehntausenden echten Tages-Snapshots blieben ungenutzt. Beide Quellen laufen jetzt zusammen' },

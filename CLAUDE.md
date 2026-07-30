@@ -979,6 +979,10 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 
 40. **Ein fehlgeschlagener Preisabruf darf nicht wie eine Messung aussehen** → Ohne Live-Preis rechnete die Positionszeile mit dem Kaufpreis weiter und zeigte „+0,00 € · 0,0 %" — grafisch identisch mit einer Karte, die sich tatsächlich nicht bewegt hat. **Regel:** `hasLivePrice()` prüfen und den fehlenden Abruf ausweisen, nie als Nullbewegung darstellen. Gilt für jede abgeleitete Kennzahl (siehe auch Stolperstelle 29).
 
+41. **Datenfarben dürfen NIE aus einer Dekorfarbe kommen** → Das Balkendiagramm im Artikel nahm die Akzentfarbe des Artikeltyps als „Aufwärts"-Farbe. Beim Wochenrückblick ist das `gray` — ein Kursanstieg wurde also grau gezeichnet, während direkt darunter eine Legende „akzentuiert = Aufwärtstrend" behauptete. **Regeln:** (a) Steigend ist `emerald-400`, fallend ist `rose-400`, überall und ohne Ausnahme; (b) braucht eine Grafik eine Legende, die ihre Farben erklärt, ist sie noch nicht fertig — Wert an den Balken schreiben statt in einen Tooltip (auf einem Telefon gibt es kein Hover); (c) Balken mit Beschriftung waagerecht anlegen, senkrechte zwingen Namen auf ~13 Zeichen (`Terapagos …`). Umgesetzt in `src/components/DataBars.tsx` — Artikel UND Marktbericht nutzen dieselben Bausteine, `datengrafiken.test.ts` verhindert eine zweite Umsetzung.
+
+42. **Ein Pflicht-Bild an der falschen Größe frisst die Seite auf** → Die Regel „Boosterpack-Bild überall dort wo Karten erwähnt werden" wurde in der Artikel-Galerie mit `h-14` unter JEDER Karte umgesetzt. Bei vier Karten aus demselben Set standen dort viermal dasselbe Logo — zusammen mehr Fläche als die Kartenbilder selbst. **Regel:** Die Pflicht ist die Herkunft, nicht die Größe. Stammen alle gezeigten Karten aus einem Set, gehört das Logo EINMAL in die Kopfzeile; sonst klein an die einzelne Karte (`h-4`). Das Kartenbild bleibt der Blickfang (`aspect-[63/88]`, echtes Kartenformat).
+
 ---
 
 ## Monetisierungsstrategie & Business-Plan

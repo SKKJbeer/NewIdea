@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.38.0] — 30. Juli 2026 · Anschaulicher: neue Datengrafiken, Kartenbilder als Blickfang
+
+### Behoben
+- **Das Preisdiagramm färbte einen Kursanstieg grau.** Die Balkenfarbe kam aus der Akzentfarbe des Artikeltyps — beim Wochenrückblick ist das Grau. Darunter stand eine Legende, die für Aufwärtstrends Grün versprach. Steigend ist jetzt immer grün, fallend immer rot, und die Legende entfällt: Eine Grafik, die ihre Farben erklären muss, ist noch nicht fertig
+- **Kartennamen wurden auf 13 Zeichen gekürzt** („Terapagos …"), weil senkrechte Balken keinen Platz für sie hatten. Die Balken liegen jetzt waagerecht — der Name hat die volle Zeilenbreite
+- **Der Preis stand nur im Tooltip.** Auf einem Telefon gibt es kein Hover; der Wert steht jetzt am Balken
+- **Unter jeder Karte stand dasselbe Set-Logo in voller Größe** — bei vier Karten aus einem Set viermal dasselbe Bild, das mehr Platz einnahm als die Karten. Stammen alle aus einem Set, steht das Logo einmal in der Kopfzeile
+- **Der Marktbericht zeigte Listenlängen als Kennzahlen** („Top Gewinner: 6", „Marktbericht: Live") — Zahlen, die nichts über den Markt aussagen
+
+### Neu
+- **Kennzahlen-Kacheln** über Artikel und Marktbericht: stärkster Zuwachs, größter Rückgang, Preisspanne, Zahl der Karten — alles aus echten Marktdaten. Reicht die Datenlage nicht, erscheint der Block gar nicht
+- **Marktbild-Grafik**: Veränderungen als Balken beidseits einer Nulllinie. Wer steigt, wer fällt und wie weit das auseinanderliegt, ist damit in einer Sekunde erfasst statt im Fließtext verstreut
+- **Preisvergleich als Rangliste** mit Wert und Veränderung an jedem Balken
+- **Kartenbilder sind der Blickfang**: volles Kartenformat, Rahmen und Tiefe statt einer festen Höhe
+- Der Preisverlauf auf Kartenseiten färbt jetzt ebenfalls nach Richtung und zeigt bei dünner Datenlage die echten Messpunkte — alle Grafiken der Seite sprechen damit dieselbe Farbsprache
+
+---
+
 ## [2.37.0] — 30. Juli 2026 · Portfolio: Zukäufe sind kein Gewinn, und die Kurve nutzt endlich alle Daten
 
 Vollständige Durchsicht des Portfolios. Der Eindruck, hinter der Kurve steckten kaum Preisdaten, war berechtigt — und dabei kam ein Rechenfehler zum Vorschein, der schwerer wog als die Optik.

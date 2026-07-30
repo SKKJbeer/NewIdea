@@ -2,11 +2,14 @@ import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
-import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft, Archive, Gem } from 'lucide-react';
+import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft, Archive } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import { Reveal } from '@/components/Reveal';
 import { Prose } from '@/components/Prose';
 import { ReadingProgress } from '@/components/ReadingProgress';
+import { ArticleStats } from '@/components/ArticleStats';
+import { PriceBars, TrendBars, type BarItem } from '@/components/DataBars';
+import { displayPrice } from '@/lib/pokemon-api';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -33,6 +36,17 @@ export default async function MarktberichtPage() {
 
   const hasContent = !!report;
   const previousReports = allMeta.slice(1);
+
+  // Grundlage für Kennzahlen und Grafiken: die echten Karten des Berichts.
+  // Doppelte Nennungen fallen raus, damit eine Karte nicht zweimal im Balken
+  // steht, wenn sie sowohl unter den Gewinnern als auch bei den Werten liegt.
+  const balkenDaten: BarItem[] = report
+    ? [...new Map(
+        [...report.topGainers, ...report.topValue]
+          .filter((c) => displayPrice(c) > 0)
+          .map((c) => [c.id, { name: c.name, price: displayPrice(c), trend: c.trendPercent ?? 0 }]),
+      ).values()]
+    : [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
@@ -90,25 +104,23 @@ export default async function MarktberichtPage() {
           </Reveal>
         )}
 
-        {report && (
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'Top Gewinner', value: `${report.topGainers.length}`, icon: TrendingUp },
-              { label: 'Wertvollste Karten', value: `${report.topValue.length}`, icon: Gem },
-              { label: 'Marktbericht', value: 'Live', icon: BarChart3 },
-            ].map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-3 sm:p-4 text-center">
-                <div className="mb-1 flex justify-center text-violet-400"><stat.icon size={20} /></div>
-                <p className="text-lg sm:text-2xl font-black text-violet-400">{stat.value}</p>
-                <p className="text-[10px] sm:text-xs text-slate-600 mt-0.5 leading-tight">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+        {/* Kennzahlen aus den echten Kartendaten des Berichts.
+            Vorher standen hier die LÄNGEN der beiden Listen („Top Gewinner: 6")
+            und ein festes „Live" — Zahlen, die nichts über den Markt sagen. */}
+        {balkenDaten.length >= 2 && (
+          <ArticleStats cards={balkenDaten} label="Karten im Bericht" />
         )}
 
         {report && report.topGainers.length > 0 && (
           <div className="space-y-8">
             <CardGrid cards={report.topGainers} title="Top Investment-Karten" />
+
+            {/* Dieselben Grafiken wie im Artikel — eine Umsetzung für beide. */}
+            <div className="space-y-4">
+              <TrendBars items={balkenDaten} title="Marktbild — Veränderung der Woche" />
+              <PriceBars items={balkenDaten} title="Preisvergleich der Woche" />
+            </div>
+
             {report.topValue.length > 0 && <CardGrid cards={report.topValue} title="Höchste Kartenwerte" />}
           </div>
         )}
