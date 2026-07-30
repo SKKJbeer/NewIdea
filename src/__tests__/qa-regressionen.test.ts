@@ -118,6 +118,32 @@ describe('Die Startseite führt durch die Produktlogik', () => {
   });
 });
 
+describe('Die Fußzeile zeigt in Produktion eine Version', () => {
+  const paket = JSON.parse(lies('package.json'));
+  const vercel = JSON.parse(lies('vercel.json'));
+
+  it('baut über npm — nur dann existiert die Versionsvariable', () => {
+    // BEFUND: Live stand in der Fußzeile ein nacktes „v" ohne Nummer. Die
+    // Quelle ist `process.env.npm_package_version`, und die setzt AUSSCHLIESSLICH
+    // npm beim Ausführen eines Skripts. Der Build-Befehl lautete `next build` —
+    // also ohne npm, also ohne Variable. Damit war die Deploy-Prüfung „Footer
+    // zeigt vX.Y.Z" auf Produktion die ganze Zeit nicht durchführbar.
+    expect(vercel.buildCommand).toMatch(/^npm run /);
+  });
+
+  it('überspringt in Vercels Umgebung weiterhin die Tests', () => {
+    // Stolperstelle 10: vitest scheitert dort an der Initialisierung. Der
+    // Vercel-Einstieg darf deshalb NICHT der lokale `build`-Befehl sein.
+    const skript = vercel.buildCommand.replace(/^npm run /, '');
+    expect(paket.scripts[skript]).toBe('next build');
+  });
+
+  it('führt lokal weiterhin beide Schritte aus', () => {
+    // Vercel prüft die Tests nicht — der lokale Build ist die letzte Linie.
+    expect(paket.scripts.build).toContain('vitest run');
+  });
+});
+
 describe('Ein Aussetzer der Kartendatenbank bricht nicht das Deployment', () => {
   const seite = lies('src/app/sets/page.tsx');
 

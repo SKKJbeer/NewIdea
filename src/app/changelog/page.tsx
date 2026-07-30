@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.1.2',
+    date: '30. Juli 2026',
+    label: 'Versionsanzeige in der Fußzeile',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'In der Fußzeile stand live ein nacktes „v" ohne Nummer — der Build lief an npm vorbei, und nur npm setzt die Variable, aus der die Anzeige liest' },
+    ],
+  },
+  {
     version: '3.1.1',
     date: '30. Juli 2026',
     label: 'Marktbreite: zwei Zahlen, eine Wahrheit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Auf der Startseite standen zwei verschiedene Marktbreiten: die Kachel zeigte „16 % · 8/50", die Erklärung darunter „16 von 50" (32 %)' },
       { type: 'fixed',   text: 'Als Zähler diente die auf acht Einträge gekürzte Gewinnerliste der Anzeige — ab neun gestiegenen Karten blieb er stehen, während der Nenner weiterwuchs' },

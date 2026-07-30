@@ -1,10 +1,11 @@
 {
   "name": "pokemarketapp",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "vitest run && next build",
+    "vercel-build": "next build",
     "test": "vitest run",
     "test:watch": "vitest",
     "start": "next start",

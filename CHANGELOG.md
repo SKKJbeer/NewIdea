@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.1.2] — 30. Juli 2026 · Versionsanzeige in der Fußzeile
+
+### Behoben
+- **In der Fußzeile stand auf der Live-Seite ein nacktes „v" ohne Nummer.** Die Anzeige liest `npm_package_version`, und diese Variable setzt ausschließlich npm beim Ausführen eines Skripts — der Build-Befehl lautete aber `next build`, lief also an npm vorbei. Damit war die Deploy-Prüfung „Fußzeile zeigt die neue Version" auf Produktion die ganze Zeit gar nicht durchführbar. Der Build läuft jetzt über `npm run vercel-build`, das weiterhin nur `next build` ausführt (die Tests bleiben dort übersprungen und laufen lokal)
+
+---
+
 ## [3.1.1] — 30. Juli 2026 · Marktbreite: zwei Zahlen, eine Wahrheit
 
 Auf der Startseite standen zwei verschiedene Marktbreiten gleichzeitig: die Kennzahlen-Kachel zeigte „16 % · 8/50 im Plus", die Erklärung zu Angst & Gier direkt darunter „16 von 50 Karten über ihrem 30-Tage-Schnitt" (32 %). Aufgefallen ist es beim Nachrechnen der Live-Werte gegen die Kartendatenbank.
