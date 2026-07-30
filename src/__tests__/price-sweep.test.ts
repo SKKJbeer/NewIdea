@@ -134,6 +134,17 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     }
   });
 
+  it('setzt auch nach einem Abruffehler fort', () => {
+    // Die Kartendatenbank liefert regelmäßig 500er. Hängt die Fortsetzung an
+    // einem fehlerfreien Häppchen, endet der Durchlauf bei der ersten Störung
+    // — im echten Lauf blieb er dreimal hintereinander nach ein bis zwei von
+    // 82 Seiten stehen.
+    const studio = lies('src/app/api/studio/price-sweep/route.ts');
+    expect(studio).toContain('if (!erste.done)');
+    expect(studio).not.toContain('erste.ok &&');
+    expect(route).toContain('if (!progress.done && chain < MAX_CHAIN)');
+  });
+
   it('macht einen abgerissenen Anstoß sichtbar', () => {
     // Sonst sieht ein Stillstand aus wie ein langsamer Durchlauf — im
     // Monitoring stand weiter der alte Abruffehler.

@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.3] — 30. Juli 2026 · Erfassung überlebt einen Aussetzer der Kartendatenbank
+
+### Behoben
+- **Ein einzelner Abruffehler beendete den ganzen Durchlauf.** Die Fortsetzung war an ein fehlerfreies erstes Häppchen geknüpft — und die Kartendatenbank liefert regelmäßig Fehler. Im echten Lauf blieb die Erfassung dadurch dreimal hintereinander nach ein bis zwei von 82 Seiten stehen. Der Seitenzeiger steht nach einem Fehler ohnehin noch auf derselben Seite; die nächste Runde versucht sie erneut
+
+---
+
 ## [3.2.2] — 30. Juli 2026 · Preiserfassung lief nach acht Seiten ins Leere
 
 Im ersten echten Durchlauf blieb die Erfassung nach 8 von 82 Seiten stehen.

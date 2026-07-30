@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.3',
+    date: '30. Juli 2026',
+    label: 'Erfassung überlebt einen Aussetzer der Kartendatenbank',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Ein einzelner Abruffehler beendete den ganzen Durchlauf — die Fortsetzung hing an einem fehlerfreien ersten Häppchen, obwohl die Kartendatenbank regelmäßig Fehler liefert' },
+    ],
+  },
+  {
     version: '3.2.2',
     date: '30. Juli 2026',
     label: 'Preiserfassung lief nach acht Seiten ins Leere',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Erfassung blieb nach 8 von 82 Seiten stehen — der Folgeaufruf ging an die noch nicht verbundene eigene Domain statt an die Adresse, unter der sie gerade selbst lief' },
       { type: 'fixed', text: 'Ein abgerissener Anstoß war unsichtbar: Der Stillstand sah aus wie ein langsamer Durchlauf. Er wird jetzt im Klartext vermerkt' },

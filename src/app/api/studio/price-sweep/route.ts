@@ -66,7 +66,13 @@ export async function POST(request: Request) {
   // stumm in einem Hintergrundlauf zu verschwinden.
   const erste = await sweepChunk({ budgetMs: 30_000 });
 
-  if (erste.ok && !erste.done) {
+  // BEWUSST NICHT `erste.ok`: Die Kartendatenbank liefert regelmäßig 500er
+  // (Stolperstelle 28). Hing die Fortsetzung an einem fehlerfreien ersten
+  // Häppchen, endete der Durchlauf bei der ersten Störung — beim echten Lauf
+  // blieb er deshalb dreimal hintereinander nach ein bis zwei Seiten stehen.
+  // Der Seitenzeiger steht nach einem Fehler noch auf derselben Seite; die
+  // nächste Runde versucht sie erneut. Genau dafür ist die Kette da.
+  if (!erste.done) {
     after(async () => {
       try {
         await fetch(`${basis}/api/cron/price-sweep?chain=1`, {
