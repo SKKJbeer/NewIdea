@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
-import { ArrowLeft, Star, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
-import { fetchCardById, calculateInvestmentScore } from '@/lib/pokemon-api';
+import { ArrowLeft, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
+import { fetchCardById } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -14,6 +14,8 @@ import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
+import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
+import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -43,11 +45,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${card.name} (${card.nameDe})`
     : card.name;
 
+  // Die Kartennummer gehört in den Titel: Danach wird gesucht („199/165"),
+  // und sie unterscheidet gleichnamige Karten verschiedener Sets voneinander.
+  const nummer = card.number
+    ? ` ${card.number}${card.printedTotal ? `/${card.printedTotal}` : ''}`
+    : '';
+
   return {
-    title: `${nameStr}${priceStr} Pokémon Karte Preis`,
-    description: `${card.name} aus ${card.set} — Cardmarket Preis: ${price > 0 ? formatEur(price) : 'k. A.'}, Seltenheit: ${card.rarity}. Investment-Score & 30-Tage-Preisverlauf kostenlos ansehen.`,
+    title: `${nameStr}${nummer} Preis & Wert | PokéMarket Intelligence`,
+    description: `Aktueller Marktpreis, Preisentwicklung und historische Marktdaten für ${card.name}${nummer} aus ${card.set}. Cardmarket-Preis: ${price > 0 ? formatEur(price) : 'k. A.'}, Seltenheit: ${card.rarity}.`,
     openGraph: {
-      title: `${card.name} — Pokémon Karte Preis`,
+      title: `${card.name}${nummer} — Preis & Wert`,
       description: `Aktueller Cardmarket-Preis für ${card.name} (${card.set}): ${price > 0 ? formatEur(price) : 'k. A.'}.`,
       images: card.imageUrlHiRes ? [{ url: card.imageUrlHiRes, alt: card.name }] : undefined,
       type: 'article',
@@ -73,7 +81,6 @@ export default async function CardDetailPage({ params }: Props) {
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
   const trend = card.trendPercent || 0;
-  const score = calculateInvestmentScore(card);
 
   after(async () => {
     await recordPriceSnapshot(card);
@@ -114,10 +121,11 @@ export default async function CardDetailPage({ params }: Props) {
     }
   }
 
-  const scoreColor =
-    score >= 70 ? 'text-emerald-400 bg-emerald-500/10' : score >= 50 ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 bg-[#1a1a28]';
-  const scoreLabel =
-    score >= 70 ? 'Starkes Investment' : score >= 50 ? 'Mittleres Potenzial' : 'Vorsicht geboten';
+  // Kennzahlen aus der echten Preisreihe. Jede Funktion liefert nichts, wenn
+  // die Datenlage nicht reicht — kein Zeitraum ohne Messung.
+  const perfWindows = performanceWindows(history, price);
+  const marktStats = cardMarketStats(history, price);
+  const score2 = pmiScore(history, price, displayTrend);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -216,7 +224,15 @@ export default async function CardDetailPage({ params }: Props) {
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
                 <p className="text-sm font-semibold text-violet-400 mt-0.5">🇩🇪 {card.nameDe}</p>
               )}
-              <p className="text-sm text-slate-600 mt-1">{card.rarity}</p>
+              <p className="mt-1 text-sm text-slate-600">
+                {card.rarity}
+                {card.number && (
+                  <span className="ml-2 tabular-nums text-slate-700">
+                    Nr. {card.number}
+                    {card.printedTotal ? `/${card.printedTotal}` : ''}
+                  </span>
+                )}
+              </p>
               <div className="mt-4">
                 <CardLangPrice
                   cardId={card.id}
@@ -274,22 +290,18 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
             )}
 
-            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-bold text-slate-200">Investment-Score</h2>
-                <span className={`text-sm font-bold px-3 py-1 rounded-full ${scoreColor}`}>{score}/100</span>
-              </div>
-              <div className="w-full bg-[#2a2a3a] rounded-full h-2 mb-2">
-                <div
-                  className={`h-2 rounded-full ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-slate-700'}`}
-                  style={{ width: `${score}%` }}
-                />
-              </div>
-              <p className="text-sm text-slate-400 flex items-center gap-1">
-                <Star size={14} className={score >= 70 ? 'text-amber-400 fill-amber-400' : 'text-slate-700'} />
-                {scoreLabel}
-              </p>
-            </div>
+            {/* Wertentwicklung über mehrere Zeiträume — nur dort, wo eine
+                Messung vorliegt. */}
+            <PerformanceStrip windows={perfWindows} />
+
+            <MarketStatsPanel stats={marktStats} />
+
+            {/* Ersetzt den früheren Investment-Score. Der vergab Punkte nach
+                Preisstufen („über 100 € = +20") und beschriftete das Ergebnis
+                mit „Starkes Investment" bzw. „Vorsicht geboten" — beides
+                Handlungsempfehlungen, die auf einer Analyseplattform nichts zu
+                suchen haben. */}
+            <PmiScorePanel score={score2} />
 
             {card.setCode && (
               <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">

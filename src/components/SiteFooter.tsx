@@ -27,8 +27,11 @@ const NAV_GROUPS: Array<{ label: string; links: Array<{ href: string; label: str
     ],
   },
   {
-    label: 'Rechtliches',
+    label: 'Transparenz',
     links: [
+      // Die Methodik steht bewusst weit oben in dieser Spalte: Sie ist das
+      // Vertrauensdokument der Plattform, nicht eine Pflichtseite.
+      { href: '/methodik', label: 'Methodik' },
       { href: '/impressum', label: 'Impressum' },
       { href: '/datenschutz', label: 'Datenschutz' },
     ],

@@ -28,6 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/`,                  lastModified: now, changeFrequency: 'daily',   priority: 1.0 },
     { url: `${BASE_URL}/suche`,             lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
     { url: `${BASE_URL}/einsteiger`,        lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    // Die Methodik ist ein Vertrauensdokument — sie gehört indexiert.
+    { url: `${BASE_URL}/methodik`,          lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/sets`,              lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${BASE_URL}/artikel`,           lastModified: now, changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE_URL}/guides`,            lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },

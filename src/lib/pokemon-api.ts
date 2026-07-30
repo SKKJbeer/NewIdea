@@ -383,6 +383,9 @@ function mapApiCardToCard(apiCard: Record<string, unknown>): PokemonCard {
     nameDe: englishToGermanName(cardName) || undefined,
     set: (setData?.name as string) || '',
     setCode: (setData?.id as string) || '',
+    // Kartennummer und Gesamtzahl — ergeben „199/165" für Titel und Anzeige.
+    number: (apiCard.number as string) || undefined,
+    printedTotal: (setData?.printedTotal as number) || undefined,
     rarity: (apiCard.rarity as string) || 'Unknown',
     imageUrl: images?.small || '',
     imageUrlHiRes: images?.large,

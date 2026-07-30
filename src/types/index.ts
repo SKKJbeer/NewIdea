@@ -4,6 +4,10 @@ export interface PokemonCard {
   nameDe?: string;
   set: string;
   setCode: string;
+  /** Kartennummer im Set, etwa `199`. */
+  number?: string;
+  /** Gedruckte Gesamtzahl des Sets, etwa `165` — ergibt „199/165". */
+  printedTotal?: number;
   rarity: string;
   imageUrl: string;
   imageUrlHiRes?: string;
