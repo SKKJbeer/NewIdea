@@ -38,7 +38,10 @@ export function CardGrid({ cards, title, compact = false, priceOverrides = {}, p
 function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card: PokemonCard; compact?: boolean; priceOverride?: number; priceLanguage?: string }) {
   const price = priceOverride ?? (card.prices.market || card.prices.holofoil?.market || 0);
   const trend = card.trendPercent || 0;
-  const isPositive = trend >= 0;
+  // Genau 0 ist WEDER Gewinn noch Verlust. Vorher wurde jede unveränderte
+  // Karte rot dargestellt — dieselbe Verwechslung wie bei den Rankings.
+  const isPositive = trend > 0;
+  const unveraendert = trend === 0;
   const score = card.investmentScore || 0;
 
   if (compact) {
@@ -105,6 +108,9 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
             )}
             <p className="text-xs text-slate-600 line-clamp-1 min-w-0">{card.set}</p>
           </div>
+          {card.rarity && card.rarity !== 'Unknown' && (
+            <p className="mt-1 line-clamp-1 text-[10px] text-slate-700">{card.rarity}</p>
+          )}
 
           <div className="flex items-center justify-between mt-2">
             <div>
@@ -115,9 +121,17 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
                 <span className="ml-1.5 text-[10px] font-bold text-violet-400">{priceLanguage}</span>
               )}
             </div>
-            <span className={`flex items-center gap-0.5 text-xs font-medium ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            <span
+              className={`flex items-center gap-0.5 text-xs font-medium ${
+                unveraendert ? 'text-slate-500' : isPositive ? 'text-emerald-400' : 'text-rose-400'
+              }`}
+              // Der Zeitraum gehört an die Zahl — sonst weiß niemand, worauf
+              // sich die Veränderung bezieht.
+              title="Veränderung über 30 Tage"
+            >
+              {!unveraendert && (isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />)}
               {formatPercent(Math.abs(trend), { withSign: false })}
+              <span className="ml-0.5 text-[9px] text-slate-600">30T</span>
             </span>
           </div>
 

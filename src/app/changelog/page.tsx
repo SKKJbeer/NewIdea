@@ -11,10 +11,27 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.0.0',
+    date: '30. Juli 2026',
+    label: 'Professionalisierung: Datenvertrauen & Methodik',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Die Rankings waren logisch falsch — Gewinner und Verlierer entstanden aus derselben Liste ohne Vorzeichenfilter. Bei einer gestiegenen Karte standen unter „Top Gewinner" gefallene Karten' },
+      { type: 'fixed',   text: 'Der PMI wirkte belastbarer als er war: unter 20 Karten wird kein Wert mehr ausgewiesen, sonst stehen Kartenzahl, Sets, Zeitraum und Datenstand daneben' },
+      { type: 'fixed',   text: 'Angst & Gier ist nachvollziehbar — drei offengelegte Teilwerte, die zusammen exakt den angezeigten Wert ergeben' },
+      { type: 'fixed',   text: 'Fehlerhafte Datensätze werden vor jeder Berechnung aussortiert statt unbemerkt einzufließen' },
+      { type: 'fixed',   text: 'Die Set-Übersicht konnte einen ganzen Tag als „nicht verfügbar" feststecken — jetzt mit Wiederholung, Fehler- und Ladezustand' },
+      { type: 'fixed',   text: 'Der Investment-Score war eine Kaufempfehlung („Starkes Investment"). Ersetzt durch den PMI Score aus vier offengelegten Faktoren' },
+      { type: 'new',     text: 'Karten-Detailseite: Wertentwicklung über fünf Zeiträume, Marktkennzahlen, PMI Score mit Faktoren, Kartennummer im Titel' },
+      { type: 'new',     text: 'Portfolio: stärkste und schwächste Positionen, größte Posten, Aufteilung nach Set, Vergleich gegen den Markt' },
+      { type: 'new',     text: 'Methodik-Seite unter /methodik — jede Kennzahl offengelegt, Schwellenwerte direkt aus dem Code' },
+    ],
+  },
+  {
     version: '2.40.0',
     date: '30. Juli 2026',
     label: 'Startseite: Set-Bilder und Messbalken',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'In der Set-Tabelle fehlten die Bilder vollständig — jede Zeile zeigt jetzt ihr Set-Logo und führt zur Set-Seite' },
       { type: 'new',     text: 'Ø-Preis als Anteilsbalken je Set: aus einer Zahlenspalte wird eine Rangfolge, die man auf einen Blick erfasst' },

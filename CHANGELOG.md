@@ -7,6 +7,37 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.0.0] — 30. Juli 2026 · Professionalisierung: Datenvertrauen, Karten-Detailseite, Portfolio-Auswertung, Methodik
+
+Ein Sprint mit einem Ziel: aus dem MVP eine belastbare öffentliche Beta machen. Datenvertrauen vor Funktionsumfang.
+
+### Behoben — Datenvertrauen
+- **Die Rankings waren logisch falsch.** Gewinner und Verlierer entstanden aus derselben Liste, zweimal sortiert und jeweils oben abgeschnitten — ohne Vorzeichenfilter. Bei nur einer gestiegenen Karte standen unter „Top Gewinner" gefallene Karten, und dieselbe Karte konnte in beiden Listen stehen. Jetzt strikt getrennt, ohne künstliche Auffüllung
+- **Der PMI wirkte belastbarer, als er war.** Unter 20 auswertbaren Karten wird kein Wert mehr ausgewiesen. Bei ausreichender Datenlage stehen Kartenzahl, Anzahl der Sets, Zeitraum und Datenstand an der Kennzahl
+- **Angst &amp; Gier war nicht nachvollziehbar.** Der Wert entsteht jetzt aus drei offengelegten Teilwerten, die sich per Info-Knopf einzeln aufklappen lassen — die gewichtete Summe ergibt exakt den angezeigten Wert
+- **Fehlerhafte Datensätze flossen unbemerkt in die Kennzahlen.** Vor jeder Berechnung werden fehlende Preise, doppelte Karten, unplausible Preise und absurde Trendwerte aussortiert und protokolliert
+- **Eine Karte mit genau 0 % Veränderung wurde rot dargestellt** — unverändert ist weder Gewinn noch Verlust
+- **Die Set-Übersicht konnte einen ganzen Tag als „nicht verfügbar" feststecken.** Der Abruf hatte weder Wiederholung noch Fehlerbehandlung, und die Seite wird 24 Stunden gecacht. Jetzt drei Versuche, echter Fehlerzustand mit Wiederholung und ein Ladezustand ohne Layoutsprung
+- **Der Investment-Score war eine Kaufempfehlung.** Er vergab Punkte nach Preisstufen („über 100 € = +20") und beschriftete das Ergebnis mit „Starkes Investment" bzw. „Vorsicht geboten"
+
+### Neu — Karten-Detailseite
+- Wertentwicklung über 24H/7T/30T/90T/1J — aber nur für Zeiträume mit vorliegendem Messpunkt
+- Marktkennzahlen: Höchstwert der Reihe, Abstand dazu, 30-Tage-Hoch und -Tief, Schwankungsbreite
+- **PMI Score** aus vier offengelegten Faktoren (Momentum, Stabilität, Nachfrage, Datenlage). Der Preis fließt bewusst nicht ein — teuer bedeutet nicht besser
+- Kartennummer sichtbar und im Seitentitel
+
+### Neu — Portfolio
+- Stärkste und schwächste Positionen, größte Posten, Aufteilung nach Set
+- **Vergleich gegen den Markt**: eigene 30-Tage-Entwicklung gegen den PMI, Unterschied in Prozentpunkten. Erscheint nur, wenn beide Seiten eine belastbare Zahl haben
+
+### Neu — Vertrauen
+- **Methodik-Seite** unter `/methodik`: Preisquelle, Aktualisierung, Berechnung von Veränderungen, PMI, Angst &amp; Gier, PMI Score, Datenprüfung und die Grenzen der Datenlage. Die Schwellenwerte werden aus dem Code importiert, nicht abgetippt
+
+### Suche
+- Seltenheit in den Ergebnissen, Zeitraum-Bezug an der Veränderung
+
+---
+
 ## [2.40.0] — 30. Juli 2026 · Startseite: Set-Bilder, Messbalken, Insights als Karten
 
 ### Behoben

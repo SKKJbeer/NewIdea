@@ -9,6 +9,7 @@ import {
   normalizeHolding, computePnl, computeChartData, filterByRange,
   realObservationDates, assessDataQuality,
   computeRangePerformance, investedAfter, hasLivePrice,
+  positionPerformances, topPositions, setAllocation, comparePerformance,
   formatEur, shortEur, setCodeFromId,
   LANG_FLAG, RANGE_DAYS,
   type PortfolioHolding, type LiveCardData, type CardLanguage,
@@ -17,6 +18,7 @@ import { cachedImg } from '@/lib/cached-image';
 import { formatPercent } from '@/lib/format';
 import { AccountBar } from '@/components/AccountBar';
 import { mergeHoldings } from '@/lib/portfolio-sync';
+import { PortfolioInsights, MarketComparison } from '@/components/PortfolioInsights';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -86,6 +88,9 @@ export default function PortfolioPage() {
   const [editTarget, setEditTarget] = useState<PortfolioHolding | null>(null);
   const [timeRange,  setTimeRange]  = useState<keyof typeof RANGE_DAYS>('1M');
   const [scrubPoint, setScrubPoint] = useState<ChartPoint | null>(null);
+  // Markttrend für den Vergleich „mein Bestand gegen den Markt". `null` heißt:
+  // liegt (noch) nicht belastbar vor — dann entfällt der Vergleich.
+  const [marktPct, setMarktPct] = useState<number | null>(null);
 
   // Konto-Zustand. `signedIn` steuert, wohin gespeichert wird: ins Konto oder
   // nur in diesen Browser.
@@ -145,6 +150,19 @@ export default function PortfolioPage() {
     })();
     return () => { abgebrochen = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Markttrend einmalig laden. Scheitert der Abruf, bleibt der Vergleich aus —
+  // eine Outperformance gegen einen Index, den es nicht gibt, wäre erfunden.
+  useEffect(() => {
+    let abgebrochen = false;
+    fetch('/api/market/pmi')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!abgebrochen && d && d.sufficient && typeof d.value === 'number') setMarktPct(d.value);
+      })
+      .catch((err) => console.warn('Markttrend konnte nicht geladen werden:', err));
+    return () => { abgebrochen = true; };
   }, []);
 
   /** Schreibt den Bestand ins Konto. Fehler werden angezeigt, nie verschluckt. */
@@ -256,6 +274,22 @@ export default function PortfolioPage() {
       ),
     [holdings, totalValue, rangeStartValue, chartData, pnl, pnlPct],
   );
+  // Auswertung des Bestands: Treiber statt nur Gesamtwert.
+  const performances = useMemo(() => positionPerformances(holdings, liveData), [holdings, liveData]);
+  const { winners, losers } = useMemo(() => topPositions(performances, 3), [performances]);
+  const groesste = useMemo(
+    () => [...performances].filter((p) => p.value > 0).sort((a, b) => b.value - a.value).slice(0, 5),
+    [performances],
+  );
+  const aufteilung = useMemo(() => setAllocation(performances), [performances]);
+
+  // Der Vergleich ist nur sinnvoll, wenn beide Seiten denselben Zeitraum
+  // meinen: Der PMI ist ein 30-Tage-Wert.
+  const vergleich = useMemo(
+    () => (timeRange === '1M' ? comparePerformance(rangePerf.pnlPct, marktPct) : null),
+    [timeRange, rangePerf.pnlPct, marktPct],
+  );
+
   const rangePnl    = rangePerf.pnl;
   const rangePnlPct = rangePerf.pnlPct;
   const isUp      = rangePnl >= 0;
@@ -540,6 +574,29 @@ export default function PortfolioPage() {
               );
             })}
         </div>
+
+        {vergleich && (
+          <div className="mt-5">
+            <MarketComparison
+              portfolioPct={vergleich.portfolioPct}
+              marketPct={vergleich.marketPct}
+              deltaPoints={vergleich.deltaPoints}
+              days={30}
+            />
+          </div>
+        )}
+
+        {/* Auswertung: was den Bestand tatsächlich bewegt */}
+        {holdings.length > 1 && (
+          <div className="mt-5">
+            <PortfolioInsights
+              winners={winners}
+              losers={losers}
+              biggest={groesste}
+              allocation={aufteilung}
+            />
+          </div>
+        )}
 
         {/* Stats strip */}
         <div className="mt-4 grid grid-cols-3 gap-3">

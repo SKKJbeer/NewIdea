@@ -341,3 +341,117 @@ export function setCodeFromId(cardId: string): string {
   const parts = cardId.split('-');
   return parts.slice(0, -1).join('-');
 }
+
+// ── Auswertung des Bestands ─────────────────────────────────────────────────
+//
+// Die Portfolio-Seite soll zwei Fragen sofort beantworten: Was ist meine
+// Sammlung wert, und wie entwickelt sie sich? Ein Gesamtwert allein reicht
+// dafür nicht — es braucht die Treiber dahinter.
+
+export interface PositionPerformance {
+  holding: PortfolioHolding;
+  value: number;
+  cost: number;
+  pnl: number;
+  pnlPct: number;
+  /** Marktpreis vorhanden? Ohne ihn ist die Zeile keine Messung. */
+  live: boolean;
+}
+
+/** Wertentwicklung je Position — Grundlage für Gewinner, Verlierer und Größe. */
+export function positionPerformances(
+  holdings: PortfolioHolding[],
+  liveData: Record<string, LiveCardData>,
+): PositionPerformance[] {
+  return holdings.map((h) => {
+    const live = hasLivePrice(h, liveData);
+    const preis = livePriceOf(h, liveData);
+    const value = preis * h.quantity;
+    const cost = h.purchasePrice * h.quantity;
+    return {
+      holding: h,
+      value,
+      cost,
+      pnl: value - cost,
+      pnlPct: cost > 0 ? ((value - cost) / cost) * 100 : 0,
+      live,
+    };
+  });
+}
+
+/**
+ * Beste und schwächste Positionen.
+ *
+ * Nur Positionen MIT Marktpreis: Ohne ihn rechnet die Zeile mit dem Kaufpreis
+ * weiter und stünde mit 0,0 % in der Mitte — als hätte sie sich nicht bewegt.
+ * Strikt nach Vorzeichen getrennt, wie bei den Marktkennzahlen: Eine Position
+ * kann nicht gleichzeitig bester und schwächster Wert sein.
+ */
+export function topPositions(
+  performances: PositionPerformance[],
+  limit = 3,
+): { winners: PositionPerformance[]; losers: PositionPerformance[] } {
+  const bewertbar = performances.filter((p) => p.live && p.cost > 0);
+  return {
+    winners: bewertbar.filter((p) => p.pnl > 0).sort((a, b) => b.pnlPct - a.pnlPct).slice(0, limit),
+    losers: bewertbar.filter((p) => p.pnl < 0).sort((a, b) => a.pnlPct - b.pnlPct).slice(0, limit),
+  };
+}
+
+export interface SetAllocation {
+  setCode: string;
+  setName: string;
+  value: number;
+  cost: number;
+  pnlPct: number;
+  cards: number;
+  /** Anteil am Gesamtwert in Prozent. */
+  sharePct: number;
+}
+
+/** Aufteilung des Bestands nach Set — zeigt Klumpenrisiko und Treiber. */
+export function setAllocation(performances: PositionPerformance[]): SetAllocation[] {
+  const gesamt = performances.reduce((s, p) => s + p.value, 0);
+  const nachSet = new Map<string, SetAllocation>();
+
+  for (const p of performances) {
+    const code = p.holding.setCode || 'unbekannt';
+    const eintrag = nachSet.get(code) ?? {
+      setCode: code,
+      setName: p.holding.setName || 'Ohne Set',
+      value: 0,
+      cost: 0,
+      pnlPct: 0,
+      cards: 0,
+      sharePct: 0,
+    };
+    eintrag.value += p.value;
+    eintrag.cost += p.cost;
+    eintrag.cards += p.holding.quantity;
+    nachSet.set(code, eintrag);
+  }
+
+  return [...nachSet.values()]
+    .map((e) => ({
+      ...e,
+      pnlPct: e.cost > 0 ? ((e.value - e.cost) / e.cost) * 100 : 0,
+      sharePct: gesamt > 0 ? (e.value / gesamt) * 100 : 0,
+    }))
+    .sort((a, b) => b.value - a.value);
+}
+
+/**
+ * Vergleich der eigenen Entwicklung gegen den Gesamtmarkt.
+ *
+ * Gibt `null` zurück, wenn eine der beiden Seiten keine belastbare Zahl hat —
+ * eine Outperformance gegen einen Index, den es nicht gibt, wäre eine
+ * erfundene Aussage.
+ */
+export function comparePerformance(
+  portfolioPct: number | null,
+  marketPct: number | null,
+): { portfolioPct: number; marketPct: number; deltaPoints: number } | null {
+  if (portfolioPct === null || marketPct === null) return null;
+  if (!Number.isFinite(portfolioPct) || !Number.isFinite(marketPct)) return null;
+  return { portfolioPct, marketPct, deltaPoints: portfolioPct - marketPct };
+}
