@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.36.0] — 30. Juli 2026 · Trade-Republic-Partnerlink aktiv
+
+### Neu
+- **Trade-Republic-Partnerlink eingesetzt.** Er steht als Standard im Code und bleibt per `NEXT_PUBLIC_TRADE_REPUBLIC_URL` überschreibbar — damit ist er sofort live, ohne dass in Vercel etwas gesetzt werden muss
+- **Kennzeichnung an der Partner-Leiste.** Der Hinweis „Affiliate-Links — bei einem Abschluss erhält diese Seite eine Provision. Für dich ändert sich der Preis nicht." steht jetzt in der Komponente selbst, nicht in den einzelnen Seiten. So kann er beim Einbau an einer neuen Stelle nicht vergessen werden (Kennzeichnungspflicht)
+
+### Behoben
+- **Der Trade-Republic-Eintrag war ein klickbarer Link ohne Ziel** (`href="#"`, mangels hinterlegter Adresse). Sichtbar, aber wirkungslos — und damit auch ohne Provision
+- **Ein Cardmarket-Link im Archiv-Hinweis** war weder gekennzeichnet noch an die Affiliate-Variable gekoppelt. Er wird jetzt automatisch monetarisiert, sobald der Cardmarket-Link vorliegt
+- Eine neue Prüfung findet ab sofort jeden Partner-Link ohne `rel="sponsored"` — sie hat genau diese Stelle aufgedeckt
+
+---
+
 ## [2.35.2] — 30. Juli 2026 · Die tatsächliche Ursache: eine Spalte, die es nicht gibt
 
 Die in v2.35.1 eingebaute Fehlermeldung hat sofort geliefert: `Could not find the 'title' column of 'articles'`. Die Vermutung aus v2.35.1 (fehlender eindeutiger Index) war falsch — deshalb war es richtig, die echte Meldung sichtbar zu machen, statt zu raten.

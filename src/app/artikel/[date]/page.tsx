@@ -210,7 +210,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                 <TriangleAlert size={15} className="text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-400/80 leading-relaxed">
                   <strong className="text-amber-400">Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
-                  <a href="https://www.cardmarket.com/en/Pokemon" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-300">Cardmarket</a>{' '}
+                  <a href={process.env.NEXT_PUBLIC_CARDMARKET_URL || 'https://www.cardmarket.com/en/Pokemon'} target="_blank" rel="noopener noreferrer sponsored" className="underline hover:text-amber-300">Cardmarket</a>{' '}
                   prüfen.
                 </p>
               </div>

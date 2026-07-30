@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.36.0',
+    date: '30. Juli 2026',
+    label: 'Trade-Republic-Partnerlink aktiv',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Trade-Republic-Partnerlink eingesetzt — sofort live, weiterhin per Umgebungsvariable überschreibbar' },
+      { type: 'new',     text: 'Kennzeichnungshinweis steht jetzt in der Partner-Leiste selbst und kann an neuen Stellen nicht mehr vergessen werden' },
+      { type: 'fixed',   text: 'Der Trade-Republic-Eintrag war ein klickbarer Link ohne Ziel — sichtbar, aber wirkungslos' },
+      { type: 'fixed',   text: 'Ein Cardmarket-Link im Archiv-Hinweis war nicht gekennzeichnet und nicht an die Affiliate-Variable gekoppelt' },
+    ],
+  },
+  {
     version: '2.35.2',
     date: '30. Juli 2026',
     label: 'Die tatsächliche Ursache: eine Spalte, die es nicht gibt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Der Artikel-Speicher schrieb in eine title-Spalte, die die Tabelle nicht hat. Der Titel wird jetzt aus dem gespeicherten Beitrag gelesen — kein SQL nötig' },
       { type: 'fixed',   text: 'Das Blog-Listing las dieselbe fehlende Spalte und bekam deshalb immer eine leere Liste' },

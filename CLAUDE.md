@@ -718,7 +718,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `CARDMARKET_USER_SECRET` | Cardmarket OAuth User-Secret | Alle 4 nötig — fehlt eine, Fallback auf EN-Preis |
 | `NEXT_PUBLIC_AMAZON_URL` | ⭐ Eigener Amazon-Affiliate-Link (Booster) | **Alle Boosterpack-Bilder + Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ⭐ Eigener Cardmarket-Affiliate-Link | **Alle Cardmarket-Kauflinks auf diesen Link umstellen** |
-| `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Trade Republic-Link sichtbar |
+| `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Optional — der Link ist seit v2.36.0 als Standard im Code hinterlegt |
 | `NEXT_PUBLIC_TOPLOADER_AFFILIATE_URL` | ⭐ Amazon-Affiliate für Toploader | `<AccessoryLink type="toploader">` nutzt diesen Link |
 | `NEXT_PUBLIC_BINDER_AFFILIATE_URL` | ⭐ Amazon-Affiliate für Sammelalbum/Binder | `<AccessoryLink type="binder">` nutzt diesen Link |
 | `NEXT_PUBLIC_SLEEVE_AFFILIATE_URL` | ⭐ Affiliate für Sleeves/Kartenhüllen | `<AccessoryLink type="sleeve">` nutzt diesen Link (Dragon Shield / Amazon) |
@@ -983,7 +983,7 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 |---|---|---|
 | **Amazon Affiliate** (Booster-Packs) | 🔄 Generischer Link aktiv | Eigenen Affiliate-Link beantragen → `NEXT_PUBLIC_AMAZON_URL` setzen |
 | **Cardmarket Affiliate** (Einzelkarten) | 🔄 Generischer Link aktiv | Eigenen Affiliate-Link beantragen → `NEXT_PUBLIC_CARDMARKET_URL` setzen |
-| **Trade Republic Affiliate** | ⏳ Noch nicht aktiv | Link beantragen → `NEXT_PUBLIC_TRADE_REPUBLIC_URL` setzen |
+| **Trade Republic Affiliate** | ✅ Aktiv (seit v2.36.0) | Link steht als Standard in `AffiliateBar.tsx`, per `NEXT_PUBLIC_TRADE_REPUBLIC_URL` überschreibbar |
 | **Newsletter** (Beehiiv) | ⏳ API nicht konfiguriert | `BEEHIIV_API_KEY` setzen |
 
 ### Affiliate-Link-Strategie (PFLICHT wenn Links bereit)
