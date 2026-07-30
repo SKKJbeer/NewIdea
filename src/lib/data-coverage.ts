@@ -21,8 +21,16 @@ import { loadSweepState } from './price-sweep';
 export interface DataCoverage {
   /** Karten, die die Erfassung abdeckt. */
   cards: number;
-  /** Sets in der Kartendatenbank. */
-  sets: number;
+  /**
+   * Sets in der Kartendatenbank — `null`, wenn die Zahl gerade nicht
+   * ermittelbar war.
+   *
+   * BEFUND AUS DEM LIVE-LAUF: Der Abruf schlug einmal fehl, `catch` lieferte
+   * 0, und auf der Seite stand „0 Sets" — ein Messwert, der aus einer
+   * gescheiterten Messung entstand. Genau die Sorte Zahl, die diese Datei
+   * verhindern soll. Fehlt die Angabe, wird sie weggelassen statt genullt.
+   */
+  sets: number | null;
   /** Gespeicherte echte Messpunkte. */
   pricePoints: number;
   /** Tag des letzten vollständigen Durchlaufs (ISO) — null, wenn keiner lief. */
@@ -47,7 +55,7 @@ export async function getDataCoverage(): Promise<DataCoverage | null> {
   const [stand, punkte, sets] = await Promise.all([
     loadSweepState().catch(() => null),
     zaehleMesspunkte(),
-    fetchSetCount().catch(() => 0),
+    fetchSetCount().catch(() => null),
   ]);
 
   // Ohne einen einzigen Messpunkt gibt es nichts zu berichten.
@@ -58,7 +66,7 @@ export async function getDataCoverage(): Promise<DataCoverage | null> {
 
   return {
     cards,
-    sets,
+    sets: sets && sets > 0 ? sets : null,
     pricePoints: punkte,
     lastSweep: stand?.runDate ?? null,
   };

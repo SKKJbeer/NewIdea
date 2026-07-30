@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.3] - 30. Juli 2026 · Keine Null aus einer gescheiterten Zaehlung
+
+### Behoben
+- In der neuen Datenabdeckung stand kurzzeitig „0 Sets“: Der Abruf der Set-Zahl schlug fehl, der Auffang-Wert lieferte 0, und die 0 erschien als Messwert. Faellt die Zaehlung aus, entfaellt die Angabe - genau die Regel, die diese Anzeige durchsetzen soll
+
+---
+
 ## [3.3.2] - 30. Juli 2026 · Index-Schnittstelle an die Startseite angeglichen
 
 ### Behoben

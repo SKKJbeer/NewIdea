@@ -428,8 +428,14 @@ export default async function Home() {
                 <span className="font-bold uppercase tracking-widest text-slate-700">Datenabdeckung</span>
                 {' · '}
                 {abdeckung.cards.toLocaleString('de-DE')} Karten
-                {' · '}
-                {abdeckung.sets.toLocaleString('de-DE')} Sets
+                {/* Die Set-Zahl entfällt, wenn sie gerade nicht ermittelbar war
+                    — eine 0 wäre hier eine Behauptung, keine Messung. */}
+                {abdeckung.sets !== null && (
+                  <>
+                    {' · '}
+                    {abdeckung.sets.toLocaleString('de-DE')} Sets
+                  </>
+                )}
                 {' · '}
                 {abdeckung.pricePoints.toLocaleString('de-DE')} gespeicherte Preispunkte
                 <br />

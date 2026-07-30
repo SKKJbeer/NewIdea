@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.3',
+    date: '30. Juli 2026',
+    label: 'Keine Null aus einer gescheiterten Zaehlung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'In der neuen Datenabdeckung stand kurzzeitig eine 0 fuer die Set-Zahl, weil der Abruf fehlschlug - faellt die Zaehlung aus, entfaellt die Angabe' },
+    ],
+  },
+  {
     version: '3.3.2',
     date: '30. Juli 2026',
     label: 'Index-Schnittstelle an die Startseite angeglichen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die oeffentliche Index-Schnittstelle wertete 50 Karten aus, die Startseite 204 - zwei Zahlen fuer denselben Index' },
     ],

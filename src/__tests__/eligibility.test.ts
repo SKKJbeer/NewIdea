@@ -121,6 +121,16 @@ describe('Datenbestand und auswertbare Stichprobe sind zweierlei', () => {
     expect(computePmi([...vieleAus('a', 25), mitHistorie]).cardCount).toBe(26);
   });
 
+  it('eine gescheiterte Zählung wird nicht als Null ausgewiesen', () => {
+    // Live stand kurzzeitig „0 Sets" in der Abdeckung, weil der Abruf
+    // fehlschlug und der Auffang-Wert 0 lieferte. Eine 0 ist hier eine
+    // Behauptung, keine Messung.
+    const lib = lies('src/lib/data-coverage.ts');
+    expect(lib).toContain('sets: number | null');
+    expect(lib).not.toContain('catch(() => 0)');
+    expect(lies('src/app/page.tsx')).toContain('abdeckung.sets !== null');
+  });
+
   it('die Oberfläche nennt die Stichprobe beim Namen', () => {
     const seite = lies('src/app/page.tsx');
     expect(seite).toContain('auswertbare Karten');
