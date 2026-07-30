@@ -11,6 +11,17 @@ interface Props {
   baselineValue?: number;
   /** Scrub-Callback: Beim Ziehen über den Chart wird der Punkt gemeldet (null = losgelassen). */
   onScrub?: (point: ChartPoint | null) => void;
+  /**
+   * Tage mit einem ECHTEN Messwert.
+   *
+   * Zwischen zwei Messungen trägt die Kurve den letzten bekannten Preis weiter.
+   * Ohne Markierung sieht diese Linie aus wie eine lückenlose Messung. Bei
+   * dünner Datenlage werden die echten Punkte deshalb sichtbar gemacht — der
+   * Betrachter sieht dann, worauf die Kurve beruht.
+   */
+  observationDates?: string[];
+  /** Beschriftung der Wertachse (oben/unten) — ohne sie fehlt jeder Maßstab. */
+  formatValue?: (v: number) => string;
 }
 
 // Leichtgewichtiger Custom-SVG-Chart im Finance-App-Stil:
@@ -18,7 +29,14 @@ interface Props {
 // - Scrubbing: Kurve rechts vom Finger dimmt ab, Datum erscheint am Crosshair,
 //   der Wert wandert über onScrub in den Seiten-Header (wie bei Trade Republic)
 // - Pulsierender Live-Punkt am aktuellen Wert
-export function PortfolioChart({ data, color, baselineValue, onScrub }: Props) {
+export function PortfolioChart({
+  data,
+  color,
+  baselineValue,
+  onScrub,
+  observationDates,
+  formatValue,
+}: Props) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -63,6 +81,17 @@ export function PortfolioChart({ data, color, baselineValue, onScrub }: Props) {
     PADT + (1 - (v - minV + vPad) / (vRange + 2 * vPad)) * chartH;
 
   const pts = data.map((d, i) => ({ x: toX(i), y: toY(d.value) }));
+
+  // Echte Messpunkte nur markieren, solange sie zählbar sind. Bei dichter
+  // Tages-Historie wären es hunderte Punkte — dann ist die Linie selbst schon
+  // die ehrliche Darstellung, und Marker würden sie nur zukleistern.
+  const beobachtet = new Set(observationDates ?? []);
+  const marker =
+    beobachtet.size > 0 && beobachtet.size <= 30
+      ? data
+          .map((d, i) => (beobachtet.has(d.date) ? { x: pts[i].x, y: pts[i].y, date: d.date } : null))
+          .filter((m): m is { x: number; y: number; date: string } => m !== null)
+      : [];
 
   // ── SVG path helpers ──────────────────────────────────────────────────────
 
@@ -190,6 +219,35 @@ export function PortfolioChart({ data, color, baselineValue, onScrub }: Props) {
             <circle cx={last.x} cy={last.y} r="3.5" fill={color} />
           </>
         )}
+
+        {/* Wertachse: höchster und niedrigster Wert des Zeitraums. Ohne diese
+            beiden Zahlen hat die Kurve keinen Maßstab — eine Bewegung von 2 %
+            sieht dann genauso dramatisch aus wie eine von 60 %. */}
+        {formatValue && (
+          <>
+            <text x={VW - PADR - 2} y={PADT + 4} fontSize="12" fill="#475569" textAnchor="end">
+              {formatValue(maxV)}
+            </text>
+            <text x={VW - PADR - 2} y={VH - PADB - 3} fontSize="12" fill="#475569" textAnchor="end">
+              {formatValue(minV)}
+            </text>
+          </>
+        )}
+
+        {/* Echte Messpunkte — nur bei dünner Datenlage sichtbar */}
+        {!scrubbing &&
+          marker.map((m) => (
+            <circle
+              key={m.date}
+              cx={f(m.x)}
+              cy={f(m.y)}
+              r="2.5"
+              fill="#0a0a0f"
+              stroke={color}
+              strokeWidth="1.5"
+              strokeOpacity="0.9"
+            />
+          ))}
 
         {/* X-Achse: nur Start- und Enddatum, dezent */}
         <text x={PADL + 2} y={VH - 4} fontSize="13" fill="#475569">

@@ -18,6 +18,26 @@ vi.mock('@/lib/cardmarket-api', () => ({
   fetchCMLanguagePrice: (...args: unknown[]) => fetchCMLanguagePrice(...args),
 }));
 
+// Die Route schreibt die Preise der Portfolio-Karten nach der Antwort mit —
+// darüber bauen genau die Karten Historie auf, die jemanden interessieren.
+const recordPriceSnapshots = vi.fn(async () => 0);
+const getStoredPriceHistories = vi.fn(async () => ({}) as Record<string, Array<{ date: string; price: number }>>);
+vi.mock('@/lib/price-history', async (original) => {
+  const echt = await original<typeof import('@/lib/price-history')>();
+  return {
+    ...echt,
+    recordPriceSnapshots: (...args: unknown[]) => recordPriceSnapshots(...(args as [])),
+    getStoredPriceHistories: (...args: unknown[]) => getStoredPriceHistories(...(args as [])),
+  };
+});
+
+// `after()` verlangt einen Request-Kontext, den es im Test nicht gibt. Der
+// Rückruf wird deshalb sofort ausgeführt — geprüft wird ja sein Inhalt.
+vi.mock('next/server', async (original) => {
+  const echt = await original<typeof import('next/server')>();
+  return { ...echt, after: (fn: () => unknown) => { void fn(); } };
+});
+
 const { POST } = await import('@/app/api/portfolio/prices/route');
 
 function card(id: string, market = 100): PokemonCard {

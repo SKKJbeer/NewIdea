@@ -67,3 +67,65 @@ export async function getStoredPriceHistory(cardId: string, days = 90): Promise<
   if (error || !data) return [];
   return data.map((r) => ({ date: r.captured_on as string, price: Number(r.price) }));
 }
+
+/**
+ * Führt echte Tages-Snapshots und Cardmarket-Ankerpunkte zu EINER Reihe zusammen.
+ *
+ * ANLASS: Diese Zusammenführung stand nur auf der Karten-Detailseite. Das
+ * Portfolio bekam ausschließlich die Cardmarket-Anker — also höchstens vier
+ * Punkte je Karte (Ø 30 Tage, Ø 7 Tage, Ø gestern, Trend). Über ein Jahr
+ * getragen ergab das eine wochenlang flache Linie mit zwei Stufen, während
+ * zehntausende echte Tageswerte ungenutzt in der Datenbank lagen.
+ *
+ * Regel bleibt unverändert (Preis-Wahrheitspflicht): Bei Datumskollision
+ * gewinnt IMMER der echte Snapshot. Es wird nichts interpoliert und nichts
+ * erfunden — es werden nur alle vorhandenen echten Quellen genutzt.
+ */
+export function mergePriceHistory(
+  anchors: PriceDataPoint[],
+  stored: PriceDataPoint[],
+): PriceDataPoint[] {
+  const byDate = new Map<string, number>();
+  for (const p of anchors) {
+    if (p && p.date && p.price > 0) byDate.set(p.date, p.price);
+  }
+  for (const p of stored) {
+    if (p && p.date && p.price > 0) byDate.set(p.date, p.price); // echter Snapshot gewinnt
+  }
+  return [...byDate.entries()]
+    .map(([date, price]) => ({ date, price }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Liest die gespeicherte Historie für mehrere Karten in EINER Abfrage. */
+export async function getStoredPriceHistories(
+  cardIds: string[],
+  days = 365,
+): Promise<Record<string, PriceDataPoint[]>> {
+  const sb = getSupabase();
+  if (!sb || cardIds.length === 0) return {};
+
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  // Eine Abfrage statt einer je Karte — bei 50 Positionen ist das der
+  // Unterschied zwischen einem Rundlauf und fünfzig.
+  const { data, error } = await sb
+    .from('price_snapshots')
+    .select('card_id, captured_on, price')
+    .in('card_id', cardIds)
+    .gte('captured_on', since.toISOString().split('T')[0])
+    .order('captured_on', { ascending: true });
+
+  if (error || !data) {
+    if (error) console.error('Preis-Historie konnte nicht gelesen werden:', error.message);
+    return {};
+  }
+
+  const byCard: Record<string, PriceDataPoint[]> = {};
+  for (const r of data) {
+    const id = r.card_id as string;
+    (byCard[id] ??= []).push({ date: r.captured_on as string, price: Number(r.price) });
+  }
+  return byCard;
+}

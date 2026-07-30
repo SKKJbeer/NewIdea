@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.37.0] — 30. Juli 2026 · Portfolio: Zukäufe sind kein Gewinn, und die Kurve nutzt endlich alle Daten
+
+Vollständige Durchsicht des Portfolios. Der Eindruck, hinter der Kurve steckten kaum Preisdaten, war berechtigt — und dabei kam ein Rechenfehler zum Vorschein, der schwerer wog als die Optik.
+
+### Behoben
+- **Zukäufe wurden als Wertsteigerung gezählt.** An einem echten Bestand wies der Jahreswert +636,90 € (+19,90 %) aus, während der tatsächliche Gewinn +216,90 € betrug. Die Differenz von exakt 420 € waren zwei später gekaufte Positionen. Wer nachkauft, hat dadurch nichts verdient — die Wertentwicklung ist jetzt um Zukäufe bereinigt, auch beim Ziehen über die Kurve
+- **Das Portfolio nutzte nur einen Bruchteil der vorhandenen Preisdaten.** Es bekam ausschließlich die Cardmarket-Ankerpunkte — höchstens vier je Karte (Ø 30 Tage, Ø 7 Tage, Ø gestern, Trend). Für eine Karte waren das drei Punkte über ein ganzes Jahr. Die echten Tages-Snapshots, von denen zehntausende gespeichert sind, wurden nur auf der Karten-Detailseite eingemischt. Beide Quellen laufen jetzt über dieselbe Funktion
+- **Positionen ohne geladenen Marktpreis zeigten „+0,00 € · 0,0 %"** — nicht zu unterscheiden von einer Karte, die sich wirklich nicht bewegt hat. Ein ausgefallener Abruf wird jetzt als solcher ausgewiesen
+
+### Neu
+- **Die Preise der Portfolio-Karten werden mitgeschrieben.** Bisher bauten genau die Karten, die jemanden interessieren, nie eine Tages-Historie auf: Sie stehen weder in den Top-Karten des täglichen Laufs, noch werden ihre Detailseiten zwangsläufig aufgerufen. Ab jetzt wächst die Historie mit jedem Portfolio-Aufruf
+- **Die Kurve sagt, worauf sie beruht**: Zahl der echten Messpunkte im Zeitraum, Markierung der echten Punkte bei dünner Datenlage, Hinweis auf das Fortschreiben zwischen zwei Messungen. Zwischen zwei Messungen wird der zuletzt bekannte Preis weitergetragen — ohne diese Angabe liest sich eine Linie aus drei Werten wie eine lückenlose Aufzeichnung
+- **Werteachse beschriftet** (höchster/niedrigster Wert des Zeitraums). Ohne Maßstab sieht eine Bewegung von 2 % genauso dramatisch aus wie eine von 60 %
+
+---
+
 ## [2.36.0] — 30. Juli 2026 · Trade-Republic-Partnerlink aktiv
 
 ### Neu

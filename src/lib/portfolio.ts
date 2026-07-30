@@ -29,6 +29,8 @@ export interface PortfolioHolding {
 export interface LiveCardData {
   price: number;
   priceHistory: Array<{ date: string; price: number }>;
+  /** Wie viele davon echte Tages-Snapshots sind (Rest: Cardmarket-Ankerpunkte). */
+  dailyPoints?: number;
 }
 
 export interface ChartPoint {
@@ -176,6 +178,139 @@ export function filterByRange(
   const cutoffStr = cutoff.toISOString().split('T')[0];
   const filtered = data.filter((p) => p.date >= cutoffStr);
   return filtered.length >= 2 ? filtered : data.slice(-2);
+}
+
+/**
+ * Einstand aller Karten, die NACH einem Stichtag gekauft wurden.
+ *
+ * WOZU: Ohne das zählt jeder Zukauf als Wertzuwachs. Beobachtet an einem
+ * echten Bestand: Der Jahreswert wies +636,90 € aus, während der tatsächliche
+ * Gewinn +216,90 € betrug — die Differenz von 420 € waren exakt zwei später
+ * gekaufte Positionen. Wer Karten nachkauft, hat dadurch nichts verdient.
+ *
+ * Käufe GENAU am Stichtag zählen nicht mit: Sie stecken bereits im Startwert
+ * des Zeitraums.
+ */
+export function investedAfter(
+  holdings: PortfolioHolding[],
+  afterDate: string,
+  untilDate?: string,
+): number {
+  if (!afterDate) return 0;
+  return holdings
+    .filter(
+      (h) =>
+        h.purchaseDate &&
+        h.purchaseDate > afterDate &&
+        (!untilDate || h.purchaseDate <= untilDate),
+    )
+    .reduce((s, h) => s + h.purchasePrice * h.quantity, 0);
+}
+
+export interface RangePerformance {
+  /** Wertveränderung ohne Zukäufe — das, was der Markt gemacht hat. */
+  pnl: number;
+  pnlPct: number;
+  /** Im Zeitraum zusätzlich investiert (erklärt die Stufen in der Kurve). */
+  invested: number;
+}
+
+/**
+ * Wertentwicklung eines Zeitraums, bereinigt um Zukäufe.
+ *
+ * Die Bezugsgröße für den Prozentwert ist Startwert + Zukäufe: Wer im Zeitraum
+ * nachgelegt hat, hat auch mehr Kapital im Risiko — sonst fiele der Prozentwert
+ * allein durch einen Zukauf.
+ */
+export function computeRangePerformance(
+  holdings: PortfolioHolding[],
+  endValue: number,
+  startValue: number | null,
+  startDate: string,
+  fallback: { pnl: number; pnlPct: number },
+): RangePerformance {
+  if (startValue === null) {
+    return { pnl: fallback.pnl, pnlPct: fallback.pnlPct, invested: 0 };
+  }
+  const invested = investedAfter(holdings, startDate);
+  const pnl = endValue - startValue - invested;
+  const basis = startValue + invested;
+  return { pnl, pnlPct: basis > 0 ? (pnl / basis) * 100 : 0, invested };
+}
+
+/**
+ * Liegt für diese Karte ein echter Marktpreis vor?
+ *
+ * WARUM DAS SICHTBAR SEIN MUSS: Fehlt der Live-Preis, rechnet die Seite mit dem
+ * Kaufpreis weiter. Die Position zeigt dann „+0,00 € · 0,0 %" — nicht zu
+ * unterscheiden von einer Karte, die sich tatsächlich nicht bewegt hat. Ein
+ * ausgefallener Abruf sieht so aus wie eine Messung.
+ */
+export function hasLivePrice(
+  holding: Pick<PortfolioHolding, 'cardId'>,
+  liveData: Record<string, LiveCardData>,
+): boolean {
+  return (liveData[holding.cardId]?.price ?? 0) > 0;
+}
+
+/**
+ * Tage, an denen mindestens eine Karte einen ECHTEN Messwert hat.
+ *
+ * WOZU: Die Portfolio-Kurve ist eine lückenlose Tagesreihe — zwischen zwei
+ * Messungen wird der letzte bekannte Preis weitergetragen. Das ist richtig
+ * (siehe `computeChartData`), erzeugt aber eine glatte Linie, die nach viel
+ * mehr Messung aussieht, als stattgefunden hat. Mit dieser Liste kann die
+ * Oberfläche die echten Punkte markieren und ihre Anzahl nennen, statt den
+ * Eindruck einer durchgehenden Messung zu erwecken.
+ */
+export function realObservationDates(
+  holdings: PortfolioHolding[],
+  liveData: Record<string, LiveCardData>,
+): string[] {
+  const dates = new Set<string>();
+  for (const h of holdings) {
+    for (const p of liveData[h.cardId]?.priceHistory ?? []) {
+      if (p?.date && p.price > 0) dates.add(p.date);
+    }
+  }
+  return [...dates].sort();
+}
+
+export interface DataQuality {
+  /** Echte Messtage im gewählten Zeitraum. */
+  observations: number;
+  /** Karten, für die eine echte Tages-Historie vorliegt. */
+  cardsWithDailyHistory: number;
+  totalCards: number;
+  /** Reicht die Dichte, damit die Linie nicht mehr erklärungsbedürftig ist? */
+  dense: boolean;
+}
+
+/** Ab so vielen Messtagen im Zeitraum gilt die Kurve als dicht genug. */
+export const DENSE_THRESHOLD = 12;
+
+/**
+ * Beurteilt, wie belastbar die Kurve im gewählten Zeitraum ist.
+ *
+ * Bewusst KEINE Schönfärberei: Liegen nur drei Messpunkte vor, sagt die
+ * Oberfläche das. Der Gegenentwurf — eine glatte Linie ohne Hinweis — wäre
+ * eine Aussage über Kursverläufe, die niemand gemessen hat.
+ */
+export function assessDataQuality(
+  holdings: PortfolioHolding[],
+  liveData: Record<string, LiveCardData>,
+  fromDate: string,
+): DataQuality {
+  const observations = realObservationDates(holdings, liveData).filter((d) => d >= fromDate).length;
+  const cardsWithDailyHistory = holdings.filter(
+    (h) => (liveData[h.cardId]?.dailyPoints ?? 0) >= 2,
+  ).length;
+  return {
+    observations,
+    cardsWithDailyHistory,
+    totalCards: holdings.length,
+    dense: observations >= DENSE_THRESHOLD,
+  };
 }
 
 /**

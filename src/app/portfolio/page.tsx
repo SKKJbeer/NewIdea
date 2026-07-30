@@ -7,7 +7,9 @@ import { NavBar } from '@/components/NavBar';
 import { PortfolioChart, type ChartPoint } from '@/components/PortfolioChart';
 import {
   normalizeHolding, computePnl, computeChartData, filterByRange,
-  formatEur, setCodeFromId,
+  realObservationDates, assessDataQuality,
+  computeRangePerformance, investedAfter, hasLivePrice,
+  formatEur, shortEur, setCodeFromId,
   LANG_FLAG, RANGE_DAYS,
   type PortfolioHolding, type LiveCardData, type CardLanguage,
 } from '@/lib/portfolio';
@@ -222,22 +224,60 @@ export default function PortfolioPage() {
   const allChartData = useMemo(() => computeChartData(holdings, liveData), [holdings, liveData]);
   const chartData    = useMemo(() => filterByRange(allChartData, timeRange), [allChartData, timeRange]);
 
-  // P&L gekoppelt an gewählten Zeitraum — nutzt ersten Chart-Punkt als Referenzwert
+  // Woher die Kurve stammt — sichtbar gemacht statt geglättet. Zwischen zwei
+  // Messungen trägt die Reihe den letzten bekannten Preis weiter; ohne diese
+  // Angabe sähe eine Linie aus drei Messwerten aus wie eine aus neunzig.
+  const observationDates = useMemo(
+    () => realObservationDates(holdings, liveData),
+    [holdings, liveData],
+  );
+  const dataQuality = useMemo(
+    () => assessDataQuality(holdings, liveData, chartData[0]?.date ?? ''),
+    [holdings, liveData, chartData],
+  );
+  const rangeObservations = useMemo(
+    () => (chartData.length ? observationDates.filter((d) => d >= chartData[0].date) : []),
+    [observationDates, chartData],
+  );
+
+  // P&L gekoppelt an gewählten Zeitraum — nutzt ersten Chart-Punkt als Referenzwert.
+  // Zukäufe im Zeitraum werden herausgerechnet: Wer nachkauft, hat dadurch
+  // nichts verdient. Ohne das wies der Jahreswert eines echten Bestands
+  // +636,90 € aus, während der tatsächliche Gewinn +216,90 € betrug.
   const rangeStartValue = chartData.length >= 2 ? chartData[0].value : null;
-  const rangePnl    = rangeStartValue !== null ? totalValue - rangeStartValue : pnl;
-  const rangePnlPct = rangeStartValue !== null && rangeStartValue > 0
-    ? (rangePnl / rangeStartValue) * 100
-    : pnlPct;
+  const rangePerf = useMemo(
+    () =>
+      computeRangePerformance(
+        holdings,
+        totalValue,
+        rangeStartValue,
+        chartData[0]?.date ?? '',
+        { pnl, pnlPct },
+      ),
+    [holdings, totalValue, rangeStartValue, chartData, pnl, pnlPct],
+  );
+  const rangePnl    = rangePerf.pnl;
+  const rangePnlPct = rangePerf.pnlPct;
   const isUp      = rangePnl >= 0;
   const lineColor = isUp ? '#34d399' : '#fb7185';
 
   // Scrubbing (Trade-Republic-Pattern): Beim Ziehen über den Chart zeigt der Header
   // den Wert am Finger + die Veränderung von Zeitraum-Start bis zu diesem Punkt.
-  const displayValue  = scrubPoint ? scrubPoint.value : totalValue;
-  const displayPnl    = scrubPoint && rangeStartValue !== null ? scrubPoint.value - rangeStartValue : rangePnl;
-  const displayPnlPct = scrubPoint && rangeStartValue !== null && rangeStartValue > 0
-    ? (displayPnl / rangeStartValue) * 100
-    : rangePnlPct;
+  // Auch beim Ziehen gilt: Zukäufe bis zu diesem Tag sind kein Gewinn.
+  const displayValue = scrubPoint ? scrubPoint.value : totalValue;
+  const scrubInvested =
+    scrubPoint && chartData.length
+      ? investedAfter(holdings, chartData[0].date, scrubPoint.date)
+      : 0;
+  const displayPnl =
+    scrubPoint && rangeStartValue !== null
+      ? scrubPoint.value - rangeStartValue - scrubInvested
+      : rangePnl;
+  const scrubBasis = (rangeStartValue ?? 0) + scrubInvested;
+  const displayPnlPct =
+    scrubPoint && rangeStartValue !== null && scrubBasis > 0
+      ? (displayPnl / scrubBasis) * 100
+      : rangePnlPct;
   const displayUp = displayPnl >= 0;
 
   if (!mounted) return <div className="min-h-screen bg-[#0a0a0f]" />;
@@ -337,14 +377,51 @@ export default function PortfolioPage() {
           )}
 
           {/* Chart */}
-          <div className="-mx-1 mb-3">
+          <div className="-mx-1 mb-2">
             <PortfolioChart
               data={chartData}
               color={lineColor}
               baselineValue={rangeStartValue ?? undefined}
               onScrub={setScrubPoint}
+              observationDates={rangeObservations}
+              formatValue={shortEur}
             />
           </div>
+
+          {/* Datenlage — ehrlich benannt statt weggeglättet.
+              Die Kurve trägt zwischen zwei Messungen den letzten bekannten
+              Preis weiter. Wie viele echte Messungen dahinterstehen, gehört
+              dazu; sonst liest sich eine Linie aus drei Werten wie eine
+              lückenlose Aufzeichnung. */}
+          {chartData.length >= 2 && (
+            <p className="mb-3 text-[10px] leading-relaxed text-slate-600">
+              {rangeObservations.length > 0 ? (
+                <>
+                  {rangeObservations.length} {rangeObservations.length === 1 ? 'echter Messpunkt' : 'echte Messpunkte'} im
+                  Zeitraum
+                  {!dataQuality.dense && (
+                    <>
+                      {' '}· dazwischen wird der zuletzt bekannte Preis fortgeschrieben
+                      {dataQuality.cardsWithDailyHistory < dataQuality.totalCards && (
+                        <>
+                          {' '}· tägliche Werte liegen für {dataQuality.cardsWithDailyHistory} von{' '}
+                          {dataQuality.totalCards} Karten vor und wachsen ab jetzt weiter
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <>Noch keine Marktdaten geladen — angezeigt werden die Kaufpreise.</>
+              )}
+              {rangePerf.invested > 0 && (
+                <>
+                  {' '}· Stufen in der Kurve entstehen auch durch Zukäufe ({formatEur(rangePerf.invested)} im
+                  Zeitraum) — sie sind aus der Wertentwicklung herausgerechnet
+                </>
+              )}
+            </p>
+          )}
 
           {/* Time-range segmented control */}
           <div className="flex bg-[#1a1a28] rounded-full p-1">
@@ -378,6 +455,11 @@ export default function PortfolioPage() {
               (liveData[a.cardId]?.price || a.purchasePrice) * a.quantity,
             )
             .map((h) => {
+              // Ohne Live-Preis rechnet die Zeile mit dem Kaufpreis weiter und
+              // zeigt „+0,00 € · 0,0 %" — nicht zu unterscheiden von einer
+              // Karte, die sich wirklich nicht bewegt hat. Deshalb wird der
+              // fehlende Abruf ausgewiesen statt als Nullbewegung dargestellt.
+              const live  = hasLivePrice(h, liveData);
               const price = liveData[h.cardId]?.price || h.purchasePrice;
               const value = price * h.quantity;
               const cost  = h.purchasePrice * h.quantity;
@@ -430,12 +512,20 @@ export default function PortfolioPage() {
                     <p className="text-sm font-bold text-slate-200 tabular-nums">
                       {formatEur(value)}
                     </p>
-                    <p className={`text-xs font-semibold tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {pos ? '+' : ''}{formatEur(pnlH)}
-                    </p>
-                    <p className={`text-[10px] tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {formatPercent(pct)}
-                    </p>
+                    {live ? (
+                      <>
+                        <p className={`text-xs font-semibold tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {pos ? '+' : ''}{formatEur(pnlH)}
+                        </p>
+                        <p className={`text-[10px] tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {formatPercent(pct)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-[10px] leading-tight text-amber-400/70 max-w-[92px]">
+                        Kein Marktpreis geladen — Kaufpreis
+                      </p>
+                    )}
                   </div>
 
                   {/* Delete — nur Desktop (Hover). Mobile: via Edit-Modal löschen */}

@@ -3,7 +3,7 @@ import { after } from 'next/server';
 import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
 import { fetchCardById, calculateInvestmentScore } from '@/lib/pokemon-api';
-import { getStoredPriceHistory, recordPriceSnapshot } from '@/lib/price-history';
+import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@/lib/price-history';
 import { PriceChart } from '@/components/PriceChart';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
@@ -85,12 +85,9 @@ export default async function CardDetailPage({ params }: Props) {
   // Bei Datumskollision gewinnt IMMER der echte Snapshot. Keine erfundenen Punkte.
   const stored = await getStoredPriceHistory(id, 90);
   const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
-  const byDate = new Map<string, number>();
-  for (const p of anchors) byDate.set(p.date, p.price);
-  for (const p of stored) byDate.set(p.date, p.price); // echte Snapshots überschreiben Anker
-  const history = [...byDate.entries()]
-    .map(([date, p]) => ({ date, price: p }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  // Zusammenführung liegt zentral in price-history.ts — dieselbe Funktion nutzt
+  // das Portfolio (Code-Regel 10: keine zweite Umsetzung derselben Logik).
+  const history = mergePriceHistory(anchors, stored);
 
   const hasChart = history.length >= 2;
   // 'daily' = mind. 2 echte Tages-Snapshots vorhanden, sonst Cardmarket-Referenz

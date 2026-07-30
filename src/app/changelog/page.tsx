@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.37.0',
+    date: '30. Juli 2026',
+    label: 'Portfolio: Zukäufe sind kein Gewinn',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Zukäufe wurden als Wertsteigerung gezählt — an einem echten Bestand wies der Jahreswert +636,90 € aus statt der tatsächlichen +216,90 €. Die Wertentwicklung ist jetzt um Zukäufe bereinigt' },
+      { type: 'fixed',   text: 'Das Portfolio nutzte nur die Cardmarket-Ankerpunkte (höchstens vier je Karte) — die zehntausenden echten Tages-Snapshots blieben ungenutzt. Beide Quellen laufen jetzt zusammen' },
+      { type: 'fixed',   text: 'Positionen ohne geladenen Marktpreis zeigten „+0,00 € · 0,0 %" — nicht zu unterscheiden von einer Karte, die sich wirklich nicht bewegt hat' },
+      { type: 'new',     text: 'Die Preise der Portfolio-Karten werden mitgeschrieben — ihre Tages-Historie wächst ab jetzt mit jedem Aufruf' },
+      { type: 'new',     text: 'Die Kurve nennt die Zahl ihrer echten Messpunkte und markiert sie bei dünner Datenlage, statt eine lückenlose Messung vorzutäuschen' },
+      { type: 'new',     text: 'Werteachse beschriftet — ohne Maßstab sieht eine Bewegung von 2 % aus wie eine von 60 %' },
+    ],
+  },
+  {
     version: '2.36.0',
     date: '30. Juli 2026',
     label: 'Trade-Republic-Partnerlink aktiv',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Trade-Republic-Partnerlink eingesetzt — sofort live, weiterhin per Umgebungsvariable überschreibbar' },
       { type: 'new',     text: 'Kennzeichnungshinweis steht jetzt in der Partner-Leiste selbst und kann an neuen Stellen nicht mehr vergessen werden' },

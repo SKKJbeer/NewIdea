@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { fetchCardById } from '@/lib/pokemon-api';
 import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
-import { PriceDataPoint } from '@/types';
+import { PriceDataPoint, PokemonCard } from '@/types';
+import { getStoredPriceHistories, mergePriceHistory, recordPriceSnapshots } from '@/lib/price-history';
+import { after } from 'next/server';
 
 export const maxDuration = 30;
 
@@ -14,6 +16,15 @@ interface CardRequest {
 interface LiveCardData {
   price: number;
   priceHistory: PriceDataPoint[];
+  /**
+   * Wie viele Punkte der Reihe echte Tages-Snapshots sind (nicht Cardmarket-Anker).
+   *
+   * Die Oberfläche sagt damit ehrlich, worauf die Kurve beruht. Ohne diese
+   * Angabe sieht eine Reihe aus drei Ankerpunkten genauso aus wie eine aus
+   * neunzig Tageswerten — und erweckt den Eindruck einer Messung, die es
+   * nicht gab.
+   */
+  dailyPoints: number;
   name: string;
   set: string;
   setCode: string;
@@ -60,6 +71,11 @@ export async function POST(request: Request) {
     ]);
   }
 
+  // Echte Tages-Snapshots für ALLE angefragten Karten in einer Abfrage holen.
+  // Vorher bekam das Portfolio nur die Cardmarket-Anker (höchstens vier Punkte
+  // je Karte) — die vorhandene Tages-Historie blieb ungenutzt.
+  const storedByCard = await getStoredPriceHistories(cards.map((c) => c.id), 365);
+
   const results = await Promise.allSettled(
     cards.map(async (c) => {
       const card = await withTimeout(fetchCardById(c.id));
@@ -77,11 +93,19 @@ export async function POST(request: Request) {
         // If CM not configured or no result, fall back to English Cardmarket price
       }
 
+      const stored = storedByCard[c.id] ?? [];
+      // Ohne `realData`-Bedingung: `priceHistory` wird ohnehin nur gesetzt,
+      // wenn echte Cardmarket-Daten vorliegen — eine zusätzliche Prüfung würde
+      // hier nur bestehendes Verhalten verengen.
+      const anchors = card.priceHistory ?? [];
+
       return {
         id: c.id,
+        card,
         data: {
           price,
-          priceHistory: card.priceHistory ?? [],
+          priceHistory: mergePriceHistory(anchors, stored),
+          dailyPoints: stored.length,
           name: card.name,
           set: card.set,
           setCode: card.setCode,
@@ -93,11 +117,25 @@ export async function POST(request: Request) {
   );
 
   const data: Record<string, LiveCardData> = {};
+  const abgerufen: PokemonCard[] = [];
   results.forEach((result) => {
     if (result.status === 'fulfilled' && result.value) {
       data[result.value.id] = result.value.data;
+      abgerufen.push(result.value.card);
     }
   });
+
+  // Den heutigen Preis der Portfolio-Karten mitschreiben. Ohne das bauen genau
+  // die Karten, die jemanden interessieren, NIE eine Tages-Historie auf — sie
+  // stehen weder in den Top-Karten des Cron-Laufs noch werden ihre Detailseiten
+  // zwangsläufig aufgerufen. Nach der Antwort, damit es nichts verzögert.
+  if (abgerufen.length > 0) {
+    after(async () => {
+      await recordPriceSnapshots(abgerufen).catch((err) =>
+        console.error('Preis-Snapshots des Portfolios nicht gespeichert:', err),
+      );
+    });
+  }
 
   return NextResponse.json(data, {
     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },

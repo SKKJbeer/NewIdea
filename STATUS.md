@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.36.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v2.37.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.36.0)
+## Was gebaut ist (Stand v2.37.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.37.0 | Portfolio: Zukäufe aus der Wertentwicklung herausgerechnet, Tages-Snapshots eingemischt, Datenlage sichtbar |
 | v2.36.0 | Trade-Republic-Partnerlink aktiv, Kennzeichnung in der Partner-Leiste, toter Link behoben |
 | v2.35.2 | Echte Ursache: Artikel-Speicher schrieb in eine nicht existierende title-Spalte |
 | v2.35.1 | Artikel-Speicherung scheiterte still + Artikelseite war nicht zwischengespeichert (ein KI-Aufruf pro Seitenaufruf) |
@@ -205,4 +206,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.36.0 — 30. Juli 2026*
+*Zuletzt aktualisiert: v2.37.0 — 30. Juli 2026*
