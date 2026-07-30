@@ -5,12 +5,13 @@
 // `false`. Vorgeschichte: Auf der Seite stand über Wochen ein Bericht, dessen
 // gesamter Inhalt das Wort „test" war, während der Cron Erfolg meldete.
 
-import { fetchTrendingCards } from './pokemon-api';
 import { generateMarketSummary } from './ai-generator';
 import { saveMarketReport } from './market-report-storage';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
 import type { PokemonCard } from '@/types';
+import { getHomepageCards } from './homepage-data';
+import { splitMovers } from './market-metrics';
 
 /**
  * Mindestlänge für einen veröffentlichungswürdigen Bericht. Ein Platzhalter wie
@@ -63,13 +64,20 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
   const { weekStart, weekNumber } = currentWeek();
 
   try {
-    const cards = await fetchTrendingCards(20);
+    // DIESELBE QUELLE WIE DIE STARTSEITE.
+    //
+    // Vorher: `fetchTrendingCards(20)` — 20 Karten aus EINER Set-Abfrage. Der
+    // Bericht sprach damit über den Markt, sah aber nur ein einziges Set, und
+    // die „wertvollsten Karten" waren sechs Karten aus ebendiesem Set. Zwei
+    // Seiten, zwei Datengrundlagen, zwei Wahrheiten.
+    const cards = await getHomepageCards(250);
     if (cards.length === 0) {
       return { status: 'no_cards', weekStart, weekNumber, error: 'Keine Kartendaten von der TCG-API erhalten' };
     }
 
-    const sorted = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0));
-    const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
+    // Vorzeichen-Trennung zentral — dieselbe Regel wie auf der Startseite.
+    const { gainers, losers } = splitMovers(cards, 5);
+    const summary = await generateMarketSummary(cards, gainers, losers);
     const reportText = (summary.weeklyReport || '').trim();
 
     // Qualitätsgate: lieber kein neuer Bericht als ein Platzhalter auf der Startseite.

@@ -82,7 +82,7 @@ export const ARTICLE_PREVIEW_TITLES: Record<ArticleType, string> = {
   karte:      'Karte im Fokus: Charizard ex — Preisentwicklung und Marktanalyse',
   strategie:  'Portfolio-Strategie: Wie Pokémon-Sammler ihr Portfolio aufbauen',
   set:        'Set-Analyse: Pokémon 151 — Marktdaten und Preisübersicht',
-  ausblick:   'Wochenend-Ausblick: Aktuelle Entwicklungen für Sammler & Investoren',
+  ausblick:   'Wochenend-Ausblick: Aktuelle Entwicklungen für Sammler',
   guide:      'Pokémon-Fälschungen erkennen: Prüfmethoden im Überblick',
   rueckblick: 'Wochenrückblick: Was der Markt diese Woche gezeigt hat',
 };
@@ -136,7 +136,7 @@ export function getArticleType(dateStr: string): ArticleType | null {
 export const ARTICLE_META: Record<ArticleType, { label: string; category: string; icon: string; color: string }> = {
   markt:      { label: 'Wöchentliche Marktanalyse',  category: 'Markt',      icon: 'chart',     color: 'violet'  },
   karte:      { label: 'Karte im Fokus',             category: 'Spotlight',  icon: 'card',      color: 'blue'    },
-  strategie:  { label: 'Investment-Strategie',       category: 'Strategie',  icon: 'lightbulb', color: 'emerald' },
+  strategie:  { label: 'Markt-Strategie',       category: 'Strategie',  icon: 'lightbulb', color: 'emerald' },
   set:        { label: 'Set-Analyse',                category: 'Analyse',    icon: 'package',   color: 'amber'   },
   ausblick:   { label: 'Wochenend-Ausblick',         category: 'Prognose',   icon: 'telescope', color: 'rose'    },
   guide:      { label: 'Sammler-Guide',              category: 'Guide',      icon: 'book',      color: 'indigo'  },
@@ -312,7 +312,7 @@ export function fallbackArticle(type: ArticleType, dateLabel: string, _cardSumma
       tags: ['pokémon 151', 'set analyse', 'scarlet violet', 'sv3pt5 investment'],
     },
     ausblick: {
-      title: 'Wochenend-Ausblick: Aktuelle Entwicklungen für Sammler & Investoren',
+      title: 'Wochenend-Ausblick: Aktuelle Entwicklungen für Sammler',
       intro: 'Das Wochenende ist die aktivste Handelszeit auf Cardmarket. Käufer haben mehr Zeit zum Stöbern, Verkäufer passen ihre Preise an — die Marktdaten zeigen dabei wiederkehrende Muster.',
       sections: [
         {

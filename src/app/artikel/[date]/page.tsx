@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: { params: Promise<{ date: str
   const dateLabel = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
   return {
     title: `${meta.label} vom ${dateLabel} — PokéMarket Intelligence`,
-    description: `${meta.label} für Pokémon-Karten-Investoren vom ${dateLabel}.`,
+    description: `${meta.label} zum Pokémon-Kartenmarkt vom ${dateLabel}.`,
   };
 }
 

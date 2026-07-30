@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.0] - 30. Juli 2026 · Datenbestand und Kennzahl sauber getrennt
+
+### Behoben
+- **„151 - staerkstes Set · 1 Karte im Datensatz“.** Ein Set mit einer einzigen Karte konnte die Rangliste anfuehren; der Durchschnitt einer Karte ist ihr Preis. Ein Set erscheint jetzt erst ab fuenf auswertbaren Karten, und gewertet wird der typische Kartenpreis (Median) statt des Mittelwerts - der bleibt sonst von einer teuren Einzelkarte bestimmt. Erfuellt kein Set die Schwelle, steht dort „Noch nicht genuegend Daten fuer ein belastbares Set-Ranking“
+- **„50 Karten · 4 Sets“ las sich wie der gesamte Datenbestand**, war aber die Stichprobe einer einzelnen Kennzahl - und diese Zahl kam nicht aus der Datenlage, sondern aus einer Begrenzung im Code. Die Stichprobe umfasst jetzt 250 Karten aus 17 Sets
+- **Der Marktbericht sah nur ein einziges Set.** Er zog 20 Karten aus einer Set-Abfrage, waehrend die Startseite eine andere Quelle nutzte - zwei Seiten, zwei Datengrundlagen. Beide nutzen jetzt dieselbe
+- **Drei Routen trennten Gewinner und Verlierer noch nach der alten, fehlerhaften Regel** (dieselbe Liste zweimal sortiert, oben und unten abgeschnitten). Auf der Startseite war das seit v3.0.0 behoben, im Marktbericht lief es weiter
+- **„Pokemon Kartenmarkt in Echtzeit“** stand direkt neben „taeglich aktualisiert“. Die Preisquelle liefert keinen Echtzeit-Stand; der Begriff ist ueberall entfernt
+
+### Neu
+- **Datenabdeckung getrennt ausgewiesen** - Karten, Sets und gespeicherte Preispunkte des gesamten Bestands, sichtbar neben den Kennzahlen, die jeweils nur die vollstaendig gemessenen Karten nutzen
+- Eine heute neu erfasste Karte zaehlt sofort zur Abdeckung und erst mit echter Historie zu den 30-Tage-Kennzahlen. Es wird keine Entwicklung angedichtet
+
+### Geaendert
+- **„Investment-Scores“ heissen „Markt-Scores“, „Investor Insights“ heissen „Markt-Insights“.** Die Plattform analysiert einen Markt und beraet nicht bei Geldanlagen. Adressen bleiben unveraendert
+
+---
+
 ## [3.2.6] — 30. Juli 2026 · Erfassung läuft ohne Abriss durch
 
 ### Behoben

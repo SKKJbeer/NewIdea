@@ -10,6 +10,7 @@
 
 import type { PokemonCard } from '@/types';
 import { displayPrice } from './pokemon-api';
+import { median } from './portfolio';
 
 /**
  * Hat diese Karte einen ECHTEN Trendwert?
@@ -103,6 +104,76 @@ export function marketBreadth(cards: PokemonCard[]): Breadth {
     total: mitTrend.length,
     pct: mitTrend.length > 0 ? (up / mitTrend.length) * 100 : 0,
   };
+}
+
+// ── Set-Rangliste ───────────────────────────────────────────────────────────
+
+/**
+ * Mindestanzahl auswertbarer Karten, damit ein Set in einer Rangliste
+ * erscheinen darf.
+ *
+ * DER FEHLER, DEN DAS BEHEBT: Auf der Startseite stand „151 — stärkstes Set
+ * nach Durchschnittspreis · 1 Karten im Datensatz". Der Durchschnitt einer
+ * einzigen Karte ist kein Set-Durchschnitt, sondern der Preis dieser Karte.
+ * Mit einer teuren Einzelkarte gewinnt so jedes beliebige Set die Rangliste.
+ *
+ * Fünf ist die untere Grenze, ab der ein Median überhaupt etwas beschreibt.
+ * Lieber gar keine Rangliste als eine, die in die Irre führt.
+ */
+export const MIN_SET_SAMPLE = 5;
+
+export interface SetRank {
+  code: string;
+  name: string;
+  /** Auswertbare Karten dieses Sets in der Stichprobe. */
+  count: number;
+  /**
+   * MEDIAN, nicht Mittelwert.
+   *
+   * Ein Mittelwert bleibt auch oberhalb der Mindest-Stichprobe von einer
+   * einzelnen teuren Karte bestimmt: Fünf Karten zu 5 € plus eine zu 5.000 €
+   * ergeben 837 € — ein „Durchschnittspreis", den keine der sechs Karten
+   * auch nur annähernd hat. Der Median beschreibt, was eine Karte dieses Sets
+   * typischerweise kostet. Dieselbe Regel gilt im Projekt bereits für
+   * Marktpreise aus Einzelangeboten.
+   */
+  medianPrice: number;
+  /** Mittlerer Trend — nur aus Karten mit echter Messung. */
+  avgTrend: number;
+}
+
+/**
+ * Set-Rangliste nach typischem Kartenpreis (Median).
+ *
+ * EINE Stelle für ALLE Ranglisten (Startseite, Marktbericht, künftige).
+ * Sets unter `MIN_SET_SAMPLE` werden ausgeschlossen — nicht nach hinten
+ * sortiert, sondern gar nicht aufgenommen.
+ */
+export function rankSets(cards: PokemonCard[], limit = 5): SetRank[] {
+  const proSet = new Map<string, { name: string; preise: number[]; trends: number[] }>();
+
+  for (const card of cards) {
+    if (!card.setCode) continue;
+    const preis = displayPrice(card);
+    if (!(preis > 0)) continue;
+
+    const eintrag = proSet.get(card.setCode) ?? { name: card.set || card.setCode, preise: [], trends: [] };
+    eintrag.preise.push(preis);
+    if (hasRealTrend(card)) eintrag.trends.push(card.trendPercent as number);
+    proSet.set(card.setCode, eintrag);
+  }
+
+  return [...proSet.entries()]
+    .filter(([, d]) => d.preise.length >= MIN_SET_SAMPLE)
+    .map(([code, d]) => ({
+      code,
+      name: d.name,
+      count: d.preise.length,
+      medianPrice: median(d.preise) ?? 0,
+      avgTrend: d.trends.length > 0 ? d.trends.reduce((s, t) => s + t, 0) / d.trends.length : 0,
+    }))
+    .sort((a, b) => b.medianPrice - a.medianPrice)
+    .slice(0, limit);
 }
 
 // ── PokéMarket Index (PMI) ──────────────────────────────────────────────────

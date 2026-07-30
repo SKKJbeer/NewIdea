@@ -10,7 +10,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Pokémon Karten Guides — PokéMarket Intelligence',
-  description: 'Kostenlose Pokémon-Karten-Guides für Sammler und Investoren: Seltenheitsstufen, Grading, Lagerung und Investment-Strategien verständlich erklärt.',
+  description: 'Kostenlose Pokémon-Karten-Guides für Sammler: Seltenheitsstufen, Grading, Lagerung und Markt-Strategien verständlich erklärt.',
 };
 
 export default async function GuidesPage() {
@@ -34,7 +34,7 @@ export default async function GuidesPage() {
             Pokémon Karten<br /><span className="text-violet-400">Guides</span>
           </h1>
           <p className="text-slate-400 text-sm max-w-sm mx-auto">
-            Alles was du über Pokémon-Karten wissen musst — von Seltenheitsstufen über Grading bis zur richtigen Investment-Strategie.
+            Alles was du über Pokémon-Karten wissen musst — von Seltenheitsstufen über Grading bis zur richtigen Markt-Strategie.
           </p>
         </div>
       </header>

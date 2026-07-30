@@ -212,7 +212,7 @@ export async function GET(request: Request) {
     features: {
       supabaseConnected,
       priceSnapshots: { working: supabaseConnected, label: 'Preis-Snapshots (Supabase)', effect: 'Echte tägl. Preis-Historie' },
-      tcgPrices: { working: tcgApiWorking, label: 'Echtzeit-Preise (Cardmarket EUR)', effect: 'via TCG-API-Key' },
+      tcgPrices: { working: tcgApiWorking, label: 'Cardmarket-Preise (EUR)', effect: 'via TCG-API-Key' },
       aiBlog: { working: env('ANTHROPIC_API_KEY'), label: 'KI-Blog-Artikel', effect: 'Ohne Key: Evergreen-Fallback-Inhalte' },
       cronDaily: { working: env('CRON_SECRET') && !!siteUrl, label: 'Täglicher Cron (08:00)', effect: 'Speichert Preise & wärmt Cache' },
       portfolioKonto: { working: process.env.NEXT_PUBLIC_PORTFOLIO_LOGIN === 'on' && env('NEXT_PUBLIC_SUPABASE_URL') && env('NEXT_PUBLIC_SUPABASE_ANON_KEY'), label: 'Portfolio-Konto (Google/Apple)', effect: 'Ohne: Portfolio liegt nur im Browser des Besuchers' },

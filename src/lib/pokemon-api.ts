@@ -299,6 +299,21 @@ async function tcgSets(params: Record<string, string | number>, retries = 2): Pr
   throw lastError instanceof Error ? lastError : new Error('Set-Abfrage fehlgeschlagen');
 }
 
+/**
+ * Zahl der Sets in der Kartendatenbank — für die Datenabdeckung.
+ *
+ * Holt bewusst nur EINEN Datensatz: Gebraucht wird die Gesamtzahl aus dem
+ * Kopf der Antwort, nicht die Liste.
+ */
+export async function fetchSetCount(): Promise<number> {
+  const response = await axios.get(`${TCG_API_BASE}/sets`, {
+    headers: { ...tcgHeaders() },
+    params: { pageSize: 1 },
+    timeout: 8000,
+  });
+  return Number(response.data?.totalCount) || 0;
+}
+
 export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
   const daten = await tcgSets({ orderBy: '-releaseDate', pageSize: limit });
 

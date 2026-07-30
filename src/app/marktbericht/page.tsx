@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const week = report?.weekNumber ?? '—';
   return {
     title: `Marktanalyse KW ${week} — PokéMarket Intelligence`,
-    description: 'Wöchentliche Marktanalyse für Pokémon-Karten-Sammler und Investoren.',
+    description: 'Wöchentliche Marktanalyse für Pokémon-Karten-Sammler.',
   };
 }
 
@@ -64,11 +64,11 @@ export default async function MarktberichtPage() {
             Wöchentliche<br /><span className="text-violet-400">Marktanalyse</span>
           </h1>
           <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-6">
-            Datenbasierte Investment-Analyse für Pokémon-Karten-Sammler und Investoren.
+            Datenbasierte Marktanalyse für Pokémon-Karten-Sammler.
           </p>
           <div className="flex justify-center gap-6 text-slate-600 text-xs">
             <div className="flex items-center gap-1.5"><BarChart3 size={12} />Marktanalyse</div>
-            <div className="flex items-center gap-1.5"><TrendingUp size={12} />Echtzeit-Preise</div>
+            <div className="flex items-center gap-1.5"><TrendingUp size={12} />Cardmarket-Preise</div>
             <div className="flex items-center gap-1.5"><Zap size={12} />Wöchentlich neu</div>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default async function MarktberichtPage() {
 
         {report && report.topGainers.length > 0 && (
           <div className="space-y-8">
-            <CardGrid cards={report.topGainers} title="Top Investment-Karten" />
+            <CardGrid cards={report.topGainers} title="Stärkste Aufwärtsbewegungen" />
 
             {/* Dieselben Grafiken wie im Artikel — eine Umsetzung für beide. */}
             <div className="space-y-4">

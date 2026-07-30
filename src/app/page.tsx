@@ -1,4 +1,5 @@
 import { getHomepageCards } from '@/lib/homepage-data';
+import { getDataCoverage } from '@/lib/data-coverage';
 import { cachedImg } from '@/lib/cached-image';
 import { ContentIcon } from '@/components/ContentIcon';
 import { SearchBox } from '@/components/SearchBox';
@@ -17,6 +18,8 @@ import { FearGreedPanel } from '@/components/FearGreedPanel';
 import {
   splitMovers,
   marketBreadth,
+  rankSets,
+  MIN_SET_SAMPLE,
   hasRealTrend,
   computePmi,
   computeFearGreed,
@@ -27,20 +30,20 @@ import {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Pokémon Kartenmarkt in Echtzeit — PokéMarket Intelligence',
+  title: 'Pokémon Kartenmarkt datenbasiert verstehen — PokéMarket Intelligence',
   description:
-    'Echtzeit-Preise von Cardmarket für Pokémon-Sammelkarten. Marktindex, Top-Gewinner, Verlierer und Investment-Scores täglich aktualisiert.',
+    'Cardmarket-Preise für Pokémon-Sammelkarten. Marktindex, Top-Gewinner, Verlierer und Markt-Scores — täglich aktualisiert.',
   keywords: [
     'Pokémon Karten Preis',
     'Pokémon TCG Markt',
     'Cardmarket Pokémon',
-    'Pokémon Investment',
+    'Pokémon Karten Marktanalyse',
     'Pokémon Karten Wert',
     'Charizard Preis',
     'seltene Pokémon Karten',
   ],
   openGraph: {
-    title: 'Pokémon Kartenmarkt in Echtzeit — PokéMarket Intelligence',
+    title: 'Pokémon Kartenmarkt datenbasiert verstehen — PokéMarket Intelligence',
     description: 'Echte Cardmarket-Preise, Marktindex und Trend-Analyse für Pokémon-Sammelkarten.',
     type: 'website',
     locale: 'de_DE',
@@ -103,7 +106,14 @@ function fmtPct(pct: number | undefined): string {
 export default async function Home() {
   // Robust: Live-TCG-Daten mit Fallback auf den letzten Supabase-Marktbericht,
   // damit die Startseite bei einem API-Ausfall nicht LEER gecacht wird (Stolperstelle 19).
-  const cards = await getHomepageCards(50);
+  // STICHPROBE: 250 statt 50 Karten.
+  //
+  // Die „50 Karten · 4 Sets" neben dem Marktindex kamen NICHT aus der Datenlage,
+  // sondern aus diesem Aufruf — eine Kennzahl über den halben Markt, begrenzt
+  // durch eine Zahl im Code. Dieselbe Abfrage liefert bei 250 Karten 17 Sets
+  // statt 4; erst damit sind Set-Ranglisten und Marktbreite überhaupt
+  // aussagekräftig. Ein Abruf mehr je Neuerzeugung (stündlich) ist das wert.
+  const cards = await getHomepageCards(250);
 
   // Ohne Kartendaten KEINE erfundene Marktlage: Die Kennzahlen unten (PMI,
   // Marktbreite, Fear & Greed) würden aus einem leeren Datensatz trotzdem
@@ -118,6 +128,12 @@ export default async function Home() {
   // Zuerst prüfen, dann rechnen: Ein einzelner Ausreißer (Preis- oder
   // Trendfehler) verschiebt einen gewichteten Index spürbar, und zwar
   // unbemerkt. Die Befunde landen im Server-Log, statt still einzufließen.
+  // Datenabdeckung ist etwas ANDERES als die Stichprobe unten — sie beschreibt,
+  // was die Plattform insgesamt beobachtet. Beides nebeneinander zu zeigen ist
+  // der Punkt: Eine heute neu erfasste Karte gehört sofort in die Abdeckung und
+  // noch nicht in eine 30-Tage-Kennzahl.
+  const abdeckung = await getDataCoverage().catch(() => null);
+
   const qualitaet = validateMarketData(cards);
   logDataIssues(qualitaet, 'startseite');
   const geprueft = qualitaet.clean;
@@ -158,39 +174,16 @@ export default async function Home() {
     .sort((a, b) => Math.abs(b.trendPercent ?? 0) - Math.abs(a.trendPercent ?? 0))
     .slice(0, 10);
 
-  // Top Sets aggregated from card data
-  const setMap = new Map<string, { name: string; count: number; totalPrice: number; totalTrend: number; trendCount: number }>();
-  for (const card of geprueft) {
-    const prev = setMap.get(card.setCode) ?? {
-      name: card.set,
-      count: 0,
-      totalPrice: 0,
-      totalTrend: 0,
-      trendCount: 0,
-    };
-    const price = card.prices.market ?? 0;
-    prev.count++;
-    prev.totalPrice += price;
-    if (typeof card.trendPercent === 'number') {
-      prev.totalTrend += card.trendPercent;
-      prev.trendCount++;
-    }
-    setMap.set(card.setCode, prev);
-  }
-  const topSets = [...setMap.entries()]
-    .map(([code, d]) => ({
-      code,
-      name: d.name,
-      count: d.count,
-      avgPrice: d.count > 0 ? d.totalPrice / d.count : 0,
-      avgTrend: d.trendCount > 0 ? d.totalTrend / d.trendCount : 0,
-    }))
-    .sort((a, b) => b.avgPrice - a.avgPrice)
-    .slice(0, 5);
-  // Maßstab für die Anteilsbalken in der Set-Tabelle.
-  const maxSetPreis = Math.max(...topSets.map((s) => s.avgPrice), 0);
+  // Set-Rangliste — zentral aus `market-metrics`, damit Startseite und
+  // Marktbericht dieselbe Regel anwenden. Sets unter der Mindest-Stichprobe
+  // erscheinen NICHT: Zuvor stand hier „151 — stärkstes Set · 1 Karten im
+  // Datensatz", also der Preis einer einzelnen Karte als Set-Durchschnitt.
+  const topSets = rankSets(geprueft, 5);
 
-  // Investor Insights — ausschließlich abgeleitet, nichts erfunden.
+  // Maßstab für die Anteilsbalken in der Set-Tabelle.
+  const maxSetPreis = Math.max(...topSets.map((s) => s.medianPrice), 0);
+
+  // Markt-Insights — ausschließlich abgeleitet, nichts erfunden.
   // Als reine Textzeilen gingen diese Aussagen unter; jede bekommt jetzt ein
   // Bild und eine hervorgehobene Kennzahl, damit die Zahl den Satz trägt.
   interface Insight {
@@ -241,9 +234,9 @@ export default async function Home() {
   }
   if (topSets[0]) {
     insights.push({
-      kennzahl: formatEurRounded(topSets[0].avgPrice),
+      kennzahl: formatEurRounded(topSets[0].medianPrice),
       titel: topSets[0].name,
-      text: `Stärkstes Set nach Durchschnittspreis — ${topSets[0].count} Karten im Datensatz.`,
+      text: `Höchster typischer Kartenpreis (Median) unter den Sets mit mindestens ${MIN_SET_SAMPLE} auswertbaren Karten — hier ${topSets[0].count}.`,
       ton: 'neutral',
       setCode: topSets[0].code,
       setName: topSets[0].name,
@@ -267,9 +260,9 @@ export default async function Home() {
           <h1 className="mb-2 text-3xl font-black tracking-tight text-white sm:text-5xl">
             Pokémon Kartenmarkt
           </h1>
-          <p className="mb-6 text-xl font-black text-violet-400 sm:text-3xl">in Echtzeit</p>
+          <p className="mb-6 text-xl font-black text-violet-400 sm:text-3xl">datenbasiert verstehen</p>
           <p className="mb-6 text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-            Preise · Trends · Investment-Scores — aus echten Cardmarket-Daten
+            Preise · Trends · Marktanalysen — auf Basis aktueller Cardmarket-Daten
           </p>
           <div className="mx-auto max-w-xl">
             <SearchBox placeholder="Karte suchen, z.B. Glurak oder Charizard …" />
@@ -361,8 +354,12 @@ export default async function Home() {
                     <div className="mt-2.5">
                       <ZeroMeter value={pmiNum} max={10} />
                     </div>
+                    {/* „auswertbar" ist hier das entscheidende Wort: Das ist die
+                        Stichprobe DIESER Kennzahl, nicht der Datenbestand. Der
+                        steht als Abdeckung unter den Kacheln. */}
                     <p className="mt-1.5 text-[10px] leading-snug text-slate-600">
-                      {pmi.cardCount} Karten · {pmi.setCount} {pmi.setCount === 1 ? 'Set' : 'Sets'}
+                      {pmi.cardCount} auswertbare Karten · {pmi.setCount}{' '}
+                      {pmi.setCount === 1 ? 'Set' : 'Sets'}
                       <br />
                       {pmi.windowDays} Tage · Stand {datenstand}
                     </p>
@@ -420,6 +417,28 @@ export default async function Home() {
                 <FearGreedPanel result={fg} />
               </div>
             </div>
+
+            {/* DATENABDECKUNG — bewusst UNTER den Kennzahlen und optisch ruhiger.
+                Sie beantwortet eine andere Frage als die Kacheln darüber: nicht
+                „wie steht der Markt", sondern „worauf schaut diese Seite
+                überhaupt". Ohne diese Zeile las sich die Stichprobe des Index
+                wie der gesamte Datenbestand. */}
+            {abdeckung && (
+              <p className="mt-3 text-center text-[10px] leading-relaxed text-slate-600">
+                <span className="font-bold uppercase tracking-widest text-slate-700">Datenabdeckung</span>
+                {' · '}
+                {abdeckung.cards.toLocaleString('de-DE')} Karten
+                {' · '}
+                {abdeckung.sets.toLocaleString('de-DE')} Sets
+                {' · '}
+                {abdeckung.pricePoints.toLocaleString('de-DE')} gespeicherte Preispunkte
+                <br />
+                <span className="text-slate-700">
+                  Die Kennzahlen oben nutzen davon jeweils die Karten, für die der
+                  betrachtete Zeitraum vollständig gemessen ist.
+                </span>
+              </p>
+            )}
           </section>
         )}
 
@@ -616,10 +635,10 @@ export default async function Home() {
 
         {/* ── INVESTOR INSIGHTS ───────────────────────────────────────────── */}
         {hasData && insights.length > 0 && (
-          <section aria-label="Investor Insights">
+          <section aria-label="Markt-Insights">
             <div className="mb-4 flex items-center gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">
-                Investor Insights
+                Markt-Insights
               </span>
               <span className="h-px flex-1 bg-[#1e1e30]" />
             </div>
@@ -679,18 +698,31 @@ export default async function Home() {
               })}
             </div>
             <p className="mt-3 text-[10px] text-slate-700">
-              Alle Insights basieren ausschließlich auf Echtzeit-Cardmarket-Daten. Keine Anlageberatung.
+              Alle Insights sind aus Cardmarket-Daten abgeleitet. Keine Anlageberatung.
             </p>
           </section>
         )}
 
         {/* ── TOP SETS ────────────────────────────────────────────────────── */}
-        {hasData && topSets.length > 0 && (
+        {hasData && (
           <section aria-label="Top Sets">
             <div className="mb-4 flex items-center gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Top Sets</span>
               <span className="h-px flex-1 bg-[#1e1e30]" />
             </div>
+            {topSets.length === 0 ? (
+              /* Eine Rangliste aus Sets mit ein bis zwei Karten ist keine
+                 Rangliste, sondern eine Preisliste einzelner Karten. Dann
+                 lieber nichts behaupten. */
+              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] px-4 py-5 text-center">
+                <p className="text-xs font-semibold text-slate-300">
+                  Noch nicht genügend Daten für ein belastbares Set-Ranking.
+                </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Ein Set erscheint hier ab {MIN_SET_SAMPLE} auswertbaren Karten.
+                </p>
+              </div>
+            ) : (
             <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
               <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 border-b border-[#1e1e30] px-4 py-2">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700">Set</span>
@@ -703,7 +735,7 @@ export default async function Home() {
                   const up = s.avgTrend >= 0;
                   // Anteil am teuersten Set — macht aus einer Zahlenspalte eine
                   // Rangfolge, die man auf einen Blick erfasst.
-                  const anteil = maxSetPreis > 0 ? (s.avgPrice / maxSetPreis) * 100 : 0;
+                  const anteil = maxSetPreis > 0 ? (s.medianPrice / maxSetPreis) * 100 : 0;
                   return (
                     <Link
                       key={s.code}
@@ -730,7 +762,7 @@ export default async function Home() {
                         </div>
                       </div>
                       <span className="text-right text-[11px] tabular-nums text-slate-600">{s.count}</span>
-                      <span className="text-right text-[11px] font-mono tabular-nums text-slate-400">{fmt(s.avgPrice)}</span>
+                      <span className="text-right text-[11px] font-mono tabular-nums text-slate-400">{fmt(s.medianPrice)}</span>
                       <span className={`text-right text-xs font-bold tabular-nums ${up ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {fmtPct(s.avgTrend)}
                       </span>
@@ -739,6 +771,7 @@ export default async function Home() {
                 })}
               </div>
             </div>
+            )}
           </section>
         )}
 

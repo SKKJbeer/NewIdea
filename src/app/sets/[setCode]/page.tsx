@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const setName = cards[0].set;
   return {
     title: `${setName} — Kartenpreise & wertvollste Karten`,
-    description: `Alle handelbaren Karten aus ${setName} mit aktuellen Cardmarket-Preisen (EUR), Trends und Investment-Scores — sortiert nach Marktwert.`,
+    description: `Alle handelbaren Karten aus ${setName} mit aktuellen Cardmarket-Preisen (EUR), Trends und Markt-Scores — sortiert nach Marktwert.`,
     alternates: { canonical: `${SITE_URL}/sets/${setCode}` },
   };
 }

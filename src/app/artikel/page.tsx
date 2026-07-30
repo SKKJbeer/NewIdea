@@ -17,7 +17,7 @@ const LEVEL_STYLE: Record<string, string> = {
 };
 
 export const metadata: Metadata = {
-  title: 'Pokémon Investment Blog — PokéMarket Intelligence',
+  title: 'Pokémon Marktanalysen — PokéMarket Intelligence',
   description: 'Wöchentlicher Wochenrückblick (sonntags) und rotierender Donnerstags-Artikel — Marktanalysen und Guides für Pokémon-Karten-Sammler.',
 };
 
@@ -40,7 +40,7 @@ export default async function ArtikelListPage() {
             Sonntags + Donnerstags
           </div>
           <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white">
-            Pokémon Investment<br /><span className="text-violet-400">Blog</span>
+            Pokémon<br /><span className="text-violet-400">Marktanalysen</span>
           </h1>
           <p className="text-slate-400 text-sm max-w-sm mx-auto">
             Sonntags: Wochenrückblick. Donnerstags: Marktanalyse, Karte im Fokus oder Guide.

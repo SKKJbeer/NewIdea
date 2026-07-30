@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
+import { splitMovers } from '@/lib/market-metrics';
 import {
   generateMarketSummary,
   generateNewsletterContent,
@@ -29,15 +30,17 @@ export async function POST(request: Request) {
 
   try {
     const cards = await fetchTrendingCards(20);
-    const sorted = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0));
+    // Zentrale Vorzeichen-Trennung statt derselben Liste zweimal sortiert —
+    // siehe api/cron/route.ts.
+    const { gainers, losers } = splitMovers(cards, 5);
 
     switch (type) {
       case 'market': {
-        const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
+        const summary = await generateMarketSummary(cards, gainers, losers);
         return NextResponse.json({ type, content: summary });
       }
       case 'newsletter': {
-        const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
+        const summary = await generateMarketSummary(cards, gainers, losers);
         const newsletter = await generateNewsletterContent(summary, cards);
         return NextResponse.json({ type, content: newsletter });
       }
@@ -50,7 +53,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ type, content: script });
       }
       case 'social': {
-        const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
+        const summary = await generateMarketSummary(cards, gainers, losers);
         const posts = await generateSocialPosts(cards, summary);
         return NextResponse.json({ type, content: posts });
       }

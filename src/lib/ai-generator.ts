@@ -180,7 +180,7 @@ Antworte NUR mit validem JSON:
         reason: 'Starke Performance diese Woche.',
       })),
       tip: 'Diversifiziere dein Portfolio und setze auf bewährte Sets mit hoher Nachfrage.',
-      tipTitle: 'Investment-Tipp der Woche',
+      tipTitle: 'Markt-Hinweis der Woche',
       ctaText: 'Jetzt die besten Deals sichern:',
     };
   }
@@ -232,7 +232,7 @@ export async function generateVideoScript(
     parsed = JSON.parse(jsonMatch?.[0] || '{}');
   } catch (err) {
     warnUnusable('Video-Skript', message.stop_reason, err);
-    parsed = { title: 'Top 5 Pokémon Investment-Karten', description: 'Wöchentliche Marktanalyse', tags: ['pokémon'], voiceoverText: '', scenes: [] };
+    parsed = { title: 'Top 5 Pokémon Karten der Woche', description: 'Wöchentliche Marktanalyse', tags: ['pokémon'], voiceoverText: '', scenes: [] };
   }
 
   return {

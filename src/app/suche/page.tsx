@@ -16,7 +16,7 @@ export async function generateMetadata({
   if (query) {
     return {
       title: `„${query}" Pokémon Karte Preis`,
-      description: `Cardmarket-Preise, Trend und Investment-Score für Pokémon-Karten mit „${query}". Echtzeit-Daten ohne Gewähr.`,
+      description: `Cardmarket-Preise, Trend und Markt-Score für Pokémon-Karten mit „${query}". Angaben ohne Gewähr.`,
     };
   }
   return {

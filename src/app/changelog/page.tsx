@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.0',
+    date: '30. Juli 2026',
+    label: 'Datenbestand und Kennzahl sauber getrennt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Ein Set mit einer einzigen Karte konnte die Set-Rangliste anfuehren - jetzt erst ab fuenf auswertbaren Karten und nach typischem Kartenpreis statt Mittelwert' },
+      { type: 'fixed',   text: 'Die Angabe neben dem Marktindex las sich wie der gesamte Datenbestand, war aber die Stichprobe einer Kennzahl - und kam aus einer Begrenzung im Code, nicht aus der Datenlage' },
+      { type: 'fixed',   text: 'Der Marktbericht sah nur ein einziges Set und nutzte eine andere Datenquelle als die Startseite' },
+      { type: 'fixed',   text: 'Drei Routen trennten Gewinner und Verlierer noch nach der alten, fehlerhaften Regel' },
+      { type: 'fixed',   text: 'Das Versprechen von Echtzeit-Daten stand neben dem Hinweis auf taegliche Aktualisierung - der Begriff ist ueberall entfernt' },
+      { type: 'new',     text: 'Datenabdeckung getrennt ausgewiesen: Karten, Sets und gespeicherte Preispunkte des gesamten Bestands' },
+      { type: 'changed', text: 'Die Score- und Insight-Bezeichnungen sind auf Marktanalyse umgestellt - Adressen bleiben unveraendert' },
+    ],
+  },
+  {
     version: '3.2.6',
     date: '30. Juli 2026',
-    label: 'Erfassung läuft ohne Abriss durch',
-    isLatest: true,
+    label: 'Erfassung laeuft ohne Abriss durch',
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Erfassung brach reproduzierbar nach fünf bis sechs Übergaben ab — bei Seite 20, 32 und 49 von 82, jedes Mal ohne Fehlermeldung. Die Arbeit läuft jetzt innerhalb der Anfrage statt danach' },
     ],
@@ -902,7 +917,7 @@ const RELEASES = [
     changes: [
       { type: 'new',     text: 'Komplett neues Homepage-Design im Bloomberg Terminal / TradingView / CoinMarketCap Stil' },
       { type: 'new',     text: 'Dark Mode als Standard — schwarz-anthrazit Hintergrund auf der Startseite' },
-      { type: 'new',     text: 'Ticker Strip mit echten Echtzeit-Preisen und Trends aller Top-Mover (horizontaler Scroll)' },
+      { type: 'new',     text: 'Ticker Strip mit echten Cardmarket-Preisen und Trends aller Top-Mover (horizontaler Scroll)' },
       { type: 'new',     text: '4 KPI-Karten: PMI (gewichteter Marktindex), Marktbreite, Marktstimmung, Fear & Greed Index' },
       { type: 'new',     text: 'Fear & Greed Meter — visueller Gradient-Balken aus echten Breadth- und Momentum-Daten' },
       { type: 'new',     text: 'Inline SVG Sparklines — serverseitig gerenderte Mini-Charts in Gewinner/Verlierer-Listen' },

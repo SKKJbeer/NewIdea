@@ -4,6 +4,7 @@ import { fetchTrendingCards } from '@/lib/pokemon-api';
 import { generateMarketSummary, generateNewsletterContent } from '@/lib/ai-generator';
 import { sendNewsletter } from '@/lib/newsletter';
 import { generateAndSaveMarketReport } from '@/lib/market-report-generator';
+import { splitMovers } from '@/lib/market-metrics';
 
 // Montags 07:00 UTC: Marktbericht generieren und als Newsletter-Draft in Beehiiv anlegen.
 // Video- und Social-Media-Pipeline erfolgt manuell via /studio (erfordert separate Keys).
@@ -39,8 +40,14 @@ export async function GET(request: Request) {
   // 2. Newsletter — optional. Ein Fehler hier darf den Bericht nicht entwerten.
   try {
     const cards = await fetchTrendingCards(20);
-    const sorted = [...cards].sort((a, b) => (b.trendPercent || 0) - (a.trendPercent || 0));
-    const summary = await generateMarketSummary(cards, sorted.slice(0, 5), sorted.slice(-5).reverse());
+    // Vorzeichen-Filter über die zentrale Stelle — NICHT dieselbe Liste
+    // zweimal sortieren und oben bzw. unten abschneiden. Genau das stand hier:
+    // Bei nur zwei gestiegenen Karten enthielten die „Gewinner" drei gefallene,
+    // und eine Karte konnte in beiden Listen auftauchen. Auf der Startseite war
+    // dieser Fehler seit v3.0.0 behoben — hier lief er weiter und speiste den
+    // Marktbericht.
+    const { gainers, losers } = splitMovers(cards, 5);
+    const summary = await generateMarketSummary(cards, gainers, losers);
     const newsletter = await generateNewsletterContent(summary, cards);
     const newsletterSent = await sendNewsletter(newsletter);
     results.newsletter = newsletterSent ? 'draft_created' : 'skipped_no_key';

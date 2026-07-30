@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 // Standard-OG-Bild (Startseite + Fallback für Segmente ohne eigenes Bild).
 // Wird von Next automatisch in og:image + twitter:image verdrahtet.
-export const alt = 'PokéMarket Intelligence — Pokémon Kartenmarkt in Echtzeit';
+export const alt = 'PokéMarket Intelligence — Pokémon Kartenmarkt datenbasiert';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -45,7 +45,7 @@ export default function Image() {
           </div>
         </div>
         <div style={{ display: 'flex', fontSize: 68, fontWeight: 800, lineHeight: 1.1, maxWidth: 900 }}>
-          Pokémon Kartenmarkt in Echtzeit
+          Pokémon Kartenmarkt datenbasiert
         </div>
         <div style={{ display: 'flex', fontSize: 34, color: '#94a3b8', marginTop: 28, maxWidth: 900 }}>
           Echte Cardmarket-Preise · Trends · Marktanalysen · kostenlos &amp; auf Deutsch
