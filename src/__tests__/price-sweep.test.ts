@@ -152,12 +152,20 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(sweep).toContain('Fortsetzung nicht angestoßen:');
   });
 
-  it('macht die Kette kurz statt lang', () => {
-    // BEFUND: Mit 60 Sekunden je Runde brauchte ein Tag rund 40 Übergaben, und
-    // irgendwo dazwischen riss die Kette lautlos ab (zuletzt bei Seite 20).
-    // Jede Übergabe ist ein möglicher Abrisspunkt — die zuverlässigste Kette
-    // ist die kürzeste.
-    expect(Number(/maxDuration = (\d+)/.exec(route)?.[1])).toBeGreaterThanOrEqual(300);
+  it('sichert den Stand nach JEDER Seite', () => {
+    // BEFUND: Der Stand wurde erst am Ende einer Runde geschrieben. Wurde die
+    // Runde vorzeitig beendet, war ihre gesamte Arbeit für den Seitenzeiger
+    // verloren — der Durchlauf kam über Seite 32 von 82 nicht hinaus, ohne
+    // einen Fehler zu melden.
+    expect(sweep).toMatch(/pagesThisRun \+= 1;[\s\S]{0,900}await saveSweepState\(state\);/);
+  });
+
+  it('bleibt mit dem Budget unter der kleinsten Laufzeitgrenze', () => {
+    // Ob die längere Laufzeit auf dem gebuchten Tarif gewährt wird, ist von
+    // außen nicht erkennbar. Wird eine Runde abgeschnitten, stößt sie die
+    // nächste nicht mehr an — und die Kette ist tot.
+    const budget = Number(/BUDGET_MS = ([\d_]+)/.exec(route)?.[1].replace(/_/g, ''));
+    expect(budget).toBeLessThan(60_000);
   });
 
   it('lässt den Anstoß nicht zwischenspeichern', () => {

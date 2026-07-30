@@ -36,8 +36,18 @@ export const maxDuration = 300;
 /** Genug für einen ganzen Tag (~82 Seiten bei ~15 je Runde), zu wenig für eine Dauerschleife. */
 const MAX_CHAIN = 150;
 
-/** Knapp unter `maxDuration`, damit der Stand noch gespeichert werden kann. */
-const BUDGET_MS = 240_000;
+/**
+ * Arbeitszeit je Runde.
+ *
+ * BEWUSST WEIT UNTER `maxDuration`: Ob die längere Laufzeit auf dem
+ * gebuchten Tarif tatsächlich gewährt wird, ist von außen nicht erkennbar —
+ * wird eine Runde vorher abgeschnitten, stößt sie die nächste nicht mehr an
+ * und die Kette ist tot. 45 Sekunden halten auch die kleinste Grenze ein.
+ * Dass das mehr Übergaben bedeutet, ist verkraftbar, seit der Stand nach
+ * JEDER Seite gesichert wird — eine abgebrochene Runde kostet dann höchstens
+ * eine Seite, nicht ihre gesamte Arbeit.
+ */
+const BUDGET_MS = 45_000;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');

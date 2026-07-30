@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.5] — 30. Juli 2026 · Erfassung verliert keinen Fortschritt mehr
+
+### Behoben
+- **Der Stand wurde erst am Ende einer Runde gespeichert.** Wurde eine Runde vorzeitig beendet, war ihre gesamte Arbeit für den Seitenzeiger verloren — die Messpunkte standen zwar in der Datenbank, der nächste Anlauf begann aber wieder bei derselben Seite. Der Durchlauf kam so über Seite 32 von 82 nicht hinaus, ohne einen Fehler zu melden. Gespeichert wird jetzt nach jeder einzelnen Seite
+- **Die Arbeitszeit je Runde liegt wieder klar unter der kleinsten Laufzeitgrenze.** Wird eine Runde abgeschnitten, stößt sie die nächste nicht mehr an und die Kette reißt
+
+---
+
 ## [3.2.4] — 30. Juli 2026 · Kürzere Kette in der Preiserfassung
 
 ### Behoben

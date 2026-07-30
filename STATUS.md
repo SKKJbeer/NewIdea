@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v3.2.4` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v3.2.5` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v3.2.4)
+## Was gebaut ist (Stand v3.2.5)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v3.2.5 | Erfassung sichert den Stand nach jeder Seite — vorzeitig beendete Runden verloren vorher ihren ganzen Fortschritt |
 | v3.2.4 | Kürzere Kette in der Preiserfassung — statt 40 Übergaben pro Tag nur noch etwa fünf |
 | v3.2.3 | Erfassung überlebt einen Aussetzer der Kartendatenbank — ein Abruffehler beendete vorher den ganzen Durchlauf |
 | v3.2.2 | Preiserfassung blieb nach 8 von 82 Seiten stehen — Folgeaufruf ging an die noch nicht verbundene Domain |
@@ -220,4 +221,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v3.2.4 — 30. Juli 2026*
+*Zuletzt aktualisiert: v3.2.5 — 30. Juli 2026*

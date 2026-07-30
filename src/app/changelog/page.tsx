@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.5',
+    date: '30. Juli 2026',
+    label: 'Erfassung verliert keinen Fortschritt mehr',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Der Stand wurde erst am Ende einer Runde gespeichert — eine vorzeitig beendete Runde verlor ihren gesamten Fortschritt und der Durchlauf kam über Seite 32 von 82 nicht hinaus' },
+      { type: 'fixed', text: 'Die Arbeitszeit je Runde liegt wieder klar unter der kleinsten Laufzeitgrenze, damit die Fortsetzung zuverlässig angestoßen wird' },
+    ],
+  },
+  {
     version: '3.2.4',
     date: '30. Juli 2026',
     label: 'Kürzere Kette in der Preiserfassung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Erfassung blieb bei Seite 20 von 82 stehen, ohne einen Fehler zu melden — statt rund 40 Übergaben zwischen den Läufen sind es jetzt etwa fünf' },
     ],

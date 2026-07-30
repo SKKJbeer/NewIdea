@@ -291,6 +291,17 @@ export async function sweepChunk({
       state.lastError = null;
       pagesThisRun += 1;
 
+      // STAND NACH JEDER SEITE SICHERN — nicht erst am Ende der Runde.
+      //
+      // ANLASS: Wird eine Runde vorzeitig beendet (Laufzeitgrenze, Neustart,
+      // abgebrochene Anfrage), war bis hierher die gesamte Arbeit dieser Runde
+      // für den Seitenzeiger verloren: Die Messpunkte standen zwar in der
+      // Datenbank, aber der nächste Anlauf begann wieder bei derselben Seite.
+      // Genau so kam der Durchlauf über Seite 32 nicht hinaus. Ein kleiner
+      // Schreibvorgang je Seite fällt neben einem Abruf von 10 bis 17 Sekunden
+      // nicht ins Gewicht — und macht den Fortschritt nebenbei laufend sichtbar.
+      await saveSweepState(state);
+
       // Ende der Datenbank — falls `totalCount` einmal fehlt. Maßgeblich ist
       // die UNGEFILTERTE Menge: Eine Seite kann komplett aus Vorschau-Karten
       // ohne Preis bestehen; `cards` wäre dann leer, obwohl noch tausende
