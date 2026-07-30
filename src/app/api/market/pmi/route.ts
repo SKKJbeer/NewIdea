@@ -17,7 +17,9 @@ export const revalidate = 3600;
 
 export async function GET() {
   try {
-    const cards = await getHomepageCards(50);
+    // Dieselbe Stichprobengröße wie die Startseite — sonst nennt die Seite eine
+    // andere Kartenzahl als die Schnittstelle, die denselben Index ausliefert.
+    const cards = await getHomepageCards(250);
     // Dieselbe Prüfung wie auf der Startseite — sonst könnten hier andere
     // Zahlen stehen als dort.
     const pmi = computePmi(validateMarketData(cards).clean);

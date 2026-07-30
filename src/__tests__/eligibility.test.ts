@@ -163,6 +163,17 @@ describe('Gewinner und Verlierer bleiben vorzeichenrein', () => {
     }
   });
 
+  it('Startseite, PMI-Schnittstelle und Marktbericht ziehen dieselbe Menge', () => {
+    // Sonst nennt die Seite eine andere Kartenzahl als die Schnittstelle, die
+    // denselben Index ausliefert — live standen dort 204 gegen 50.
+    const groessen = [
+      'src/app/page.tsx',
+      'src/app/api/market/pmi/route.ts',
+      'src/lib/market-report-generator.ts',
+    ].map((d) => /getHomepageCards\((\d+)\)/.exec(lies(d))?.[1]);
+    expect(new Set(groessen).size, `Stichproben: ${groessen.join(' / ')}`).toBe(1);
+  });
+
   it('der Marktbericht nutzt dieselbe Datenquelle wie die Startseite', () => {
     // Vorher: 20 Karten aus EINER Set-Abfrage — daher „6 Karten" aus einem
     // einzigen Set als „wertvollste Karten des Marktes".

@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.2',
+    date: '30. Juli 2026',
+    label: 'Index-Schnittstelle an die Startseite angeglichen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die oeffentliche Index-Schnittstelle wertete 50 Karten aus, die Startseite 204 - zwei Zahlen fuer denselben Index' },
+    ],
+  },
+  {
     version: '3.3.1',
     date: '30. Juli 2026',
     label: 'Nachtrag zur Sprachpruefung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die neue Sprachpruefung schlug am eigenen Changelog-Eintrag an - der Verlauf ist jetzt ausgenommen, wie schon bei den uebrigen Begriffen' },
     ],

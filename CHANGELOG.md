@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.2] - 30. Juli 2026 · Index-Schnittstelle an die Startseite angeglichen
+
+### Behoben
+- Die oeffentliche Index-Schnittstelle wertete weiterhin 50 Karten aus, waehrend die Startseite 204 auswies - zwei verschiedene Zahlen fuer denselben Index. Beide ziehen jetzt dieselbe Menge
+
+---
+
 ## [3.3.1] - 30. Juli 2026 · Nachtrag zur Sprachpruefung
 
 ### Behoben
