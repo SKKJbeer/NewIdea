@@ -21,6 +21,7 @@ const LEVEL_STYLE: Record<string, string> = {
 
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
+import { jsonLd } from '@/lib/json-ld';
 
 export const revalidate = 86400;
 
@@ -121,7 +122,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const related = relatedRaw.filter((m) => m.date !== date).slice(0, 3);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
-  const jsonLd = article && {
+  const structuredData = article && {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.title,
@@ -137,8 +138,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
       <ReadingProgress />
-      {jsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {structuredData && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       )}
 
       <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">

@@ -1,26 +1,20 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { serverAuthClient } from '@/lib/supabase-auth';
+import { safeRedirectPath } from '@/lib/safe-redirect';
 
 // Rückkehr von Google bzw. Apple: Der mitgegebene Code wird gegen eine Sitzung
 // getauscht, die Sitzung landet in HttpOnly-Cookies.
 //
-// Sicherheit: Weitergeleitet wird ausschließlich auf einen relativen Pfad der
-// eigenen Seite. Ohne diese Prüfung wäre `?next=https://fremde-seite` eine
-// offene Weiterleitung — ein beliebter Baustein für Phishing.
-
-function safeRedirectPath(raw: string | null): string {
-  if (!raw) return '/portfolio';
-  // Nur ein einzelner Schrägstrich am Anfang; `//host` wäre protokollrelativ
-  // und damit eine externe Adresse.
-  if (!raw.startsWith('/') || raw.startsWith('//')) return '/portfolio';
-  return raw;
-}
+// Sicherheit: Weitergeleitet wird ausschließlich auf einen Pfad der eigenen
+// Seite. Die Prüfung liegt in `safeRedirectPath` (src/lib/safe-redirect.ts) —
+// die frühere Fassung an dieser Stelle ließ sich mit einem Rückstrich und mit
+// einem Tabulator umgehen.
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const next = safeRedirectPath(url.searchParams.get('next'));
+  const next = safeRedirectPath(url.searchParams.get('next'), url.origin);
 
   // Der Anbieter meldet einen Abbruch als Fehler zurück (z. B. „access_denied").
   const providerError = url.searchParams.get('error');

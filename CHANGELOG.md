@@ -7,6 +7,30 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.35.0] — 30. Juli 2026 · Sicherheitsdurchsicht: neun Befunde geschlossen
+
+Eine vollständige Durchsicht der Plattform aus Angreifersicht. Neun Befunde, alle behoben, jeder mit einer Prüfung abgesichert (74 neue Tests, insgesamt 521).
+
+### Behoben
+- **Fremder Code über strukturierte Daten (schwerwiegend).** Die Suchmaschinen-Daten wurden mit `JSON.stringify` in einen `<script>`-Block geschrieben — und `JSON.stringify` maskiert `</script>` nicht. Auf der Suchseite floss die Suchanfrage des Besuchers ungefiltert dort hinein: Ein präparierter Link hätte im Browser jedes Besuchers fremden Code ausgeführt. Fünf Seiten waren betroffen; alle laufen jetzt über `jsonLd()`
+- **Offene Weiterleitung nach der Anmeldung (schwerwiegend).** Die Prüfung des Rücksprungziels ließ sich mit einem Rückstrich (`/\ziel`) und mit einem Tabulator umgehen — beides wandelt der Browser in eine fremde Adresse um. Ein Link auf die echte Domain hätte nach erfolgreicher Anmeldung auf einer fremden Seite geendet. Die Prüfung vergleicht jetzt die Herkunft der fertig aufgelösten Adresse
+- **Newsletter-Vorlage setzte jeden Wert ungeprüft in HTML ein** — Kartennamen aus der externen Datenquelle, Texte aus der Generierung, sogar die Bildadresse direkt in ein `src`-Attribut. Alle Werte werden jetzt maskiert, Bildquellen nur noch von den bekannten Hosts und nur über https
+- **Der Bild-Zwischenspeicher folgte Weiterleitungen blind.** Die Liste erlaubter Hosts galt damit nur für den ersten Sprung — eine Weiterleitung hätte den Server dazu gebracht, ein beliebiges internes Ziel abzurufen und nach außen zu geben. Jede Weiterleitung wird jetzt einzeln geprüft, höchstens drei
+- **Zusätzliche FFmpeg-Optionen über die Schnittlänge.** Der Wert floss ungeprüft in die Kommandozeile; jetzt ist es eine Zahl mit Grenzen. Der Speicherpfad wird ebenfalls geprüft
+- **Newsletter-Anmeldung ohne jede Begrenzung** — fünf Versuche je Adresse und Stunde, dazu eine echte Prüfung der E-Mail-Adresse statt nur „enthält ein @"
+- **Next.js von 16.2.9 auf 16.2.12** — schließt neun Meldungen, darunter serverseitige Anfragefälschung in Server Actions und die Preisgabe interner Endpunkte
+- **Ein KI-Aufruf fehlte in der Kostenerfassung** (Video-Bildunterschrift) und trug eine fest verdrahtete Modell-ID
+
+### Neu
+- **Sicherheits-Kopfzeilen auf jeder Antwort**: Inhaltsrichtlinie (CSP), `X-Frame-Options: DENY`, `nosniff`, Referrer- und Berechtigungsregeln. Das Studio ließ sich zuvor unsichtbar in eine fremde Seite einbetten — dort liegen Knöpfe, die veröffentlichen und Guthaben verbrauchen
+- `src/lib/json-ld.ts`, `src/lib/safe-redirect.ts`, `src/lib/rate-limit.ts` — je eine Stelle für Maskierung, Weiterleitungsziele und Zugriffsgrenzen
+- **74 neue Prüfungen** in `security.test.ts`, darunter dauerhafte Regeln: keine Seite darf wieder unmaskiertes JSON einbetten, neue Stellen mit rohem HTML fallen auf, die Kopfzeilen müssen vorhanden bleiben, Next.js darf nicht unter 16.2.12 fallen
+
+### Bekannt und bewertet
+`postcss` und `sharp` melden weiterhin Schwachstellen. Beide stecken innerhalb von Next.js selbst; die einzige von npm angebotene „Lösung" wäre ein Rückschritt auf Next.js 9. `postcss` läuft nur beim Bauen, `sharp` verarbeitet ausschließlich Bilder der beiden erlaubten Hosts. Ein erzwungenes Update läge außerhalb der von Next.js zugelassenen Fassung und könnte die Bildauslieferung in Produktion brechen — deshalb bewusst nicht erzwungen, sondern beobachtet.
+
+---
+
 ## [2.34.0] — 2026-07-30 · Kostenerfassung — und der Grund für das leere Guthaben
 
 ### Behoben

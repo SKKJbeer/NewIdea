@@ -8,8 +8,47 @@ import { join } from 'path';
 import { randomUUID } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { ensureFfmpeg } from '@/lib/ffmpeg-setup';
+import { recordAiUsage } from '@/lib/ai-usage';
+import { describeAiError } from '@/lib/ai-error';
 
 export const maxDuration = 300;
+
+// Modell-ID zentral und per Umgebungsvariable überschreibbar — nie als nackter
+// String in der Route (Code-Qualitätsregel 7).
+const CAPTION_MODEL = process.env.ANTHROPIC_CAPTION_MODEL || 'claude-haiku-4-5';
+
+/**
+ * Zwingt eine Zahl aus der Anfrage in einen gültigen Bereich.
+ *
+ * WARUM: `clipDuration` floss ungeprüft in die FFmpeg-Argumente
+ * (`-sseof -${clipDuration}`, `-t ${clipDuration}`). Ein Wert wie
+ * `"30 -f mp4 -y /tmp/x"` hätte dort zusätzliche Optionen eingeschleust —
+ * jede Zeichenkette wird als eigenes Argument weitergereicht. Eine Zahl mit
+ * Grenzen kann das nicht.
+ */
+function zahlImBereich(wert: unknown, min: number, max: number, standard: number): number {
+  const n = Number(wert);
+  if (!Number.isFinite(n)) return standard;
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
+/**
+ * Prüft einen Speicherpfad im Supabase-Bucket.
+ *
+ * Ohne Prüfung ließe sich mit `../` aus dem vorgesehenen Bereich heraus auf
+ * andere Objekte zugreifen. Der Zugang ist zwar passwortgeschützt — trotzdem
+ * gehört eine Eingabe aus dem Netz nie ungeprüft in einen Pfad.
+ */
+function istGueltigerSpeicherpfad(pfad: unknown): pfad is string {
+  return (
+    typeof pfad === 'string' &&
+    pfad.length > 0 &&
+    pfad.length <= 512 &&
+    !pfad.startsWith('/') &&
+    !pfad.includes('..') &&
+    /^[\w./-]+$/.test(pfad)
+  );
+}
 
 ensureFfmpeg();
 
@@ -59,8 +98,21 @@ export async function POST(request: Request) {
   const sb = getSupabase();
   if (!sb) return NextResponse.json({ error: 'Supabase nicht konfiguriert' }, { status: 503 });
 
-  const { path, clipDuration = 30, description = '', startTime } = await request.json().catch(() => ({}));
-  if (!path) return NextResponse.json({ error: 'path fehlt' }, { status: 400 });
+  const body: Record<string, unknown> = await request
+    .json()
+    .catch(() => ({} as Record<string, unknown>));
+  const path = body.path;
+  const description = typeof body.description === 'string' ? body.description : '';
+  if (!istGueltigerSpeicherpfad(path)) {
+    return NextResponse.json({ error: 'ungueltiger_pfad' }, { status: 400 });
+  }
+
+  // Grenzen: höchstens 3 Minuten Clip, höchstens 12 Stunden Vorlauf.
+  const clipDuration = zahlImBereich(body.clipDuration ?? 30, 1, 180, 30);
+  const startTime =
+    body.startTime === undefined || body.startTime === null
+      ? undefined
+      : zahlImBereich(body.startTime, 0, 43_200, 0);
 
   const uid = randomUUID();
   const inputPath = join(tmpdir(), `pm-in-${uid}.mp4`);
@@ -74,7 +126,7 @@ export async function POST(request: Request) {
     await writeFile(inputPath, Buffer.from(await dl.arrayBuffer()));
 
     // Cut + crop + brand
-    await processVideo(inputPath, outputPath, clipDuration, typeof startTime === 'number' ? startTime : undefined);
+    await processVideo(inputPath, outputPath, clipDuration, startTime);
 
     // Upload processed Reel
     const outputBuffer = await readFile(outputPath);
@@ -95,7 +147,7 @@ export async function POST(request: Request) {
       try {
         const client = new Anthropic({ apiKey: anthropicKey });
         const msg = await client.messages.create({
-          model: 'claude-haiku-4-5-20251001',
+          model: CAPTION_MODEL,
           max_tokens: 250,
           messages: [{
             role: 'user',
@@ -104,7 +156,13 @@ export async function POST(request: Request) {
         });
         const text = msg.content[0].type === 'text' ? msg.content[0].text.trim() : null;
         if (text) caption = text;
-      } catch { /* fallback caption */ }
+        await recordAiUsage({ purpose: 'social-posts', model: CAPTION_MODEL, usage: msg.usage, ok: true });
+      } catch (err) {
+        // Ohne Erfassung fehlte dieser Aufruf komplett in der Kostenübersicht.
+        const grund = describeAiError(err);
+        console.warn('Caption-Generierung fehlgeschlagen:', grund.message);
+        await recordAiUsage({ purpose: 'social-posts', model: CAPTION_MODEL, ok: false, error: grund.message });
+      }
     }
 
     return NextResponse.json({ reelPath, reelUrl: urlData?.signedUrl ?? null, caption });

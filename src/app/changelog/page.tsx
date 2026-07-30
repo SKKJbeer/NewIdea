@@ -11,10 +11,27 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.35.0',
+    date: '30. Juli 2026',
+    label: 'Sicherheitsdurchsicht: neun Befunde geschlossen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Fremder Code über strukturierte Daten war möglich — JSON.stringify maskiert </script> nicht, und auf der Suchseite floss die Suchanfrage des Besuchers ungefiltert dorthin. Fünf Seiten betroffen, alle behoben' },
+      { type: 'fixed',   text: 'Die Weiterleitung nach der Anmeldung ließ sich mit einem Rückstrich oder Tabulator auf eine fremde Seite umbiegen — der Baustein für Phishing' },
+      { type: 'fixed',   text: 'Die Newsletter-Vorlage setzte Kartennamen, Texte und sogar Bildadressen ungeprüft in HTML ein' },
+      { type: 'fixed',   text: 'Der Bild-Zwischenspeicher folgte Weiterleitungen blind — die Liste erlaubter Hosts galt nur für den ersten Sprung' },
+      { type: 'fixed',   text: 'Die Schnittlänge der Video-Verarbeitung floss ungeprüft in die FFmpeg-Kommandozeile' },
+      { type: 'fixed',   text: 'Die Newsletter-Anmeldung hatte keine Begrenzung und prüfte die Adresse nur auf ein @' },
+      { type: 'fixed',   text: 'Next.js von 16.2.9 auf 16.2.12 — schließt neun Meldungen, darunter Anfragefälschung in Server Actions' },
+      { type: 'new',     text: 'Sicherheits-Kopfzeilen auf jeder Antwort: Inhaltsrichtlinie, kein Einbetten in fremde Seiten, kein MIME-Raten' },
+      { type: 'new',     text: '74 neue Prüfungen (521 insgesamt) — darunter dauerhafte Regeln, die jeden dieser Befunde beim Bauen abfangen' },
+    ],
+  },
+  {
     version: '2.34.0',
     date: '30. Juli 2026',
     label: 'Kostenerfassung — und der Grund für das leere Guthaben',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Zwei Endpunkte lösten KI-Generierungen ohne Anmeldung aus — /api/market war ein GET, den jeder Crawler auslösen konnte' },
       { type: 'new',     text: 'KI-Verbrauch wird erfasst: Aufrufe, Token und Kosten der letzten 30 Tage nach Zweck gruppiert, im Monitoring sichtbar' },

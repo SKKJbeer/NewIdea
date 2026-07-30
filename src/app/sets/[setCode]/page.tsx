@@ -8,6 +8,7 @@ import { ApiErrorState } from '@/components/ApiErrorState';
 import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
 import { formatEurRounded } from '@/lib/format';
 import type { Metadata } from 'next';
+import { jsonLd } from '@/lib/json-ld';
 
 // BEWUSST KEIN generateStaticParams: Schlägt die TCG-API während des Builds fehl,
 // würden existierende Sets als 404 fest ins CDN gebacken (siehe karten/[id]).
@@ -72,7 +73,7 @@ export default async function SetDetailPage({ params }: Props) {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
       <NavBar />
 

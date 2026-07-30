@@ -11,6 +11,50 @@ import { NextResponse } from 'next/server';
 
 const ALLOWED_HOSTS = new Set(['images.pokemontcg.io', 'assets.pokemon.com']);
 
+/** Höchstens so viele Weiterleitungen — jede wird erneut geprüft. */
+const MAX_REDIRECTS = 3;
+
+function istErlaubt(url: URL): boolean {
+  return url.protocol === 'https:' && ALLOWED_HOSTS.has(url.hostname);
+}
+
+/**
+ * Holt das Bild und folgt Weiterleitungen SELBST.
+ *
+ * WARUM NICHT AUTOMATISCH: `fetch` folgt standardmäßig jeder Weiterleitung,
+ * ohne das Ziel noch einmal gegen die Liste zu halten. Antwortet einer der
+ * erlaubten Hosts (oder jemand, der ihn übernommen hat) mit
+ * `Location: http://169.254.169.254/...`, holt der Server dieses Ziel ab und
+ * gibt die Antwort nach außen — die Allowlist gilt dann nur noch für den
+ * ersten Sprung. Genau das ist eine serverseitige Anfragefälschung (SSRF).
+ */
+async function holeBild(start: URL): Promise<Response | null> {
+  let ziel = start;
+  for (let sprung = 0; sprung <= MAX_REDIRECTS; sprung++) {
+    const antwort = await fetch(ziel.toString(), {
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store',
+      redirect: 'manual',
+    });
+
+    if (antwort.status < 300 || antwort.status >= 400) return antwort;
+
+    const location = antwort.headers.get('location');
+    if (!location) return antwort;
+
+    let naechstes: URL;
+    try {
+      naechstes = new URL(location, ziel);
+    } catch {
+      // catch erlaubt: eine unparsbare Weiterleitung wird nicht verfolgt.
+      return null;
+    }
+    if (!istErlaubt(naechstes)) return null;
+    ziel = naechstes;
+  }
+  return null;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const raw = searchParams.get('u') || '';
@@ -21,16 +65,13 @@ export async function GET(request: Request) {
   } catch {
     return new NextResponse('bad url', { status: 400 });
   }
-  if (target.protocol !== 'https:' || !ALLOWED_HOSTS.has(target.hostname)) {
+  if (!istErlaubt(target)) {
     return new NextResponse('host not allowed', { status: 400 });
   }
 
   try {
-    const upstream = await fetch(target.toString(), {
-      signal: AbortSignal.timeout(8000),
-      cache: 'no-store',
-    });
-    if (!upstream.ok || !upstream.body) {
+    const upstream = await holeBild(target);
+    if (!upstream || !upstream.ok || !upstream.body) {
       // Fehler NICHT cachen — nächster Request versucht es erneut
       return new NextResponse('upstream error', { status: 502 });
     }

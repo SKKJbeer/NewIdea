@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.34.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.35.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.34.0)
+## Was gebaut ist (Stand v2.35.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -24,6 +24,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
 | Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR |
 | Reels Studio | ✅ Funktioniert | Auto-Reel lokal verifiziert (1080x1920, 23s, echte Marktdaten). Instagram-Auto-Publish wartet auf INSTAGRAM_ACCESS_TOKEN |
+| Sicherheit | ✅ Durchgesehen | v2.35.0: 9 Befunde behoben, Sicherheits-Kopfzeilen (CSP, kein Einbetten), 74 Prüfungen halten sie geschlossen |
 | Design-System | ✅ Fertig | Einheitlicher Dark Mode über alle Seiten, in CLAUDE.md verankert |
 | Impressum & Datenschutz | ✅ Fertig | Echte Daten, § 5 DDG, Datenschutz beschreibt echten Datenfluss (cookielos) |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | Marktbericht + Newsletter-Draft, CRON_SECRET ✅ |
@@ -165,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.35.0 | Sicherheitsdurchsicht: 9 Befunde geschlossen (XSS über strukturierte Daten, offene Weiterleitung, Newsletter-HTML, SSRF im Bild-Proxy, FFmpeg-Optionen, fehlende Kopfzeilen, Next.js 16.2.12) · 74 neue Tests |
 | v2.34.0 | KOSTENFUND: /api/market (GET!) und /api/generate loesten KI-Generierungen OHNE Auth aus — jeder Crawler konnte Guthaben verbrennen. Beide abgesichert + Regel-Test gegen Wiederholung. Neu: ai-usage.ts erfasst jeden Aufruf (Zweck, Modell, Token, Kosten, auch Fehlschlaege), Auswertung im Monitoring nach Zweck. Model-ID in article-generator zentralisiert. 447 Tests |
 | v2.33.0 | URSACHE Content-Ausfall: Anthropic-Guthaben aufgebraucht (live verifiziert, alle drei Endpunkte). BUGFIX publishMarktbericht war ein No-Op mit garantiertem Erfolg -> Studio zeigte immer "Live!", oeffentliche Seite leer. Jetzt echtes saveMarketReport + Mindestmass-Gate + Auth-Pruefung + Klartext-Ergebnis. ai-error.ts uebersetzt KI-Fehler; Artikel-Route nennt die Ursache; 2 stumme catch beim Speichern beseitigt. 428 Tests |
 | v2.32.0 | Portfolio-Konto via Supabase Auth (Google + Apple): supabase-auth.ts, /auth/callback (nur relative Weiterleitung), /api/portfolio/sync (GET/PUT, Nutzerpruefung), portfolio-sync.ts (idempotente Zusammenfuehrung, Stueckzahlen nie addieren), AccountBar mit sichtbarem Speicherort. Tabelle portfolio_holdings mit RLS im Monitoring-Setup-SQL. 409 Tests |
@@ -200,4 +202,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.34.0 — 30. Juli 2026*
+*Zuletzt aktualisiert: v2.35.0 — 30. Juli 2026*

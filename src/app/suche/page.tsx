@@ -4,6 +4,7 @@ import { SearchResultsLang } from '@/components/SearchResultsLang';
 import { searchCards } from '@/lib/pokemon-api';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
+import { jsonLd } from '@/lib/json-ld';
 
 export async function generateMetadata({
   searchParams,
@@ -64,7 +65,7 @@ export default async function SearchPage({
       {structuredData && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
         />
       )}
 

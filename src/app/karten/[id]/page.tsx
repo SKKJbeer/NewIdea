@@ -13,6 +13,7 @@ import { CardImage } from '@/components/CardImage';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
+import { jsonLd } from '@/lib/json-ld';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
 
@@ -147,7 +148,7 @@ export default async function CardDetailPage({ params }: Props) {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
 
       <NavBar />

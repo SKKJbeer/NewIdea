@@ -496,6 +496,11 @@ function OutputView({ type, content }: { type: GenType; content: unknown }) {
         </div>
         <div>
           <p className="text-[10px] font-bold text-slate-500 uppercase mb-2">Newsletter-Vorschau</p>
+          {/* Roh eingesetzt, weil eine Vorschau nur als HTML Sinn ergibt. Sicher
+              ist das erst, seit `buildNewsletterHtml` JEDEN eingesetzten Wert
+              über `escapeHtml` führt (Kartennamen aus der TCG-API, Texte aus
+              der Generierung). Bleibt das dort bestehen, ist diese Zeile
+              harmlos — fällt es weg, ist sie eine gespeicherte XSS-Lücke. */}
           <div className="border border-[#2a2a3a] rounded-xl p-3 text-sm bg-[#0d0d18] max-h-72 overflow-auto" dangerouslySetInnerHTML={{ __html: c.htmlContent }} />
         </div>
       </div>

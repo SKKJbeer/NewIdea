@@ -43,11 +43,14 @@ export const MODEL_PRICES: Record<string, { input: number; output: number }> = {
 /** Rückfall für unbekannte Modelle — lieber zu hoch schätzen als zu niedrig. */
 const FALLBACK_PRICE = { input: 5, output: 25 };
 
+// `null` ist bewusst erlaubt: Das Anthropic-SDK liefert die Cache-Felder als
+// `number | null`, wenn kein Cache im Spiel war. Ohne diese Angabe müsste
+// jede Aufrufstelle umrechnen — und genau dabei geht eine vergessen.
 export interface AiTokenUsage {
-  input_tokens?: number;
-  output_tokens?: number;
-  cache_read_input_tokens?: number;
-  cache_creation_input_tokens?: number;
+  input_tokens?: number | null;
+  output_tokens?: number | null;
+  cache_read_input_tokens?: number | null;
+  cache_creation_input_tokens?: number | null;
 }
 
 /**
