@@ -21,7 +21,11 @@ function formatReleaseDate(dateStr: string): string {
 }
 
 export default async function SetsPage() {
-  const sets = await fetchRecentSets(24).catch(() => []);
+  // BEWUSST OHNE `.catch(() => [])`: Ein verschluckter Fehler wurde hier mit
+  // `revalidate = 86400` einen GANZEN TAG als Leerzustand gecacht. Lässt man
+  // ihn laufen, behält Next.js die zuletzt erfolgreiche Seite und zeigt
+  // `error.tsx` nur bei kaltem Cache — mit Wiederholmöglichkeit.
+  const sets = await fetchRecentSets(24);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
@@ -43,9 +47,20 @@ export default async function SetsPage() {
 
       <main className="max-w-5xl mx-auto px-4 py-10 pb-16">
         {sets.length === 0 ? (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-center max-w-md mx-auto">
-            <p className="font-semibold text-amber-400">Set-Daten momentan nicht verfügbar</p>
-            <p className="text-sm mt-1 text-amber-400/60">Bitte später erneut versuchen.</p>
+          <div className="mx-auto max-w-md rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 text-center">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+              <Package size={20} />
+            </div>
+            <p className="font-semibold text-slate-200">Noch keine Sets geladen</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Die Set-Übersicht wird gleich befüllt. In der Zwischenzeit findest du jede Karte über die Suche.
+            </p>
+            <Link
+              href="/suche"
+              className="mt-4 inline-block rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-violet-700"
+            >
+              Zur Kartensuche
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

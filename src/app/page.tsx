@@ -13,6 +13,8 @@ import { formatEur, formatEurRounded, formatPercent } from '@/lib/format';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ZeroMeter, RatioBar, RowBar } from '@/components/DataBars';
+import { FearGreedPanel } from '@/components/FearGreedPanel';
+import { splitMovers, computePmi, computeFearGreed, validateMarketData, logDataIssues } from '@/lib/market-metrics';
 
 export const revalidate = 3600;
 
@@ -78,32 +80,6 @@ function Sparkline({
   );
 }
 
-// --- Fear & Greed meter display ---
-function FearGreedBar({ value }: { value: number }) {
-  const pct = Math.round(Math.min(100, Math.max(0, value)));
-  let label: string;
-  let color: string;
-  if (pct >= 75) { label = 'Extreme Gier'; color = '#34d399'; }
-  else if (pct >= 60) { label = 'Gier'; color = '#86efac'; }
-  else if (pct >= 40) { label = 'Neutral'; color = '#fbbf24'; }
-  else if (pct >= 25) { label = 'Angst'; color = '#fb7185'; }
-  else { label = 'Extreme Angst'; color = '#ef4444'; }
-  return (
-    <div>
-      <div className="flex items-end justify-between mb-1">
-        <span className="text-2xl font-black tabular-nums leading-none" style={{ color }}>{pct}</span>
-        <span className="text-[10px] font-semibold" style={{ color }}>{label}</span>
-      </div>
-      <div className="h-1.5 rounded-full bg-[#2a2a3a] overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, background: `linear-gradient(to right, #ef4444, #fbbf24, #34d399)` }}
-        />
-      </div>
-    </div>
-  );
-}
-
 function fmt(price: number | undefined): string {
   if (!price || price <= 0) return '–';
   // Ab 100 € ohne Nachkommastellen (kompakter im Raster), aber MIT deutschem
@@ -130,42 +106,39 @@ export default async function Home() {
     return <ApiErrorState backHref="/suche" backLabel="Zur Kartensuche" />;
   }
 
-  // --- Derived metrics ---
-  const withTrend = cards.filter((c) => typeof c.trendPercent === 'number');
-  const gainers = [...withTrend]
-    .sort((a, b) => (b.trendPercent ?? 0) - (a.trendPercent ?? 0))
-    .slice(0, 8);
-  const losers = [...withTrend]
-    .sort((a, b) => (a.trendPercent ?? 0) - (b.trendPercent ?? 0))
-    .slice(0, 8);
+  // --- Kennzahlen ---
+  // Zuerst prüfen, dann rechnen: Ein einzelner Ausreißer (Preis- oder
+  // Trendfehler) verschiebt einen gewichteten Index spürbar, und zwar
+  // unbemerkt. Die Befunde landen im Server-Log, statt still einzufließen.
+  const qualitaet = validateMarketData(cards);
+  logDataIssues(qualitaet, 'startseite');
+  const geprueft = qualitaet.clean;
 
-  const gainCount = withTrend.filter((c) => (c.trendPercent ?? 0) > 0).length;
-  const breadthPct = withTrend.length > 0 ? (gainCount / withTrend.length) * 100 : 50;
+  const withTrend = geprueft.filter((c) => typeof c.trendPercent === 'number');
+  // Gewinner und Verlierer streng nach Vorzeichen — keine Auffüllung.
+  const { gainers, losers } = splitMovers(geprueft, 8);
 
-  // PMI = price-weighted average trend
-  let pmiNum = 0;
-  if (withTrend.length > 0) {
-    let weightSum = 0;
-    let trendSum = 0;
-    for (const c of withTrend) {
-      const w = c.prices.market || 1;
-      trendSum += (c.trendPercent ?? 0) * w;
-      weightSum += w;
-    }
-    pmiNum = weightSum > 0 ? trendSum / weightSum : 0;
-  }
+  const gainCount = gainers.length;
+  const breadthPct = withTrend.length > 0 ? (gainCount / withTrend.length) * 100 : 0;
 
-  // Fear & Greed = composite: breadth (60%) + PMI momentum (40%)
-  const momentumScore = Math.min(100, Math.max(0, ((pmiNum + 15) / 30) * 100));
-  const fearGreed = Math.round(breadthPct * 0.6 + momentumScore * 0.4);
+  const pmi = computePmi(geprueft);
+  const pmiNum = pmi.value;
+  const fg = computeFearGreed(geprueft);
+
+  // Datenstand: der Zeitpunkt, zu dem diese Seite erzeugt wurde. Das ist der
+  // ehrliche Stand dessen, was hier steht — nicht der Stand der Quelle.
+  const datenstand = new Date().toLocaleString('de-DE', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+  });
 
   const sentiment =
-    fearGreed >= 65 ? { label: 'Bullish', dotClass: 'bg-emerald-400' }
-    : fearGreed >= 40 ? { label: 'Neutral', dotClass: 'bg-amber-400' }
+    !fg.sufficient ? { label: 'Zu wenig Daten', dotClass: 'bg-slate-600' }
+    : fg.value >= 65 ? { label: 'Bullish', dotClass: 'bg-emerald-400' }
+    : fg.value >= 40 ? { label: 'Neutral', dotClass: 'bg-amber-400' }
     : { label: 'Bearish', dotClass: 'bg-rose-400' };
 
   // Ticker: top 10 gainers + losers interleaved
-  const tickerCards = withTrend
+  const tickerCards = [...withTrend]
     .sort((a, b) => Math.abs(b.trendPercent ?? 0) - Math.abs(a.trendPercent ?? 0))
     .slice(0, 14);
 
@@ -176,7 +149,7 @@ export default async function Home() {
 
   // Top Sets aggregated from card data
   const setMap = new Map<string, { name: string; count: number; totalPrice: number; totalTrend: number; trendCount: number }>();
-  for (const card of cards) {
+  for (const card of geprueft) {
     const prev = setMap.get(card.setCode) ?? {
       name: card.set,
       count: 0,
@@ -357,17 +330,35 @@ export default async function Home() {
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">PMI Index</span>
                 </div>
-                <p
-                  className={`text-2xl font-black tabular-nums leading-none ${pmiNum >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
-                >
-                  {formatPercent(pmiNum)}
-                </p>
-                {/* Ohne Balken ist eine Prozentzahl nur eine Zahl — mit ihm
-                    sieht man sofort, ob der Ausschlag klein oder groß ist. */}
-                <div className="mt-2.5">
-                  <ZeroMeter value={pmiNum} max={10} />
-                </div>
-                <p className="mt-1.5 text-[10px] text-slate-600">Gewichteter Markttrend</p>
+                {/* Ein Index aus wenigen Karten ist kein Index, sondern ein
+                    Mittelwert — und sieht in der Oberfläche trotzdem aus wie
+                    ein Index. Unterhalb der Mindestmenge wird deshalb KEIN
+                    Wert ausgewiesen. */}
+                {pmi.sufficient ? (
+                  <>
+                    <p
+                      className={`text-2xl font-black tabular-nums leading-none ${pmiNum >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                    >
+                      {formatPercent(pmiNum)}
+                    </p>
+                    <div className="mt-2.5">
+                      <ZeroMeter value={pmiNum} max={10} />
+                    </div>
+                    <p className="mt-1.5 text-[10px] leading-snug text-slate-600">
+                      {pmi.cardCount} Karten · {pmi.setCount} {pmi.setCount === 1 ? 'Set' : 'Sets'}
+                      <br />
+                      {pmi.windowDays} Tage · Stand {datenstand}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg font-black leading-tight text-slate-500">—</p>
+                    <p className="mt-1.5 text-[10px] leading-snug text-slate-600">
+                      Noch nicht genügend Marktdaten für einen belastbaren PMI
+                      ({pmi.cardCount}/{pmi.minCards} Karten).
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Marktbreite */}
@@ -409,7 +400,7 @@ export default async function Home() {
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Fear &amp; Greed</span>
                 </div>
-                <FearGreedBar value={fearGreed} />
+                <FearGreedPanel result={fg} />
               </div>
             </div>
           </section>

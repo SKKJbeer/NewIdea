@@ -212,19 +212,44 @@ export interface SetMeta {
   symbolUrl: string;
 }
 
-export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
-  const response = await axios.get(`${TCG_API_BASE}/sets`, {
-    headers: {
-      ...tcgHeaders(),
-    },
-    params: {
-      orderBy: '-releaseDate',
-      pageSize: limit,
-    },
-    timeout: 8000,
-  });
+/**
+ * Set-Abruf MIT Wiederholung.
+ *
+ * ANLASS: `fetchRecentSets` hatte weder Wiederholung noch Fehlerbehandlung.
+ * Die Seite fing den Fehler mit `.catch(() => [])` ab — und weil sie mit
+ * `revalidate = 86400` gecacht wird, blieb ein einziger Aussetzer der TCG-API
+ * einen GANZEN TAG als „Set-Daten momentan nicht verfügbar" stehen. Genau die
+ * Falle aus Stolperstelle 28, nur für Sets statt für Karten.
+ *
+ * Wirft nach dem letzten Versuch bewusst weiter: Next.js behält dann die
+ * zuletzt erfolgreich erzeugte Seite im Cache, statt den Leerzustand
+ * einzufrieren. Der Fehlerzustand erscheint nur bei kaltem Cache.
+ */
+async function tcgSets(params: Record<string, string | number>, retries = 2): Promise<Array<Record<string, unknown>>> {
+  let lastError: unknown;
+  for (let versuch = 0; versuch <= retries; versuch++) {
+    try {
+      const response = await axios.get(`${TCG_API_BASE}/sets`, {
+        headers: { ...tcgHeaders() },
+        params,
+        timeout: 8000,
+      });
+      const data = response.data?.data;
+      if (Array.isArray(data) && data.length > 0) return data as Array<Record<string, unknown>>;
+      lastError = new Error('leere Antwort');
+    } catch (err) {
+      lastError = err;
+    }
+    if (versuch < retries) await new Promise((r) => setTimeout(r, 400 * (versuch + 1)));
+  }
+  console.warn('Set-Abfrage ohne Ergebnis:', lastError instanceof Error ? lastError.message : lastError);
+  throw lastError instanceof Error ? lastError : new Error('Set-Abfrage fehlgeschlagen');
+}
 
-  return (response.data.data as Array<Record<string, unknown>>).map((set) => {
+export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
+  const daten = await tcgSets({ orderBy: '-releaseDate', pageSize: limit });
+
+  return daten.map((set) => {
     const images = (set.images as { logo?: string; symbol?: string } | undefined) ?? {};
     return {
       id: set.id as string,
