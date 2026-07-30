@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.0] — 30. Juli 2026 · Preise werden für alle Karten erfasst
+
+Bisher entstand die Preis-Historie fast nur dort, wo jemand geklickt hat: ein Messpunkt bei jedem Kartenaufruf plus ein täglicher Lauf über rund 80 Karten. Eine Karte, die niemand aufruft, bekam nie einen Wert — und verpasste Zeit lässt sich nicht nachholen, Preise von gestern gibt es nirgends zu kaufen.
+
+### Neu
+- **Flächendeckende Preiserfassung über die gesamte Kartendatenbank** (~20.500 Karten). Der Durchlauf arbeitet in Häppchen, merkt sich seinen Stand und setzt sich selbst fort, bis der Tag vollständig erfasst ist
+- **Stand im Monitoring sichtbar** — Fortschritt, Datenstand und ein etwaiger Fehler im Klartext, statt nur im Log
+
+### Geändert
+- Gespeichert wird bei **Preisänderung** und zusätzlich mindestens **einmal pro Woche** je Karte. Zwischen zwei gleichen Preisen liegt eine gerade Linie — genau die zeichnet das Diagramm ohnehin, tägliche Wiederholungen derselben Zahl bringen keine zusätzliche Aussage
+- Der Schnappschuss beim Kartenaufruf bleibt bestehen: Er erfasst genau die Karten, die gerade jemanden interessieren, sofort
+
+---
+
 ## [3.1.4] — 30. Juli 2026 · Richtigstellung im Changelog
 
 ### Geändert

@@ -1,0 +1,147 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import {
+  needsSnapshot,
+  seitenGesamt,
+  leererStand,
+  HEARTBEAT_DAYS,
+  SWEEP_PAGE_SIZE,
+} from '@/lib/price-sweep';
+
+// ANLASS: Die Preis-Historie entstand nur dort, wo jemand geklickt hat. Eine
+// Karte, die niemand aufruft, bekam nie einen Messpunkt — und verpasste Zeit
+// lässt sich nicht nachholen, Preise von gestern gibt es nirgends zu kaufen.
+
+const lies = (datei: string) => readFileSync(join(process.cwd(), datei), 'utf8');
+
+describe('needsSnapshot — wann ein Messpunkt entsteht', () => {
+  it('schreibt für eine Karte ohne jeden Messpunkt', () => {
+    expect(needsSnapshot(12.5, undefined, '2026-07-30')).toBe(true);
+  });
+
+  it('schreibt bei geändertem Preis', () => {
+    expect(needsSnapshot(13.0, { price: 12.5, date: '2026-07-29' }, '2026-07-30')).toBe(true);
+  });
+
+  it('schreibt NICHT zweimal am selben Tag', () => {
+    // Der Durchlauf kann nach einem Abbruch dieselbe Seite erneut verarbeiten.
+    expect(needsSnapshot(12.5, { price: 12.5, date: '2026-07-30' }, '2026-07-30')).toBe(false);
+  });
+
+  it('schreibt bei unverändertem Preis erst nach dem Lebenszeichen-Abstand', () => {
+    // Zwischen zwei gleichen Preisen liegt eine gerade Linie — genau die
+    // zeichnet das Diagramm ohnehin. Täglich dieselbe Zahl zu speichern kostet
+    // Platz, ohne eine einzige zusätzliche Aussage zu liefern.
+    const gestern = { price: 12.5, date: '2026-07-29' };
+    expect(needsSnapshot(12.5, gestern, '2026-07-30')).toBe(false);
+
+    const alt = { price: 12.5, date: '2026-07-23' };
+    expect(needsSnapshot(12.5, alt, '2026-07-30')).toBe(true);
+  });
+
+  it('ignoriert Karten ohne Preis', () => {
+    // Preis-Wahrheitspflicht: Eine 0 ist keine Messung.
+    expect(needsSnapshot(0, undefined, '2026-07-30')).toBe(false);
+    expect(needsSnapshot(-1, undefined, '2026-07-30')).toBe(false);
+  });
+
+  it('hält den Lebenszeichen-Abstand über genau eine Woche', () => {
+    expect(HEARTBEAT_DAYS).toBe(7);
+  });
+
+  it('verliert keine Preisänderung, egal wie klein', () => {
+    // Jede Änderung wird erfasst — nur die Wiederholung derselben Zahl nicht.
+    expect(needsSnapshot(12.51, { price: 12.5, date: '2026-07-29' }, '2026-07-30')).toBe(true);
+  });
+});
+
+describe('Seitenaufteilung', () => {
+  it('rechnet die letzte, angebrochene Seite mit', () => {
+    expect(seitenGesamt(20479, 250)).toBe(82);
+    expect(seitenGesamt(500, 250)).toBe(2);
+    expect(seitenGesamt(501, 250)).toBe(3);
+  });
+
+  it('meldet ohne bekannte Gesamtzahl keine Seiten', () => {
+    // Sonst gälte der Durchlauf sofort als fertig.
+    expect(seitenGesamt(0)).toBe(0);
+  });
+
+  it('nutzt die größtmögliche Seite der API', () => {
+    expect(SWEEP_PAGE_SIZE).toBe(250);
+  });
+});
+
+describe('Tageswechsel', () => {
+  it('beginnt einen neuen Tag bei Seite 1', () => {
+    const stand = leererStand('2026-07-31');
+    expect(stand).toMatchObject({ nextPage: 1, runDate: '2026-07-31', seen: 0, saved: 0 });
+  });
+});
+
+describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
+  const sweep = lies('src/lib/price-sweep.ts');
+  const api = lies('src/lib/pokemon-api.ts');
+  const route = lies('src/app/api/cron/price-sweep/route.ts');
+
+  it('blättert in fester Reihenfolge', () => {
+    // Ohne `orderBy` darf die API zwischen zwei Seitenabrufen anders sortieren.
+    // Der Seitenzeiger überspränge dann Karten und läse andere doppelt — und
+    // zwar unbemerkt, weil beides plausibel aussieht.
+    expect(api).toMatch(/orderBy: 'id'/);
+  });
+
+  it('schiebt den Zeiger bei einem Fehler NICHT weiter', () => {
+    // Sonst entstünde für die fehlgeschlagene Seite ein dauerhaftes Loch:
+    // 250 Karten ohne Messpunkt für diesen Tag, ohne dass es auffällt.
+    expect(sweep).toMatch(/catch \(err\)[\s\S]{0,400}break;/);
+    expect(sweep).not.toMatch(/catch \(err\)[\s\S]{0,200}state\.nextPage \+= 1/);
+  });
+
+  it('gibt beim Abruf einer Seite auf statt leer zurückzukommen', () => {
+    // Ein leeres Ergebnis wäre vom Ende der Datenbank nicht zu unterscheiden.
+    expect(api).toContain('Seitenabruf fehlgeschlagen');
+  });
+
+  it('erkennt das Ende an der ungefilterten Seite', () => {
+    // Eine Seite kann ausschließlich aus Vorschau-Karten ohne Preis bestehen.
+    // Am gefilterten Ergebnis gemessen hätte der Durchlauf dort stumm
+    // aufgehört — mit tausenden nie erfassten Karten dahinter.
+    expect(sweep).toContain('if (rawCount === 0) break;');
+    expect(sweep).not.toContain('if (cards.length === 0) break;');
+  });
+
+  it('antwortet sofort und arbeitet danach', () => {
+    // Sonst müsste der Kettenaufruf eine volle Runde abwarten; ein Zeitlimit
+    // dort würde die bereits laufende Runde als Abbruch dastehen lassen.
+    expect(route).toMatch(/after\(runde\)/);
+  });
+
+  it('deckelt die Selbstfortsetzung', () => {
+    expect(route).toMatch(/MAX_CHAIN = \d+/);
+    expect(route).toContain('chain < MAX_CHAIN');
+  });
+
+  it('hält das Zeitbudget unter der Funktionslaufzeit', () => {
+    // Sonst wird der Aufruf abgeschnitten, bevor der Stand gespeichert ist —
+    // und der nächste beginnt wieder an derselben Stelle.
+    const budget = Number(/BUDGET_MS = ([\d_]+)/.exec(route)?.[1].replace(/_/g, ''));
+    const laufzeit = Number(/maxDuration = (\d+)/.exec(route)?.[1]) * 1000;
+    expect(budget).toBeGreaterThan(0);
+    expect(budget).toBeLessThan(laufzeit);
+  });
+
+  it('ist wie jeder Cron mit dem Geheimnis geschützt', () => {
+    expect(route).toContain('Bearer ${process.env.CRON_SECRET}');
+    expect(route).toContain('401');
+  });
+
+  it('legt die Zustandstabelle im Monitoring als SQL bereit', () => {
+    // Stolperstelle 21: Eine fehlende Tabelle legt eine Pipeline still — das
+    // muss mit fertigem SQL sichtbar sein, nicht im Log verschwinden.
+    const health = lies('src/lib/system-health.ts');
+    expect(health).toContain('CREATE TABLE IF NOT EXISTS price_sweep_state');
+    expect(health).toContain('price_snapshots_card_date');
+  });
+});

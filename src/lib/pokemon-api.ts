@@ -105,6 +105,59 @@ export async function fetchTrendingCards(limit = 20): Promise<PokemonCard[]> {
   return [];
 }
 
+export interface CardPage {
+  /** Karten mit Preis und Bild — nur die sind erfassbar. */
+  cards: PokemonCard[];
+  /**
+   * Karten auf dieser Seite VOR dem Filter.
+   *
+   * Wird gebraucht, um das Ende der Datenbank zu erkennen: Eine Seite kann
+   * ausschließlich aus Vorschau-Karten ohne Preis bestehen — `cards` ist dann
+   * leer, obwohl danach noch tausende Karten kommen.
+   */
+  rawCount: number;
+  /** Gesamtzahl der Karten in der Datenbank — für den Fortschritt des Durchlaufs. */
+  totalCount: number;
+}
+
+/**
+ * Eine Seite der GESAMTEN Kartendatenbank — für die flächendeckende
+ * Preiserfassung (`price-sweep.ts`).
+ *
+ * Zwei Dinge unterscheiden das von den übrigen Abrufen:
+ *
+ * 1. `orderBy: 'id'` ist NICHT optional. Ohne feste Sortierung darf die API
+ *    zwischen zwei Seitenabrufen anders sortieren; der Seitenzeiger überspringt
+ *    dann Karten und liest andere doppelt — und zwar unbemerkt.
+ * 2. Ein großzügiger Zeitrahmen. Eine volle Seite (250 Karten) braucht gemessen
+ *    rund 17 Sekunden; mit den üblichen 8 Sekunden schlüge jeder Abruf fehl.
+ */
+export async function fetchCardPage(page: number, pageSize = 250): Promise<CardPage> {
+  let lastError: unknown;
+  for (let versuch = 0; versuch <= 2; versuch++) {
+    try {
+      const response = await axios.get(`${TCG_API_BASE}/cards`, {
+        headers: { ...tcgHeaders() },
+        params: { page, pageSize, orderBy: 'id' },
+        timeout: 30000,
+      });
+      const data = response.data?.data;
+      if (!Array.isArray(data)) throw new Error('unerwartete Antwort');
+      return {
+        cards: mapAndFilter(data),
+        rawCount: data.length,
+        totalCount: Number(response.data?.totalCount) || 0,
+      };
+    } catch (err) {
+      lastError = err;
+      if (versuch < 2) await new Promise((r) => setTimeout(r, 800 * (versuch + 1)));
+    }
+  }
+  // Bewusst werfen statt leer zurückgeben: Der Aufrufer darf den Seitenzeiger
+  // dann NICHT weiterschieben, sonst entsteht ein dauerhaftes Loch.
+  throw lastError instanceof Error ? lastError : new Error('Seitenabruf fehlgeschlagen');
+}
+
 // Gültige Set-Codes: nur Kleinbuchstaben/Ziffern/Punkt (z.B. sv3pt5, swsh7, cel25).
 // Verhindert Lucene-Query-Injection, da der Code in `set.id:` interpoliert wird.
 export function isValidSetCode(setCode: string): boolean {

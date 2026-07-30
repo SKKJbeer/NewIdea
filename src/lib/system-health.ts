@@ -94,6 +94,24 @@ const SETUP_SQL: Record<string, string> = {
   captured_on DATE NOT NULL,
   UNIQUE (card_id, captured_on)
 );`,
+  // Stand der flächendeckenden Preiserfassung. EINE Zeile, die den
+  // Seitenzeiger hält — ohne sie beginnt jeder Aufruf wieder bei Seite 1 und
+  // der Durchlauf käme nie über den Anfang der Datenbank hinaus.
+  price_sweep_state: `CREATE TABLE IF NOT EXISTS price_sweep_state (
+  id          TEXT PRIMARY KEY,
+  next_page   INT NOT NULL DEFAULT 1,
+  run_date    DATE NOT NULL,
+  seen        INT NOT NULL DEFAULT 0,
+  saved       INT NOT NULL DEFAULT 0,
+  total_cards INT NOT NULL DEFAULT 0,
+  last_error  TEXT,
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- Ohne diesen Index dauert der Vergleich mit den letzten Messpunkten bei
+-- wachsender Tabelle immer länger — er wird pro Seite einmal ausgeführt.
+CREATE INDEX IF NOT EXISTS price_snapshots_card_date
+  ON price_snapshots (card_id, captured_on DESC);`,
   articles: `CREATE TABLE IF NOT EXISTS articles (
   date       DATE PRIMARY KEY,
   type       TEXT NOT NULL,
@@ -159,6 +177,13 @@ const PROBES: ProbeSpec[] = [
     label: 'Preis-Schnappschüsse',
     effect: 'Echte Preis-Historie in den Charts',
     dateColumn: 'captured_on',
+    maxAgeDays: 2,
+  },
+  {
+    table: 'price_sweep_state',
+    label: 'Stand der Preiserfassung',
+    effect: 'Flächendeckende Messpunkte über alle Karten',
+    dateColumn: 'updated_at',
     maxAgeDays: 2,
   },
   {

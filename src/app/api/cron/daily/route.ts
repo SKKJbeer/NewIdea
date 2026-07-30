@@ -37,6 +37,28 @@ export async function GET(request: Request) {
       results.priceSnapshotError = String(err);
       console.error('Failed to record price snapshots:', err);
     }
+
+    // FLÄCHENDECKENDE ERFASSUNG ANSTOSSEN.
+    //
+    // Die Zeilen darüber decken rund 80 Karten ab — die wichtigsten, sofort.
+    // Sie bleiben als schnelle Absicherung stehen. Den Rest der ~20.500 Karten
+    // übernimmt der Durchlauf, der sich selbst weiterreicht, bis der Tag fertig
+    // ist. Er läuft absichtlich NEBENHER: Ein Fehler dort darf den Artikel
+    // dieses Crons nicht mitreißen.
+    const basis = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+    try {
+      const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        signal: AbortSignal.timeout(8000),
+      });
+      results.priceSweepStarted = antwort.ok;
+      if (!antwort.ok) results.priceSweepError = `HTTP ${antwort.status}`;
+    } catch (err) {
+      // Der Anstoß kann in ein Zeitlimit laufen, während der Durchlauf längst
+      // arbeitet — deshalb ist das eine Notiz, kein Fehlschlag.
+      results.priceSweepStarted = 'angestoßen (Antwort nicht abgewartet)';
+      console.warn('Preis-Durchlauf: Anstoß ohne Bestätigung:', err);
+    }
   } else {
     results.priceSnapshots = 'skipped (Supabase nicht konfiguriert)';
   }
