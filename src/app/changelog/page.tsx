@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.35.2',
+    date: '30. Juli 2026',
+    label: 'Die tatsächliche Ursache: eine Spalte, die es nicht gibt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Der Artikel-Speicher schrieb in eine title-Spalte, die die Tabelle nicht hat. Der Titel wird jetzt aus dem gespeicherten Beitrag gelesen — kein SQL nötig' },
+      { type: 'fixed',   text: 'Das Blog-Listing las dieselbe fehlende Spalte und bekam deshalb immer eine leere Liste' },
+    ],
+  },
+  {
     version: '2.35.1',
     date: '30. Juli 2026',
     label: 'Artikel wurden nie gespeichert — und jeder Aufruf kostete neu',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Das Speichern der Artikel scheiterte still: zehn erzeugte Beiträge, null gespeicherte Zeilen, keine Meldung. Die Speicher-Funktion gibt jetzt die echte Ursache zurück' },
       { type: 'fixed',   text: 'Jeder Seitenaufruf erzeugte den Artikel neu — der Route fehlte generateStaticParams, wodurch die Zwischenspeicherung nie griff. Drei Abrufe lieferten drei verschiedene Titel' },

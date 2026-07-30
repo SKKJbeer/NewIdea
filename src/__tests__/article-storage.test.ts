@@ -25,6 +25,14 @@ describe('Speicher-Funktionen melden die Ursache', () => {
     expect(ARTICLES_FIX_SQL).toContain('date');
   });
 
+  it('schreibt keine title-Spalte — die Tabelle hat keine', () => {
+    // Der erste Versuch tat genau das und scheiterte an jedem Upsert.
+    const src = lies('src/lib/article-storage.ts');
+    expect(src).not.toMatch(/title:\s*article\.title/);
+    // Gelesen wird der Titel aus dem gespeicherten JSON.
+    expect(src).toContain('title:content->>title');
+  });
+
   it('behandelt den Upsert-Fehlercode 42P10 gesondert', () => {
     // Ohne eindeutigen Index auf `date` scheitert JEDER Upsert — und zwar
     // stillschweigend, weil supabase-js nicht wirft, sondern zurückgibt.

@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.35.2] — 30. Juli 2026 · Die tatsächliche Ursache: eine Spalte, die es nicht gibt
+
+Die in v2.35.1 eingebaute Fehlermeldung hat sofort geliefert: `Could not find the 'title' column of 'articles'`. Die Vermutung aus v2.35.1 (fehlender eindeutiger Index) war falsch — deshalb war es richtig, die echte Meldung sichtbar zu machen, statt zu raten.
+
+### Behoben
+- **Der Artikel-Speicher schrieb in eine Spalte, die die Tabelle nicht hat.** Der Titel wird nicht mehr doppelt abgelegt, sondern dort gelesen, wo er ohnehin steht — im gespeicherten Beitrag (`content->>title`). Kein SQL nötig, keine Migration
+- Das Blog-Listing las dieselbe fehlende Spalte und bekam deshalb immer eine leere Liste zurück; ein Lesefehler wird jetzt protokolliert statt verschluckt
+
+---
+
 ## [2.35.1] — 30. Juli 2026 · Artikel wurden nie gespeichert — und jeder Aufruf kostete neu
 
 Beim Nachziehen der Inhalte aufgefallen: Zehn erfolgreich erzeugte Artikel, null gespeicherte Zeilen, keine einzige Fehlermeldung. Drei Abrufe derselben Artikelseite lieferten drei verschiedene Titel.
