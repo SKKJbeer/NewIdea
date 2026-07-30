@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
 import {
   generateMarketSummary,
@@ -9,7 +10,14 @@ import {
 
 // On-demand content generation for the control dashboard.
 // Returns generated content for PREVIEW — does not auto-publish.
+// ACHTUNG: Löst pro Aufruf eine vollständige KI-Generierung aus. War ohne
+// jede Prüfung öffentlich erreichbar — das ist nicht nur ein Sicherheits-,
+// sondern vor allem ein Kostenproblem (siehe /api/market).
 export async function POST(request: Request) {
+  if (!isStudioAuthedFromRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { type } = await request.json().catch(() => ({ type: 'market' }));
 
   if (!process.env.ANTHROPIC_API_KEY) {

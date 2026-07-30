@@ -9,6 +9,7 @@ import { fetchTrendingCards } from './pokemon-api';
 import { generateMarketSummary } from './ai-generator';
 import { saveMarketReport } from './market-report-storage';
 import { describeAiError } from './ai-error';
+import { recordAiUsage } from './ai-usage';
 import type { PokemonCard } from '@/types';
 
 /**
@@ -110,6 +111,12 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
   } catch (err) {
     const info = describeAiError(err);
     console.error(`Marktbericht KW ${weekNumber} fehlgeschlagen: ${info.message} :: ${info.raw}`);
+    await recordAiUsage({
+      purpose: 'marktbericht',
+      model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
+      ok: false,
+      error: info.message,
+    });
     return { status: 'failed', weekStart, weekNumber, error: info.message };
   }
 }

@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.33.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.34.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.33.0)
+## Was gebaut ist (Stand v2.34.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.34.0 | KOSTENFUND: /api/market (GET!) und /api/generate loesten KI-Generierungen OHNE Auth aus — jeder Crawler konnte Guthaben verbrennen. Beide abgesichert + Regel-Test gegen Wiederholung. Neu: ai-usage.ts erfasst jeden Aufruf (Zweck, Modell, Token, Kosten, auch Fehlschlaege), Auswertung im Monitoring nach Zweck. Model-ID in article-generator zentralisiert. 447 Tests |
 | v2.33.0 | URSACHE Content-Ausfall: Anthropic-Guthaben aufgebraucht (live verifiziert, alle drei Endpunkte). BUGFIX publishMarktbericht war ein No-Op mit garantiertem Erfolg -> Studio zeigte immer "Live!", oeffentliche Seite leer. Jetzt echtes saveMarketReport + Mindestmass-Gate + Auth-Pruefung + Klartext-Ergebnis. ai-error.ts uebersetzt KI-Fehler; Artikel-Route nennt die Ursache; 2 stumme catch beim Speichern beseitigt. 428 Tests |
 | v2.32.0 | Portfolio-Konto via Supabase Auth (Google + Apple): supabase-auth.ts, /auth/callback (nur relative Weiterleitung), /api/portfolio/sync (GET/PUT, Nutzerpruefung), portfolio-sync.ts (idempotente Zusammenfuehrung, Stueckzahlen nie addieren), AccountBar mit sichtbarem Speicherort. Tabelle portfolio_holdings mit RLS im Monitoring-Setup-SQL. 409 Tests |
 | v2.31.0 | Portfolio-Tests (portfolio-edge 33, portfolio-api 18 Funktionstests der Preis-Route, newsletter-watchlist 29) — 364 Tests. Behoben: normalizeHolding erzeugte NaN bei null/undefined-Feldern; Newsletter ohne rel=sponsored, mit toten Footer-Links, Kaufaufforderung und Emojis, ohne CONTENT_RULES im Prompt; 5 fetch-Aufrufe (Cardmarket, Instagram) ohne Timeout — Regel war zu eng gefasst |
@@ -199,4 +200,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v2.33.0 — 30. Juli 2026*
+*Zuletzt aktualisiert: v2.34.0 — 30. Juli 2026*

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { loadUsageSummary, AI_USAGE_SETUP_SQL } from '@/lib/ai-usage';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { collectSystemHealth } from '@/lib/system-health';
@@ -126,7 +127,15 @@ export async function GET(request: Request) {
     }
   }
 
+  // KI-Verbrauch der letzten 30 Tage — beantwortet die Frage „wofür ging das
+  // Guthaben drauf?", die sich ohne Erfassung nur raten lässt.
+  const aiUsage = await loadUsageSummary(30).catch((err) => {
+    console.warn('KI-Verbrauch konnte nicht geladen werden:', err);
+    return null;
+  });
+
   const data = {
+    aiUsage: aiUsage ? { ...aiUsage, setupSql: aiUsage.missingTable ? AI_USAGE_SETUP_SQL : null } : null,
     // Build info
     build: {
       version: process.env.NEXT_PUBLIC_APP_VERSION || '?',

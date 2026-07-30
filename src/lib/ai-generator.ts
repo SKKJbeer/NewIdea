@@ -3,6 +3,7 @@ import { PokemonCard, NewsletterContent, VideoScript, SocialPost, MarketSummary 
 import { buildNewsletterHtml } from '@/lib/newsletter-template';
 import { CONTENT_RULES, STYLE_RULES } from '@/lib/article-generator';
 import { formatEur, formatPercent } from '@/lib/format';
+import { recordAiUsage, type AiPurpose } from '@/lib/ai-usage';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -24,6 +25,27 @@ function warnUnusable(was: string, stopReason: string | null | undefined, err: u
   } else {
     console.error(`${was}: Antwort nicht als JSON lesbar (stop_reason=${stopReason ?? 'unbekannt'}):`, err);
   }
+}
+
+/**
+ * Erfasst Verbrauch und Kosten eines Aufrufs.
+ *
+ * Wird nach JEDEM Aufruf gerufen — auch nach einem gescheiterten. Ein Aufruf,
+ * der am Guthaben scheitert, kostet nichts, aber ohne seine Spur sieht es aus,
+ * als sei gar nichts passiert.
+ */
+async function track(
+  purpose: AiPurpose,
+  message: { usage?: unknown } | null,
+  error?: string,
+): Promise<void> {
+  await recordAiUsage({
+    purpose,
+    model: MODEL,
+    usage: (message?.usage ?? {}) as Record<string, number>,
+    ok: !error,
+    error,
+  });
 }
 
 export async function generateMarketSummary(
@@ -66,6 +88,7 @@ Antworte NUR mit dem Berichtstext, ohne Überschrift und ohne Vorrede.`,
       },
     ],
   });
+  await track('marktbericht', message);
 
   if (message.stop_reason === 'max_tokens') {
     console.error('Marktbericht: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)');
@@ -124,6 +147,7 @@ Antworte NUR mit validem JSON:
       },
     ],
   });
+  await track('newsletter', message);
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
 
@@ -198,6 +222,7 @@ export async function generateVideoScript(
       },
     ],
   });
+  await track('video-skript', message);
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
 
@@ -238,6 +263,7 @@ export async function generateSocialPosts(
       },
     ],
   });
+  await track('social-posts', message);
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '[]';
 

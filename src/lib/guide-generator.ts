@@ -5,6 +5,7 @@ import { GUIDE_TOPICS, type GuideTopic } from './guide-topics';
 import { findViolations, type ContentViolation } from './content-rules';
 import { saveGeneratedGuide, listGeneratedGuideSlugs } from './guide-storage';
 import { describeAiError } from './ai-error';
+import { recordAiUsage } from './ai-usage';
 
 // Automatisierte Guide-Generierung mit hartem Qualitäts-Gate:
 // Ein Guide, der die Content-Regeln (Wahrheitspflicht, Neutralität, Schreibstil)
@@ -121,6 +122,8 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
       messages: [{ role: 'user', content: buildGuidePrompt(topic) }],
     });
 
+    await recordAiUsage({ purpose: 'guide', model: MODEL, usage: message.usage as never, ok: true });
+
     if (message.stop_reason === 'max_tokens') {
       console.error(`Guide ${topic.slug}: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)`);
     }
@@ -167,6 +170,7 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
   } catch (err) {
     const info = describeAiError(err);
     console.error(`Guide-Generierung fehlgeschlagen (${topic.slug}): ${info.message} :: ${info.raw}`);
+    await recordAiUsage({ purpose: 'guide', model: MODEL, ok: false, error: info.message });
     return { status: 'failed', slug: topic.slug, error: info.message };
   }
 }

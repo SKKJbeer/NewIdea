@@ -3,6 +3,11 @@ import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
 import { loadArticle, saveArticle, listSavedArticleMeta } from './article-storage';
 import { describeAiError } from './ai-error';
+import { recordAiUsage } from './ai-usage';
+
+// Zentrale Model-ID mit Env-Override (Code-Regel 7) — bei Deprecation nur
+// eine Stelle bzw. eine Variable ändern.
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
@@ -646,7 +651,7 @@ export async function generateArticle(
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await client.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
+      model: MODEL,
       // WICHTIG: Ein vollständiger Artikel (Intro + 4-5 Abschnitte + Kernpunkte +
       // Tags + Quellen als JSON) überschreitet 2048 Tokens deutlich. Zu knapp
       // bemessen wird die JSON-Antwort mitten im Satz abgeschnitten, JSON.parse
@@ -657,6 +662,8 @@ export async function generateArticle(
     });
 
     // Abgeschnittene Antworten sichtbar machen statt sie als Parse-Fehler zu tarnen.
+    await recordAiUsage({ purpose: 'artikel', model: MODEL, usage: message.usage as never, ok: true });
+
     if (message.stop_reason === 'max_tokens') {
       console.error(
         `Artikel ${date}: Antwort wurde vom Token-Limit abgeschnitten (stop_reason=max_tokens) — max_tokens erhöhen`,
@@ -710,6 +717,7 @@ export async function generateArticle(
     // entstehen (siehe CLAUDE.md, Stolperstelle 21).
     const info = describeAiError(err);
     console.error(`Artikel-Generierung ${date} fehlgeschlagen: ${info.message} :: ${info.raw}`);
+    await recordAiUsage({ purpose: 'artikel', model: MODEL, ok: false, error: info.message });
     options.onAiError?.({ message: info.message, raw: info.raw });
 
     const fallback = fallbackArticle(type, dateLabel, cardSummary);

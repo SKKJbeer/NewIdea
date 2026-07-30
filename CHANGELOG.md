@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.34.0] — 2026-07-30 · Kostenerfassung — und der Grund für das leere Guthaben
+
+### Behoben
+- **Zwei Endpunkte lösten KI-Generierungen ohne jede Anmeldung aus.** `/api/market` war ein schlichter GET-Aufruf: jeder Crawler, Bot oder Scanner, der ihn fand, startete eine vollständige Marktanalyse — und damit einen der teuersten Aufrufe der Plattform. `/api/generate` war ebenso offen. Beide verlangen jetzt die Studio-Anmeldung
+- Die Model-ID stand in `article-generator.ts` fest im Code statt zentral über die Umgebungsvariable (Code-Regel 7)
+
+### Neu
+- **KI-Verbrauch wird erfasst und im Monitoring ausgewiesen**: Aufrufe, Token und Kosten der letzten 30 Tage, gruppiert nach Zweck (Artikel, Guide, Marktbericht, Newsletter, Video, Social) — teuerster Zweck zuerst, dazu die Kosten von heute
+- Auch **gescheiterte** Aufrufe werden erfasst. Ein Aufruf, der am Guthaben scheitert, kostet nichts — aber ohne seine Spur sieht es aus, als sei gar nichts passiert
+- Ein Test verhindert die Wiederholung: Jede neue Route, die eine Generierung auslösen kann, muss einen Zugriffsschutz haben, sonst schlägt der Build fehl
+
+### Wichtig
+Die eingesetzte Modellklasse (Opus) kostet **5 $ je Million Eingabe- und 25 $ je Million Ausgabe-Token** — fünfmal so viel wie die kleinste Klasse. Ein einzelner Artikel liegt bei etwa 0,17 $. Sobald die Erfassung ein paar Tage läuft, steht im Monitoring, wohin das Geld tatsächlich fließt.
+
+---
+
 ## [2.33.0] — 2026-07-30 · Ursache des Content-Ausfalls gefunden
 
 ### Behoben

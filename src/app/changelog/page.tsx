@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.34.0',
+    date: '30. Juli 2026',
+    label: 'Kostenerfassung — und der Grund für das leere Guthaben',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Zwei Endpunkte lösten KI-Generierungen ohne Anmeldung aus — /api/market war ein GET, den jeder Crawler auslösen konnte' },
+      { type: 'new',     text: 'KI-Verbrauch wird erfasst: Aufrufe, Token und Kosten der letzten 30 Tage nach Zweck gruppiert, im Monitoring sichtbar' },
+      { type: 'new',     text: 'Ein Test verhindert die Wiederholung: Neue Routen mit KI-Aufruf brauchen einen Zugriffsschutz, sonst schlägt der Build fehl' },
+      { type: 'changed', text: 'Auch gescheiterte Aufrufe werden erfasst — sonst sieht ein Ausfall aus, als sei nichts passiert' },
+    ],
+  },
+  {
     version: '2.33.0',
     date: '30. Juli 2026',
     label: 'Ursache des Content-Ausfalls gefunden',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Das „Live!“ im Studio war eine reine Behauptung — die Veröffentlichung speicherte nichts und konnte gar nicht fehlschlagen. Jetzt wird wirklich gespeichert und das echte Ergebnis angezeigt' },
       { type: 'fixed',   text: 'Fehler der KI-Schnittstelle werden in Klartext übersetzt statt als rohes JSON angezeigt' },
