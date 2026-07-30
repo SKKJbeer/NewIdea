@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v2.32.1` · **Stand:** 29. Juli 2026 · **Branch:** `main`
+**Version:** `v2.33.0` · **Stand:** 29. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v2.32.1)
+## Was gebaut ist (Stand v2.33.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -165,6 +165,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v2.33.0 | URSACHE Content-Ausfall: Anthropic-Guthaben aufgebraucht (live verifiziert, alle drei Endpunkte). BUGFIX publishMarktbericht war ein No-Op mit garantiertem Erfolg -> Studio zeigte immer "Live!", oeffentliche Seite leer. Jetzt echtes saveMarketReport + Mindestmass-Gate + Auth-Pruefung + Klartext-Ergebnis. ai-error.ts uebersetzt KI-Fehler; Artikel-Route nennt die Ursache; 2 stumme catch beim Speichern beseitigt. 428 Tests |
 | v2.32.0 | Portfolio-Konto via Supabase Auth (Google + Apple): supabase-auth.ts, /auth/callback (nur relative Weiterleitung), /api/portfolio/sync (GET/PUT, Nutzerpruefung), portfolio-sync.ts (idempotente Zusammenfuehrung, Stueckzahlen nie addieren), AccountBar mit sichtbarem Speicherort. Tabelle portfolio_holdings mit RLS im Monitoring-Setup-SQL. 409 Tests |
 | v2.31.0 | Portfolio-Tests (portfolio-edge 33, portfolio-api 18 Funktionstests der Preis-Route, newsletter-watchlist 29) — 364 Tests. Behoben: normalizeHolding erzeugte NaN bei null/undefined-Feldern; Newsletter ohne rel=sponsored, mit toten Footer-Links, Kaufaufforderung und Emojis, ohne CONTENT_RULES im Prompt; 5 fetch-Aufrufe (Cardmarket, Instagram) ohne Timeout — Regel war zu eng gefasst |
 | v2.30.0 | Test-Offensive: 284 statt 149 Tests (7 neue Dateien: studio-auth, price-truth, reel-concepts, homepage-data, cached-image, i18n-names, code-rules). Gefundene Fehler behoben: 6× englisches Zahlenformat zurück, Newsletter an format.ts vorbei, Prozent-Umbruch (NBSP), Reel-Rotation wechselte mitten in der Woche, 2× String(error) nach außen, 3× stilles catch + zu knappe Token-Limits, Monitoring-fetch ohne Timeout, helle Boxen im Studio |
@@ -191,11 +192,11 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 | 3 | **Reel-Link tot**: Caption-URL nutzt dieselbe Variable → auch manuell gepostete Reels führen ins Leere | Offen — mit Befund 1 erledigt |
 | 4 | **Affiliate**: 26 Kauflink-Stellen ohne eigene Tracking-ID → 0 € Provision unabhängig vom Traffic | Offen (deine Aktion: Links beantragen) |
 | 5 | **Keine E-Mail-Erfassung**: Newsletter-Formular seit v2.5.4 global entfernt → jeder Besucher ist ein Einmalbesuch | Offen |
-| 8 | **Kein echter Inhalt live**: Marktbericht nie erzeugt, alle Artikel sind Ersatztexte, 0 von 12 Guides erstellt | Auslöser seit v2.29.0 im Monitoring — deine Aktion: drei Klicks |
+| 8 | **Kein echter Inhalt live**: Marktbericht nie erzeugt, alle Artikel sind Ersatztexte, 0 von 12 Guides erstellt | **Ursache gefunden (30.07.): Anthropic-Guthaben aufgebraucht.** Live verifiziert an allen drei Endpunkten. Deine Aktion: aufladen, danach die drei Klicks im Monitoring |
 | 9 | **Portfolio-Konto gebaut, aber abgeschaltet**: Code vollständig (v2.32.0), Anmeldung per `NEXT_PUBLIC_PORTFOLIO_LOGIN=on` freizuschalten | Bewusst zurückgestellt |
 | 6 | **Guide-Pipeline**: 12 Themen warten, 0 erzeugt | Diagnose eingebaut (v2.21.0) — Ursache jetzt sichtbar |
 | 7 | **Blindflug im Monitoring**: prüfte nur Konfiguration, nicht Ergebnisse | ✅ Behoben (v2.21.0) |
 
 ---
 
-*Zuletzt aktualisiert: v2.32.1 — 29. Juli 2026*
+*Zuletzt aktualisiert: v2.33.0 — 30. Juli 2026*

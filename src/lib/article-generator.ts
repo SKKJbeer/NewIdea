@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
 import { loadArticle, saveArticle, listSavedArticleMeta } from './article-storage';
+import { describeAiError } from './ai-error';
 import type { PokemonCard } from '@/types';
 
 export type ArticleType = 'markt' | 'karte' | 'strategie' | 'set' | 'ausblick' | 'guide' | 'rueckblick';
@@ -562,6 +563,13 @@ export interface GenerateArticleOptions {
    * Seitenaufrufen setzen, sonst löst jeder Besuch einen KI-Aufruf aus.
    */
   replaceFallback?: boolean;
+  /**
+   * Wird aufgerufen, wenn die KI-Erzeugung scheitert und der Ersatztext greift.
+   *
+   * Ohne diesen Weg meldet der Aufrufer nur „ist ein Ersatztext" — und das sah
+   * wie ein Programmfehler aus, obwohl schlicht das Guthaben leer war.
+   */
+  onAiError?: (info: { message: string; raw: string }) => void;
 }
 
 /** Generate + persist. For cron jobs only — never call from a user-facing page. */
@@ -690,21 +698,28 @@ export async function generateArticle(
       generatedAt: new Date().toISOString(),
     };
     // Persist so future requests are instant and the article is available historically.
-    await saveArticle(date, type, article).catch(() => {});
+    await saveArticle(date, type, article).catch((saveErr) => {
+      // Nicht stumm: Ein Artikel, der erzeugt aber nicht gespeichert wurde,
+      // wird beim naechsten Aufruf erneut erzeugt — und kostet erneut.
+      console.error(`Artikel ${date} konnte nicht gespeichert werden:`, saveErr);
+    });
     return article;
   } catch (err) {
-    // Ursache IMMER protokollieren — ein stiller catch hat hier monatelang
-    // verdeckt, dass gar keine echten Artikel entstehen (siehe CLAUDE.md, Stolperstelle 21).
-    console.error(
-      `Artikel-Generierung ${date} fehlgeschlagen:`,
-      err instanceof Error ? err.message : err,
-    );
+    // Ursache IMMER protokollieren UND an den Aufrufer melden — ein stiller
+    // catch hat hier monatelang verdeckt, dass gar keine echten Artikel
+    // entstehen (siehe CLAUDE.md, Stolperstelle 21).
+    const info = describeAiError(err);
+    console.error(`Artikel-Generierung ${date} fehlgeschlagen: ${info.message} :: ${info.raw}`);
+    options.onAiError?.({ message: info.message, raw: info.raw });
+
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
     fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
-    await saveArticle(date, type, fallback).catch(() => {});
+    await saveArticle(date, type, fallback).catch((saveErr) => {
+      console.error(`Ersatzartikel ${date} konnte nicht gespeichert werden:`, saveErr);
+    });
     return fallback;
   }
 }

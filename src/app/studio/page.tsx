@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { publishMarktbericht } from '@/app/actions';
+import type { MarketSummary } from '@/types';
 import { MonitoringPanel } from '@/components/MonitoringPanel';
 import { ReelsStudio } from '@/components/ReelsStudio';
 import { AutoReelPanel } from '@/components/AutoReelPanel';
@@ -132,7 +133,10 @@ export default function StudioPage() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [published, setPublished] = useState(false);
+  // Kein blosses `true` mehr: Hier steht das ECHTE Ergebnis des Speicherns
+  // inklusive Klartext-Ursache. Vorher meldete die Aktion immer Erfolg, ohne
+  // je etwas gespeichert zu haben.
+  const [publishResult, setPublishResult] = useState<{ ok: boolean; message: string } | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const stepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -210,18 +214,19 @@ export default function StudioPage() {
 
   function clearOutput() {
     setOutput(null);
-    setPublished(false);
+    setPublishResult(null);
     localStorage.removeItem(STORAGE_KEY);
   }
 
   async function publish() {
     setPublishing(true);
-    setPublished(false);
+    setPublishResult(null);
     try {
-      await publishMarktbericht();
-      setPublished(true);
-    } catch {
-      setError('Veröffentlichung fehlgeschlagen — bitte nochmal versuchen');
+      const result = await publishMarktbericht((output?.content ?? null) as MarketSummary | null);
+      setPublishResult(result);
+    } catch (err) {
+      console.error('Veröffentlichung fehlgeschlagen:', err);
+      setPublishResult({ ok: false, message: 'Veröffentlichung fehlgeschlagen — bitte nochmal versuchen.' });
     } finally {
       setPublishing(false);
     }
@@ -425,7 +430,7 @@ export default function StudioPage() {
                       <p className="text-xs font-semibold text-violet-800">Marktbericht veröffentlichen</p>
                       <p className="text-[10px] text-violet-500">Aktualisiert die öffentliche Seite sofort</p>
                     </div>
-                    {published ? (
+                    {publishResult?.ok ? (
                       <div className="flex items-center gap-2">
                         <span className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-lg"><Check size={11} /> Live!</span>
                         <Link href="/marktbericht" target="_blank" className="text-xs text-violet-600 underline">Ansehen →</Link>
@@ -437,6 +442,17 @@ export default function StudioPage() {
                       </button>
                     )}
                   </div>
+                )}
+
+                {/* Ergebnis im Klartext — auch und gerade im Fehlerfall. */}
+                {publishResult && (
+                  <p className={`mx-4 mb-3 text-[11px] rounded-lg px-3 py-2 border ${
+                    publishResult.ok
+                      ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                      : 'text-amber-400 bg-amber-500/5 border-amber-500/20'
+                  }`}>
+                    {publishResult.message}
+                  </p>
                 )}
 
                 <div className="p-4"><OutputView type={output.type} content={output.content} /></div>

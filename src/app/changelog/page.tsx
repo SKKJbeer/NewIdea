@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '2.33.0',
+    date: '30. Juli 2026',
+    label: 'Ursache des Content-Ausfalls gefunden',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Das „Live!“ im Studio war eine reine Behauptung — die Veröffentlichung speicherte nichts und konnte gar nicht fehlschlagen. Jetzt wird wirklich gespeichert und das echte Ergebnis angezeigt' },
+      { type: 'fixed',   text: 'Fehler der KI-Schnittstelle werden in Klartext übersetzt statt als rohes JSON angezeigt' },
+      { type: 'fixed',   text: 'Der Artikel-Auslöser nennt jetzt die Ursache, statt nur „ist ein Ersatztext“ zu melden' },
+      { type: 'changed', text: 'Die Veröffentlichung prüft serverseitig die Anmeldung' },
+    ],
+  },
+  {
     version: '2.32.1',
     date: '29. Juli 2026',
     label: 'Anmeldung vorerst abgeschaltet',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Die Anmeldeknöpfe erscheinen erst nach expliziter Freischaltung — so lässt sich Supabase in Ruhe einrichten, ohne dass Besucher eine halb fertige Anmeldung sehen' },
     ],

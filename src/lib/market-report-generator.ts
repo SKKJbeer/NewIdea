@@ -8,6 +8,7 @@
 import { fetchTrendingCards } from './pokemon-api';
 import { generateMarketSummary } from './ai-generator';
 import { saveMarketReport } from './market-report-storage';
+import { describeAiError } from './ai-error';
 import type { PokemonCard } from '@/types';
 
 /**
@@ -107,8 +108,8 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
       cards: cards.length,
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`Marktbericht KW ${weekNumber} fehlgeschlagen:`, message);
-    return { status: 'failed', weekStart, weekNumber, error: message };
+    const info = describeAiError(err);
+    console.error(`Marktbericht KW ${weekNumber} fehlgeschlagen: ${info.message} :: ${info.raw}`);
+    return { status: 'failed', weekStart, weekNumber, error: info.message };
   }
 }

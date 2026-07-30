@@ -29,7 +29,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const article = await generateArticle(type, date, { replaceFallback: true });
+    // Die Ursache eines Fehlschlags einsammeln, damit die Antwort sie nennen
+    // kann. Ohne das meldete die Route nur „ist ein Ersatztext" — und ein
+    // leeres KI-Guthaben sah damit wie ein Programmfehler aus.
+    let aiError: { message: string; raw: string } | null = null;
+    const article = await generateArticle(type, date, {
+      replaceFallback: true,
+      onAiError: (info) => { aiError = info; },
+    });
     revalidatePath(`/artikel/${date}`);
     revalidatePath('/artikel');
     return NextResponse.json(
@@ -39,6 +46,9 @@ export async function POST(request: Request) {
         title: article.title,
         // isStatic bedeutet: es ist weiterhin der Fallback — die Generierung hat nicht gegriffen.
         isFallback: article.isStatic === true,
+        // Klartext-Ursache, wenn die Erzeugung nicht griff. `raw` bleibt
+        // draussen — interne Details gehoeren nicht in eine Antwort.
+        reason: aiError ? (aiError as { message: string }).message : undefined,
         sections: article.sections.length,
         readingTimeMin: article.readingTimeMin,
       },

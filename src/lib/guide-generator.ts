@@ -4,6 +4,7 @@ import { GUIDES } from './guides';
 import { GUIDE_TOPICS, type GuideTopic } from './guide-topics';
 import { findViolations, type ContentViolation } from './content-rules';
 import { saveGeneratedGuide, listGeneratedGuideSlugs } from './guide-storage';
+import { describeAiError } from './ai-error';
 
 // Automatisierte Guide-Generierung mit hartem Qualitäts-Gate:
 // Ein Guide, der die Content-Regeln (Wahrheitspflicht, Neutralität, Schreibstil)
@@ -164,8 +165,8 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
 
     return { status: 'created', slug: guide.slug, title: guide.title };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`Guide-Generierung fehlgeschlagen (${topic.slug}):`, err);
-    return { status: 'failed', slug: topic.slug, error: message };
+    const info = describeAiError(err);
+    console.error(`Guide-Generierung fehlgeschlagen (${topic.slug}): ${info.message} :: ${info.raw}`);
+    return { status: 'failed', slug: topic.slug, error: info.message };
   }
 }

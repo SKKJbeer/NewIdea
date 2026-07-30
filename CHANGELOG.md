@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [2.33.0] — 2026-07-30 · Ursache des Content-Ausfalls gefunden
+
+### Behoben
+- **Das „Live!" im Studio war eine reine Behauptung.** `publishMarktbericht()` rief ausschließlich die Cache-Erneuerung auf und speicherte **nichts** — die Funktion konnte gar nicht fehlschlagen, also war die Meldung immer grün. Auf der öffentlichen Seite stand derweil „Erster Bericht noch ausstehend". Jetzt wird der angezeigte Text tatsächlich gespeichert, durchläuft dasselbe Mindestmaß-Gate wie der Cron, und das echte Ergebnis steht im Klartext darunter
+- Die Veröffentlichung prüft jetzt serverseitig die Anmeldung — eine Server-Action ist öffentlich erreichbar, auch wenn nur das Studio sie aufruft
+- **Fehler der KI-Schnittstelle werden übersetzt.** Aus `400 {"type":"error",…}` wird „Das Guthaben der KI-Schnittstelle ist aufgebraucht" — mit dem Hinweis, wer was tun muss
+- **Der Artikel-Auslöser nennt jetzt die Ursache.** Vorher meldete er nur „ist ein Ersatztext", was wie ein Programmfehler aussah
+- Zwei weitere stumme `catch`-Blöcke beim Speichern von Artikeln beseitigt
+
+### Wichtig
+Marktbericht, Artikel und Guides scheitern derzeit **alle an derselben Ursache**: Das Anthropic-Guthaben ist aufgebraucht. Das ist kein Codefehler — nach dem Aufladen laufen alle drei sofort. Ab dieser Version sagen die Auslöser das auch so.
+
+---
+
 ## [2.32.1] — 2026-07-29 · Anmeldung vorerst abgeschaltet
 
 ### Geändert
