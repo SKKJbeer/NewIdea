@@ -7,20 +7,27 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
-## [3.1.3] — 30. Juli 2026 · Versionsanzeige in der Fußzeile
-
-### Behoben
-- **In der Fußzeile stand auf der Live-Seite ein nacktes „v" ohne Nummer.** Damit war der Pflicht-Schritt „Live-Seite verifizieren: Fußzeile zeigt die neue Version" auf Produktion nie durchführbar — einem Deployment sah man schlicht nicht an, ob es angekommen war. Die Version steht jetzt als Konstante im Code (`src/lib/app-version.ts`); ein Test hält sie mit `package.json` zusammen und bricht den Build, wenn beim Versionssprung eine der beiden Stellen vergessen wird
+## [3.1.4] — 30. Juli 2026 · Richtigstellung im Changelog
 
 ### Geändert
-- **Die Erklärung in v3.1.2 war falsch.** Dort stand, der Build-Befehl laufe an npm vorbei. Das war er nicht: Auch über npm gebaut blieb die Anzeige leer, ebenso über `env` in der Build-Konfiguration. Beide Wege scheitern lautlos — der Code sieht jeweils korrekt aus und liefert nichts. Die Änderung an `vercel.json` ist deshalb zurückgenommen; der Build-Befehl ist wieder `next build`
+- **Der Eintrag zu v3.1.2 war zwischenzeitlich als Fehlschlag markiert.** Das war er nicht — die dort beschriebene Ursache stimmte, und die Anzeige funktionierte danach. Der Eintrag steht wieder korrekt; v3.1.3 löst dasselbe Problem lediglich unabhängig davon, wie gebaut wird
 
 ---
 
-## [3.1.2] — 30. Juli 2026 · Versionsanzeige in der Fußzeile (Fehlschlag)
+## [3.1.3] — 30. Juli 2026 · Versionsanzeige unabhängig vom Build-Befehl
 
 ### Behoben
-- **Versuch, die leere Versionsanzeige in der Fußzeile zu beheben** — über den Build-Befehl. Der Ansatz war falsch und hat nichts geändert; die tatsächliche Ursache und die Behebung stehen in v3.1.3
+- **Die Versionsanzeige in der Fußzeile hing an einer Umgebungsvariable, die nur beim Bauen über npm existiert.** Ein geänderter Build-Befehl hätte sie jederzeit wieder verstummen lassen — und genau das war zuvor über Monate der Fall, ohne dass es auffiel. Die Version steht jetzt als Konstante im Code (`src/lib/app-version.ts`); ein Test hält sie mit `package.json` zusammen und bricht den Build, wenn beim Versionssprung eine der beiden Stellen vergessen wird
+
+### Geändert
+- **Die Anzeige hängt nicht mehr davon ab, wie gebaut wird.** Bisher stammte der Wert aus `npm_package_version` — eine Variable, die nur existiert, wenn der Build über npm läuft. Als Konstante gilt das nicht mehr, und die Änderung am Build-Befehl aus v3.1.2 ist zurückgenommen; er ist wieder `next build`
+
+---
+
+## [3.1.2] — 30. Juli 2026 · Versionsanzeige in der Fußzeile
+
+### Behoben
+- **In der Fußzeile stand auf der Live-Seite ein nacktes „v" ohne Nummer.** Die Anzeige las `npm_package_version`, und diese Variable setzt ausschließlich npm beim Ausführen eines Skripts — der Build-Befehl lautete aber `next build` und lief an npm vorbei. Der Build lief daraufhin über `npm run vercel-build`, was die Anzeige tatsächlich wiederhergestellt hat. v3.1.3 ersetzt den Weg über die Umgebung durch eine Konstante, damit die Anzeige unabhängig vom Build-Befehl bleibt
 
 ---
 

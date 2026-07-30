@@ -11,23 +11,31 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
-    version: '3.1.3',
+    version: '3.1.4',
     date: '30. Juli 2026',
-    label: 'Versionsanzeige in der Fußzeile',
+    label: 'Richtigstellung im Changelog',
     isLatest: true,
     changes: [
-      { type: 'fixed',   text: 'In der Fußzeile stand live ein nacktes „v" ohne Nummer — damit war nach einem Deployment nicht erkennbar, ob die neue Fassung überhaupt angekommen war' },
+      { type: 'changed', text: 'Der Eintrag zu v3.1.2 war zwischenzeitlich als Fehlschlag markiert — das war er nicht, die dort beschriebene Ursache stimmte' },
+    ],
+  },
+  {
+    version: '3.1.3',
+    date: '30. Juli 2026',
+    label: 'Versionsanzeige unabhängig vom Build-Befehl',
+    isLatest: false,
+    changes: [
+      { type: 'fixed',   text: 'Die Versionsanzeige hing an einer Umgebungsvariable, die nur beim Bauen über npm existiert — ein geänderter Build-Befehl hätte sie jederzeit wieder verstummen lassen' },
       { type: 'changed', text: 'Die Version steht jetzt als Konstante im Code; ein Test hält sie mit package.json zusammen' },
-      { type: 'changed', text: 'Die Erklärung in v3.1.2 war falsch — der Build-Befehl war nicht die Ursache, die Änderung daran ist zurückgenommen' },
     ],
   },
   {
     version: '3.1.2',
     date: '30. Juli 2026',
-    label: 'Versionsanzeige in der Fußzeile (Fehlschlag)',
+    label: 'Versionsanzeige in der Fußzeile',
     isLatest: false,
     changes: [
-      { type: 'fixed', text: 'Versuch, die leere Versionsanzeige über den Build-Befehl zu beheben — der Ansatz war falsch und hat nichts geändert (siehe v3.1.3)' },
+      { type: 'fixed', text: 'In der Fußzeile stand live ein nacktes „v" ohne Nummer — damit war nach einem Deployment nicht erkennbar, ob die neue Fassung überhaupt angekommen war' },
     ],
   },
   {
