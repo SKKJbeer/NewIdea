@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.4] — 30. Juli 2026 · Kürzere Kette in der Preiserfassung
+
+### Behoben
+- **Die Erfassung blieb bei Seite 20 von 82 stehen, ohne einen Fehler zu melden.** Mit einer Minute je Runde brauchte ein Tag rund 40 Übergaben zwischen den Läufen, und jede davon ist ein möglicher Abrisspunkt. Eine Runde darf jetzt fünf Minuten arbeiten — damit bleiben etwa fünf Übergaben statt vierzig
+- Der Anstoß der nächsten Runde wird nicht mehr zwischengespeichert
+
+---
+
 ## [3.2.3] — 30. Juli 2026 · Erfassung überlebt einen Aussetzer der Kartendatenbank
 
 ### Behoben

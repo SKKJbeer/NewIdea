@@ -15,7 +15,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 // Knopf gehört zur Bedienung, und das Cron-Geheimnis hat in einem Browser
 // nichts verloren.
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /** GET: nur nachsehen, wie weit die Erfassung ist. */
 export async function GET(request: Request) {
@@ -64,7 +64,10 @@ export async function POST(request: Request) {
   // schon nach dem ersten Klick sichtbar, dass wirklich etwas passiert —
   // und ein Fehler (fehlende Tabelle, Schlüssel) fällt sofort auf, statt
   // stumm in einem Hintergrundlauf zu verschwinden.
-  const erste = await sweepChunk({ budgetMs: 30_000 });
+  // Bewusst KURZ: Der Knopf soll schnell zurückmelden, dass etwas passiert,
+  // und einen Einrichtungsfehler sofort zeigen. Die langen Runden macht die
+  // Kette — dort wartet niemand vor einem Bildschirm.
+  const erste = await sweepChunk({ budgetMs: 25_000 });
 
   // BEWUSST NICHT `erste.ok`: Die Kartendatenbank liefert regelmäßig 500er
   // (Stolperstelle 28). Hing die Fortsetzung an einem fehlerfreien ersten
@@ -77,6 +80,7 @@ export async function POST(request: Request) {
       try {
         await fetch(`${basis}/api/cron/price-sweep?chain=1`, {
           headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+          cache: 'no-store',
           signal: AbortSignal.timeout(10_000),
         });
       } catch (err) {

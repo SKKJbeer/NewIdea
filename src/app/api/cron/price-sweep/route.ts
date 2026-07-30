@@ -24,13 +24,20 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 //   2. Der Durchlauf endet ohnehin, sobald der Seitenzeiger über die letzte
 //      Seite des Tages hinaus ist — ein weiterer Aufruf tut dann nichts.
 
-export const maxDuration = 60;
+// LÄNGER STATT ÖFTER.
+//
+// BEFUND AUS DEM ECHTEN LAUF: Mit 60 Sekunden schaffte eine Runde ein bis drei
+// Seiten — für 82 Seiten also rund 40 Übergaben, und irgendwo dazwischen riss
+// die Kette lautlos ab (zuletzt bei Seite 20). Jede Übergabe ist ein möglicher
+// Abrisspunkt; die zuverlässigste Kette ist die kürzeste. Mit 300 Sekunden
+// bleiben etwa fünf Übergaben für den ganzen Tag.
+export const maxDuration = 300;
 
-/** Genug für einen ganzen Tag (~82 Seiten bei ~2 je Runde), zu wenig für eine Dauerschleife. */
+/** Genug für einen ganzen Tag (~82 Seiten bei ~15 je Runde), zu wenig für eine Dauerschleife. */
 const MAX_CHAIN = 150;
 
 /** Knapp unter `maxDuration`, damit der Stand noch gespeichert werden kann. */
-const BUDGET_MS = 40_000;
+const BUDGET_MS = 240_000;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -69,6 +76,8 @@ export async function GET(request: Request) {
       try {
         await fetch(`${basis}/api/cron/price-sweep?chain=${chain + 1}`, {
           headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+          // Kein Zwischenspeicher: Der Anstoß MUSS jedes Mal wirklich rausgehen.
+          cache: 'no-store',
           signal: AbortSignal.timeout(10_000),
         });
       } catch (err) {

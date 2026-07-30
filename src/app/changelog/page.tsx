@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.4',
+    date: '30. Juli 2026',
+    label: 'Kürzere Kette in der Preiserfassung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Erfassung blieb bei Seite 20 von 82 stehen, ohne einen Fehler zu melden — statt rund 40 Übergaben zwischen den Läufen sind es jetzt etwa fünf' },
+    ],
+  },
+  {
     version: '3.2.3',
     date: '30. Juli 2026',
     label: 'Erfassung überlebt einen Aussetzer der Kartendatenbank',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Ein einzelner Abruffehler beendete den ganzen Durchlauf — die Fortsetzung hing an einem fehlerfreien ersten Häppchen, obwohl die Kartendatenbank regelmäßig Fehler liefert' },
     ],

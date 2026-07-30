@@ -152,6 +152,18 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(sweep).toContain('Fortsetzung nicht angestoßen:');
   });
 
+  it('macht die Kette kurz statt lang', () => {
+    // BEFUND: Mit 60 Sekunden je Runde brauchte ein Tag rund 40 Übergaben, und
+    // irgendwo dazwischen riss die Kette lautlos ab (zuletzt bei Seite 20).
+    // Jede Übergabe ist ein möglicher Abrisspunkt — die zuverlässigste Kette
+    // ist die kürzeste.
+    expect(Number(/maxDuration = (\d+)/.exec(route)?.[1])).toBeGreaterThanOrEqual(300);
+  });
+
+  it('lässt den Anstoß nicht zwischenspeichern', () => {
+    expect(route).toContain("cache: 'no-store'");
+  });
+
   it('deckelt die Selbstfortsetzung', () => {
     expect(route).toMatch(/MAX_CHAIN = \d+/);
     expect(route).toContain('chain < MAX_CHAIN');
