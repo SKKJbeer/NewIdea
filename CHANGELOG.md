@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.1] - 30. Juli 2026 · Nachtrag zur Sprachpruefung
+
+### Behoben
+- Die in v3.3.0 eingefuehrte Sprachpruefung schlug am eigenen Changelog-Eintrag an, der die Entfernung des Begriffs beschreibt. Der Verlauf ist jetzt ausgenommen - wie schon bei den uebrigen geprueften Begriffen
+
+---
+
 ## [3.3.0] - 30. Juli 2026 · Datenbestand und Kennzahl sauber getrennt
 
 ### Behoben

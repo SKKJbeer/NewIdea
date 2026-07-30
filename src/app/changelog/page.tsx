@@ -11,16 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.1',
+    date: '30. Juli 2026',
+    label: 'Nachtrag zur Sprachpruefung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die neue Sprachpruefung schlug am eigenen Changelog-Eintrag an - der Verlauf ist jetzt ausgenommen, wie schon bei den uebrigen Begriffen' },
+    ],
+  },
+  {
     version: '3.3.0',
     date: '30. Juli 2026',
     label: 'Datenbestand und Kennzahl sauber getrennt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Ein Set mit einer einzigen Karte konnte die Set-Rangliste anfuehren - jetzt erst ab fuenf auswertbaren Karten und nach typischem Kartenpreis statt Mittelwert' },
       { type: 'fixed',   text: 'Die Angabe neben dem Marktindex las sich wie der gesamte Datenbestand, war aber die Stichprobe einer Kennzahl - und kam aus einer Begrenzung im Code, nicht aus der Datenlage' },
       { type: 'fixed',   text: 'Der Marktbericht sah nur ein einziges Set und nutzte eine andere Datenquelle als die Startseite' },
       { type: 'fixed',   text: 'Drei Routen trennten Gewinner und Verlierer noch nach der alten, fehlerhaften Regel' },
-      { type: 'fixed',   text: 'Das Versprechen von Echtzeit-Daten stand neben dem Hinweis auf taegliche Aktualisierung - der Begriff ist ueberall entfernt' },
+      { type: 'fixed',   text: 'Die Startseite versprach eine sekundengenaue Aktualisierung und nannte im selben Block die taegliche - die Formulierung entspricht jetzt der Datenlage' },
       { type: 'new',     text: 'Datenabdeckung getrennt ausgewiesen: Karten, Sets und gespeicherte Preispunkte des gesamten Bestands' },
       { type: 'changed', text: 'Die Score- und Insight-Bezeichnungen sind auf Marktanalyse umgestellt - Adressen bleiben unveraendert' },
     ],

@@ -35,6 +35,9 @@ describe('Kein Versprechen von Echtzeit-Daten', () => {
   it('kommt in keiner Quelldatei vor', () => {
     const treffer: string[] = [];
     for (const datei of quellen()) {
+      // Der Verlauf haelt fest, was ausgeliefert wurde — auch die Entfernung
+      // eines Begriffs muss dort benennbar bleiben.
+      if (datei.includes('changelog')) continue;
       for (const zeile of ohneKommentare(lies(datei)).split('\n')) {
         if (verboten.test(zeile)) treffer.push(`${datei}  ${zeile.trim().slice(0, 90)}`);
       }
