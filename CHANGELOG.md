@@ -7,10 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
-## [3.1.2] — 30. Juli 2026 · Versionsanzeige in der Fußzeile
+## [3.1.3] — 30. Juli 2026 · Versionsanzeige in der Fußzeile
 
 ### Behoben
-- **In der Fußzeile stand auf der Live-Seite ein nacktes „v" ohne Nummer.** Die Anzeige liest `npm_package_version`, und diese Variable setzt ausschließlich npm beim Ausführen eines Skripts — der Build-Befehl lautete aber `next build`, lief also an npm vorbei. Damit war die Deploy-Prüfung „Fußzeile zeigt die neue Version" auf Produktion die ganze Zeit gar nicht durchführbar. Der Build läuft jetzt über `npm run vercel-build`, das weiterhin nur `next build` ausführt (die Tests bleiben dort übersprungen und laufen lokal)
+- **In der Fußzeile stand auf der Live-Seite ein nacktes „v" ohne Nummer.** Damit war der Pflicht-Schritt „Live-Seite verifizieren: Fußzeile zeigt die neue Version" auf Produktion nie durchführbar — einem Deployment sah man schlicht nicht an, ob es angekommen war. Die Version steht jetzt als Konstante im Code (`src/lib/app-version.ts`); ein Test hält sie mit `package.json` zusammen und bricht den Build, wenn beim Versionssprung eine der beiden Stellen vergessen wird
+
+### Geändert
+- **Die Erklärung in v3.1.2 war falsch.** Dort stand, der Build-Befehl laufe an npm vorbei. Das war er nicht: Auch über npm gebaut blieb die Anzeige leer, ebenso über `env` in der Build-Konfiguration. Beide Wege scheitern lautlos — der Code sieht jeweils korrekt aus und liefert nichts. Die Änderung an `vercel.json` ist deshalb zurückgenommen; der Build-Befehl ist wieder `next build`
+
+---
+
+## [3.1.2] — 30. Juli 2026 · Versionsanzeige in der Fußzeile (Fehlschlag)
+
+### Behoben
+- **Versuch, die leere Versionsanzeige in der Fußzeile zu beheben** — über den Build-Befehl. Der Ansatz war falsch und hat nichts geändert; die tatsächliche Ursache und die Behebung stehen in v3.1.3
 
 ---
 

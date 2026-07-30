@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, globSync } from 'fs';
 import { join } from 'path';
+import { APP_VERSION } from '@/lib/app-version';
 
 // Befunde aus dem systematischen Durchlauf über 14 Seiten × 5 Breiten
 // (375/390/430/768/1280). Jeder Befund bekommt hier eine Prüfung, damit er
@@ -119,28 +120,24 @@ describe('Die Startseite führt durch die Produktlogik', () => {
 });
 
 describe('Die Fußzeile zeigt in Produktion eine Version', () => {
-  const paket = JSON.parse(lies('package.json'));
-  const vercel = JSON.parse(lies('vercel.json'));
+  const footer = lies('src/components/SiteFooter.tsx');
 
-  it('baut über npm — nur dann existiert die Versionsvariable', () => {
-    // BEFUND: Live stand in der Fußzeile ein nacktes „v" ohne Nummer. Die
-    // Quelle ist `process.env.npm_package_version`, und die setzt AUSSCHLIESSLICH
-    // npm beim Ausführen eines Skripts. Der Build-Befehl lautete `next build` —
-    // also ohne npm, also ohne Variable. Damit war die Deploy-Prüfung „Footer
-    // zeigt vX.Y.Z" auf Produktion die ganze Zeit nicht durchführbar.
-    expect(vercel.buildCommand).toMatch(/^npm run /);
+  it('die Konstante stimmt mit package.json überein', () => {
+    // DER EIGENTLICHE ZWECK DIESES TESTS: Er ist der Preis dafür, dass die
+    // Version als Konstante im Code steht. Wird beim Versionssprung nur
+    // package.json angefasst, bricht hier der Build — und nicht erst die
+    // Live-Seite, auf der es monatelang niemandem auffiel.
+    expect(APP_VERSION).toBe(JSON.parse(lies('package.json')).version);
   });
 
-  it('überspringt in Vercels Umgebung weiterhin die Tests', () => {
-    // Stolperstelle 10: vitest scheitert dort an der Initialisierung. Der
-    // Vercel-Einstieg darf deshalb NICHT der lokale `build`-Befehl sein.
-    const skript = vercel.buildCommand.replace(/^npm run /, '');
-    expect(paket.scripts[skript]).toBe('next build');
-  });
-
-  it('führt lokal weiterhin beide Schritte aus', () => {
-    // Vercel prüft die Tests nicht — der lokale Build ist die letzte Linie.
-    expect(paket.scripts.build).toContain('vitest run');
+  it('kommt ohne Umgebungsvariable aus', () => {
+    // BEFUND: Live stand in der Fußzeile ein nacktes „v" ohne Nummer. Damit war
+    // der Pflicht-Schritt „Live-Seite verifizieren: Fußzeile zeigt vX.Y.Z" auf
+    // Produktion nie durchführbar. Zwei Wege über die Umgebung sind lautlos
+    // gescheitert (npm_package_version; `env` in next.config.ts) — beide sahen
+    // im Code korrekt aus und lieferten nichts.
+    expect(footer).toContain('v{APP_VERSION}');
+    expect(footer).not.toContain('process.env.');
   });
 });
 

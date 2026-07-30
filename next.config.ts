@@ -1,7 +1,4 @@
 import type { NextConfig } from "next";
-import { readFileSync } from 'fs';
-
-const { version } = JSON.parse(readFileSync('./package.json', 'utf-8')) as { version: string };
 
 // Sicherheits-Kopfzeilen für JEDE Antwort.
 //
@@ -47,9 +44,6 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
-  env: {
-    NEXT_PUBLIC_APP_VERSION: version,
-  },
   // Für die Video-Routen ins Function-Bundle zwingen:
   // - die ffmpeg-static-Binary (wird sonst nicht getracet → spawn ENOENT)
   // - die Reel-Schriftart (Vercel hat keine System-Fonts → drawtext scheitert)

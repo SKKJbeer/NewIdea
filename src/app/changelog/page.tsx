@@ -11,12 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
-    version: '3.1.2',
+    version: '3.1.3',
     date: '30. Juli 2026',
     label: 'Versionsanzeige in der Fußzeile',
     isLatest: true,
     changes: [
-      { type: 'fixed', text: 'In der Fußzeile stand live ein nacktes „v" ohne Nummer — der Build lief an npm vorbei, und nur npm setzt die Variable, aus der die Anzeige liest' },
+      { type: 'fixed',   text: 'In der Fußzeile stand live ein nacktes „v" ohne Nummer — damit war nach einem Deployment nicht erkennbar, ob die neue Fassung überhaupt angekommen war' },
+      { type: 'changed', text: 'Die Version steht jetzt als Konstante im Code; ein Test hält sie mit package.json zusammen' },
+      { type: 'changed', text: 'Die Erklärung in v3.1.2 war falsch — der Build-Befehl war nicht die Ursache, die Änderung daran ist zurückgenommen' },
+    ],
+  },
+  {
+    version: '3.1.2',
+    date: '30. Juli 2026',
+    label: 'Versionsanzeige in der Fußzeile (Fehlschlag)',
+    isLatest: false,
+    changes: [
+      { type: 'fixed', text: 'Versuch, die leere Versionsanzeige über den Build-Befehl zu beheben — der Ansatz war falsch und hat nichts geändert (siehe v3.1.3)' },
     ],
   },
   {

@@ -1,5 +1,6 @@
 'use client';
 
+import { APP_VERSION } from '@/lib/app-version';
 import { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, Loader2, BarChart3, Search, X, Check, TrendingUp, Coins, Globe, Lock } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -616,7 +617,7 @@ export default function PortfolioPage() {
           Daten werden lokal im Browser gespeichert · Keine Anlageberatung · Preise ohne Gewähr
         </p>
         <p className="text-[10px] text-slate-800 text-center mt-1 font-mono">
-          v{process.env.NEXT_PUBLIC_APP_VERSION}
+          v{APP_VERSION}
         </p>
       </div>
 

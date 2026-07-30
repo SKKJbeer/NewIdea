@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
+import { APP_VERSION } from '@/lib/app-version';
 
 const NAV_GROUPS: Array<{ label: string; links: Array<{ href: string; label: string }> }> = [
   {
@@ -87,8 +88,10 @@ export function SiteFooter() {
             Inoffizielle Fan-Seite · Kein offizielles Pokémon-Produkt · Keine Anlageberatung · Alle Preise ohne Gewähr.
             Pokémon ist eine Marke von Nintendo / Creatures Inc. / GAME FREAK Inc.
           </p>
+          {/* Konstante statt Umgebungsvariable — siehe app-version.ts: Über die
+              Umgebung blieb die Anzeige live leer, egal welche Variable sie las. */}
           <p className="text-[10px] text-slate-700 font-mono shrink-0">
-            v{process.env.npm_package_version}
+            v{APP_VERSION}
           </p>
         </div>
       </div>

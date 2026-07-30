@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { APP_VERSION } from '@/lib/app-version';
 import { loadUsageSummary, AI_USAGE_SETUP_SQL } from '@/lib/ai-usage';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
@@ -138,7 +139,7 @@ export async function GET(request: Request) {
     aiUsage: aiUsage ? { ...aiUsage, setupSql: aiUsage.missingTable ? AI_USAGE_SETUP_SQL : null } : null,
     // Build info
     build: {
-      version: process.env.NEXT_PUBLIC_APP_VERSION || '?',
+      version: APP_VERSION,
       siteUrl: siteUrl || null,
       siteUrlMissing: !siteUrl,
       nodeEnv: process.env.NODE_ENV,
