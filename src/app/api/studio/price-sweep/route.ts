@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { loadSweepState, sweepChunk, seitenGesamt, heute, markChainError } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -76,22 +76,27 @@ export async function POST(request: Request) {
   // Der Seitenzeiger steht nach einem Fehler noch auf derselben Seite; die
   // nächste Runde versucht sie erneut. Genau dafür ist die Kette da.
   if (!erste.done) {
-    after(async () => {
+    // Anstoß IN der Anfrage absetzen, nicht danach: Nach der Antwort geplante
+    // Arbeit wurde im echten Betrieb nicht zuverlässig ausgeführt — genau
+    // daran ist die Kette wiederholt gestorben. Drei Sekunden Warten kostet
+    // der Knopf dadurch, mehr nicht.
+    {
       try {
-        await fetch(`${basis}/api/cron/price-sweep?chain=1`, {
+      await fetch(`${basis}/api/cron/price-sweep?chain=1`, {
           headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
           cache: 'no-store',
-          signal: AbortSignal.timeout(10_000),
+          // Nur absenden — die Gegenseite arbeitet danach weiter.
+          signal: AbortSignal.timeout(3_000),
         });
       } catch (err) {
-        // Stand bleibt erhalten; der nächste Klick oder der Tages-Cron setzt
-        // dort fort. Der Abriss wird vermerkt, damit ein Stillstand nicht wie
-        // ein langsamer Durchlauf aussieht.
-        const grund = err instanceof Error ? err.message : String(err);
-        console.warn('[Preis-Sweep] Kette nicht angestoßen:', grund);
-        await markChainError(grund);
+        // Das eigene kurze Zeitlimit ist der Normalfall, kein Fehler.
+        if (!(err instanceof Error && err.name === 'TimeoutError')) {
+          const grund = err instanceof Error ? err.message : String(err);
+          console.warn('[Preis-Sweep] Kette nicht angestoßen:', grund);
+          await markChainError(grund);
+        }
       }
-    });
+    }
   }
 
   return NextResponse.json(erste);

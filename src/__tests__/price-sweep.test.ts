@@ -112,10 +112,24 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(sweep).not.toContain('if (cards.length === 0) break;');
   });
 
-  it('antwortet sofort und arbeitet danach', () => {
-    // Sonst müsste der Kettenaufruf eine volle Runde abwarten; ein Zeitlimit
-    // dort würde die bereits laufende Runde als Abbruch dastehen lassen.
-    expect(route).toMatch(/after\(runde\)/);
+  it('arbeitet IN der Anfrage, nicht danach', () => {
+    // BEFUND: Mit der Arbeit in `after()` brach die Kette reproduzierbar nach
+    // fünf bis sechs Übergaben ab — bei Seite 20, 32 und 49 von 82, jedes Mal
+    // ohne Fehler und ohne Log. Die nach der Antwort geplante Arbeit wurde
+    // schlicht nicht mehr ausgeführt. Was in der Anfrage passiert, läuft.
+    // Nur die tatsächliche Verwendung prüfen — der Kommentar nennt den alten
+    // Weg absichtlich, damit der Grund am Code steht.
+    expect(route).toContain('const progress = await runde();');
+    expect(route).not.toContain("from 'next/server';\nimport { after }");
+    expect(route).not.toMatch(/^\s*after\(/m);
+    expect(lies('src/app/api/studio/price-sweep/route.ts')).not.toMatch(/^\s*after\(/m);
+  });
+
+  it('wartet beim Anstoß nicht auf die nächste Runde', () => {
+    // Sonst triebe das Warten die eigene Runde über ihre Laufzeitgrenze.
+    expect(route).toContain('AbortSignal.timeout(3_000)');
+    // Das eigene Zeitlimit ist der Normalfall und darf nicht als Abriss gelten.
+    expect(route).toContain("err.name === 'TimeoutError'");
   });
 
   it('ruft sich unter der eigenen Adresse auf', () => {

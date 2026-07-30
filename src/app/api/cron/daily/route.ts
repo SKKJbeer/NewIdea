@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     try {
       const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
         headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(3000),
       });
       results.priceSweepStarted = antwort.ok;
       if (!antwort.ok) results.priceSweepError = `HTTP ${antwort.status}`;

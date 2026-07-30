@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.2.6] — 30. Juli 2026 · Erfassung läuft ohne Abriss durch
+
+### Behoben
+- **Die Erfassung brach reproduzierbar nach fünf bis sechs Übergaben ab** — bei Seite 20, 32 und 49 von 82, jedes Mal ohne Fehlermeldung und ohne Logeintrag. Ursache: Die Arbeit war jeweils für den Zeitpunkt NACH der Antwort eingeplant, und diese Einplanung wurde im laufenden Betrieb nicht zuverlässig ausgeführt. Sie läuft jetzt innerhalb der Anfrage
+
+---
+
 ## [3.2.5] — 30. Juli 2026 · Erfassung verliert keinen Fortschritt mehr
 
 ### Behoben

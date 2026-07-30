@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { sweepChunk, markChainError } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -12,12 +12,17 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 // (auf dem kleinen Tarif zwei, beide sind vergeben). Die Selbstfortsetzung ist
 // davon unabhängig — sie braucht nur einen Anstoß pro Tag.
 //
-// WARUM DIE ANTWORT SOFORT KOMMT und die Arbeit erst danach läuft: Der
-// Kettenaufruf müsste sonst auf eine volle Runde warten. Bräche er vorher ab
-// (Zeitlimit), stünde die bereits laufende Runde als abgebrochene Anfrage da.
-// So bestätigt jede Runde in Millisekunden, und die Kette hängt an keiner
-// Antwortzeit. Der Fortschritt ist deshalb NICHT in dieser Antwort zu suchen,
-// sondern in `price_sweep_state` — im Monitoring sichtbar.
+// WARUM DIE ARBEIT IN DER ANFRAGE LÄUFT und nicht in `after()`: Zuerst war es
+// umgekehrt — Antwort sofort, Arbeit danach. Im echten Betrieb brach die Kette
+// damit reproduzierbar nach fünf bis sechs Übergaben ab (zuletzt bei Seite 20,
+// 32 und 49 von 82), ohne Fehler und ohne Log: Die nach der Antwort geplante
+// Arbeit wurde schlicht nicht mehr ausgeführt. Was IN der Anfrage passiert,
+// läuft dagegen garantiert.
+//
+// Der Aufrufer wartet deshalb nicht auf das Ergebnis — er bricht seinen Abruf
+// nach wenigen Sekunden ab. Das beendet die laufende Runde nicht; sie arbeitet
+// weiter und stößt am Ende selbst die nächste an. Der Fortschritt ist deshalb
+// NICHT in dieser Antwort zu suchen, sondern in `price_sweep_state`.
 //
 // SICHERUNG GEGEN ENDLOSSCHLEIFEN, doppelt:
 //   1. `chain` zählt die Fortsetzungen und ist hart gedeckelt.
@@ -61,7 +66,6 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const chain = Number(url.searchParams.get('chain')) || 0;
-  // Für Prüfläufe: inline arbeiten und das echte Ergebnis zurückgeben.
   const sync = url.searchParams.get('sync') === '1';
 
   // IMMER die Adresse, unter der dieser Aufruf gerade läuft — NICHT
@@ -88,33 +92,27 @@ export async function GET(request: Request) {
           headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
           // Kein Zwischenspeicher: Der Anstoß MUSS jedes Mal wirklich rausgehen.
           cache: 'no-store',
-          signal: AbortSignal.timeout(10_000),
+          // Nur das Absenden zählt. Die nächste Runde arbeitet danach rund 45
+          // Sekunden weiter — darauf zu warten würde diese Runde über ihre
+          // eigene Laufzeitgrenze treiben.
+          signal: AbortSignal.timeout(3_000),
         });
       } catch (err) {
-        // Der gespeicherte Stand geht nicht verloren — aber der Abriss MUSS
-        // sichtbar werden. Ohne diesen Vermerk sieht ein Stillstand aus wie
-        // ein langsamer Durchlauf, und genau so blieb der erste echte Lauf
-        // unbemerkt bei Seite 8 stehen.
-        const grund = err instanceof Error ? err.message : String(err);
-        console.warn('[Preis-Sweep] Fortsetzung nicht angestoßen:', grund);
-        await markChainError(grund);
+        // Das eigene kurze Zeitlimit ist der Normalfall, KEIN Fehler: Die
+        // Anfrage ist raus, die nächste Runde läuft. Alles andere ist ein
+        // echter Abriss und muss sichtbar werden — ohne diesen Vermerk sieht
+        // ein Stillstand aus wie ein langsamer Durchlauf.
+        const abgebrochen = err instanceof Error && err.name === 'TimeoutError';
+        if (!abgebrochen) {
+          const grund = err instanceof Error ? err.message : String(err);
+          console.warn('[Preis-Sweep] Fortsetzung nicht angestoßen:', grund);
+          await markChainError(grund);
+        }
       }
     }
     return progress;
   }
 
-  if (sync) {
-    const progress = await runde();
-    return NextResponse.json({ modus: 'sync', chain, ...progress });
-  }
-
-  // `after` läuft NACH der Antwort — die Kette hängt an keiner Arbeitszeit.
-  after(runde);
-
-  return NextResponse.json({
-    ok: true,
-    modus: 'gestartet',
-    chain,
-    hinweis: 'Fortschritt steht in price_sweep_state (Monitoring), nicht in dieser Antwort.',
-  });
+  const progress = await runde();
+  return NextResponse.json({ chain, sync, ...progress });
 }

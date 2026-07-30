@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.2.6',
+    date: '30. Juli 2026',
+    label: 'Erfassung läuft ohne Abriss durch',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Erfassung brach reproduzierbar nach fünf bis sechs Übergaben ab — bei Seite 20, 32 und 49 von 82, jedes Mal ohne Fehlermeldung. Die Arbeit läuft jetzt innerhalb der Anfrage statt danach' },
+    ],
+  },
+  {
     version: '3.2.5',
     date: '30. Juli 2026',
     label: 'Erfassung verliert keinen Fortschritt mehr',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Der Stand wurde erst am Ende einer Runde gespeichert — eine vorzeitig beendete Runde verlor ihren gesamten Fortschritt und der Durchlauf kam über Seite 32 von 82 nicht hinaus' },
       { type: 'fixed', text: 'Die Arbeitszeit je Runde liegt wieder klar unter der kleinsten Laufzeitgrenze, damit die Fortsetzung zuverlässig angestoßen wird' },
