@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.1.1] — 30. Juli 2026 · Marktbreite: zwei Zahlen, eine Wahrheit
+
+Auf der Startseite standen zwei verschiedene Marktbreiten gleichzeitig: die Kennzahlen-Kachel zeigte „16 % · 8/50 im Plus", die Erklärung zu Angst & Gier direkt darunter „16 von 50 Karten über ihrem 30-Tage-Schnitt" (32 %). Aufgefallen ist es beim Nachrechnen der Live-Werte gegen die Kartendatenbank.
+
+### Behoben
+- **Die Marktbreite war zu niedrig.** Als Zähler diente die Gewinnerliste der Anzeige — und die ist auf acht Einträge gekürzt. Sobald mehr als acht Karten gestiegen waren, blieb der Zähler auf 8 stehen, während der Nenner mit dem Datensatz weiterwuchs. Gezählt wird jetzt über den gesamten Datensatz
+- **Kachel, Erklärtext und Angst & Gier rechnen aus derselben Quelle** (`marketBreadth`). Vorher gab es zwei Zählungen nebeneinander, von denen eine falsch war
+- **Ein Aussetzer der Kartendatenbank konnte das gesamte Deployment verhindern.** Die Set-Übersicht ließ den Fehler bewusst durchschlagen — richtig zur Laufzeit, weil dann die zuletzt erfolgreiche Seite bestehen bleibt. Beim Erzeugen der Seiten gibt es aber keine solche Seite, und der Fehler brach den ganzen Vorgang ab, inklusive aller Änderungen, die mit Sets nichts zu tun haben. Aufgefallen ist es beim Bauen dieser Version
+
+### Geändert
+- **Karten ohne gemessenen Trend zählen nicht mehr als „nicht gestiegen".** Fehlt der 30-Tage-Schnitt der Preisquelle, steht der Trend rechnerisch auf 0 — das ist keine Messung, sondern eine Lücke. Solche Karten fließen jetzt in keine Trendkennzahl mehr ein (Marktbreite, Index, Angst & Gier)
+
+---
+
 ## [3.1.0] — 30. Juli 2026 · QA-Durchlauf: Set-Logos, Tablet-Layout, Bedienbarkeit, Ladezeit
 
 Systematischer Durchlauf über 14 Seiten in fünf Breiten (375 / 390 / 430 / 768 / 1280 Pixel). 129 Befunde zu Beginn, 0 am Ende.

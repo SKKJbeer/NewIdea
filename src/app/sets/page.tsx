@@ -21,11 +21,27 @@ function formatReleaseDate(dateStr: string): string {
 }
 
 export default async function SetsPage() {
-  // BEWUSST OHNE `.catch(() => [])`: Ein verschluckter Fehler wurde hier mit
-  // `revalidate = 86400` einen GANZEN TAG als Leerzustand gecacht. Lässt man
-  // ihn laufen, behält Next.js die zuletzt erfolgreiche Seite und zeigt
-  // `error.tsx` nur bei kaltem Cache — mit Wiederholmöglichkeit.
-  const sets = await fetchRecentSets(24);
+  // BEWUSST OHNE pauschales `.catch(() => [])`: Ein verschluckter Fehler wurde
+  // hier mit `revalidate = 86400` einen GANZEN TAG als Leerzustand gecacht.
+  // Zur Laufzeit darf der Fehler deshalb durchschlagen — Next.js behält dann
+  // die zuletzt erfolgreiche Seite und zeigt `error.tsx` nur bei kaltem Cache,
+  // mit Wiederholmöglichkeit.
+  //
+  // WÄHREND DES BUILDS gilt das Gegenteil: Dort gibt es keine vorherige Seite,
+  // die Next.js behalten könnte — ein Fehler bricht stattdessen den GESAMTEN
+  // Build ab. Genau das ist passiert: ein Aussetzer der Kartendatenbank (die
+  // laut Stolperstelle 28 regelmäßig welche hat) hätte das ganze Deployment
+  // verhindert, inklusive aller Änderungen, die mit Sets nichts zu tun haben.
+  // In dieser Phase ist der ehrliche Leerzustand das kleinere Übel: Die erste
+  // Neuvalidierung holt die Sets nach.
+  let sets = await fetchRecentSets(24).catch((err) => {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      console.warn('[sets] Abruf während des Builds fehlgeschlagen — Leerzustand:', err);
+      return [];
+    }
+    throw err;
+  });
+  sets = sets ?? [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">

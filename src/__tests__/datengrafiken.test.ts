@@ -258,7 +258,9 @@ describe('Startseite zeigt Bilder und Grafiken statt reiner Tabellen', () => {
 
   it('leitet die Insights weiterhin nur aus echten Daten ab', () => {
     // Stolperstelle 29: keine Kennzahl ohne Datengrundlage.
-    expect(seite).toMatch(/if \(withTrend\.length > 0\)/);
+    // Bezugsgröße ist die Zahl der GEMESSENEN Karten (`marketBreadth`), nicht
+    // die Größe des Datensatzes.
+    expect(seite).toMatch(/if \(breite\.total > 0\)/);
     expect(seite).toMatch(/if \(topSets\[0\]\)/);
   });
 });

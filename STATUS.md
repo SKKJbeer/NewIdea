@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v3.1.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v3.1.1` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v3.1.0)
+## Was gebaut ist (Stand v3.1.1)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v3.1.1 | Marktbreite aus einer Quelle — die Kachel zählte die auf acht gekürzte Anzeige-Liste, die Erklärung darunter den ganzen Datensatz |
 | v3.1.0 | QA über 14 Seiten × 5 Breiten: Set-Logos, Tablet-Overflow, Tippziele, 29 % weniger JS auf der Kartenseite |
 | v3.0.0 | Professionalisierung: Ranking-Logik, PMI-Belastbarkeit, Angst&Gier nachvollziehbar, Datenprüfung, Karten-Detailseite, Portfolio-Auswertung, /methodik |
 | v2.40.0 | Startseite: Set-Bilder in der Tabelle, Messbalken bei PMI/Marktbreite, Insights als Karten |
@@ -211,4 +212,4 @@ Wertschöpfungsketten sind nicht zu Ende verdrahtet.
 
 ---
 
-*Zuletzt aktualisiert: v3.1.0 — 30. Juli 2026*
+*Zuletzt aktualisiert: v3.1.1 — 30. Juli 2026*

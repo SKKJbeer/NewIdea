@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   splitMovers,
+  marketBreadth,
+  hasRealTrend,
   computePmi,
   computeFearGreed,
   fearGreedLabel,
@@ -30,6 +32,74 @@ function card(id: string, trend: number | undefined, price = 10, extra: Partial<
     ...extra,
   } as PokemonCard;
 }
+
+describe('hasRealTrend', () => {
+  it('erkennt einen gemessenen Trend', () => {
+    expect(hasRealTrend(card('a', 4.2))).toBe(true);
+    expect(hasRealTrend(card('b', -4.2))).toBe(true);
+  });
+
+  it('verwirft die Null ohne Datengrundlage', () => {
+    // `mapAndFilter` startet mit `trendPercent = 0` und setzt `realData` erst,
+    // wenn ein echter 30-Tage-Schnitt vorlag. Ohne diesen Filter zählt eine
+    // NICHT GEMESSENE Karte als „nicht gestiegen" und drückt die Marktbreite.
+    expect(hasRealTrend(card('a', 0))).toBe(false);
+  });
+
+  it('lässt eine gemessene Null zu', () => {
+    expect(hasRealTrend(card('a', 0, 10, { realData: true }))).toBe(true);
+  });
+
+  it('verwirft fehlende und ungültige Werte', () => {
+    expect(hasRealTrend(card('a', undefined))).toBe(false);
+    expect(hasRealTrend(card('b', NaN))).toBe(false);
+  });
+});
+
+describe('marketBreadth', () => {
+  it('zählt über den GANZEN Datensatz, nicht über die Anzeige-Liste', () => {
+    // DER FEHLER: Die Startseite nahm `splitMovers(cards, 8).gainers.length`
+    // als Zähler. Ab neun gestiegenen Karten blieb der bei 8 stehen, während
+    // der Nenner weiterwuchs — live standen deshalb „8/50" (16 %) und
+    // gleichzeitig „16 von 50" (32 %) auf derselben Seite.
+    const cards = [
+      ...Array.from({ length: 12 }, (_, i) => card(`up${i}`, i + 1)),
+      ...Array.from({ length: 8 }, (_, i) => card(`down${i}`, -(i + 1))),
+    ];
+    const breite = marketBreadth(cards);
+    expect(breite.up).toBe(12);
+    expect(breite.down).toBe(8);
+    expect(breite.total).toBe(20);
+    expect(breite.pct).toBeCloseTo(60);
+
+    // Die Anzeige-Liste ist gekürzt — genau der Unterschied, um den es geht.
+    expect(splitMovers(cards, 8).gainers).toHaveLength(8);
+  });
+
+  it('bezieht sich nur auf gemessene Karten', () => {
+    const breite = marketBreadth([card('a', 5), card('b', -5), card('c', 0)]);
+    expect(breite.total).toBe(2);
+    expect(breite.pct).toBeCloseTo(50);
+  });
+
+  it('erfindet ohne Daten keinen Wert', () => {
+    expect(marketBreadth([])).toMatchObject({ up: 0, down: 0, total: 0, pct: 0 });
+  });
+
+  it('stimmt mit der Erklärung zu Angst & Gier überein', () => {
+    // Beide Zahlen stehen auf derselben Seite. Laufen sie auseinander, ist
+    // mindestens eine falsch — und der Besucher sieht es sofort.
+    const cards = [
+      ...Array.from({ length: 16 }, (_, i) => card(`up${i}`, i + 1)),
+      ...Array.from({ length: 34 }, (_, i) => card(`down${i}`, -(i + 1))),
+    ];
+    const breite = marketBreadth(cards);
+    const fg = computeFearGreed(cards);
+    const marktbreite = fg.components.find((k) => k.label === 'Marktbreite');
+    expect(marktbreite?.detail).toBe(`${breite.up} von ${breite.total} Karten über ihrem 30-Tage-Schnitt`);
+    expect(marktbreite?.score).toBeCloseTo(breite.pct);
+  });
+});
 
 describe('splitMovers', () => {
   it('nimmt in die Gewinner ausschließlich gestiegene Karten', () => {

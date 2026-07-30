@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.1.1',
+    date: '30. Juli 2026',
+    label: 'Marktbreite: zwei Zahlen, eine Wahrheit',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Auf der Startseite standen zwei verschiedene Marktbreiten: die Kachel zeigte „16 % · 8/50", die Erklärung darunter „16 von 50" (32 %)' },
+      { type: 'fixed',   text: 'Als Zähler diente die auf acht Einträge gekürzte Gewinnerliste der Anzeige — ab neun gestiegenen Karten blieb er stehen, während der Nenner weiterwuchs' },
+      { type: 'fixed',   text: 'Ein Aussetzer der Kartendatenbank konnte beim Erzeugen der Seiten das gesamte Deployment verhindern — auch für Änderungen, die mit Sets nichts zu tun haben' },
+      { type: 'changed', text: 'Kachel, Erklärtext und Angst & Gier rechnen jetzt aus derselben Quelle' },
+      { type: 'changed', text: 'Karten ohne gemessenen 30-Tage-Schnitt zählen nicht mehr als „nicht gestiegen" — eine Datenlücke ist keine Messung' },
+    ],
+  },
+  {
     version: '3.1.0',
     date: '30. Juli 2026',
     label: 'QA-Durchlauf: Layout, Bedienbarkeit, Ladezeit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Auf der Set-Übersicht blieben vier Logos leer — ein weiterer Bild-Host stand nicht in der Inhaltsrichtlinie. Läuft jetzt über die eigene Bild-Weiterleitung' },
       { type: 'fixed',   text: 'Auf Tablet-Breite ragte die Navigationsleiste über den Rand — waagerechtes Scrollen auf jeder Seite' },

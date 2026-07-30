@@ -11,6 +11,24 @@
 import type { PokemonCard } from '@/types';
 import { displayPrice } from './pokemon-api';
 
+/**
+ * Hat diese Karte einen ECHTEN Trendwert?
+ *
+ * WARUM DAS NÖTIG IST: Karten ohne Cardmarket-30-Tage-Schnitt bekommen in
+ * `mapAndFilter` den Startwert `trendPercent = 0` — nicht weil sie sich nicht
+ * bewegt haben, sondern weil nichts gemessen wurde. Als „nicht gestiegen"
+ * mitgezählt drücken sie die Marktbreite, ohne dass es irgendwo auffällt.
+ *
+ * `realData` wird an derselben Stelle genau dann gesetzt, wenn ein echter
+ * 30-Tage-Schnitt vorlag — also exakt die Bedingung, die hier gebraucht wird.
+ */
+export function hasRealTrend(card: PokemonCard): boolean {
+  if (typeof card.trendPercent !== 'number' || !Number.isFinite(card.trendPercent)) return false;
+  // Ein Trend von exakt 0 OHNE echte Datengrundlage ist keine Messung.
+  if (card.trendPercent === 0 && card.realData !== true) return false;
+  return true;
+}
+
 // ── Gewinner und Verlierer ──────────────────────────────────────────────────
 
 export interface Movers {
@@ -34,7 +52,7 @@ export interface Movers {
  * - Keine künstliche Auffüllung: Gibt es einen Gewinner, steht dort einer
  */
 export function splitMovers(cards: PokemonCard[], limit = 8): Movers {
-  const mitTrend = cards.filter((c) => typeof c.trendPercent === 'number' && Number.isFinite(c.trendPercent));
+  const mitTrend = cards.filter(hasRealTrend);
 
   const gainers = mitTrend
     .filter((c) => (c.trendPercent as number) > 0)
@@ -47,6 +65,44 @@ export function splitMovers(cards: PokemonCard[], limit = 8): Movers {
     .slice(0, limit);
 
   return { gainers, losers };
+}
+
+// ── Marktbreite ─────────────────────────────────────────────────────────────
+
+export interface Breadth {
+  /** Karten über ihrem 30-Tage-Schnitt. */
+  up: number;
+  /** Karten darunter. */
+  down: number;
+  /** Karten mit echter Messung — die Bezugsgröße. */
+  total: number;
+  /** Anteil gestiegener Karten in Prozent. */
+  pct: number;
+}
+
+/**
+ * Anteil der Karten über ihrem 30-Tage-Schnitt.
+ *
+ * DER FEHLER, DEN DAS BEHEBT: Die Startseite zählte die Gewinner aus der
+ * ANZEIGE-Liste (`splitMovers(cards, 8)`) — die ist bei acht Einträgen
+ * abgeschnitten. Sobald mehr als acht Karten gestiegen waren, war der Zähler
+ * auf 8 festgenagelt, während der Nenner mit dem Datensatz wuchs. Live standen
+ * deshalb auf EINER Seite zwei verschiedene Marktbreiten: die Kachel zeigte
+ * „16 % · 8/50", die Erklärung zu Angst & Gier gleichzeitig „16 von 50" (32 %).
+ *
+ * Eine Anzeige-Begrenzung darf nie in eine Kennzahl geraten. Deshalb gibt es
+ * die Zählung hier einmal — für Kachel, Erklärtext und Angst & Gier.
+ */
+export function marketBreadth(cards: PokemonCard[]): Breadth {
+  const mitTrend = cards.filter(hasRealTrend);
+  const up = mitTrend.filter((c) => (c.trendPercent as number) > 0).length;
+  const down = mitTrend.filter((c) => (c.trendPercent as number) < 0).length;
+  return {
+    up,
+    down,
+    total: mitTrend.length,
+    pct: mitTrend.length > 0 ? (up / mitTrend.length) * 100 : 0,
+  };
 }
 
 // ── PokéMarket Index (PMI) ──────────────────────────────────────────────────
@@ -80,9 +136,7 @@ export interface PmiResult {
  * bestimmen.
  */
 export function computePmi(cards: PokemonCard[]): PmiResult {
-  const mitTrend = cards.filter(
-    (c) => typeof c.trendPercent === 'number' && Number.isFinite(c.trendPercent),
-  );
+  const mitTrend = cards.filter(hasRealTrend);
   const setCount = new Set(mitTrend.map((c) => c.setCode).filter(Boolean)).size;
 
   let gewichtSumme = 0;
@@ -144,27 +198,24 @@ function skalieren(wert: number, min: number, max: number): number {
  * - Verhältnis (20 %): Gewinner gegen Verlierer.
  */
 export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
-  const mitTrend = cards.filter(
-    (c) => typeof c.trendPercent === 'number' && Number.isFinite(c.trendPercent),
-  );
+  const mitTrend = cards.filter(hasRealTrend);
   if (mitTrend.length < PMI_MIN_CARDS) {
     return { value: 0, label: 'Zu wenig Daten', sufficient: false, components: [] };
   }
 
-  const { gainers, losers } = splitMovers(mitTrend, mitTrend.length);
-  const breadthPct = (gainers.length / mitTrend.length) * 100;
+  // Dieselbe Zählung wie die Kachel auf der Startseite — nicht die
+  // abgeschnittene Anzeige-Liste (siehe `marketBreadth`).
+  const breite = marketBreadth(mitTrend);
   const pmi = computePmi(mitTrend).value;
   const verhaeltnis =
-    gainers.length + losers.length > 0
-      ? (gainers.length / (gainers.length + losers.length)) * 100
-      : 50;
+    breite.up + breite.down > 0 ? (breite.up / (breite.up + breite.down)) * 100 : 50;
 
   const components: FearGreedComponent[] = [
     {
       label: 'Marktbreite',
-      score: breadthPct,
+      score: breite.pct,
       weight: FEAR_GREED_WEIGHTS.breadth,
-      detail: `${gainers.length} von ${mitTrend.length} Karten über ihrem 30-Tage-Schnitt`,
+      detail: `${breite.up} von ${breite.total} Karten über ihrem 30-Tage-Schnitt`,
     },
     {
       label: 'Momentum',
@@ -176,7 +227,7 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
       label: 'Gewinner zu Verlierer',
       score: verhaeltnis,
       weight: FEAR_GREED_WEIGHTS.ratio,
-      detail: `${gainers.length} gestiegen, ${losers.length} gefallen`,
+      detail: `${breite.up} gestiegen, ${breite.down} gefallen`,
     },
   ];
 

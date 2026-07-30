@@ -14,7 +14,15 @@ import { ApiErrorState } from '@/components/ApiErrorState';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ZeroMeter, RatioBar, RowBar } from '@/components/DataBars';
 import { FearGreedPanel } from '@/components/FearGreedPanel';
-import { splitMovers, computePmi, computeFearGreed, validateMarketData, logDataIssues } from '@/lib/market-metrics';
+import {
+  splitMovers,
+  marketBreadth,
+  hasRealTrend,
+  computePmi,
+  computeFearGreed,
+  validateMarketData,
+  logDataIssues,
+} from '@/lib/market-metrics';
 
 export const revalidate = 3600;
 
@@ -114,12 +122,15 @@ export default async function Home() {
   logDataIssues(qualitaet, 'startseite');
   const geprueft = qualitaet.clean;
 
-  const withTrend = geprueft.filter((c) => typeof c.trendPercent === 'number');
+  const withTrend = geprueft.filter(hasRealTrend);
   // Gewinner und Verlierer streng nach Vorzeichen — keine Auffüllung.
+  // ACHTUNG: Diese beiden Listen sind auf acht Einträge gekürzt. Sie sind für
+  // die ANZEIGE da und dürfen in keine Kennzahl einfließen (siehe unten).
   const { gainers, losers } = splitMovers(geprueft, 8);
 
-  const gainCount = gainers.length;
-  const breadthPct = withTrend.length > 0 ? (gainCount / withTrend.length) * 100 : 0;
+  // Marktbreite über den GANZEN Datensatz — nicht über die gekürzte Liste.
+  const breite = marketBreadth(geprueft);
+  const breadthPct = breite.pct;
 
   const pmi = computePmi(geprueft);
   const pmiNum = pmi.value;
@@ -219,12 +230,12 @@ export default async function Home() {
       href: `/karten/${worstLoser.id}`,
     });
   }
-  if (withTrend.length > 0) {
-    const positiv = gainCount > withTrend.length / 2;
+  if (breite.total > 0) {
+    const positiv = breite.up > breite.total / 2;
     insights.push({
       kennzahl: formatPercent(breadthPct, { withSign: false, digits: 0 }),
       titel: positiv ? 'Marktbreite positiv' : 'Marktbreite negativ',
-      text: `${gainCount} von ${withTrend.length} analysierten Karten notieren über ihrem 30-Tages-Schnitt.`,
+      text: `${breite.up} von ${breite.total} analysierten Karten notieren über ihrem 30-Tages-Schnitt.`,
       ton: positiv ? 'up' : 'down',
     });
   }
@@ -381,9 +392,9 @@ export default async function Home() {
                 {/* „18 von 40 im Plus" muss man umrechnen — als geteilter
                     Balken ist das Verhältnis unmittelbar sichtbar. */}
                 <div className="mt-2.5">
-                  <RatioBar up={gainCount} total={withTrend.length} />
+                  <RatioBar up={breite.up} total={breite.total} />
                 </div>
-                <p className="mt-1.5 text-[10px] text-slate-600">{gainCount}/{withTrend.length} im Plus (30T)</p>
+                <p className="mt-1.5 text-[10px] text-slate-600">{breite.up}/{breite.total} im Plus (30T)</p>
               </div>
 
               {/* Marktstimmung */}

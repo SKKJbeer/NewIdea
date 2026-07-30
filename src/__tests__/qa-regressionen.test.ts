@@ -118,6 +118,42 @@ describe('Die Startseite führt durch die Produktlogik', () => {
   });
 });
 
+describe('Ein Aussetzer der Kartendatenbank bricht nicht das Deployment', () => {
+  const seite = lies('src/app/sets/page.tsx');
+
+  it('fängt den Fehler nur während des Builds ab', () => {
+    // Der Abruf soll zur LAUFZEIT durchschlagen (dann behält Next.js die
+    // zuletzt erfolgreiche Seite). Während des Builds gibt es keine solche
+    // Seite — dort brach ein einzelner Aussetzer den gesamten Export ab und
+    // hätte alle übrigen Änderungen mit blockiert.
+    expect(seite).toContain("process.env.NEXT_PHASE === 'phase-production-build'");
+    expect(seite).toContain('throw err;');
+  });
+
+  it('schluckt den Fehler nicht pauschal', () => {
+    // `.catch(() => [])` hätte den Leerzustand einen ganzen Tag gecacht.
+    expect(seite).not.toMatch(/fetchRecentSets\([^)]*\)\.catch\(\(\) => \[\]\)/);
+  });
+});
+
+describe('Anzeige-Begrenzungen fließen in keine Kennzahl', () => {
+  const seite = lies('src/app/page.tsx');
+
+  it('die Marktbreite kommt aus der geteilten Zählung', () => {
+    // Vorher: Zähler aus `splitMovers(cards, 8).gainers.length` (bei acht
+    // gekappt), Nenner aus dem vollen Datensatz. Ergebnis waren zwei
+    // verschiedene Marktbreiten auf derselben Seite: „8/50" und „16 von 50".
+    expect(seite).toContain('marketBreadth(');
+    expect(seite).not.toMatch(/gainCount/);
+  });
+
+  it('die gekürzten Listen dienen nur der Anzeige', () => {
+    // `gainers`/`losers` dürfen nur noch in Bedingungen und beim Ausgeben
+    // vorkommen — nie als Zähler einer Quote.
+    expect(seite).not.toMatch(/\((?:gainers|losers)\.length\s*\/\s*/);
+  });
+});
+
 describe('Jede Seite hat einen Titel und eine Beschreibung', () => {
   it('keine Seite ohne Metadaten', () => {
     const ohne: string[] = [];
