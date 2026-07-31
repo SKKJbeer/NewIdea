@@ -29,9 +29,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const guide = await resolveGuide(slug);
   if (!guide) return { title: 'Guide nicht gefunden' };
   return {
-    title: `${guide.title} — CardBeacon`,
+    title: guide.title,
     description: guide.metaDescription,
     openGraph: {
+      siteName: 'CardBeacon',
       title: guide.title,
       description: guide.metaDescription,
       type: 'article',

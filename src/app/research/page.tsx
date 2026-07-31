@@ -17,7 +17,7 @@ import { SECTION_LABEL, TABLE } from '@/lib/ui';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: `Research — ${BRAND}`,
+  title: 'Research',
   description:
     'Marktbericht, Analysen, Guides und die vollständige Methodik hinter den Kennzahlen von CardBeacon.',
 };

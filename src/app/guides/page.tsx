@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Pokémon Karten Guides — CardBeacon',
+  title: 'Pokémon Karten Guides',
   description: 'Kostenlose Pokémon-Karten-Guides für Sammler: Seltenheitsstufen, Grading, Lagerung und Markt-Strategien verständlich erklärt.',
 };
 

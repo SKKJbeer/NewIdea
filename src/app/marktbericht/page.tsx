@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const report = await loadLatestMarketReport().catch(() => null);
   const week = report?.weekNumber ?? '—';
   return {
-    title: `Marktanalyse KW ${week} — CardBeacon`,
+    title: `Marktanalyse KW ${week}`,
     description: 'Wöchentliche Marktanalyse für Pokémon-Karten-Sammler.',
   };
 }

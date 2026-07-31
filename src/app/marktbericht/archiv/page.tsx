@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Marktanalyse-Archiv — CardBeacon',
+  title: 'Marktanalyse-Archiv',
   description: 'Alle wöchentlichen Pokémon-Karten-Marktanalysen im Archiv.',
 };
 

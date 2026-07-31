@@ -55,9 +55,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : '';
 
   return {
-    title: `${nameStr}${nummer} Preis & Wert | CardBeacon`,
+    title: `${nameStr}${nummer} Preis & Wert`,
     description: `Aktueller Marktpreis, Preisentwicklung und historische Marktdaten für ${card.name}${nummer} aus ${card.set}. Cardmarket-Preis: ${price > 0 ? formatEur(price) : 'k. A.'}, Seltenheit: ${card.rarity}.`,
     openGraph: {
+      siteName: 'CardBeacon',
       title: `${card.name}${nummer} — Preis & Wert`,
       description: `Aktueller Cardmarket-Preis für ${card.name} (${card.set}): ${price > 0 ? formatEur(price) : 'k. A.'}.`,
       images: card.imageUrlHiRes ? [{ url: card.imageUrlHiRes, alt: card.name }] : undefined,

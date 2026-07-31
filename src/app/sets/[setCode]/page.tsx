@@ -25,8 +25,19 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { setCode } = await params;
   if (!isValidSetCode(setCode)) return { title: 'Set nicht gefunden' };
-  const cards = await fetchCardsBySet(setCode).catch(() => []);
-  if (cards.length === 0) return { title: 'Set nicht gefunden' };
+
+  // Ausfall der Quelle und „Set gibt es nicht" sind zwei verschiedene Aussagen.
+  // Frueher endeten beide im Titel „Set nicht gefunden" — bei einem Aussetzer
+  // stand das dann fuer ein reales Set in der Auslieferung. Bei einem Ausfall
+  // gibt es hier gar keine Behauptung, nur einen neutralen Titel; die Seite
+  // selbst zeigt den Fehlerzustand.
+  let cards;
+  try {
+    cards = await fetchCardsBySet(setCode);
+  } catch {
+    return { title: 'Set-Analyse', robots: { index: false } };
+  }
+  if (cards.length === 0) return { title: 'Set nicht gefunden', robots: { index: false } };
 
   const setName = cards[0].set;
   return {

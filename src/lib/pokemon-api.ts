@@ -21,9 +21,22 @@ function tcgHeaders(): Record<string, string> {
  * (siehe CLAUDE.md, Stolperstelle 19 — genau so war die Startseite ohne Karten).
  * Ein kurzer zweiter Versuch fängt die meisten dieser Aussetzer ab.
  */
+// WAS BEI EINEM TOTALAUSFALL PASSIEREN SOLL
+//
+// `'leer'` ist die richtige Antwort ueberall dort, wo eine leere Liste ein
+// gueltiger Zustand ist (Suche ohne Treffer, Trendliste eines Sets).
+//
+// `'werfen'` ist die richtige Antwort dort, wo der Aufrufer aus einer leeren
+// Liste einen FEHLENDEN INHALT ableitet. Genau das ist passiert: Die Set-Seite
+// machte aus `[]` ein `notFound()`, und weil sie mit ISR gecacht wird, stand
+// „Set nicht gefunden" fuer ein existierendes Set (Pokémon 151) in der
+// Auslieferung — inklusive Titel und Metadaten. Ein Aussetzer der Quelle darf
+// nie als Aussage ueber den Bestand ankommen (Stolperstelle 16).
+type BeiAusfall = 'leer' | 'werfen';
+
 async function tcgList(
   params: Record<string, string | number>,
-  { retries = 1, timeout = 8000 } = {},
+  { retries = 1, timeout = 8000, beiAusfall = 'leer' as BeiAusfall } = {},
 ): Promise<unknown[]> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -49,6 +62,9 @@ async function tcgList(
       `TCG-Abfrage ohne Ergebnis (${JSON.stringify(params).slice(0, 80)}):`,
       lastError instanceof Error ? lastError.message : lastError,
     );
+    if (beiAusfall === 'werfen') {
+      throw lastError instanceof Error ? lastError : new Error('TCG-Abfrage fehlgeschlagen');
+    }
   }
   return [];
 }
@@ -166,11 +182,26 @@ export function isValidSetCode(setCode: string): boolean {
   return /^[a-z0-9.]{2,20}$/i.test(setCode);
 }
 
+/**
+ * Karten eines Sets.
+ *
+ * WIRFT bei einem Totalausfall der Quelle, statt eine leere Liste
+ * zurueckzugeben. Der Unterschied ist nicht kosmetisch: Die Set-Seite leitet
+ * aus einer leeren Liste „Set existiert nicht" ab und ruft `notFound()`. Mit
+ * `[]` als Ausfallantwort stand deshalb fuer ein reales Set „Set nicht
+ * gefunden" in der Auslieferung — und ISR haelt das fest.
+ *
+ * Eine leere Liste bedeutet ab jetzt genau eine Sache: Die Quelle hat
+ * geantwortet, und dieses Set hat keine handelbaren Karten.
+ */
 export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
   if (!isValidSetCode(setCode)) return [];
   // Mit Wiederholung — aus demselben Grund wie bei der Suche: Ohne sie zeigt
   // eine Set-Seite bei einem kurzen Aussetzer einen Fehler statt ihrer Karten.
-  const data = await tcgList({ q: `set.id:${setCode}`, pageSize: 60 }, { retries: 2, timeout: 12000 });
+  const data = await tcgList(
+    { q: `set.id:${setCode}`, pageSize: 60 },
+    { retries: 2, timeout: 12000, beiAusfall: 'werfen' },
+  );
   return mapAndFilter(data).sort(byPriceDesc);
 }
 

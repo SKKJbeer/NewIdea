@@ -17,7 +17,7 @@ const LEVEL_STYLE: Record<string, string> = {
 };
 
 export const metadata: Metadata = {
-  title: 'Pokémon Marktanalysen — CardBeacon',
+  title: 'Pokémon Marktanalysen',
   description: 'Wöchentlicher Wochenrückblick (sonntags) und rotierender Donnerstags-Artikel — Marktanalysen und Guides für Pokémon-Karten-Sammler.',
 };
 

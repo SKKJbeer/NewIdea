@@ -4,17 +4,29 @@ import { ArrowLeft, GitMerge, Plus, RefreshCw, Wrench } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Changelog — PokéMarket Intelligence',
-  description: 'Release-History und Versionsübersicht von PokéMarket Intelligence.',
+  title: 'Changelog',
+  description: 'Release-Historie und Versionsübersicht von CardBeacon.',
   robots: { index: false },
 };
 
 const RELEASES = [
   {
+    version: '4.3.0',
+    date: '31. Juli 2026',
+    label: 'Eine Marke, ein Titelmuster, keine falschen Aussagen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Marke stand auf sechs Seiten doppelt im Titel — das Layout haengt sie an, die Seiten schrieben sie zusaetzlich selbst' },
+      { type: 'fixed', text: 'Die kanonische Adresse der Startseite zeigte auf /index — eine Adresse, die es nicht gibt' },
+      { type: 'fixed', text: '„Set nicht gefunden" fuer ein reales Set: Ein Ausfall der Kartendatenbank kam als leere Liste an und wurde als fehlender Bestand gedeutet' },
+      { type: 'fixed', text: 'siteName fehlte in den Teilen-Vorschauen von Startseite, Kartenseiten und Guides' },
+    ],
+  },
+  {
     version: '4.2.5',
     date: '31. Juli 2026',
     label: 'Kartenseiten geben nach einem Aussetzer nicht auf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '„Karte nicht erreichbar" trotz existierender Karte: Drei von acht Aufrufen scheiterten an einem Serverfehler der Quelle — jetzt vier Versuche mit wachsender Wartezeit statt einem' },
     ],
@@ -1514,7 +1526,7 @@ export default function ChangelogPage() {
             </div>
           </div>
           <p className="text-slate-400 text-sm">
-            Alle Versionen von PokéMarket Intelligence — was wann hinzugekommen ist.
+            Alle Versionen von CardBeacon — was wann hinzugekommen ist.
           </p>
         </div>
       </header>

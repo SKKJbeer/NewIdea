@@ -24,7 +24,7 @@ import { MIN_POINTS_FOR_SCORE, MIN_POINTS_FOR_VOLATILITY, PERFORMANCE_WINDOWS } 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Methodik — wie unsere Marktkennzahlen entstehen | CardBeacon',
+  title: 'Methodik — wie unsere Marktkennzahlen entstehen',
   description:
     'Offenlegung der Berechnung: CardBeacon Index (CBI), Angst & Gier, Markt-Score, Preisquellen, Aktualisierungsintervalle und die Grenzen der Datenlage.',
   alternates: { canonical: '/methodik' },

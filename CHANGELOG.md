@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.3.0] - 31. Juli 2026 · Eine Marke, ein Titelmuster, keine falschen Aussagen
+
+### Behoben
+- **Die Marke stand auf sechs Seiten doppelt im Titel** („… — CardBeacon | CardBeacon"). Das Root-Layout haengt sie an jeden Seitentitel an, und die Seiten schrieben sie zusaetzlich selbst
+- **Die kanonische Adresse der Startseite zeigte auf `/index`** — eine Adresse, die es nicht gibt. Die geerbte relative Angabe loest auf der Wurzelroute so auf
+- **`/sets/sv3pt5` meldete „Set nicht gefunden" fuer ein reales Set.** Bei einem Ausfall der Kartendatenbank gab die Listenabfrage eine leere Liste zurueck, und die Set-Seite leitete daraus „existiert nicht" ab — mit ISR blieb das stehen. Ein Ausfall der Quelle ist jetzt ein Ausfall, keine Aussage ueber den Bestand
+- **`siteName` fehlte in den Teilen-Vorschauen** von Startseite, Kartenseiten und Guides: Setzt eine Seite eigene OpenGraph-Angaben, ersetzt Next das geerbte Objekt vollstaendig
+- **Letzte sichtbare Altmarke entfernt** — die Changelog-Seite trug sie noch in Titel, Beschreibung und Einleitung
+
+### Geaendert
+- Acht neue Tests halten das fest: ein Titelmuster, keine doppelte Marke, eigene kanonische Adresse der Startseite, keine sichtbare Altmarke, Ausfall ≠ Fehlbestand
+
+---
+
 ## [4.2.5] - 31. Juli 2026 · Kartenseiten geben nach einem Aussetzer nicht auf
 
 ### Behoben

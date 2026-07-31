@@ -435,3 +435,91 @@ describe('Navigation und Adressen', () => {
     }
   });
 });
+
+// ── EINE MARKE, EINE VERSION, EIN TITELMUSTER ───────────────────────────────
+//
+// Anlass war eine externe Beobachtung, auf Unterseiten stuende noch die alte
+// Marke. Nachgemessen stimmte das nicht — dafuer stand die NEUE Marke auf sechs
+// Seiten DOPPELT im Titel („… — CardBeacon | CardBeacon"), weil das Root-Layout
+// `| CardBeacon` anhaengt und die Seiten sie zusaetzlich selbst schrieben.
+
+const SEITEN_MIT_TITEL = [
+  'src/app/artikel/page.tsx',
+  'src/app/datenschutz/page.tsx',
+  'src/app/guides/page.tsx',
+  'src/app/impressum/page.tsx',
+  'src/app/marktbericht/page.tsx',
+  'src/app/marktbericht/archiv/page.tsx',
+  'src/app/methodik/page.tsx',
+  'src/app/research/page.tsx',
+  'src/app/changelog/page.tsx',
+  'src/app/artikel/[date]/page.tsx',
+  'src/app/guides/[slug]/page.tsx',
+  'src/app/karten/[id]/page.tsx',
+  'src/app/marktbericht/[week]/page.tsx',
+];
+
+describe('Marke und Titel', () => {
+  it('das Layout haengt die Marke genau einmal an', () => {
+    expect(lies('src/app/layout.tsx')).toMatch(/template: `%s \| \$\{SITE_NAME\}`/);
+  });
+
+  it('keine Seite schreibt die Marke zusaetzlich in ihren Titel', () => {
+    for (const datei of SEITEN_MIT_TITEL) {
+      const titel = lies(datei).match(/^\s*title: .*$/gm) ?? [];
+      for (const zeile of titel) {
+        expect(zeile, `${datei}: ${zeile.trim()}`).not.toMatch(/CardBeacon|BRAND/);
+      }
+    }
+  });
+
+  it('die Startseite nennt die Marke einmal und setzt den Titel absolut', () => {
+    // Sie fuehrt die Marke im Titel — deshalb `absolute`, sonst haengt das
+    // Layout sie ein zweites Mal an.
+    const seite = lies('src/app/page.tsx');
+    expect(seite).toMatch(/title: \{ absolute:/);
+  });
+
+  it('die Startseite hat eine eigene kanonische Adresse', () => {
+    // Die geerbte relative Angabe loest auf der Wurzelroute zu `/index` auf —
+    // einer Adresse, die es nicht gibt.
+    expect(lies('src/app/page.tsx')).toMatch(/alternates: \{ canonical: '\/' \}/);
+  });
+
+  it('keine sichtbare Altmarke in Seiten und Bausteinen', () => {
+    // Technische Bezeichner (computePmi, PMI_MIN_CARDS, /api/market/pmi) bleiben
+    // absichtlich — sie sind nirgends sichtbar. Verboten ist die MARKE.
+    const dateien = [...SEITEN_MIT_TITEL, 'src/app/page.tsx', 'src/app/layout.tsx'];
+    for (const datei of dateien) {
+      expect(lies(datei), datei).not.toMatch(/Pok[eé]Market|PokemonMarket/i);
+    }
+  });
+
+  it('Seiten mit eigenem openGraph setzen den Markennamen selbst', () => {
+    // Setzt eine Seite `openGraph`, ersetzt Next das geerbte Objekt vollstaendig
+    // — `siteName` faellt dann still weg.
+    for (const datei of ['src/app/page.tsx', 'src/app/karten/[id]/page.tsx', 'src/app/guides/[slug]/page.tsx']) {
+      expect(lies(datei), datei).toMatch(/siteName/);
+    }
+  });
+});
+
+describe('Ein Ausfall der Quelle ist keine Aussage ueber den Bestand', () => {
+  it('die Set-Karten werfen bei Totalausfall statt leer zu liefern', () => {
+    // BEFUND: /sets/sv3pt5 (Pokémon 151) lieferte „Set nicht gefunden".
+    // `tcgList` gab bei Ausfall `[]` zurueck, die Set-Seite machte daraus
+    // `notFound()` — und ISR hielt das fest.
+    const api = lies('src/lib/pokemon-api.ts');
+    const block = api.slice(api.indexOf('export async function fetchCardsBySet'));
+    expect(block.slice(0, 900)).toMatch(/beiAusfall: 'werfen'/);
+    expect(api).toMatch(/type BeiAusfall/);
+  });
+
+  it('die Set-Seite behauptet bei einem Ausfall nichts', () => {
+    const seite = lies('src/app/sets/[setCode]/page.tsx');
+    // Der Fehlerfall in generateMetadata darf NICHT „Set nicht gefunden" heissen.
+    expect(seite).toMatch(/catch \{\s*\n\s*return \{ title: 'Set-Analyse'/);
+    // Und die Seite selbst zeigt den Fehlerzustand statt eines 404.
+    expect(seite).toContain('<ApiErrorState');
+  });
+});

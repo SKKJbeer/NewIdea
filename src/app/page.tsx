@@ -54,9 +54,15 @@ import { SECTION_LABEL } from '@/lib/ui';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: `${BRAND} — ${DESCRIPTOR_DE} für Pokémon-Karten`,
+  // `absolute` statt eines gewoehnlichen Titels: Das Root-Layout haengt an jeden
+  // Seitentitel `| CardBeacon` an. Die Startseite fuehrt die Marke bereits im
+  // Titel — ohne `absolute` stuende sie zweimal darin.
+  title: { absolute: `${BRAND} — ${DESCRIPTOR_DE} für Pokémon-Karten` },
   description:
     'Marktindex, Marktbreite und Preisbewegungen für Pokémon-Sammelkarten auf Basis aktueller Cardmarket-Daten. Offengelegte Methodik, keine Anlageberatung.',
+  // Die geerbte relative Angabe (`./`) loest auf der Wurzelroute zu `/index`
+  // auf — einer Adresse, die es nicht gibt. Fuer die Startseite deshalb fest.
+  alternates: { canonical: '/' },
   keywords: [
     'Pokémon Karten Preis',
     'Pokémon TCG Markt',
@@ -66,6 +72,7 @@ export const metadata: Metadata = {
     'CardBeacon',
   ],
   openGraph: {
+    siteName: BRAND,
     title: `${BRAND} — ${DESCRIPTOR_DE}`,
     description:
       'Marktindex, Marktbreite und Preisbewegungen für Pokémon-Sammelkarten. Offengelegte Methodik.',

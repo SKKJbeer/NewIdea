@@ -97,7 +97,7 @@ export async function generateMetadata({ params }: { params: Promise<{ date: str
   const meta = ARTICLE_META[type];
   const dateLabel = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
   return {
-    title: `${meta.label} vom ${dateLabel} — CardBeacon`,
+    title: `${meta.label} vom ${dateLabel}`,
     description: `${meta.label} zum Pokémon-Kartenmarkt vom ${dateLabel}.`,
   };
 }

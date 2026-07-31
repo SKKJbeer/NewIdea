@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ week: str
   const report = await loadMarketReportByWeek(week).catch(() => null);
   if (!report) return { title: 'Bericht nicht gefunden' };
   return {
-    title: `Marktanalyse KW ${report.weekNumber} — CardBeacon`,
+    title: `Marktanalyse KW ${report.weekNumber}`,
     description: `Wöchentliche Pokémon-Karten-Marktanalyse für KW ${report.weekNumber} (${formatWeekDate(report.weekStart)}).`,
   };
 }
