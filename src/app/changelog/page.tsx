@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.2.2',
+    date: '31. Juli 2026',
+    label: 'Der Schreibvorgang ist nachweisbar',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auch der zweite Anlauf lief nie — die Index-Schnittstelle ist beim Bauen vorgerendert und fuehrt ihren Rumpf zur Laufzeit nicht aus' },
+      { type: 'new',   text: 'Eine ausdruecklich dynamische Route zum Setzen und Nachsehen des Indexstands; ihr Ergebnis steht in der Antwort' },
+    ],
+  },
+  {
     version: '4.2.1',
     date: '31. Juli 2026',
     label: 'Der Indexstand wird auch tatsaechlich geschrieben',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Der Schreibvorgang haengt an der Startseite — die aus dem Zwischenspeicher kommt und ihre Funktion dann gar nicht ausfuehrt. Jetzt schreiben zusaetzlich die Index-Schnittstelle und der Tages-Cron' },
     ],

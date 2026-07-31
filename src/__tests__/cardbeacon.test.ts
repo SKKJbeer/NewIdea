@@ -350,6 +350,25 @@ describe('Der Indexstand wird gespeichert statt nachgerechnet', () => {
     expect(seite).toMatch(/if \(cbi\.sufficient\) \{/);
   });
 
+  it('es gibt eine Stelle, die den Schreibvorgang nachweisbar macht', () => {
+    // ANLASS: Zwei Schreibstellen sahen richtig aus und liefen nie — die
+    // Startseite kommt aus dem Zwischenspeicher, die Index-Schnittstelle ist
+    // beim Bauen vorgerendert. Beide Male war der einzige Nachweis, dass die
+    // Tabelle leer blieb.
+    const route = lies('src/app/api/studio/market-index/route.ts');
+    expect(route).toContain("export const dynamic = 'force-dynamic'");
+    expect(route).toContain('isStudioAuthedFromRequest');
+    // Das Ergebnis steht in der Antwort, nicht nur im Log.
+    expect(route).toMatch(/ok: !fehler/);
+  });
+
+  it('der Tages-Cron schreibt ihn als verlaessliche Untergrenze', () => {
+    const cron = lies('src/app/api/cron/daily/route.ts');
+    expect(cron).toContain('saveMarketIndex');
+    // Und legt das Ergebnis in seine Antwort statt nur ins Log.
+    expect(cron).toMatch(/results\.marketIndex/);
+  });
+
   it('die fehlende Tabelle ist im Monitoring sichtbar', () => {
     const health = lies('src/lib/system-health.ts');
     expect(health).toContain('CREATE TABLE IF NOT EXISTS market_index');

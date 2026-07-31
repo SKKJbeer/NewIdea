@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.2] - 31. Juli 2026 · Der Schreibvorgang ist nachweisbar
+
+### Behoben
+- **Auch der zweite Anlauf lief nie.** Die oeffentliche Index-Schnittstelle ist beim Bauen vorgerendert — ihr Rumpf laeuft zur Laufzeit gar nicht, egal wie oft man sie aufruft. Damit sahen zwei Schreibstellen richtig aus und schrieben beide nichts
+
+### Neu
+- **Eine ausdruecklich dynamische Route zum Setzen und Nachsehen des Indexstands** (Studio-geschuetzt). Ihr Ergebnis steht in der Antwort — der Schreibvorgang ist damit pruefbar statt geglaubt, und nach einem Deployment laesst sich der erste Stand sofort setzen
+
+---
+
 ## [4.2.1] - 31. Juli 2026 · Der Indexstand wird auch tatsaechlich geschrieben
 
 ### Behoben
