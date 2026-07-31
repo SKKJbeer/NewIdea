@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.8.0] - 31. Juli 2026 · Bildlast und Layout-Versatz
+
+### Behoben
+- **Die Startseite lud 2.211 KB an Bildern fuer ZWOELF Miniaturen von 26 Pixel Breite** — rund 184 KB pro Briefmarke. Ursache war kein Einzelfall, sondern ein Muster: Miniaturen und Set-Logos waren rohe Bild-Tags mit der Adresse des Zwischenspeicher-Proxys. Der Proxy speichert nur zwischen; er verkleinert nichts und wandelt kein Format um. Der Bildoptimierer kam nie zum Zug
+  - Startseite: **2.596 KB → 453 KB**
+  - `/sets`: **2.278 KB → 512 KB**
+- **Layout-Versatz auf `/sets` lag bei 0,41** — dem Vierfachen der Grenze, ab der eine Seite als springend gilt. Set-Logos haben sehr unterschiedliche Seitenverhaeltnisse; ohne feste Masse wuchs die Zeile, sobald jedes Logo eintraf. Jetzt **0**
+- **Die Wortmarke war nur 25 Pixel hoch anklickbar** (17 im Fuss) — als Verweis auf die Startseite eines der meistgenutzten Ziele ueberhaupt und zugleich das kleinste. Jetzt 44 Pixel
+
+### Geprueft
+- Ein `h1` je Seite, keine Ueberschriften-Spruenge, `lang="de"`, kein Bild ohne `alt`, kein Bedienelement ohne Namen — auf Start-, Karten-, Set- und Suchseite je in Desktop- und Telefonbreite gemessen
+
+---
+
 ## [4.7.0] - 31. Juli 2026 · Die Suche wird schnell, der Set-Markt vollstaendig
 
 ### Behoben

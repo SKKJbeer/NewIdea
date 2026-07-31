@@ -59,7 +59,11 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
-            <Link href="/" aria-label="CardBeacon — Startseite">
+            <Link
+              href="/"
+              className="flex min-h-[44px] items-center"
+              aria-label="CardBeacon — Startseite"
+            >
               <Wordmark />
             </Link>
             <p className="mt-3 max-w-[220px] text-[11px] leading-relaxed text-slate-600">

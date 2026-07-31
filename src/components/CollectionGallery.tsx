@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ImageOff } from 'lucide-react';
 import type { PortfolioHolding, LiveCardData } from '@/lib/portfolio';
 import { hasLivePrice } from '@/lib/portfolio';
-import { cachedImg } from '@/lib/cached-image';
+import { CardThumb } from './CardThumb';
 import { formatEur, formatPercent } from '@/lib/format';
 import { SECTION_LABEL, toneClass } from '@/lib/ui';
 
@@ -111,11 +111,11 @@ export function CollectionGallery({ holdings, liveData }: Props) {
                   „das ist deine Karte", nicht eine Seltenheitsangabe. */}
               <span className="lift foil relative block aspect-[63/88] w-full overflow-hidden rounded-lg ring-1 ring-white/[0.06]">
                 {h.imageUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={cachedImg(h.imageUrl)}
+                  <CardThumb
+                    src={h.imageUrl}
                     alt={h.cardName}
-                    loading="lazy"
+                    width={220}
+                    height={307}
                     className="h-full w-full object-contain"
                   />
                 ) : (

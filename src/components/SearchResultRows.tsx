@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ImageOff } from 'lucide-react';
 import type { PokemonCard } from '@/types';
-import { cachedImg } from '@/lib/cached-image';
+import { CardThumb } from './CardThumb';
 import { hasRealTrend } from '@/lib/market-metrics';
 import { hatFolie } from '@/lib/collector';
 import { formatEur, formatPercent, formatPp } from '@/lib/format';
@@ -73,11 +73,10 @@ export function SearchResultRows({
               className={`lift block w-10 shrink-0 overflow-hidden rounded-[3px] ${hatFolie(card.rarity) ? 'foil' : ''}`}
             >
               {card.imageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={cachedImg(card.imageUrl)}
-                  alt=""
-                  loading="lazy"
+                <CardThumb
+                  src={card.imageUrl}
+                  width={40}
+                  height={56}
                   className="aspect-[63/88] w-10 object-contain"
                 />
               ) : (

@@ -56,7 +56,16 @@ export function NavBar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#1c1c24] bg-[#08080b]/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link href="/" className="shrink-0" aria-label="CardBeacon — Startseite">
+        {/* Trefferflaeche 44 px hoch. Gemessen war die Wortmarke 25 px — als
+            Verweis auf die Startseite ist sie damit auf einem Telefon schwerer
+            zu treffen als jedes andere Ziel der Seite, und sie ist eines der
+            meistgenutzten. Die Marke selbst bleibt gleich gross; nur der
+            anklickbare Bereich waechst. */}
+        <Link
+          href="/"
+          className="flex min-h-[44px] shrink-0 items-center"
+          aria-label="CardBeacon — Startseite"
+        >
           <Wordmark />
         </Link>
 

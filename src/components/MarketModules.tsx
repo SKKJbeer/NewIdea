@@ -4,7 +4,7 @@ import type { PokemonCard } from '@/types';
 import type { SetRank } from '@/lib/market-metrics';
 import { MIN_SET_SAMPLE } from '@/lib/market-metrics';
 import { displayPrice } from '@/lib/pokemon-api';
-import { cachedImg } from '@/lib/cached-image';
+import { CardThumb } from './CardThumb';
 import { hatFolie } from '@/lib/collector';
 import { formatEur, formatPercent, formatPp } from '@/lib/format';
 import { SECTION_LABEL, SECTION_NUM, TABLE, NUM, THUMB, toneClass, barClass } from '@/lib/ui';
@@ -116,8 +116,7 @@ function MoverRow({ card, rang, cbi }: { card: PokemonCard; rang: number; cbi: n
       </span>
 
       <span className={`lift block shrink-0 overflow-hidden rounded-[3px] ${hatFolie(card.rarity) ? 'foil' : ''}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={cachedImg(card.imageUrl)} alt="" loading="lazy" className={THUMB} />
+        <CardThumb src={card.imageUrl} width={26} height={36} className={THUMB} />
       </span>
 
       <span className="min-w-0">

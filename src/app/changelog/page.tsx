@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.8.0',
+    date: '31. Juli 2026',
+    label: 'Bildlast und Layout-Versatz',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Startseite lud 2.211 KB Bilder fuer zwoelf 26-Pixel-Miniaturen — der Bildoptimierer kam nie zum Zug. Jetzt 2.596 KB → 453 KB' },
+      { type: 'fixed', text: '/sets: 2.278 KB → 512 KB, Layout-Versatz 0,41 → 0' },
+      { type: 'fixed', text: 'Die Wortmarke war nur 25 Pixel hoch anklickbar — jetzt 44' },
+    ],
+  },
+  {
     version: '4.7.0',
     date: '31. Juli 2026',
     label: 'Die Suche wird schnell, der Set-Markt vollstaendig',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Dieselbe Suche brauchte 7,1 s, 4,3 s und 15,7 s — zwischen identischen Anfragen wurde nichts wiederverwendet. Treffer liegen jetzt im geteilten Datenspeicher' },
       { type: 'fixed', text: 'Leere Ergebnisse werden NICHT gespeichert: Ein Aussetzer der Quelle waere sonst zehn Minuten lang als „keine Treffer" festgeschrieben' },

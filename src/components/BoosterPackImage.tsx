@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { ImageOff } from 'lucide-react';
-import { cachedImg } from '@/lib/cached-image';
 
 // Zeigt das Set-Kennbild zu einer Karte — damit sofort erkennbar ist, aus
 // welchem Set sie stammt.
@@ -15,6 +15,23 @@ import { cachedImg } from '@/lib/cached-image';
 // Kartenbild lief eine garantiert scheiternde Anfrage, bevor auf das Set-Logo
 // zurückgefallen wurde. Deshalb ist das Logo jetzt die primäre Quelle.
 // Vor einer Rückkehr zum Boosterpack-Bild erst die URLs erneut prüfen.
+//
+// ZWEI MESSBARE ÄNDERUNGEN (31.07.2026):
+//
+// 1. ÜBER DEN BILDOPTIMIERER STATT ÜBER DEN ZWISCHENSPEICHER-PROXY.
+//    `/sets` lud 1.921 KB an Set-Logos — Bilder von 400 bis 500 Pixel Breite,
+//    angezeigt auf 130. Der Proxy speichert nur zwischen; er verkleinert nichts
+//    und wandelt kein Format um. Der Optimierer tut beides. Die ROHE Adresse
+//    der Quelle wird übergeben, nicht die Proxy-Adresse: Letztere lehnt der
+//    Optimierer mit HTTP 400 ab — das hat hier schon einmal ein Kartenbild
+//    verschwinden lassen.
+//
+// 2. PLATZ WIRD RESERVIERT.
+//    Gemessener Layout-Versatz auf `/sets`: 0,41 — das Vierfache der Grenze,
+//    ab der eine Seite als „springend" gilt. Set-Logos haben sehr
+//    unterschiedliche Seitenverhältnisse; ohne feste Maße wächst die Zeile,
+//    sobald jedes Logo eintrifft. `width`/`height` geben dem Browser das
+//    Verhältnis vorab, `className` bestimmt weiterhin die tatsächliche Größe.
 
 interface Props {
   setCode: string;
@@ -30,8 +47,8 @@ interface Props {
  */
 export function BoosterPackImage({ setCode, setName, className = '', logoUrl }: Props) {
   const sources = [
-    logoUrl ? cachedImg(logoUrl) : '',
-    setCode ? cachedImg(`https://images.pokemontcg.io/${setCode}/logo.png`) : '',
+    logoUrl || '',
+    setCode ? `https://images.pokemontcg.io/${setCode}/logo.png` : '',
   ].filter(Boolean);
 
   const [idx, setIdx] = useState(0);
@@ -49,12 +66,17 @@ export function BoosterPackImage({ setCode, setName, className = '', logoUrl }: 
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       key={sources[idx]}
       src={sources[idx]}
       // Ehrliche Beschriftung: Es ist das Set-Logo, kein Boosterpack-Foto.
       alt={`Set-Logo ${setName}`}
+      // Typisches Logo-Verhältnis. Es muss nicht exakt stimmen — es hält nur
+      // den Platz frei, bis das Bild da ist; `object-contain` in der
+      // aufrufenden Klasse setzt das echte Verhältnis dann durch.
+      width={400}
+      height={140}
+      sizes="(max-width: 640px) 40vw, 260px"
       className={className}
       onError={() => setIdx((i) => i + 1)}
       loading="lazy"
