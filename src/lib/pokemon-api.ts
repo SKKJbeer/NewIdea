@@ -166,18 +166,10 @@ export function isValidSetCode(setCode: string): boolean {
 
 export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
   if (!isValidSetCode(setCode)) return [];
-  const response = await axios.get(`${TCG_API_BASE}/cards`, {
-    headers: {
-      ...tcgHeaders(),
-    },
-    params: {
-      q: `set.id:${setCode}`,
-      pageSize: 60,
-    },
-    timeout: 8000,
-  });
-
-  return mapAndFilter(response.data.data).sort(byPriceDesc);
+  // Mit Wiederholung — aus demselben Grund wie bei der Suche: Ohne sie zeigt
+  // eine Set-Seite bei einem kurzen Aussetzer einen Fehler statt ihrer Karten.
+  const data = await tcgList({ q: `set.id:${setCode}`, pageSize: 60 }, { retries: 2, timeout: 12000 });
+  return mapAndFilter(data).sort(byPriceDesc);
 }
 
 export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
@@ -222,20 +214,23 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   // ausbrechen können (z.B. `") OR set.id:(*` zur Enumeration beliebiger Karten).
   const escaped = translated.replace(/["*?:()\[\]{}^~\\+\-!&|]/g, '').trim();
   if (!escaped) return [];
-  const response = await axios.get(`${TCG_API_BASE}/cards`, {
-    headers: {
-      ...tcgHeaders(),
-    },
-    params: {
-      q: `name:"*${escaped}*"`,
-      pageSize: limit,
-      orderBy: '-set.releaseDate',
-    },
-    timeout: 8000,
-  });
+
+  // ÜBER `tcgList` STATT DIREKT: Die Suche war der einzige Abruf ohne
+  // Wiederholungsversuch — ein einziger Aussetzer der Kartendatenbank (die
+  // laut Stolperstelle 28 regelmäßig welche hat) führte sofort zu
+  // „Suche momentan nicht verfügbar", obwohl die Karte existiert. Ausgerechnet
+  // die Funktion, die immer funktionieren muss, war die ungeschützteste.
+  //
+  // Zwei Wiederholungen und ein etwas großzügigeres Zeitlimit: Die Aussetzer
+  // sind kurzlebig, und eine Suche, die eine Sekunde später antwortet, ist
+  // unendlich viel besser als eine, die aufgibt.
+  const data = await tcgList(
+    { q: `name:"*${escaped}*"`, pageSize: limit, orderBy: '-set.releaseDate' },
+    { retries: 2, timeout: 12000 },
+  );
 
   // Nur vollständige, handelbare Karten (Preis + Bild) — nach Marktpreis absteigend.
-  return mapAndFilter(response.data.data).sort(byPriceDesc);
+  return mapAndFilter(data).sort(byPriceDesc);
 }
 
 /**

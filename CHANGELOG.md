@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.0.1] - 31. Juli 2026 · Suche und Kartenbilder
+
+### Behoben
+- **Die Suche gab bei einem Aussetzer der Kartendatenbank sofort auf.** Sie war der einzige Abruf ohne Wiederholungsversuch — ausgerechnet die Funktion, die immer funktionieren muss. Statt Ergebnissen erschien „Suche momentan nicht verfuegbar", obwohl die Karte existiert. Jetzt zwei Wiederholungen und ein groesseres Zeitlimit; dasselbe fuer die Karten einer Set-Seite
+- **Kartenbilder blieben teilweise unsichtbar.** Das Bild startete durchsichtig und wurde erst beim Ladeereignis eingeblendet — ist es schon fertig, bevor die Seite im Browser aktiv wird, kommt dieses Ereignis nie. Die Karte blieb dann dauerhaft leer. Das Bild ist jetzt von Anfang an sichtbar, der Platzhalter liegt dahinter
+
+---
+
 ## [4.0.0] - 31. Juli 2026 · CardBeacon
 
 Das Produkt heisst jetzt CardBeacon - Marktanalyse fuer Sammelkarten. Pokemon

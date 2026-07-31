@@ -217,6 +217,40 @@ describe('Aufbau und Zurückhaltung', () => {
   });
 });
 
+describe('Suche und Kartenbilder funktionieren verlässlich', () => {
+  const api = lies('src/lib/pokemon-api.ts');
+
+  it('die Suche gibt nach einem Aussetzer nicht sofort auf', () => {
+    // BEFUND: `searchCards` war der EINZIGE Abruf ohne Wiederholungsversuch —
+    // ausgerechnet die Funktion, die immer funktionieren muss. Ein kurzer
+    // Aussetzer der Kartendatenbank führte sofort zu „Suche momentan nicht
+    // verfügbar", obwohl die Karte existiert.
+    const block = api.slice(api.indexOf('export async function searchCards'));
+    expect(block.slice(0, 1800)).toMatch(/tcgList\(/);
+    expect(block.slice(0, 1800)).toMatch(/retries: 2/);
+    // Kein roher Abruf mehr in dieser Funktion.
+    expect(block.slice(0, 1800)).not.toMatch(/axios\.get\(/);
+  });
+
+  it('die Set-Karten ebenso', () => {
+    const block = api.slice(api.indexOf('export async function fetchCardsBySet'));
+    expect(block.slice(0, 900)).toMatch(/tcgList\(/);
+    expect(block.slice(0, 900)).not.toMatch(/axios\.get\(/);
+  });
+
+  it('das Kartenbild hängt nicht an einem Ereignis', () => {
+    // BEFUND: Das Bild startete mit `opacity-0` und wurde erst bei `onLoad`
+    // sichtbar. Ist das Bild schon geladen, bevor React den Behandler anhängt,
+    // feuert `onLoad` nie — die Karte bleibt dann dauerhaft leer.
+    // Ohne Kommentare geprüft — die Begründung nennt beide Muster beim Namen.
+    const bild = ohneKommentare(lies('src/components/CardImage.tsx'));
+    expect(bild).not.toContain('onLoad');
+    expect(bild).not.toContain('opacity-0');
+    // Der Platzhalter bleibt — er liegt jetzt hinter dem Bild.
+    expect(bild).toContain('shimmer');
+  });
+});
+
 describe('Navigation und Adressen', () => {
   it('Research ist ein eigenes Ziel', () => {
     expect(lies('src/components/NavBar.tsx')).toContain("{ href: '/research'");

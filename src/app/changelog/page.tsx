@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.0.1',
+    date: '31. Juli 2026',
+    label: 'Suche und Kartenbilder',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Suche gab bei einem Aussetzer der Kartendatenbank sofort auf — sie war der einzige Abruf ohne Wiederholungsversuch' },
+      { type: 'fixed', text: 'Kartenbilder blieben teilweise unsichtbar: Das Bild wartete auf ein Ladeereignis, das bei bereits geladenen Bildern nie kommt' },
+    ],
+  },
+  {
     version: '4.0.0',
     date: '31. Juli 2026',
     label: 'CardBeacon',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Das Produkt heisst CardBeacon - Marktanalyse fuer Sammelkarten. Pokemon ist der erste unterstuetzte Markt, nicht die Identitaet des Produkts' },
       { type: 'new',     text: 'Marktkontext auf jeder Kartenseite: Karte, Set und Index nebeneinander ueber denselben Zeitraum, mit Abstand zum Markt in Prozentpunkten' },
