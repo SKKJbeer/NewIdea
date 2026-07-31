@@ -6,7 +6,6 @@ import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import { Reveal } from '@/components/Reveal';
 import { Prose } from '@/components/Prose';
-import { ReadingProgress } from '@/components/ReadingProgress';
 import { ArticleStats } from '@/components/ArticleStats';
 import { PriceBars, TrendBars, type BarItem } from '@/components/DataBars';
 import { displayPrice } from '@/lib/pokemon-api';
@@ -23,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const report = await loadLatestMarketReport().catch(() => null);
   const week = report?.weekNumber ?? '—';
   return {
-    title: `Marktanalyse KW ${week} — PokéMarket Intelligence`,
+    title: `Marktanalyse KW ${week} — CardBeacon`,
     description: 'Wöchentliche Marktanalyse für Pokémon-Karten-Sammler.',
   };
 }
@@ -51,7 +50,6 @@ export default async function MarktberichtPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
-      <ReadingProgress />
 
       <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div aria-hidden className="pointer-events-none absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[110px] animate-floaty" />

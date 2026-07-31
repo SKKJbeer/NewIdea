@@ -143,7 +143,7 @@ export function AutoReelPanel() {
               {result.reelUrl && (
                 <a
                   href={result.reelUrl}
-                  download="pokemarket-reel.mp4"
+                  download="cardbeacon-reel.mp4"
                   className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#2a2a3a] bg-[#13131e] hover:bg-[#1a1a28] text-slate-200 text-sm font-bold px-4 py-3 transition-colors"
                 >
                   <Download size={15} /> Herunterladen

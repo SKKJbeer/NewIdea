@@ -122,7 +122,7 @@ export async function generateNewsletterContent(
     messages: [
       {
         role: 'user',
-        content: `Du schreibst den Newsletter von "PokéMarket Intelligence".
+        content: `Du schreibst den Newsletter von "CardBeacon".
 
 ${CONTENT_RULES}
 
@@ -168,7 +168,7 @@ Antworte NUR mit validem JSON:
   } catch (err) {
     warnUnusable('Newsletter', message.stop_reason, err);
     newsletterData = {
-      subject: 'PokéMarket Weekly: Top Karten dieser Woche',
+      subject: 'CardBeacon Weekly: Top Karten dieser Woche',
       preheader: 'Deine wöchentliche Marktanalyse ist da',
       intro: summary.weeklyReport.slice(0, 300),
       cardHighlights: topCards.map((c) => ({

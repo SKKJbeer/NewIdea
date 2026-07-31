@@ -45,30 +45,33 @@ describe('Kein Versprechen von Echtzeit-Daten', () => {
     expect(treffer, `„Echtzeit" ohne Echtzeit-Daten:\n${treffer.join('\n')}`).toEqual([]);
   });
 
-  it('die Startseite sagt stattdessen, was zutrifft', () => {
-    const seite = lies('src/app/page.tsx');
-    expect(seite).toContain('datenbasiert verstehen');
-    expect(seite).toContain('auf Basis aktueller Cardmarket-Daten');
-    // Der Hinweis auf die tägliche Aktualisierung bleibt — er ist die Wahrheit.
-    expect(seite).toContain('täglich aktualisiert');
+  it('die Startseite benennt Zeitraum und Stichprobe statt Aktualität zu behaupten', () => {
+    // Statt eines Versprechens („in Echtzeit") steht dort, worauf die Zahlen
+    // beruhen: Zeitraum, Stichprobengröße, Datenstand.
+    const kopf = lies('src/components/MarketHeader.tsx');
+    expect(kopf).toContain('Gemessene Bewegung über');
+    expect(kopf).toContain('Stichprobe');
+    expect(kopf).toContain('Stand');
   });
 });
 
 describe('Labels sagen, was die Zahl darunter ist', () => {
-  it('der Ticker verspricht keine Aktualisierung in Echtzeit', () => {
-    // Vorher stand dort schlicht „Live" — neben Zahlen aus einer täglich
-    // aktualisierten Quelle.
+  it('es gibt keinen laufenden Ticker mehr', () => {
+    // Der Ticker trug das Label „Live" neben Zahlen aus einer täglich
+    // aktualisierten Quelle — und zeigte dieselben Karten wie die Bewegungen
+    // darunter. Beides ist mit dem Umbau entfallen: keine Dauerbewegung, keine
+    // dritte Wiederholung derselben Karten.
     const seite = lies('src/app/page.tsx');
-    expect(seite).toContain('Marktbewegungen');
-    expect(seite).not.toMatch(/<Activity size=\{10\} \/> Live$/m);
+    expect(seite).not.toContain('tickerCards');
+    expect(seite).not.toMatch(/animate-\[scroll|overflow-x-auto scrollbar-none/);
   });
 
   it('die Set-Tabelle nennt den Median beim Namen', () => {
-    // Gerechnet wird der Median (rankSets), in der Spalte stand aber
-    // „Ø Preis“ — zwei verschiedene Aussagen über dieselbe Zahl.
-    const seite = lies('src/app/page.tsx');
-    expect(seite).toContain('Medianpreis');
-    expect(seite).not.toContain('Ø Preis');
+    // Gerechnet wird der Median (rankSets); die Spalte hiess einmal „Ø Preis“
+    // — zwei verschiedene Aussagen über dieselbe Zahl.
+    const modul = lies('src/components/MarketModules.tsx');
+    expect(modul).toContain('Median');
+    expect(modul).not.toContain('Ø Preis');
     expect(lies('src/lib/market-metrics.ts')).toContain('medianPrice: median(');
   });
 

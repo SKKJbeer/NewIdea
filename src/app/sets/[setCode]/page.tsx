@@ -9,13 +9,14 @@ import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api
 import { formatEurRounded } from '@/lib/format';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
+import { siteUrlOrLocal } from '@/lib/site';
 
 // BEWUSST KEIN generateStaticParams: Schlägt die TCG-API während des Builds fehl,
 // würden existierende Sets als 404 fest ins CDN gebacken (siehe karten/[id]).
 // On-Demand + ISR (24h) + Loading-Skeleton ist robuster.
 export const revalidate = 86400;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+const SITE_URL = siteUrlOrLocal();
 
 interface Props {
   params: Promise<{ setCode: string }>;
@@ -100,7 +101,7 @@ export default async function SetDetailPage({ params }: Props) {
                 href={amazonUrl}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                className="mt-4 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-xl px-5 py-2.5 font-semibold text-sm transition-colors"
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-md px-5 py-2.5 font-semibold text-sm transition-colors"
               >
                 <ShoppingCart size={15} /> Booster kaufen <ExternalLink size={12} />
               </a>
@@ -114,7 +115,7 @@ export default async function SetDetailPage({ params }: Props) {
         <CardGrid cards={cards} title={`Alle Karten aus ${setName} — nach Marktwert sortiert`} />
 
         <footer className="border-t border-[#1e1e30] pt-5 space-y-3">
-          <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
+          <div className="rounded-md border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
             <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
             <p className="text-[10px] text-amber-400/60 mt-0.5">
               Preise: Cardmarket (EUR) ohne Gewähr — <strong className="text-amber-400/80">keine Anlageberatung</strong>.

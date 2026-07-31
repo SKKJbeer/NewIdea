@@ -7,6 +7,43 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.0.0] - 31. Juli 2026 · CardBeacon
+
+Das Produkt heisst jetzt CardBeacon - Marktanalyse fuer Sammelkarten. Pokemon
+ist der erste unterstuetzte Markt, nicht mehr die Identitaet des Produkts.
+
+### Neu
+- **Marktkontext auf jeder Kartenseite.** Karte, ihr Set und der Index
+  nebeneinander, alle drei ueber denselben 30-Tage-Zeitraum, dazu der Abstand
+  zum Markt in Prozentpunkten. Fehlt eine Seite, entfaellt die Zeile - es wird
+  nichts geschaetzt
+- **Marktkommentar** aus festen Regeln: Jeder Satz haengt an einer Zahl, die
+  daneben steht. Keine Prognose, keine Ursachenbehauptung, keine Empfehlung
+- **Research** buendelt Marktbericht, Analysen, Guides und Methodik an einer Stelle
+- **Verteilung der 30-Tage-Bewegung** im Marktkopf statt einer Indexkurve: Fuer
+  eine Kurve fehlen gespeicherte Tagesstaende, und eine rueckgerechnete waere
+  erfunden
+- Design-System (`DESIGN.md`) und zentrale Marken-, Adress- und Gestaltungsmodule
+
+### Geaendert
+- **Startseite von zehn auf sechs Abschnitte.** Der laufende Ticker, die
+  Trending-Tabelle und die doppelten Gewinner-/Verlierer-Listen sind entfallen -
+  dieselbe Karte erschien darin bis zu dreimal
+- **Navigation von acht auf fuenf Ziele:** Markt, Karten, Sets, Portfolio, Research
+- **Der Index heisst CBI (CardBeacon Index).** Rechnung und Methodik unveraendert
+- **Weniger Flaechen:** Abschnitte werden durch Linie und Abstand getrennt statt
+  durch abgerundete Kacheln
+- Der Balken am oberen Seitenrand ist entfallen; Ladezustaende stehen jetzt an
+  der Stelle, an der die Daten erscheinen
+
+### Behoben
+- **Sets ohne gemessene Karte zeigten „0,0 %"**, als haetten sie sich nicht
+  bewegt. Nicht gemessen ist keine Nullbewegung - dort steht jetzt ein Strich
+- **Kanonische Adressen zeigten auf eine nie verbundene Domain.** Es wird keine
+  Produktionsadresse mehr geraten (`src/lib/site.ts`)
+
+---
+
 ## [3.3.5] - 31. Juli 2026 · Die groessere Stichprobe bekommt auch mehr Zeit
 
 ### Behoben

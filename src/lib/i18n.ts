@@ -73,7 +73,7 @@ const de = {
   // Footer
   footer_partner: 'Partner & Affiliate-Links',
   footer_disclaimer:
-    'PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben (Cardmarket, EUR) ohne Gewähr.',
+    'CardBeacon ist kein Finanzberater. Alle Preisangaben (Cardmarket, EUR) ohne Gewähr.',
   footer_affiliate: 'Affiliate-Links: Bei Käufen über unsere Links erhalten wir eine kleine Provision.',
   footer_impressum: 'Impressum',
   footer_datenschutz: 'Datenschutz',
@@ -150,7 +150,7 @@ const en: Record<keyof typeof de, string> = {
 
   footer_partner: 'Partners & Affiliate Links',
   footer_disclaimer:
-    'PokéMarket Intelligence is not a financial advisor. All prices (Cardmarket, EUR) without warranty.',
+    'CardBeacon is not a financial advisor. All prices (Cardmarket, EUR) without warranty.',
   footer_affiliate: 'Affiliate links: We earn a small commission on purchases through our links.',
   footer_impressum: 'Imprint',
   footer_datenschutz: 'Privacy Policy',

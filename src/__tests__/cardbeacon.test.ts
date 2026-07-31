@@ -1,0 +1,247 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync, globSync } from 'fs';
+import { join } from 'path';
+import { BRAND, INDEX_SHORT, INDEX_LONG } from '@/lib/brand';
+import { buildMarketContext, CONTEXT_WINDOW_DAYS } from '@/lib/market-context';
+import { verteilung } from '@/components/MarketHeader';
+import type { PokemonCard } from '@/types';
+
+// Die Zusagen der Umbenennung — als Prüfungen, nicht als Absichtserklärung.
+
+const WURZEL = process.cwd();
+const lies = (d: string) => readFileSync(join(WURZEL, d), 'utf8');
+
+/** Quelldateien ohne Tests. Der Verlauf bleibt ausgenommen: Dort steht, wie das
+ *  Produkt hieß, und das ist der Zweck eines Verlaufs. */
+function quellen(): string[] {
+  return globSync('src/**/*.{ts,tsx}', { cwd: WURZEL }).filter(
+    (f) => !f.includes('__tests__') && !f.includes('changelog'),
+  );
+}
+
+function ohneKommentare(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+}
+
+describe('Die alte Marke ist vollständig verschwunden', () => {
+  it('kommt in keiner sichtbaren Zeile mehr vor', () => {
+    const treffer: string[] = [];
+    for (const datei of quellen()) {
+      // AUSNAHME mit Grund: `studio-auth.ts` verwendet die alte Zeichenkette als
+      // Salz des Sitzungstokens. Sie ist nirgends sichtbar — sie zu ändern
+      // würde ausschließlich alle bestehenden Anmeldungen ungültig machen.
+      if (datei.endsWith('studio-auth.ts')) continue;
+      for (const zeile of ohneKommentare(lies(datei)).split('\n')) {
+        if (/Pok[ée]Market/i.test(zeile)) treffer.push(`${datei}  ${zeile.trim().slice(0, 80)}`);
+      }
+    }
+    expect(treffer, `Alte Marke gefunden:\n${treffer.join('\n')}`).toEqual([]);
+  });
+
+  it('steht an genau einer Stelle definiert', () => {
+    // Vorher stand der Name als Zeichenkette in Metadaten, Fußzeile,
+    // Newsletter-Vorlage, JSON-LD und einem Dutzend Überschriften. Genau
+    // deshalb war eine Umbenennung eine Suchen-und-Ersetzen-Übung mit Resten.
+    expect(BRAND).toBe('CardBeacon');
+    expect(lies('src/lib/brand.ts')).toContain("export const BRAND = 'CardBeacon'");
+  });
+
+  it('die Wortmarke bildet kein einzelnes Kartenspiel ab', () => {
+    // Ein Pokéball im Logo wäre in dem Moment falsch, in dem ein zweiter Markt
+    // dazukommt — und sähe aus wie jedes andere Sammel-Werkzeug.
+    // Ohne Kommentare geprüft — die Begründung im Quelltext nennt die
+    // vermiedenen Muster absichtlich beim Namen.
+    const mark = ohneKommentare(lies('src/components/Wordmark.tsx'));
+    expect(mark).not.toMatch(/pok[ée]ball|pokeball/i);
+    // Verläufe sind das Erkennungszeichen automatisch erzeugter Logos.
+    expect(mark).not.toMatch(/gradient/i);
+  });
+});
+
+describe('Der Index heißt sichtbar CBI', () => {
+  it('trägt Kurz- und Langform', () => {
+    expect(INDEX_SHORT).toBe('CBI');
+    expect(INDEX_LONG).toBe('CardBeacon Index');
+  });
+
+  it('taucht als alte Abkürzung nirgends sichtbar auf', () => {
+    // Interne Bezeichner (PMI_MIN_CARDS, computePmi, PmiResult) bleiben —
+    // die geprüften Rechenwege umzubenennen brächte Risiko ohne Nutzen.
+    const treffer: string[] = [];
+    for (const datei of quellen()) {
+      if (datei.includes('brand.ts')) continue;
+      for (const zeile of ohneKommentare(lies(datei)).split('\n')) {
+        const ohneBezeichner = zeile.replace(
+          /PMI_MIN_CARDS|PmiResult|computePmi|pmiScore|PmiScorePanel|MIN_POINTS|pmi\b/g,
+          '',
+        );
+        if (/\bPMI\b/.test(ohneBezeichner)) {
+          treffer.push(`${datei}  ${zeile.trim().slice(0, 80)}`);
+        }
+      }
+    }
+    expect(treffer, `Sichtbares PMI gefunden:\n${treffer.join('\n')}`).toEqual([]);
+  });
+
+  it('die Methodik erklärt ihn unter dem neuen Namen', () => {
+    const m = lies('src/app/methodik/page.tsx');
+    expect(m).toContain('CardBeacon Index');
+    expect(m).toContain('CBI = Σ');
+  });
+});
+
+// ── Marktkontext ────────────────────────────────────────────────────────────
+
+function karte(trend: number | undefined, gemessen = true): PokemonCard {
+  return {
+    id: 'x-1',
+    name: 'Testkarte',
+    set: 'Testset',
+    setCode: 'tst',
+    rarity: 'Rare',
+    imageUrl: 'https://images.pokemontcg.io/tst/1.png',
+    prices: { market: 10 },
+    trendPercent: trend ?? 0,
+    realData: trend !== undefined ? gemessen : false,
+  } as PokemonCard;
+}
+
+describe('Marktkontext vergleicht nur Vergleichbares', () => {
+  const markt = { value: -0.2, cardCount: 204, setCount: 15 };
+  const set = { code: 'tst', name: 'Testset', value: -4.2, measured: 12, medianPrice: 20 };
+
+  it('stellt Karte, Set und Index nebeneinander', () => {
+    const ctx = buildMarketContext(karte(-13.6), set, markt);
+    expect(ctx?.rows.map((r) => r.label)).toEqual(['Testkarte', 'Testset', 'CardBeacon Index']);
+  });
+
+  it('rechnet den Abstand in Prozentpunkten', () => {
+    // −13,6 gegen −0,2 sind 13,4 Prozentpunkte, nicht 13,4 Prozent.
+    const ctx = buildMarketContext(karte(-13.6), set, markt);
+    expect(ctx?.relativeToMarket).toBeCloseTo(-13.4, 5);
+  });
+
+  it('lässt das Set weg, wenn dafür keine Daten vorliegen', () => {
+    // Kein Ersatzwert, keine Schätzung — die Zeile entfällt.
+    const ctx = buildMarketContext(karte(-13.6), null, markt);
+    expect(ctx?.rows).toHaveLength(2);
+    expect(ctx?.rows.some((r) => r.label === 'Testset')).toBe(false);
+  });
+
+  it('zeigt gar nichts, wenn die Karte selbst nicht gemessen ist', () => {
+    expect(buildMarketContext(karte(undefined, false), set, markt)).toBeNull();
+  });
+
+  it('zeigt gar nichts, wenn es nichts zu vergleichen gibt', () => {
+    // Eine Tabelle mit nur der Karte selbst ist kein Kontext.
+    expect(buildMarketContext(karte(-13.6), null, null)).toBeNull();
+  });
+
+  it('ohne Index kein Abstand zum Index', () => {
+    const ctx = buildMarketContext(karte(-13.6), set, null);
+    expect(ctx?.relativeToMarket).toBeNull();
+  });
+
+  it('nutzt überall denselben Zeitraum', () => {
+    // Ein Vergleich von 30 Tagen gegen 7 Tage sähe aus wie eine Erkenntnis und
+    // wäre ein Rechenfehler.
+    expect(CONTEXT_WINDOW_DAYS).toBe(30);
+    const ctx = buildMarketContext(karte(-13.6), set, markt);
+    expect(ctx?.windowDays).toBe(30);
+    const quelle = lies('src/lib/market-context.ts');
+    expect(quelle).toContain('NUR GLEICHE ZEITRÄUME');
+  });
+
+  it('holt Set-Vergleich und Index über dieselbe Mindest-Stichprobe', () => {
+    const quelle = lies('src/lib/market-context.ts');
+    expect(quelle).toContain('MIN_SET_SAMPLE');
+    expect(quelle).toContain('hasRealTrend');
+  });
+});
+
+describe('Die Verteilung im Marktkopf zählt echte Messwerte', () => {
+  it('ordnet jede Bewegung genau einer Klasse zu', () => {
+    const werte = [-25, -12, -7, -2, 3, 8, 15, 40];
+    const summe = verteilung(werte).reduce((s, k) => s + k.anzahl, 0);
+    expect(summe).toBe(werte.length);
+  });
+
+  it('trennt an der Null', () => {
+    const k = verteilung([-0.1, 0.1]);
+    expect(k.find((x) => x.label === '−5 bis 0')?.anzahl).toBe(1);
+    expect(k.find((x) => x.label === '0 bis +5')?.anzahl).toBe(1);
+  });
+
+  it('erfindet ohne Werte nichts', () => {
+    expect(verteilung([]).every((k) => k.anzahl === 0)).toBe(true);
+  });
+});
+
+describe('Aufbau und Zurückhaltung', () => {
+  it('es gibt keinen Balken am oberen Rand', () => {
+    // Weder als Ladeanzeige noch als Lesefortschritt: Ein Balken oben sagt
+    // „irgendwo passiert etwas" — genau das, was niemand braucht.
+    const treffer = quellen().filter((d) => {
+      const s = ohneKommentare(lies(d));
+      return /fixed (top-0|inset-x-0 top-0)[^"]*h-\[?[0-3]/.test(s) && /scrollY|progress/i.test(s);
+    });
+    expect(treffer, `Fortschrittsbalken gefunden:\n${treffer.join('\n')}`).toEqual([]);
+  });
+
+  it('die Marktseiten kommen ohne Kachel-Radien aus', () => {
+    // DESIGN.md §4: Datenflächen haben Kanten. `rounded-2xl` war der Radius
+    // der Vorgängerfassung und ließ jede Datenfläche wie ein Werbebanner
+    // aussehen.
+    for (const datei of [
+      'src/app/page.tsx',
+      'src/app/research/page.tsx',
+      'src/components/MarketHeader.tsx',
+      'src/components/MarketModules.tsx',
+      'src/components/MarketContextPanel.tsx',
+      'src/components/NavBar.tsx',
+      'src/components/SiteFooter.tsx',
+    ]) {
+      expect(lies(datei), datei).not.toContain('rounded-2xl');
+    }
+  });
+
+  it('die Farbregel steht einmal und wird benutzt', () => {
+    expect(lies('src/lib/ui.ts')).toContain('export function toneClass');
+    for (const datei of [
+      'src/components/MarketHeader.tsx',
+      'src/components/MarketModules.tsx',
+      'src/components/MarketContextPanel.tsx',
+    ]) {
+      expect(lies(datei), datei).toContain('toneClass');
+    }
+  });
+});
+
+describe('Navigation und Adressen', () => {
+  it('Research ist ein eigenes Ziel', () => {
+    expect(lies('src/components/NavBar.tsx')).toContain("{ href: '/research'");
+    expect(() => lies('src/app/research/page.tsx')).not.toThrow();
+  });
+
+  it('keine bestehende Adresse hat sich geändert', () => {
+    // Eine geänderte Adresse ist ein verlorenes Suchmaschinen-Ergebnis. Die
+    // Umbenennung betrifft Texte, nicht Pfade.
+    const sitemap = lies('src/app/sitemap.ts');
+    for (const pfad of ['/suche', '/sets', '/artikel', '/guides', '/marktbericht', '/methodik', '/portfolio']) {
+      expect(sitemap, pfad).toContain(pfad);
+    }
+  });
+
+  it('die kanonische Adresse kommt aus der Konfiguration', () => {
+    // Sie darf nie auf eine geratene Produktionsadresse zeigen.
+    // Eine geratene Produktionsadresse ist ausgeschlossen: `site.ts` nimmt nur
+    // die bewusst gesetzte Domain oder die Adresse, unter der dieses
+    // Deployment tatsächlich läuft.
+    expect(lies('src/lib/site.ts')).toContain('NEXT_PUBLIC_SITE_URL');
+    expect(lies('src/lib/site.ts')).toContain('VERCEL_PROJECT_PRODUCTION_URL');
+    expect(lies('src/lib/site.ts')).not.toMatch(/cardbeacon\.(com|io|app)/i);
+    for (const datei of ['src/app/layout.tsx', 'src/app/sitemap.ts', 'src/app/robots.ts']) {
+      expect(lies(datei), datei).toContain('siteUrlOrLocal');
+    }
+  });
+});

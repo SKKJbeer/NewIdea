@@ -285,7 +285,7 @@ export default function PortfolioPage() {
   const aufteilung = useMemo(() => setAllocation(performances), [performances]);
 
   // Der Vergleich ist nur sinnvoll, wenn beide Seiten denselben Zeitraum
-  // meinen: Der PMI ist ein 30-Tage-Wert.
+  // meinen: Der CBI ist ein 30-Tage-Wert.
   const vergleich = useMemo(
     () => (timeRange === '1M' ? comparePerformance(rangePerf.pnlPct, marktPct) : null),
     [timeRange, rangePerf.pnlPct, marktPct],

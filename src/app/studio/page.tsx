@@ -257,7 +257,7 @@ export default function StudioPage() {
           <div className="flex items-center gap-3">
             <div className="bg-[#13131e]/15 rounded-xl p-2"><Zap size={18} className="text-yellow-300" /></div>
             <div>
-              <h1 className="text-sm font-black leading-tight">PokéMarket Studio</h1>
+              <h1 className="text-sm font-black leading-tight">CardBeacon Studio</h1>
               <p className="text-violet-200 text-[10px]">Interne Steuerung</p>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 // Standard-OG-Bild (Startseite + Fallback für Segmente ohne eigenes Bild).
 // Wird von Next automatisch in og:image + twitter:image verdrahtet.
-export const alt = 'PokéMarket Intelligence — Pokémon Kartenmarkt datenbasiert';
+export const alt = 'CardBeacon — Pokémon Kartenmarkt datenbasiert';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -40,7 +40,7 @@ export default function Image() {
             P
           </div>
           <div style={{ display: 'flex', fontSize: 40, fontWeight: 800 }}>
-            <span>PokéMarket&nbsp;</span>
+            <span>CardBeacon&nbsp;</span>
             <span style={{ color: '#a78bfa' }}>Intelligence</span>
           </div>
         </div>

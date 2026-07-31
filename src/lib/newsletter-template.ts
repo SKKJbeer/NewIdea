@@ -40,7 +40,10 @@ export function buildNewsletterHtml(data: NewsletterData, cards: PokemonCard[]):
   const amazon = process.env.NEXT_PUBLIC_AMAZON_URL || 'https://www.amazon.de/s?k=pokemon+booster';
   // Fußzeilen-Links müssen auf echte Seiten zeigen. Ein totes „Abmelden" ist
   // nicht nur unhöflich, sondern verletzt die Pflicht zum Widerspruch.
-  const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarket-intelligence.vercel.app';
+  // Kein geratener Rückfall auf eine Produktionsadresse: Eine falsche Domain im
+  // Newsletter führt Leser ins Leere, und niemand merkt es. Fehlt die Angabe,
+  // bleiben die Links relativ.
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? '';
 
   const cardRows = data.cardHighlights
     .map((card, i) => {
@@ -82,7 +85,7 @@ export function buildNewsletterHtml(data: NewsletterData, cards: PokemonCard[]):
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
         <tr><td style="background:linear-gradient(135deg, #4c1d95 0%, #3730a3 100%); border-radius:16px 16px 0 0; padding:32px 32px 28px; text-align:center;">
-          <p style="margin:0 0 6px; font-size:11px; font-weight:700; letter-spacing:3px; color:#c4b5fd; text-transform:uppercase;">PokéMarket Intelligence</p>
+          <p style="margin:0 0 6px; font-size:11px; font-weight:700; letter-spacing:3px; color:#c4b5fd; text-transform:uppercase;">CardBeacon</p>
           <h1 style="margin:0 0 8px; font-size:26px; font-weight:900; color:#ffffff; line-height:1.2;">Wöchentliche Marktanalyse</h1>
           <p style="margin:0; font-size:13px; color:#a5b4fc;">${escapeHtml(week)}</p>
         </td></tr>
@@ -114,7 +117,7 @@ export function buildNewsletterHtml(data: NewsletterData, cards: PokemonCard[]):
             <a href="${escapeHtml(site)}/datenschutz" style="color:#7c3aed; text-decoration:none;">Datenschutz</a> ·
             <a href="${escapeHtml(site)}/impressum" style="color:#7c3aed; text-decoration:none;">Impressum</a>
           </p>
-          <p style="margin:12px 0 0; font-size:11px; color:#d1d5db;">PokéMarket Intelligence ist kein Finanzberater. Alle Preisangaben ohne Gewähr.</p>
+          <p style="margin:12px 0 0; font-size:11px; color:#d1d5db;">CardBeacon ist kein Finanzberater. Alle Preisangaben ohne Gewähr.</p>
         </td></tr>
       </table>
     </td></tr>

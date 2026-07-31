@@ -9,9 +9,9 @@ import { cachedImg } from '@/lib/cached-image';
 import { ContentIcon } from '@/components/ContentIcon';
 import { Reveal } from '@/components/Reveal';
 import { Prose } from '@/components/Prose';
-import { ReadingProgress } from '@/components/ReadingProgress';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
+import { siteUrlOrLocal } from '@/lib/site';
 
 export const revalidate = 86400;
 
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const guide = await resolveGuide(slug);
   if (!guide) return { title: 'Guide nicht gefunden' };
   return {
-    title: `${guide.title} — PokéMarket Intelligence`,
+    title: `${guide.title} — CardBeacon`,
     description: guide.metaDescription,
     openGraph: {
       title: guide.title,
@@ -50,22 +50,21 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const allGuides = [...GUIDES, ...generated.filter((g) => !staticSlugs.has(g.slug))];
   const otherGuides = allGuides.filter((g) => g.slug !== slug).slice(0, 3);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+  const siteUrl = siteUrlOrLocal();
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: guide.title,
     description: guide.metaDescription,
     inLanguage: 'de',
-    author: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
-    publisher: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    author: { '@type': 'Organization', name: 'CardBeacon', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'CardBeacon', url: siteUrl },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/guides/${guide.slug}` },
   };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
-      <ReadingProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
 
       <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">

@@ -528,7 +528,7 @@ export function outroFrame(line = 'täglich aktuell', translucent = false): Prom
         Link in der Bio
       </div>
       <div style={{ display: 'flex', fontSize: 28, color: MUTED, marginTop: 70, letterSpacing: 3 }}>
-        POKEMARKET-INTELLIGENCE
+        CARDBEACON
       </div>
     </div>,
   );

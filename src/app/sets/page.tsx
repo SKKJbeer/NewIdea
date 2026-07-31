@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
-import { Package, Calendar, Layers } from 'lucide-react';
+import { Calendar, Layers } from 'lucide-react';
 import { fetchRecentSets } from '@/lib/pokemon-api';
 import type { Metadata } from 'next';
+import { SECTION_LABEL } from '@/lib/ui';
+import { LEGAL_NO_ADVICE, LEGAL_UNOFFICIAL } from '@/lib/brand';
 
 export const revalidate = 86400;
 
@@ -44,36 +46,34 @@ export default async function SetsPage() {
   sets = sets ?? [];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#08080b] text-slate-300">
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-10 pb-14 sm:py-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <Package size={10} /> Set-Übersicht
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white">
-            Pokémon TCG <span className="text-violet-400">Sets</span>
+      {/* Kopf nach dem gemeinsamen Muster: linksbündig, Abschnittsmarke,
+          keine Pille, kein Verlauf. Siehe DESIGN.md §2/§4. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>Sets · Pokémon</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Erweiterungen
           </h1>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">
-            Die aktuellen Erweiterungen mit ihren wertvollsten Karten und Cardmarket-Preisen.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Die aktuellen Sets mit Erscheinungsdatum und Umfang. Bewegung und
+            typischer Kartenpreis je Set stehen im Set-Markt der Übersicht.
           </p>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-10 pb-16">
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
         {sets.length === 0 ? (
-          <div className="mx-auto max-w-md rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 text-center">
-            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-              <Package size={20} />
-            </div>
+          <div className="mx-auto max-w-md border-t border-[#1c1c24] p-6 text-center">
             <p className="font-semibold text-slate-200">Noch keine Sets geladen</p>
             <p className="mt-1 text-sm text-slate-500">
               Die Set-Übersicht wird gleich befüllt. In der Zwischenzeit findest du jede Karte über die Suche.
             </p>
             <Link
               href="/suche"
-              className="mt-4 inline-block rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-violet-700"
+              className="mt-4 inline-flex min-h-[44px] items-center border border-[#2a2a35] px-4 text-[13px] text-slate-200 transition-colors hover:border-slate-500"
             >
               Zur Kartensuche
             </Link>
@@ -84,10 +84,11 @@ export default async function SetsPage() {
               <Link
                 key={set.id}
                 href={`/sets/${set.id}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] hover:border-violet-500/40 hover:bg-[#161622] transition-all"
+                className="group flex flex-col border-t border-[#1c1c24] pt-4 transition-colors hover:border-slate-600"
               >
-                {/* Logo-Well: einheitliche Höhe, Logo zentriert — ein konsistentes Raster */}
-                <div className="relative flex h-28 items-center justify-center border-b border-[#1e1e30] bg-gradient-to-b from-[#191926] to-[#101018] px-6">
+                {/* Logo-Feld in einheitlicher Höhe — ohne Fläche und ohne
+                    Verlauf, damit das Logo selbst die Farbe liefert. */}
+                <div className="flex h-20 items-center justify-start">
                   <BoosterPackImage
                     setCode={set.id}
                     setName={set.name}
@@ -97,9 +98,9 @@ export default async function SetsPage() {
                 </div>
 
                 {/* Metadaten: klare Hierarchie, dezente Meta-Pillen */}
-                <div className="flex flex-1 flex-col gap-2 p-4">
+                <div className="mt-3 flex flex-1 flex-col gap-2">
                   <div>
-                    <p className="truncate text-[15px] font-bold text-white">{set.name}</p>
+                    <p className="truncate text-[15px] text-slate-200 group-hover:text-white">{set.name}</p>
                     {set.series && (
                       <p className="mt-0.5 truncate text-xs text-slate-500">{set.series}</p>
                     )}
@@ -124,14 +125,12 @@ export default async function SetsPage() {
           </div>
         )}
 
-        <footer className="mt-12 border-t border-[#1e1e30] pt-5 space-y-3">
-          <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
-            <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite — kein offizielles Pokémon-Produkt</p>
-            <p className="text-[10px] text-amber-400/60 mt-0.5">
-              Alle Inhalte dienen ausschließlich der Information — <strong className="text-amber-400/80">keine Anlageberatung</strong>.
-            </p>
-          </div>
-        </footer>
+        <div className="mt-12 border-t border-[#1c1c24] pt-6">
+          <p className={SECTION_LABEL}>Hinweis</p>
+          <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-slate-600">
+            {LEGAL_UNOFFICIAL} {LEGAL_NO_ADVICE}
+          </p>
+        </div>
       </main>
     </div>
   );

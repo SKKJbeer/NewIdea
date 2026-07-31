@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
+import { siteUrlOrLocal } from '@/lib/site';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+// Keine geratene Adresse — siehe site.ts.
+const BASE_URL = siteUrlOrLocal();
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -10,7 +10,6 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ContentIcon } from '@/components/ContentIcon';
 import { Reveal } from '@/components/Reveal';
 import { Prose } from '@/components/Prose';
-import { ReadingProgress } from '@/components/ReadingProgress';
 import { ArrowLeft, Clock, Calendar, Tag, TriangleAlert, ChevronRight, GraduationCap } from 'lucide-react';
 
 // Level-Badge-Stil je Leserlevel — sichtbarer Einsteiger/Profi-Mix.
@@ -23,6 +22,7 @@ const LEVEL_STYLE: Record<string, string> = {
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
+import { siteUrlOrLocal } from '@/lib/site';
 
 export const revalidate = 86400;
 
@@ -97,7 +97,7 @@ export async function generateMetadata({ params }: { params: Promise<{ date: str
   const meta = ARTICLE_META[type];
   const dateLabel = d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
   return {
-    title: `${meta.label} vom ${dateLabel} — PokéMarket Intelligence`,
+    title: `${meta.label} vom ${dateLabel} — CardBeacon`,
     description: `${meta.label} zum Pokémon-Kartenmarkt vom ${dateLabel}.`,
   };
 }
@@ -139,7 +139,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   const relatedRaw = await listSavedArticleMeta().catch(() => [] as Awaited<ReturnType<typeof listSavedArticleMeta>>);
   const related = relatedRaw.filter((m) => m.date !== date).slice(0, 3);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+  const siteUrl = siteUrlOrLocal();
   const structuredData = article && {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -147,15 +147,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
     description: article.intro.slice(0, 200),
     datePublished: date,
     inLanguage: 'de',
-    author: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
-    publisher: { '@type': 'Organization', name: 'PokéMarket Intelligence', url: siteUrl },
+    author: { '@type': 'Organization', name: 'CardBeacon', url: siteUrl },
+    publisher: { '@type': 'Organization', name: 'CardBeacon', url: siteUrl },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/artikel/${date}` },
   };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
-      <ReadingProgress />
       {structuredData && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       )}

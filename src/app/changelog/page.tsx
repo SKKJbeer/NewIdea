@@ -11,10 +11,26 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.0.0',
+    date: '31. Juli 2026',
+    label: 'CardBeacon',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Das Produkt heisst CardBeacon - Marktanalyse fuer Sammelkarten. Pokemon ist der erste unterstuetzte Markt, nicht die Identitaet des Produkts' },
+      { type: 'new',     text: 'Marktkontext auf jeder Kartenseite: Karte, Set und Index nebeneinander ueber denselben Zeitraum, mit Abstand zum Markt in Prozentpunkten' },
+      { type: 'new',     text: 'Marktkommentar aus festen Regeln - jeder Satz haengt an einer Zahl, die daneben steht' },
+      { type: 'new',     text: 'Research buendelt Marktbericht, Analysen, Guides und Methodik' },
+      { type: 'changed', text: 'Startseite von zehn auf sechs Abschnitte; Ticker und Trending-Tabelle entfallen - dieselbe Karte erschien darin bis zu dreimal' },
+      { type: 'changed', text: 'Navigation von acht auf fuenf Ziele; der Index heisst CBI' },
+      { type: 'fixed',   text: 'Sets ohne gemessene Karte zeigten 0,0 % statt eines Strichs' },
+      { type: 'fixed',   text: 'Kanonische Adressen zeigten auf eine nie verbundene Domain' },
+    ],
+  },
+  {
     version: '3.3.5',
     date: '31. Juli 2026',
     label: 'Die groessere Stichprobe bekommt auch mehr Zeit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Startseite zeigte zeitweise 7 statt 204 auswertbarer Karten — die vergroesserte Abfrage lief in ein Zeitlimit, das noch fuer die alte, kleinere Stichprobe bemessen war' },
     ],

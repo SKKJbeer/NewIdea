@@ -5,8 +5,10 @@ import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
 import { fetchRecentSets, fetchTopValueCards } from '@/lib/pokemon-api';
 import { listGeneratedGuideSlugs } from '@/lib/guide-storage';
+import { siteUrlOrLocal } from '@/lib/site';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+// Keine geratene Adresse — siehe site.ts.
+const BASE_URL = siteUrlOrLocal();
 
 // Erzeugt die letzten `count` Publish-Daten (nur Sonntag + Donnerstag), neuester zuerst.
 // Rein lokal berechnet — kein Netzwerk-Fetch in der Sitemap-Generierung.

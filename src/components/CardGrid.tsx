@@ -47,7 +47,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
   if (compact) {
     return (
       <Link href={`/karten/${card.id}`} className="block group">
-        <div className="bg-[#13131e] rounded-xl border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all overflow-hidden">
+        <div className="bg-[#13131e] rounded-md border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all overflow-hidden">
           <div className="relative aspect-[3/4] bg-[#1a1a28]">
             {card.imageUrl ? (
               <CardImage
@@ -74,7 +74,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
 
   return (
     <Link href={`/karten/${card.id}`} className="block group">
-      <div className="bg-[#13131e] rounded-xl border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all duration-200 overflow-hidden cursor-pointer">
+      <div className="bg-[#13131e] rounded-md border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all duration-200 overflow-hidden cursor-pointer">
         <div className="relative bg-[#1a1a28] p-3 aspect-[3/4]">
           {card.imageUrl ? (
             <CardImage
@@ -147,7 +147,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
             </div>
           </div>
 
-          <div className="mt-2 block w-full text-center text-xs bg-violet-600 hover:bg-violet-700 text-white rounded-lg py-1.5 transition-colors">
+          <div className="mt-2 block w-full text-center text-xs border border-[#2a2a35] hover:border-slate-500 text-white rounded-lg py-1.5 transition-colors">
             Details &amp; Kaufen →
           </div>
         </div>

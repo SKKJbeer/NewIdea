@@ -1,96 +1,97 @@
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
 import { APP_VERSION } from '@/lib/app-version';
+import { Wordmark } from './Wordmark';
+import {
+  DESCRIPTOR_DE,
+  LEGAL_NO_ADVICE,
+  LEGAL_TRADEMARK,
+  LEGAL_UNOFFICIAL,
+} from '@/lib/brand';
+import { SECTION_LABEL } from '@/lib/ui';
 
-const NAV_GROUPS: Array<{ label: string; links: Array<{ href: string; label: string }> }> = [
+// FUSSZEILE
+//
+// Die Gruppierung folgt der Navigation, nicht der Dateistruktur: Markt, Karten,
+// Portfolio, Research, Rechtliches. Wer oben „Research" gesehen hat, findet
+// unten dieselbe Ordnung wieder.
+
+const GRUPPEN: Array<{ label: string; links: Array<{ href: string; label: string }> }> = [
   {
     label: 'Markt',
     links: [
-      { href: '/suche', label: 'Karten-Suche' },
+      { href: '/', label: 'Marktübersicht' },
+      { href: '/suche', label: 'Karten' },
       { href: '/sets', label: 'Sets' },
-      { href: '/marktbericht', label: 'Marktbericht' },
     ],
   },
   {
-    label: 'Wissen',
-    links: [
-      { href: '/einsteiger', label: 'Für Einsteiger' },
-      { href: '/artikel', label: 'Blog' },
-      { href: '/guides', label: 'Guides' },
-      { href: '/changelog', label: 'Changelog' },
-    ],
-  },
-  {
-    label: 'Tools',
+    label: 'Bestand',
     links: [
       { href: '/portfolio', label: 'Portfolio' },
       { href: '/merkliste', label: 'Merkliste' },
     ],
   },
   {
+    label: 'Research',
+    links: [
+      { href: '/marktbericht', label: 'Marktbericht' },
+      { href: '/artikel', label: 'Analysen' },
+      { href: '/guides', label: 'Guides' },
+      { href: '/einsteiger', label: 'Einstieg' },
+    ],
+  },
+  {
     label: 'Transparenz',
     links: [
-      // Die Methodik steht bewusst weit oben in dieser Spalte: Sie ist das
-      // Vertrauensdokument der Plattform, nicht eine Pflichtseite.
+      // Die Methodik steht bewusst zuerst: Sie ist das Vertrauensdokument,
+      // keine Pflichtseite.
       { href: '/methodik', label: 'Methodik' },
+      { href: '/changelog', label: 'Änderungen' },
       { href: '/impressum', label: 'Impressum' },
       { href: '/datenschutz', label: 'Datenschutz' },
     ],
   },
 ];
 
-// Globaler Site-Footer — auf jeder Seite (layout.tsx). Interne Verlinkung für
-// SEO + einheitlicher Abschluss. Seiten-spezifische Disclaimer-Boxen bleiben
-// in den Seiten; die Legal-Links leben nur noch hier.
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-[#1e1e30] bg-[#0d0d18]">
-      <div className="max-w-5xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-8">
+    <footer className="mt-auto border-t border-[#1c1c24] bg-[#08080b]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-lg flex items-center justify-center">
-                <Zap size={14} className="text-yellow-300 fill-yellow-300" />
-              </div>
-              <span className="font-black text-slate-200 text-sm">
-                Pokémon<span className="text-violet-400">Market</span>
-              </span>
+            <Link href="/" aria-label="CardBeacon — Startseite">
+              <Wordmark />
             </Link>
-            <p className="text-[11px] text-slate-600 mt-3 leading-relaxed">
-              Cardmarket-Preise, Markttrends und Sammler-Wissen für das Pokémon-TCG.
+            <p className="mt-3 max-w-[220px] text-[11px] leading-relaxed text-slate-600">
+              {DESCRIPTOR_DE}. Erster Markt: Pokémon.
             </p>
           </div>
 
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-3">{group.label}</p>
-              {/* `inline-flex min-h-[32px]` statt eines nackten Textlinks: Die
-                  Zeilen waren rund 16 px hoch und auf einem Telefon kaum zu
-                  treffen. Der Abstand zwischen den Einträgen bleibt gleich. */}
-              <ul className="-my-1 space-y-0.5">
-                {group.links.map((link) => (
-                  <li key={link.href}>
+          {GRUPPEN.map((g) => (
+            <nav key={g.label} aria-label={g.label}>
+              <p className={SECTION_LABEL}>{g.label}</p>
+              <ul className="mt-3 -my-1">
+                {g.links.map((l) => (
+                  <li key={l.href}>
                     <Link
-                      href={link.href}
-                      className="inline-flex min-h-[32px] items-center text-xs text-slate-500 transition-colors hover:text-violet-400"
+                      href={l.href}
+                      className="inline-flex min-h-[32px] items-center text-[12px] text-slate-500 transition-colors hover:text-slate-200"
                     >
-                      {link.label}
+                      {l.label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
 
-        <div className="mt-10 pt-5 border-t border-[#1e1e30] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[10px] text-slate-600 text-center sm:text-left leading-relaxed">
-            Inoffizielle Fan-Seite · Kein offizielles Pokémon-Produkt · Keine Anlageberatung · Alle Preise ohne Gewähr.
-            Pokémon ist eine Marke von Nintendo / Creatures Inc. / GAME FREAK Inc.
+        <div className="mt-12 flex flex-col gap-3 border-t border-[#1c1c24] pt-5 sm:flex-row sm:items-start sm:justify-between">
+          <p className="max-w-2xl text-[11px] leading-relaxed text-slate-600">
+            {LEGAL_UNOFFICIAL} {LEGAL_NO_ADVICE} {LEGAL_TRADEMARK}
           </p>
-          {/* Konstante statt Umgebungsvariable — siehe app-version.ts: Über die
-              Umgebung blieb die Anzeige live leer, egal welche Variable sie las. */}
-          <p className="text-[10px] text-slate-700 font-mono shrink-0">
+          {/* Konstante statt Umgebungsvariable — siehe app-version.ts. */}
+          <p className="shrink-0 font-mono text-[11px] tabular-nums text-slate-700">
             v{APP_VERSION}
           </p>
         </div>

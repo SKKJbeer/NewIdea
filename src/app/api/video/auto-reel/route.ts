@@ -4,6 +4,7 @@ import { getSupabase } from '@/lib/supabase';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
 import { renderStory } from '@/lib/reel-generator';
 import { buildStory, CONCEPTS } from '@/lib/reel-concepts';
+import { siteUrlOrLocal } from '@/lib/site';
 
 // FFmpeg-Rendering von ~5 Segmenten braucht Zeit — Vercel-Limit ausreizen.
 export const maxDuration = 300;
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
   try {
     const trending = await fetchTrendingCards(30);
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+    const siteUrl = siteUrlOrLocal();
     const story = buildStory(trending, siteUrl, { conceptId });
     if (!story) {
       return NextResponse.json(

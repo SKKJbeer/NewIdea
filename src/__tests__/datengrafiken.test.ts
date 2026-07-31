@@ -226,42 +226,54 @@ describe('Die Guides-Liste hat keine durchscheinende Kachel mehr', () => {
 // Prozentzahlen ohne jeden Maßstab, und die „Investor Insights" waren vier
 // Aufzählungspunkte.
 
-describe('Startseite zeigt Bilder und Grafiken statt reiner Tabellen', () => {
+describe('Die Marktübersicht zeigt Daten, keinen Katalog', () => {
   const seite = lies('src/app/page.tsx');
+  const module = lies('src/components/MarketModules.tsx');
+  const kopf = lies('src/components/MarketHeader.tsx');
 
-  it('zeigt zu jedem Set ein Bild', () => {
-    expect(seite, 'Regel: Boosterpack-Bild überall dort wo Karten/Sets erscheinen').toContain(
-      'BoosterPackImage',
-    );
+  // ANLASS DES UMBAUS: Die frühere Startseite bestand aus zehn Abschnitten, die
+  // alle gleich aussahen — Kachel, Symbol, Titel, Zahl. Dieselbe Karte erschien
+  // im Ticker, unter „Top Gewinner" und in der Trending-Tabelle. Das ist keine
+  // Marktübersicht, sondern eine Wiederholung mit wechselnder Überschrift.
+
+  it('zeigt jede Karte nur EINMAL', () => {
+    // Genau ein Modul beantwortet die Frage „was hat sich bewegt".
+    expect(seite).toContain('<MarketMovers');
+    expect(seite).not.toContain('tickerCards');
+    expect(seite).not.toContain('trendingTable');
   });
 
-  it('macht aus der Preisspalte eine sichtbare Rangfolge', () => {
-    expect(seite).toContain('RowBar');
-    expect(seite).toContain('maxSetPreis');
+  it('verlinkt Set-Zeilen und Kartenzeilen auf ihre Seite', () => {
+    expect(module).toMatch(/href=\{`\/sets\/\$\{s\.code\}`\}/);
+    expect(module).toMatch(/href=\{`\/karten\/\$\{card\.id\}`\}/);
   });
 
-  it('verlinkt die Set-Zeilen auf die Set-Seite', () => {
-    expect(seite).toMatch(/href=\{`\/sets\/\$\{s\.code\}`\}/);
+  it('gibt Bewegungen einen sichtbaren Maßstab', () => {
+    // Statt Fortschrittsbalken in Kacheln: ein Balken auf gemeinsamer
+    // Mittellinie, an dem sich Ausschläge direkt vergleichen lassen.
+    expect(module).toContain('barClass');
+    expect(module).toMatch(/left: positiv \? '50%'/);
   });
 
-  it('gibt PMI und Marktbreite einen Maßstab', () => {
-    expect(seite).toContain('<ZeroMeter');
-    expect(seite).toContain('<RatioBar');
+  it('zeigt die Verteilung der Messwerte statt einer erfundenen Kurve', () => {
+    // Für eine Indexkurve fehlen gespeicherte Tagesstände. Statt sie
+    // zurückzurechnen, zeigt der Kopf die tatsächliche Streuung der Messwerte.
+    expect(kopf).toContain('Verteilung der 30-Tage-Bewegung');
+    expect(kopf).toContain('verteilung(trends)');
   });
 
-  it('baut die Insights als Karten mit Kennzahl, nicht als Textzeilen', () => {
-    // Vorher: `const insights: string[]` und eine Liste mit ▸-Zeichen.
-    expect(seite).not.toMatch(/const insights: string\[\]/);
-    expect(seite).toMatch(/const insights: Insight\[\]/);
-    expect(seite).toContain('insight.kennzahl');
+  it('leitet keine Kennzahl ohne Datengrundlage ab', () => {
+    // Stolperstelle 29 — unverändert gültig, nur an neuer Stelle.
+    expect(kopf).toMatch(/cbi\.sufficient \?/);
+    expect(kopf).toMatch(/breite\.total > 0 \?/);
+    expect(module).toContain('sets.length === 0');
   });
 
-  it('leitet die Insights weiterhin nur aus echten Daten ab', () => {
-    // Stolperstelle 29: keine Kennzahl ohne Datengrundlage.
-    // Bezugsgröße ist die Zahl der GEMESSENEN Karten (`marketBreadth`), nicht
-    // die Größe des Datensatzes.
-    expect(seite).toMatch(/if \(breite\.total > 0\)/);
-    expect(seite).toMatch(/if \(topSets\[0\]\)/);
+  it('nutzt weniger Behälter als die Vorgängerfassung', () => {
+    // DESIGN.md §1: Abschnitte werden durch Linie und Abstand getrennt, nicht
+    // durch immer neue abgerundete Flächen.
+    const kacheln = (seite.match(/rounded-2xl/g) ?? []).length;
+    expect(kacheln, 'Startseite soll ohne rounded-2xl-Kacheln auskommen').toBe(0);
   });
 });
 

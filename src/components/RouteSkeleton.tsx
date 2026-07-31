@@ -1,111 +1,105 @@
-// Wiederverwendbares Lade-Skeleton für loading.tsx-Boundaries.
-// Zweck: SOFORTIGES visuelles Feedback bei jeder Navigation — der Nutzer sieht
-// beim Klick unmittelbar die Zielseiten-Struktur statt einer eingefrorenen Seite,
-// während der Server rendert (TCG-API bis 8s, Artikel-Generierung länger).
-// Server-Komponente ohne Interaktivität — bewusst leichtgewichtig.
+import { SKELETON } from '@/lib/ui';
 
-interface RouteSkeletonProps {
+// LADEZUSTÄNDE
+//
+// Vorher: ein sich drehender Kreis in der Seitenmitte, dazu ein Platzhalter-Kopf
+// aus abgerundeten Flächen. Ein Spinner sagt „irgendwo passiert etwas" und
+// nichts darüber, was gleich kommt — und weil er mittig stand, sprang der
+// Inhalt beim Erscheinen darüber hinweg.
+//
+// Jetzt: Der Platzhalter hat die FORM des Inhalts, der ihn ersetzt, und steht
+// an dessen Stelle. Wer auf „Sets" klickt, sieht sofort Set-Zeilen; wer eine
+// Karte öffnet, sieht die Kartenfläche in echtem Kartenformat. Kein Kreis,
+// kein Balken am oberen Rand.
+
+interface Props {
   variant?: 'list' | 'grid' | 'detail' | 'article';
-  /** Optionaler Hinweistext unter dem Spinner (z.B. bei langlaufender Generierung). */
+  /** Wird nicht mehr angezeigt — der Platzhalter selbst ist die Auskunft. */
   hint?: string;
 }
 
-function NavBarSkeleton() {
+function Kopf() {
   return (
-    <div className="sticky top-0 z-50">
-      <div className="h-[26px] bg-[#0d0d18] border-b border-[#1e1e30]" />
-      <div className="h-14 bg-[#0d0d18] border-b border-[#1e1e30]" />
-    </div>
-  );
-}
-
-function HeroSkeleton() {
-  return (
-    <div className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-      <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 sm:py-14 text-center">
-        <div className="inline-block h-6 w-32 rounded-full bg-[#1a1a28] mb-4 animate-pulse" />
-        <div className="h-9 w-64 max-w-full mx-auto rounded-xl bg-[#1a1a28] mb-3 animate-pulse" />
-        <div className="h-4 w-52 max-w-full mx-auto rounded bg-[#13131e] animate-pulse" />
+    <header className="border-b border-[#1c1c24]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+        <div className={`h-3 w-28 ${SKELETON}`} />
+        <div className={`mt-6 h-12 w-48 ${SKELETON}`} />
+        <div className={`mt-4 h-3 w-64 max-w-full ${SKELETON}`} />
       </div>
+    </header>
+  );
+}
+
+/** Datenzeilen — dieselbe Höhe und Aufteilung wie die fertige Tabelle. */
+function Zeilen({ anzahl = 8 }: { anzahl?: number }) {
+  return (
+    <div>
+      {Array.from({ length: anzahl }).map((_, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-[#1c1c24]/70 py-2.5"
+        >
+          <div className={`h-9 w-[26px] ${SKELETON}`} />
+          <div>
+            <div className={`h-3 w-40 max-w-full ${SKELETON}`} />
+            <div className={`mt-1.5 h-2 w-24 ${SKELETON}`} />
+          </div>
+          <div className={`h-3 w-16 ${SKELETON}`} />
+        </div>
+      ))}
     </div>
   );
 }
 
-function Spinner({ hint }: { hint?: string }) {
+export function RouteSkeleton({ variant = 'list' }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center py-10 gap-3">
-      <div className="w-10 h-10 rounded-full border-4 border-violet-500/20 border-t-violet-500 animate-spin" />
-      {hint && <p className="text-xs text-slate-600 animate-pulse text-center max-w-xs">{hint}</p>}
-    </div>
-  );
-}
+    <div className="min-h-screen bg-[#08080b]">
+      {/* Kopfzeile in ihrer echten Höhe — sonst springt der ganze Inhalt,
+          sobald die fertige Seite sie ersetzt. */}
+      <div className="sticky top-0 z-50 h-14 border-b border-[#1c1c24] bg-[#08080b]" />
 
-export function RouteSkeleton({ variant = 'list', hint }: RouteSkeletonProps) {
-  return (
-    <div className="min-h-screen bg-[#0a0a0f]">
-      <NavBarSkeleton />
-      <HeroSkeleton />
+      <Kopf />
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <Spinner hint={hint} />
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+        {variant === 'detail' && (
+          <div className="grid gap-10 lg:grid-cols-[300px_1fr]">
+            <div className={`aspect-[63/88] w-full max-w-[300px] ${SKELETON}`} />
+            <div>
+              <div className={`h-8 w-64 max-w-full ${SKELETON}`} />
+              <div className={`mt-3 h-3 w-40 ${SKELETON}`} />
+              <div className={`mt-8 h-14 w-32 ${SKELETON}`} />
+              <div className="mt-8 space-y-2.5">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className={`h-3 w-full ${SKELETON}`} />
+                ))}
+              </div>
+              {/* Diagrammfläche in Diagrammhöhe — dieselbe wie im fertigen Chart. */}
+              <div className={`mt-8 h-[200px] w-full ${SKELETON}`} />
+            </div>
+          </div>
+        )}
 
         {variant === 'grid' && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 opacity-30">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden animate-pulse">
-                <div className="aspect-[3/4] shimmer" />
-                <div className="p-2.5 space-y-1.5">
-                  <div className="h-3 bg-[#2a2a3a] rounded w-3/4" />
-                  <div className="h-3 bg-[#2a2a3a] rounded w-1/2" />
-                </div>
+              <div key={i}>
+                <div className={`h-24 w-full ${SKELETON}`} />
+                <div className={`mt-3 h-3 w-32 max-w-full ${SKELETON}`} />
+                <div className={`mt-2 h-2 w-20 ${SKELETON}`} />
               </div>
             ))}
-          </div>
-        )}
-
-        {variant === 'list' && (
-          <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] divide-y divide-[#1e1e30] opacity-40 overflow-hidden">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 px-5 py-4 animate-pulse">
-                <div className="w-10 h-10 rounded-xl bg-[#1a1a28] shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3.5 bg-[#2a2a3a] rounded w-2/5" />
-                  <div className="h-3 bg-[#1a1a28] rounded w-1/4" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {variant === 'detail' && (
-          <div className="grid md:grid-cols-2 gap-6 opacity-40">
-            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 animate-pulse">
-              <div className="aspect-[3/4] max-w-[280px] mx-auto shimmer rounded-xl" />
-            </div>
-            <div className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 space-y-3 animate-pulse">
-                  <div className="h-3 bg-[#2a2a3a] rounded w-1/3" />
-                  <div className="h-6 bg-[#1a1a28] rounded w-2/3" />
-                  <div className="h-3 bg-[#1a1a28] rounded w-1/2" />
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
         {variant === 'article' && (
-          <div className="max-w-3xl mx-auto space-y-5 opacity-40">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 space-y-3 animate-pulse">
-                <div className="h-4 bg-[#2a2a3a] rounded w-1/2" />
-                <div className="h-3 bg-[#1a1a28] rounded w-full" />
-                <div className="h-3 bg-[#1a1a28] rounded w-11/12" />
-                <div className="h-3 bg-[#1a1a28] rounded w-4/5" />
-              </div>
+          <div className="max-w-2xl space-y-3">
+            {[100, 96, 88, 100, 72, 94, 100, 84, 90, 60].map((breite, i) => (
+              <div key={i} className={`h-3 ${SKELETON}`} style={{ width: `${breite}%` }} />
             ))}
           </div>
         )}
+
+        {variant === 'list' && <Zeilen />}
       </main>
     </div>
   );

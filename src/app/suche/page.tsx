@@ -5,6 +5,7 @@ import { searchCards } from '@/lib/pokemon-api';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
+import { siteUrlOrLocal } from '@/lib/site';
 
 export async function generateMetadata({
   searchParams,
@@ -55,7 +56,7 @@ export default async function SearchPage({
             '@type': 'ListItem',
             position: i + 1,
             name: card.name,
-            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com'}/karten/${card.id}`,
+            url: `${siteUrlOrLocal()}/karten/${card.id}`,
           })),
         }
       : null;
@@ -94,7 +95,7 @@ export default async function SearchPage({
             <p className="text-sm">Gib mindestens 2 Zeichen ein, z.&nbsp;B. „Pikachu", „Charizard" oder „Mewtu".</p>
           </div>
         ) : error ? (
-          <div className="max-w-md mx-auto rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 text-center">
+          <div className="max-w-md mx-auto rounded-none border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 text-center">
             <p className="font-semibold flex items-center justify-center gap-1.5"><TriangleAlert size={14} /> Suche momentan nicht verfügbar</p>
             <p className="text-sm mt-1 text-amber-400/60">Bitte versuche es später erneut.</p>
           </div>

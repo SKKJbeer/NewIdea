@@ -26,7 +26,7 @@ export function buildVideoComposition(script: VideoScript, cards: PokemonCard[])
     width: script.format === 'youtube' ? 1920 : 1080,
     height: script.format === 'youtube' ? 1080 : 1920,
     scenes: script.scenes.map((scene) => ({ ...scene, card: scene.cardId ? cardMap.get(scene.cardId) : undefined })),
-    branding: { primaryColor: '#7c3aed', secondaryColor: '#4f46e5', logoText: 'PokéMarket Intelligence', channelName: '@pokemarketintelligence' },
+    branding: { primaryColor: '#7c3aed', secondaryColor: '#4f46e5', logoText: 'CardBeacon', channelName: '@cardbeacon' },
     affiliateUrl: process.env.CARDMARKET_AFFILIATE_URL || 'https://www.cardmarket.com',
   };
 }
@@ -59,6 +59,6 @@ export async function runFullVideoPipeline(script: VideoScript, cards: PokemonCa
   const voiceAudio = await generateVoiceover(script.voiceoverText);
   const voiceoverReady = voiceAudio !== null;
   const composition = buildVideoComposition(script, cards);
-  const renderId = await triggerVideoRender('PokéMarketVideo', { ...composition, voiceoverAvailable: voiceoverReady });
+  const renderId = await triggerVideoRender('CardBeaconVideo', { ...composition, voiceoverAvailable: voiceoverReady });
   return { success: true, voiceoverReady, renderTriggered: renderId !== null };
 }

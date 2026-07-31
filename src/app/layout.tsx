@@ -3,12 +3,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
+import { siteUrlOrLocal } from '@/lib/site';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
-const SITE_NAME = 'PokéMarket Intelligence';
+// Keine geratene Adresse — siehe site.ts.
+const SITE_URL = siteUrlOrLocal();
+const SITE_NAME = 'CardBeacon';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

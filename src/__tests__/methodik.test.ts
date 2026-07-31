@@ -32,9 +32,9 @@ describe('Methodik-Seite', () => {
       'Woher die Preise kommen',
       'Wie oft die Daten aktualisiert werden',
       'Wie Preisänderungen berechnet werden',
-      'PokéMarket Index',
+      'CardBeacon Index',
       'Angst &amp; Gier',
-      'PMI Score',
+      'Markt-Score',
       'Datenprüfung',
       'Grenzen dieser Daten',
     ];

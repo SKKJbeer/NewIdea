@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Impressum — PokéMarket Intelligence',
+  title: 'Impressum — CardBeacon',
   robots: { index: false },
 };
 

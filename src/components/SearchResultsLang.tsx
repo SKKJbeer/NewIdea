@@ -73,14 +73,14 @@ export function SearchResultsLang({ cards, query }: SearchResultsLangProps) {
       </div>
 
       {cmFallback && (
-        <div className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-400/80">
+        <div className="mb-5 rounded-md border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-400/80">
           <strong className="text-amber-400">Sprachspezifische Preise nicht verfügbar:</strong>{' '}
           Die Cardmarket OAuth API ist noch nicht konfiguriert — EN-Preise werden angezeigt.
         </div>
       )}
 
       {language !== 'EN' && !loading && !cmFallback && hasAnyResult && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs text-emerald-400">
+        <div className="mb-4 flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs text-emerald-400">
           ✓ Cardmarket-Preise für {language === 'DE' ? 'deutsche' : language === 'JP' ? 'japanische' : 'koreanische'} Ausgaben
         </div>
       )}

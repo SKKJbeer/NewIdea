@@ -211,7 +211,7 @@ export function MarketComparison({
           </p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-600">Markt (PMI)</p>
+          <p className="text-[10px] text-slate-600">Markt (CBI)</p>
           <p
             className={`text-sm font-black tabular-nums ${marketPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}
           >

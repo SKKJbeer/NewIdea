@@ -18,8 +18,8 @@ export function PerformanceStrip({ windows }: { windows: PerformanceWindow[] }) 
   if (windows.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-[#2a2a3a] bg-gradient-to-b from-[#16161f] to-[#101018] p-4">
-      <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+    <div className="border-t border-[#1c1c24] pt-5">
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         Wertentwicklung
       </p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -30,7 +30,7 @@ export function PerformanceStrip({ windows }: { windows: PerformanceWindow[] }) 
           return (
             <div
               key={w.label}
-              className="rounded-xl border border-[#2a2a3a] bg-[#0f0f17] px-2 py-2.5 text-center"
+              className="rounded-md border border-[#2a2a3a] bg-[#0f0f17] px-2 py-2.5 text-center"
               title={`Gegen ${formatEur(w.fromPrice)} am ${w.fromDate}`}
             >
               <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">{w.label}</p>
@@ -54,7 +54,7 @@ export function PerformanceStrip({ windows }: { windows: PerformanceWindow[] }) 
 
 function Kennzahl({ label, wert, zusatz }: { label: string; wert: string; zusatz?: string }) {
   return (
-    <div className="rounded-xl border border-[#2a2a3a] bg-[#0f0f17] p-3">
+    <div className="rounded-md border border-[#2a2a3a] bg-[#0f0f17] p-3">
       <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600">{label}</p>
       <p className="mt-1 text-sm font-black tabular-nums text-slate-100">{wert}</p>
       {zusatz && <p className="mt-0.5 text-[10px] text-slate-600">{zusatz}</p>}
@@ -67,9 +67,9 @@ export function MarketStatsPanel({ stats }: { stats: CardMarketStats }) {
   if (!hatEtwas) return null;
 
   return (
-    <div className="rounded-2xl border border-[#2a2a3a] bg-gradient-to-b from-[#16161f] to-[#101018] p-4">
+    <div className="border-t border-[#1c1c24] pt-5">
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
           Marktkennzahlen
         </p>
         <p className="text-[10px] tabular-nums text-slate-600">{stats.points} Messpunkte</p>
@@ -109,7 +109,7 @@ export function MarketStatsPanel({ stats }: { stats: CardMarketStats }) {
   );
 }
 
-// ── PMI Score ──────────────────────────────────────────────────────────────
+// ── Markt-Score ──────────────────────────────────────────────────────────────
 
 export function PmiScorePanel({ score }: { score: PmiScore }) {
   const [offen, setOffen] = useState(false);
@@ -117,8 +117,8 @@ export function PmiScorePanel({ score }: { score: PmiScore }) {
 
   if (!score.sufficient) {
     return (
-      <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">PMI Score</p>
+      <div className="border-t border-[#1c1c24] pt-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Markt-Score</p>
         <p className="mt-2 text-sm text-slate-500">
           Für diese Karte liegen noch zu wenige Messpunkte vor. Der Score erscheint, sobald die
           Preisreihe dichter ist.
@@ -137,10 +137,10 @@ export function PmiScorePanel({ score }: { score: PmiScore }) {
         : 'from-rose-600 to-rose-300';
 
   return (
-    <div ref={ref} className="rounded-2xl border border-[#2a2a3a] bg-gradient-to-b from-[#16161f] to-[#101018] p-4">
+    <div ref={ref} className="border-t border-[#1c1c24] pt-5">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">PMI Score</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Markt-Score</p>
           <p className={`mt-1 text-2xl font-black leading-none tabular-nums ${farbe}`}>
             {score.total}
             <span className="text-sm text-slate-600"> / 100</span>
@@ -187,7 +187,7 @@ export function PmiScorePanel({ score }: { score: PmiScore }) {
           Die frühere Fassung schrieb „Starkes Investment" bzw. „Vorsicht
           geboten" — das sind Handlungsempfehlungen. */}
       <p className="mt-3 border-t border-[#1e1e30] pt-2.5 text-[10px] leading-relaxed text-slate-600">
-        Der PMI Score ist eine datenbasierte Marktkennzahl und keine Anlageberatung.
+        Der Markt-Score ist eine datenbasierte Marktkennzahl und keine Anlageberatung.
       </p>
 
       {offen && (
@@ -196,15 +196,15 @@ export function PmiScorePanel({ score }: { score: PmiScore }) {
           onClick={() => setOffen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Berechnung des PMI Score"
+          aria-label="Berechnung des Markt-Score"
         >
           <div
-            className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5"
+            className="max-h-[85vh] w-full max-w-md overflow-y-auto border-t border-[#1c1c24] pt-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                   Wie entsteht dieser Score?
                 </p>
                 <p className={`mt-1 text-xl font-black ${farbe}`}>{score.total} / 100</p>
@@ -221,7 +221,7 @@ export function PmiScorePanel({ score }: { score: PmiScore }) {
 
             <div className="space-y-3">
               {score.factors.map((f) => (
-                <div key={f.label} className="rounded-xl border border-[#2a2a3a] bg-[#0f0f17] p-3">
+                <div key={f.label} className="rounded-md border border-[#2a2a3a] bg-[#0f0f17] p-3">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-xs font-bold text-slate-200">{f.label}</span>
                     <span className="text-xs tabular-nums text-slate-400">{f.value} / 100</span>

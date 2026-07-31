@@ -16,8 +16,11 @@ import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
 import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
+import { MarketContextPanel } from '@/components/MarketContextPanel';
+import { getMarketBenchmark, getSetBenchmark, buildMarketContext } from '@/lib/market-context';
+import { siteUrlOrLocal } from '@/lib/site';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemarketintelligence.com';
+const SITE_URL = siteUrlOrLocal();
 
 // ISR: Karten-Detailseite pro Karte 1h cachen statt bei jedem Request neu zu rendern.
 // Reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots — der `after()`-Hook
@@ -52,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : '';
 
   return {
-    title: `${nameStr}${nummer} Preis & Wert | PokéMarket Intelligence`,
+    title: `${nameStr}${nummer} Preis & Wert | CardBeacon`,
     description: `Aktueller Marktpreis, Preisentwicklung und historische Marktdaten für ${card.name}${nummer} aus ${card.set}. Cardmarket-Preis: ${price > 0 ? formatEur(price) : 'k. A.'}, Seltenheit: ${card.rarity}.`,
     openGraph: {
       title: `${card.name}${nummer} — Preis & Wert`,
@@ -127,6 +130,15 @@ export default async function CardDetailPage({ params }: Props) {
   const marktStats = cardMarketStats(history, price);
   const score2 = pmiScore(history, price, displayTrend);
 
+  // MARKTKONTEXT: Karte gegen ihr Set gegen den Index — alle drei über
+  // denselben 30-Tage-Zeitraum. Beide Abrufe scheitern leise; fehlt eine Seite,
+  // entfaellt genau diese Zeile, nicht der ganze Block.
+  const [setBenchmark, marktBenchmark] = await Promise.all([
+    card.setCode ? getSetBenchmark(card.setCode) : Promise.resolve(null),
+    getMarketBenchmark(),
+  ]);
+  const marktkontext = buildMarketContext(card, setBenchmark, marktBenchmark);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -164,8 +176,8 @@ export default async function CardDetailPage({ params }: Props) {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-6 flex flex-col items-center">
-            <div className="bg-[#1a1a28] rounded-xl p-4 w-full max-w-xs">
+          <div className="border-t border-[#1c1c24] p-6 flex flex-col items-center">
+            <div className="bg-[#1a1a28] rounded-md p-4 w-full max-w-xs">
               {card.imageUrlHiRes || card.imageUrl ? (
                 <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden">
                   <CardImage
@@ -193,7 +205,7 @@ export default async function CardDetailPage({ params }: Props) {
 
               {/* Sekundär & dezent: Kauf-Links */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2 text-center">Kaufen bei</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-2 text-center">Kaufen bei</p>
                 <div className="grid grid-cols-2 gap-2">
                   <a
                     href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
@@ -218,7 +230,7 @@ export default async function CardDetailPage({ params }: Props) {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+            <div className="border-t border-[#1c1c24] pt-5">
               <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">{card.set}</p>
               <h1 className="text-2xl font-black text-white">{card.name}</h1>
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
@@ -246,7 +258,7 @@ export default async function CardDetailPage({ params }: Props) {
             </div>
 
             {card.cmPrices && (card.cmPrices.trend || card.cmPrices.low) && (
-              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
+              <div className="border-t border-[#1c1c24] pt-5">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-bold text-slate-200">Cardmarket-Preise</h2>
                   <a
@@ -290,6 +302,11 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
             )}
 
+            {/* MARKTKONTEXT — die eigentliche Produktaussage.
+                Steht bewusst VOR den Einzelkennzahlen: Die Frage „ist das viel?"
+                beantwortet der Vergleich, nicht die Zahl allein. */}
+            {marktkontext && <MarketContextPanel context={marktkontext} />}
+
             {/* Wertentwicklung über mehrere Zeiträume — nur dort, wo eine
                 Messung vorliegt. */}
             <PerformanceStrip windows={perfWindows} />
@@ -304,8 +321,8 @@ export default async function CardDetailPage({ params }: Props) {
             <PmiScorePanel score={score2} />
 
             {card.setCode && (
-              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5">
-                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Aus diesem Booster-Set</p>
+              <div className="border-t border-[#1c1c24] pt-5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Aus diesem Booster-Set</p>
                 <div className="flex flex-col items-center">
                   <BoosterPackImage
                     setCode={card.setCode}
@@ -318,7 +335,7 @@ export default async function CardDetailPage({ params }: Props) {
                   href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.set} Booster`)}`}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-xl py-2.5 font-semibold text-sm transition-colors"
+                  className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-md py-2.5 font-semibold text-sm transition-colors"
                 >
                   Booster auf Amazon kaufen <ExternalLink size={13} className="opacity-70" />
                 </a>
@@ -328,7 +345,7 @@ export default async function CardDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5 mt-6">
+        <div className="border-t border-[#1c1c24] pt-5 mt-6">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
             <h2 className="font-bold text-slate-200">Preis-Historie</h2>
             {hasChart && (

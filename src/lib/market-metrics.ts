@@ -138,8 +138,17 @@ export interface SetRank {
    * Marktpreise aus Einzelangeboten.
    */
   medianPrice: number;
-  /** Mittlerer Trend — nur aus Karten mit echter Messung. */
-  avgTrend: number;
+  /**
+   * Mittlerer Trend aus Karten mit echter Messung — `null`, wenn KEINE Karte
+   * des Sets gemessen ist.
+   *
+   * BEFUND AUS DER LIVE-ANSICHT: Vorher stand hier in diesem Fall 0. Im
+   * Set-Markt erschienen dadurch Sets mit „0,0 %", als hätten sie sich nicht
+   * bewegt — tatsächlich war für keine ihrer Karten etwas gemessen. Genau die
+   * Verwechslung von „unverändert" und „nicht gemessen", die diese Datei sonst
+   * überall vermeidet.
+   */
+  avgTrend: number | null;
 }
 
 /**
@@ -170,13 +179,13 @@ export function rankSets(cards: PokemonCard[], limit = 5): SetRank[] {
       name: d.name,
       count: d.preise.length,
       medianPrice: median(d.preise) ?? 0,
-      avgTrend: d.trends.length > 0 ? d.trends.reduce((s, t) => s + t, 0) / d.trends.length : 0,
+      avgTrend: d.trends.length > 0 ? d.trends.reduce((s, t) => s + t, 0) / d.trends.length : null,
     }))
     .sort((a, b) => b.medianPrice - a.medianPrice)
     .slice(0, limit);
 }
 
-// ── PokéMarket Index (PMI) ──────────────────────────────────────────────────
+// ── CardBeacon Index (CBI) ──────────────────────────────────────────────────
 
 /**
  * Mindestanzahl auswertbarer Karten für einen belastbaren Index.
@@ -202,7 +211,7 @@ export interface PmiResult {
 /**
  * Preisgewichteter Markttrend.
  *
- * Der PMI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein
+ * Der CBI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein
  * größeres Gewicht im Index, und eine große Anzahl sehr günstiger Karten
  * dominiert die Kennzahl nicht.
  *

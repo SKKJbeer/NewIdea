@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL } from '@/lib/article-generator';
 
 // Dynamisches OG-Bild pro Artikel — Titel + Leitkarte + Level-Badge.
-export const alt = 'Artikel — PokéMarket Intelligence';
+export const alt = 'Artikel — CardBeacon';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -18,7 +18,7 @@ export default async function Image({ params }: { params: Promise<{ date: string
   const article = type ? await readArticle(date).catch(() => null) : null;
 
   const meta = type ? ARTICLE_META[type] : null;
-  const title = article?.title || meta?.label || 'PokéMarket Intelligence';
+  const title = article?.title || meta?.label || 'CardBeacon';
   const level = article && type ? articleLevel(article, type) : null;
   const heroImg = article?.featuredCards?.find((c) => c.imageUrl)?.imageUrl || null;
 
@@ -62,7 +62,7 @@ export default async function Image({ params }: { params: Promise<{ date: string
           <div style={{ display: 'flex', alignItems: 'center', marginTop: 44 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 13, background: '#7c3aed', fontSize: 26, fontWeight: 800, marginRight: 14 }}>P</div>
             <div style={{ display: 'flex', fontSize: 24, fontWeight: 700, color: '#cbd5e1' }}>
-              <span>PokéMarket&nbsp;</span>
+              <span>CardBeacon&nbsp;</span>
               <span style={{ color: '#a78bfa' }}>Intelligence</span>
             </div>
           </div>

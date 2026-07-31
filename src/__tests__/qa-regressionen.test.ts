@@ -36,17 +36,26 @@ describe('Bild-Hosts: Proxy-Liste und Richtlinie passen zusammen', () => {
   });
 });
 
-describe('Navigation passt in jede Breite', () => {
+describe('Navigation ordnet, statt aufzuzählen', () => {
   const nav = lies('src/components/NavBar.tsx');
 
-  it('nutzt bis zum großen Umbruchpunkt engere Abstände', () => {
-    // Bei 768 px ragte die Leiste 18 px über den Rand — waagerechtes Scrollen
-    // auf JEDER Seite.
-    expect(nav).toMatch(/px-2 py-2 text-xs font-semibold transition-colors lg:px-3/);
+  it('führt fünf Ziele, nicht acht', () => {
+    // Vorher standen Einsteiger, Suche, Sets, Marktbericht, Blog, Guides,
+    // Merkliste und Portfolio gleichrangig nebeneinander. Acht Punkte sind
+    // keine Ordnung, sondern ein Inhaltsverzeichnis — und bei 768 px ragte die
+    // Leiste über den Rand.
+    const eintraege = [...nav.matchAll(/\{ href: '[^']+', label: '[^']+' \}/g)];
+    expect(eintraege).toHaveLength(5);
   });
 
-  it('blendet die interne Studio-Seite auf schmalen Bildschirmen aus', () => {
-    expect(nav).toMatch(/hidden[^"]*lg:inline-flex/);
+  it('führt die interne Studio-Seite gar nicht mehr', () => {
+    expect(nav).not.toContain('/studio');
+  });
+
+  it('zeigt den aktiven Punkt mit einer Linie, nicht mit einer Pille', () => {
+    // DESIGN.md §4: `rounded-full` ist Punkten vorbehalten.
+    expect(nav).toContain('after:h-px');
+    expect(nav).not.toContain('rounded-full');
   });
 });
 
@@ -55,21 +64,29 @@ describe('Tippziele erreichen Fingergröße', () => {
     ['src/components/LangPicker.tsx', 'Sprachauswahl'],
     ['src/components/SiteFooter.tsx', 'Footer-Links'],
     ['src/components/AffiliateBar.tsx', 'Partner-Links'],
-    ['src/app/page.tsx', 'Ticker und Abschnitts-Links'],
+    ['src/components/NavBar.tsx', 'Kopfzeilen-Links'],
   ])('%s hat eine Mindesthöhe (%s)', (datei) => {
-    expect(lies(datei)).toMatch(/min-h-\[3[26]px\]/);
+    // Entweder eine ausdrückliche Mindesthöhe oder eine feste Höhe ab 44 px
+    // (h-11 = 44 px) — die Vorgabe für Tippziele auf Berührungsbildschirmen.
+    const src = lies(datei);
+    const hoehe = /min-h-\[(3[26]|4[48])px\]/.test(src) || /\bh-1[12]\b/.test(src);
+    expect(hoehe, `${datei}: keine Mindesthöhe für Tippziele`).toBe(true);
   });
 });
 
 describe('Ein Trend von genau null ist neutral', () => {
-  it.each([
-    ['src/components/CardGrid.tsx', 'unveraendert'],
-    ['src/app/page.tsx', 'neutral'],
-  ])('%s färbt 0 %% nicht rot', (datei, kennung) => {
-    // Vorher: `trend >= 0 ? gruen : rot` — jede unveränderte Karte war rot.
-    const src = lies(datei);
-    expect(src).toContain(kennung);
-    expect(src).not.toMatch(/const (up|isPositive) = trend >= 0;/);
+  it('die zentrale Farbregel färbt 0 nicht rot', () => {
+    // Vorher: `trend >= 0 ? gruen : rot` an mehreren Stellen — jede
+    // unveränderte Karte war rot. Die Regel steht jetzt einmal in `ui.ts`.
+    const ui = lies('src/lib/ui.ts');
+    expect(ui).toContain('if (value > 0)');
+    expect(ui).toContain('if (value < 0)');
+    // Und fehlende Messung ist noch einmal etwas anderes als null.
+    expect(ui).toMatch(/value === null \|\| value === undefined/);
+  });
+
+  it('CardGrid nutzt weiterhin keine >= 0-Abkürzung', () => {
+    expect(lies('src/components/CardGrid.tsx')).not.toMatch(/const (up|isPositive) = trend >= 0;/);
   });
 });
 
@@ -99,23 +116,34 @@ describe('Das Diagramm lädt erst, wenn es gebraucht wird', () => {
 describe('Die Startseite führt durch die Produktlogik', () => {
   const seite = lies('src/app/page.tsx');
 
-  it('beginnt mit der Suche', () => {
-    expect(seite.indexOf('<SearchBox')).toBeGreaterThan(0);
-    expect(seite.indexOf('<SearchBox')).toBeLessThan(seite.indexOf('aria-label="Markt-Kennzahlen"'));
+  // Neue Reihenfolge: Markt → Einordnung → Bewegungen → Set-Markt → Bestand →
+  // Research. Erst der Markt, dann seine Teile, dann der eigene Bestand.
+  const REIHENFOLGE = [
+    '<MarketHeader',
+    'aria-labelledby="einordnung"',
+    'aria-labelledby="bewegungen"',
+    'aria-labelledby="setmarkt"',
+    'aria-labelledby="bestand"',
+    'aria-labelledby="research"',
+  ];
+
+  it('beginnt mit dem Marktstand, nicht mit einem Suchfeld', () => {
+    // Der Blickfang war ein leeres Eingabefeld. Die erste Aussage der Seite
+    // ist jetzt der Marktstand; die Suche steht in der Kopfzeile.
+    expect(seite.indexOf('<MarketHeader')).toBeGreaterThan(0);
+    expect(seite).not.toContain('<SearchBox');
   });
 
-  it('führt zum Portfolio, bevor die Inhalte kommen', () => {
-    // entdecken → analysieren → sammeln → verfolgen. Ohne diesen Einstieg
-    // endet die Startseite bei der Analyse.
-    const portfolio = seite.indexOf('aria-label="Portfolio"');
-    expect(portfolio).toBeGreaterThan(0);
-    expect(portfolio).toBeLessThan(seite.indexOf('aria-label="Blog"'));
+  it('hält die Abschnitte in der Produktreihenfolge', () => {
+    const positionen = REIHENFOLGE.map((m) => seite.indexOf(m));
+    expect(positionen.every((p) => p > 0), REIHENFOLGE.join(', ')).toBe(true);
+    expect([...positionen].sort((a, b) => a - b)).toEqual(positionen);
   });
 
-  it('ordnet Kennzahlen vor Marktbewegung', () => {
-    expect(seite.indexOf('aria-label="Markt-Kennzahlen"')).toBeLessThan(
-      seite.indexOf('aria-label="Top Gewinner und Verlierer"'),
-    );
+  it('bleibt bei sechs Abschnitten', () => {
+    // Zehn Abschnitte waren der Grund, warum keiner wichtig aussah.
+    const abschnitte = (seite.match(/<section aria-labelledby=/g) ?? []).length;
+    expect(abschnitte).toBeLessThanOrEqual(6);
   });
 });
 

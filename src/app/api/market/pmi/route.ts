@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
 
-// Liefert den PokéMarket Index als Zahl — Grundlage für den Vergleich
+// Liefert den CardBeacon Index als Zahl — Grundlage für den Vergleich
 // „mein Bestand gegen den Markt" auf der Portfolio-Seite.
 //
 // BEWUSST OHNE ANMELDUNG, aber auch bewusst OHNE KI: Diese Route liest nur
@@ -36,7 +36,7 @@ export async function GET() {
     );
   } catch (err) {
     // Keine internen Details nach außen (Code-Regel 3).
-    console.error('PMI konnte nicht berechnet werden:', err);
+    console.error('Index konnte nicht berechnet werden:', err);
     return NextResponse.json({ value: null, sufficient: false }, { status: 200 });
   }
 }

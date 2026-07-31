@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
-import { ReadingProgress } from '@/components/ReadingProgress';
 import { Reveal } from '@/components/Reveal';
 import { ScrollText, ExternalLink } from 'lucide-react';
 import {
@@ -25,9 +24,9 @@ import { MIN_POINTS_FOR_SCORE, MIN_POINTS_FOR_VOLATILITY, PERFORMANCE_WINDOWS } 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Methodik — wie unsere Marktkennzahlen entstehen | PokéMarket Intelligence',
+  title: 'Methodik — wie unsere Marktkennzahlen entstehen | CardBeacon',
   description:
-    'Offenlegung der Berechnung: PokéMarket Index (PMI), Angst & Gier, PMI Score, Preisquellen, Aktualisierungsintervalle und die Grenzen der Datenlage.',
+    'Offenlegung der Berechnung: CardBeacon Index (CBI), Angst & Gier, Markt-Score, Preisquellen, Aktualisierungsintervalle und die Grenzen der Datenlage.',
   alternates: { canonical: '/methodik' },
 };
 
@@ -67,7 +66,6 @@ export default function MethodikPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
-      <ReadingProgress />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="mx-auto max-w-3xl px-4 pb-14 pt-10 text-center sm:py-16">
@@ -136,14 +134,14 @@ export default function MethodikPage() {
           </p>
         </Abschnitt>
 
-        <Abschnitt nummer={4} titel="PokéMarket Index (PMI)">
+        <Abschnitt nummer={4} titel="CardBeacon Index (CBI)">
           <p>
-            Der PMI ist der <strong className="text-slate-300">preisgewichtete</strong>{' '}
+            Der CBI ist der <strong className="text-slate-300">preisgewichtete</strong>{' '}
             Durchschnittstrend aller ausgewerteten Karten über 30 Tage.
           </p>
-          <Formel>PMI = Σ(Trend × Preis) ÷ Σ(Preis)</Formel>
+          <Formel>CBI = Σ(Trend × Preis) ÷ Σ(Preis)</Formel>
           <p>
-            Der PMI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein größeres
+            Der CBI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein größeres
             Gewicht im Index, und eine große Anzahl sehr günstiger Karten dominiert die Kennzahl
             nicht. Die Gewichtung ist eine Entscheidung über den Aufbau des Index — sie besagt
             nicht, dass ein höherer Preis mit größerer Marktbedeutung oder häufigerem Handel
@@ -174,7 +172,7 @@ export default function MethodikPage() {
               30-Tage-Schnitt
             </li>
             <li>
-              <strong className="text-slate-300">Momentum</strong> — der PMI, abgebildet von −15 %
+              <strong className="text-slate-300">Momentum</strong> — der CBI, abgebildet von −15 %
               bis +15 % auf die Skala 0–100
             </li>
             <li>
@@ -187,11 +185,11 @@ export default function MethodikPage() {
             gewichtete Summe ergibt exakt den angezeigten Wert — er ist nachrechenbar.
           </p>
           <p className="text-slate-500">
-            Unterhalb derselben Mindestdatenlage wie beim PMI wird auch hier kein Wert ausgewiesen.
+            Unterhalb derselben Mindestdatenlage wie beim CBI wird auch hier kein Wert ausgewiesen.
           </p>
         </Abschnitt>
 
-        <Abschnitt nummer={6} titel="PMI Score einer einzelnen Karte">
+        <Abschnitt nummer={6} titel="Markt-Score einer einzelnen Karte">
           <p>
             Der Score von 0 bis 100 ist der Mittelwert aus vier Faktoren, die alle aus der echten
             Preisreihe der Karte stammen:
@@ -226,7 +224,7 @@ export default function MethodikPage() {
           </p>
           <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-3.5 py-3">
             <p className="text-xs font-bold text-amber-400/80">
-              Der PMI Score ist eine datenbasierte Marktkennzahl und keine Anlageberatung.
+              Der Markt-Score ist eine datenbasierte Marktkennzahl und keine Anlageberatung.
             </p>
           </div>
         </Abschnitt>
@@ -276,7 +274,7 @@ export default function MethodikPage() {
             Keine Anlageberatung · Alle Preise ohne Gewähr
           </p>
           <p className="mt-1 text-[11px] leading-relaxed text-amber-400/60">
-            PokéMarket Intelligence ist eine Informations- und Analyseplattform. Die dargestellten
+            CardBeacon ist eine Informations- und Analyseplattform. Die dargestellten
             Kennzahlen sind keine Empfehlung zum Kauf oder Verkauf.
           </p>
         </div>

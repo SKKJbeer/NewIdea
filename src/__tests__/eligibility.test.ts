@@ -82,6 +82,14 @@ describe('Set-Ranking braucht eine Mindest-Stichprobe', () => {
     expect(rang[0].code).toBe('b');
   });
 
+  it('gibt ohne gemessene Karte KEINEN Trend zurück', () => {
+    // BEFUND AUS DER LIVE-ANSICHT: Im Set-Markt standen Sets mit „0,0 %", als
+    // hätten sie sich nicht bewegt — tatsächlich war für keine ihrer Karten
+    // etwas gemessen. „Unverändert" und „nicht gemessen" sind zweierlei.
+    const ohneMessung = Array.from({ length: 6 }, (_, i) => karte(`o${i}`, { set: 'o' }));
+    expect(rankSets(ohneMessung)[0].avgTrend).toBeNull();
+  });
+
   it('zählt für den Trend nur gemessene Karten', () => {
     const cards = [
       ...vieleAus('x', 5, 10),
@@ -97,6 +105,8 @@ describe('Set-Ranking braucht eine Mindest-Stichprobe', () => {
     const seite = lies('src/app/page.tsx');
     expect(seite).toContain('rankSets(');
     expect(seite).not.toMatch(/setMap\.set\(/);
+    // Auch der Marktkontext der Kartenseite nutzt dieselbe Funktion.
+    expect(lies('src/lib/market-context.ts')).toContain('rankSets(');
   });
 });
 
@@ -128,13 +138,15 @@ describe('Datenbestand und auswertbare Stichprobe sind zweierlei', () => {
     const lib = lies('src/lib/data-coverage.ts');
     expect(lib).toContain('sets: number | null');
     expect(lib).not.toContain('catch(() => 0)');
-    expect(lies('src/app/page.tsx')).toContain('abdeckung.sets !== null');
+    expect(lies('src/components/MarketHeader.tsx')).toContain('abdeckung.sets !== null');
   });
 
-  it('die Oberfläche nennt die Stichprobe beim Namen', () => {
-    const seite = lies('src/app/page.tsx');
-    expect(seite).toContain('auswertbare Karten');
-    expect(seite).toContain('Datenabdeckung');
+  it('die Oberfläche trennt Datenbestand und Stichprobe sichtbar', () => {
+    // Beide Zahlen stehen im Marktkopf, aber in getrennten Blöcken und mit
+    // unterschiedlichen Begriffen — genau das war der Kern des Missverständnisses.
+    const kopf = lies('src/components/MarketHeader.tsx');
+    expect(kopf).toContain('Stichprobe');
+    expect(kopf).toContain('Datenbestand');
   });
 });
 

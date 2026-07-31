@@ -4,7 +4,7 @@ import { formatEur } from '@/lib/format';
 
 // Dynamisches OG-Bild pro Karte — Kartenmotiv + Name + Preis. Macht geteilte
 // Kartenlinks (WhatsApp/Discord/X) sofort attraktiv statt nackter Text.
-export const alt = 'Pokémon Karte — PokéMarket Intelligence';
+export const alt = 'Pokémon Karte — CardBeacon';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -52,7 +52,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               P
             </div>
             <div style={{ display: 'flex', fontSize: 26, fontWeight: 700, color: '#cbd5e1' }}>
-              <span>PokéMarket&nbsp;</span>
+              <span>CardBeacon&nbsp;</span>
               <span style={{ color: '#a78bfa' }}>Intelligence</span>
             </div>
           </div>

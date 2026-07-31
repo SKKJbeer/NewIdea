@@ -165,7 +165,7 @@ export function cardMarketStats(
   return { ath, high30, low30, volatilityPct, points: punkte.length };
 }
 
-// ── PMI Score ───────────────────────────────────────────────────────────────
+// ── Markt-Score ───────────────────────────────────────────────────────────────
 
 export interface ScoreFactor {
   label: string;

@@ -1,0 +1,190 @@
+# CardBeacon — Design-System
+
+Ein Kartenbild bringt vier bis sechs kräftige Farben mit, ein Foliendruck noch
+mehr. Eine Oberfläche, die dagegen anhält, gewinnt nicht — sie wird laut.
+Deshalb gilt hier eine Arbeitsteilung:
+
+> **Die Karten liefern die Farbe. CardBeacon liefert die Struktur.**
+
+Alles Weitere folgt daraus.
+
+---
+
+## 1. Der wichtigste Grundsatz: weniger Behälter
+
+Die Vorgängerfassung löste jedes Layoutproblem mit einem weiteren abgerundeten
+Rechteck. Das Ergebnis war eine Seite aus zwei Dutzend Kacheln, die alle gleich
+wichtig aussahen — und damit keine.
+
+**Regel:** Ein Abschnitt bekommt nur dann eine eigene Fläche, wenn er sich
+inhaltlich von seiner Umgebung abheben muss. Rangfolge der Mittel:
+
+1. **Typografie** (Größe, Gewicht, Farbe)
+2. **Abstand**
+3. **Linie** (`border-t`, 1 px)
+4. **Fläche** — erst wenn 1–3 nicht reichen
+
+Drei gleich aussehende Kennzahl-Kacheln nebeneinander sind verboten. Eine
+gemeinsame Fläche mit typografischer Trennung sagt dasselbe und ordnet dabei.
+
+---
+
+## 2. Typografie
+
+Es gibt drei Rollen, nicht zehn Größen.
+
+| Rolle | Klassen | Verwendung |
+|---|---|---|
+| Kennzahl groß | `text-5xl sm:text-7xl font-semibold tabular-nums tracking-tight` | Der Indexwert. Genau EINE pro Seite. |
+| Kennzahl | `text-2xl font-semibold tabular-nums` | Zweitrangige Werte |
+| Datenzeile | `text-[13px] tabular-nums` | Tabellen, Listen |
+| Abschnittsmarke | `text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500` | Über jedem Abschnitt |
+| Fließtext | `text-sm leading-relaxed text-slate-400` | Erklärungen |
+| Beiwerk | `text-[11px] text-slate-600` | Datenstand, Stichprobe |
+
+**`tabular-nums` ist Pflicht bei jeder Zahl**, die untereinander steht. Ohne sie
+springen die Ziffern und eine Spalte liest sich nicht mehr von oben nach unten.
+
+**Keine `font-black`.** Das war die Schriftstärke der Vorgängerfassung und
+sieht nach Werbung aus. `font-semibold` trägt eine Kennzahl auch.
+
+---
+
+## 3. Abstände
+
+Vier Werte, mehr nicht: **4 · 8 · 16 · 32** (Tailwind `1 / 2 / 4 / 8`).
+Abschnittsabstand: `py-12 sm:py-16`. Zwischen Datenzeilen: `py-2.5`.
+
+---
+
+## 4. Radien
+
+| Element | Radius |
+|---|---|
+| Flächen, Panels | `rounded-none` — Kanten |
+| Eingabefelder, Knöpfe | `rounded-md` (6 px) |
+| Kartenbilder | `rounded-sm` |
+| Alles andere | kein Radius |
+
+Die Vorgängerfassung nutzte durchgehend `rounded-2xl`. Große Radien lassen
+Datenflächen nach Werbebanner aussehen; ein Terminal hat Kanten.
+**`rounded-full` ist ausschließlich für Punkte erlaubt**, nie für Beschriftungen
+— Pillen-Badges sind ausdrücklich untersagt.
+
+---
+
+## 5. Flächen
+
+| Ebene | Farbe | Verwendung |
+|---|---|---|
+| Seite | `#08080b` | Hintergrund |
+| Erhöht | `#0e0e13` | Nur wo eine Abgrenzung nötig ist |
+| Linie | `#1c1c24` | Trennlinien, Rahmen |
+| Linie betont | `#2a2a35` | Tabellenkopf |
+
+Kein Verlauf als Flächenfüllung. Kein Schlagschatten. Kein Leuchten.
+
+---
+
+## 6. Zahlenzustände
+
+| Zustand | Farbe | Zeichen |
+|---|---|---|
+| Positiv | `text-emerald-400` | `+` |
+| Negativ | `text-rose-400` | `−` |
+| Neutral / unverändert | `text-slate-400` | `±` |
+| Nicht gemessen | `text-slate-600` | `—` |
+
+**Farbe darf nie das einzige Signal sein.** Jede gerichtete Zahl trägt ihr
+Vorzeichen. Das ist keine reine Barrierefreiheitsfrage: Auf einem Telefon in der
+Sonne ist Rot gegen Grün auf dunklem Grund kaum zu unterscheiden.
+
+`—` bedeutet **nicht gemessen** und ist nie durch `0,0 %` zu ersetzen. Eine
+fehlende Messung ist keine Nullbewegung.
+
+---
+
+## 7. Tabellen und Datenzeilen
+
+Das Standardmuster für Kartenlisten, Set-Listen, Bewegungen:
+
+```
+Kopfzeile:  text-[10px] uppercase tracking-[0.18em] text-slate-600, border-b
+Zeile:      grid, items-center, py-2.5, border-b border-[#1c1c24]/60
+Hover:      bg-white/[0.02]
+Bild:       h-9 w-7 object-contain (Miniatur, nicht Blickfang)
+Zahl:       text-right tabular-nums
+```
+
+Keine Zeile bekommt eine eigene Fläche. Keine Zeile bekommt einen Rahmen.
+Die Trennlinie reicht.
+
+---
+
+## 8. Diagramme
+
+- Eine Linie, 1,5 px, keine Fläche darunter außer bei sehr flachen Kurven
+- Kein Raster außer einer Nulllinie, wo sie fachlich etwas bedeutet
+- Achsen sparsam beschriftet: erster und letzter Punkt genügen oft
+- Farbe folgt der Richtung des Gesamtzeitraums (emerald/rose)
+- Unter zwei echten Messpunkten: **kein Diagramm**, sondern ein Satz
+
+---
+
+## 9. Ladezustände
+
+**Kein Balken am oberen Rand.** Weder als Ladeanzeige noch als Lesefortschritt.
+Ein Balken oben sagt „irgendwo passiert etwas" — genau das, was niemand braucht.
+
+Stattdessen: Ein Platzhalter **an der Stelle, an der die Daten erscheinen**, mit
+**derselben Höhe** wie der fertige Inhalt.
+
+| Bereich | Platzhalter |
+|---|---|
+| Index-Diagramm | Fläche in Diagrammhöhe |
+| Bewegungen | Zeilen-Platzhalter |
+| Set-Markt | Balken-Platzhalter |
+| Kartenseite | Bild + Kennzahlblock |
+| Suche | Ergebniszeilen |
+
+---
+
+## 10. Bewegung
+
+Erlaubt: Zahlen zählen hoch, Diagramme bauen sich einmal auf, Platzhalter
+pulsieren dezent, Zustandswechsel unter 150 ms.
+
+Untersagt: Federanimationen, schwebende Flächen, dauerhafte Bewegung (Ticker),
+Leuchteffekte, Verläufe als Blickfang.
+
+Bei `prefers-reduced-motion` ist alles sofort sichtbar — kein Inhalt darf hinter
+einer Animation verborgen bleiben.
+
+---
+
+## 11. Mobil
+
+Die mobile Fassung wird eigens entworfen, nicht gestapelt.
+
+- Datenzeilen statt Kacheln
+- Zahlen rechtsbündig, Beschriftung links
+- Tippziele mindestens 44 px
+- Der Indexwert bleibt auch auf 375 px die größte Zahl der Seite
+- Keine waagerecht scrollenden Bereiche außer bei breiten Tabellen, und dort
+  mit sichtbarem Hinweis
+
+---
+
+## 12. Was diese Oberfläche NICHT sein soll
+
+Vor jedem neuen Bauteil eine Frage: **Könnte ein Bildschirmfoto davon für ein
+beliebiges anderes Kartentool gehalten werden?**
+
+Wenn ja, ist es noch nicht fertig. Konkret vermieden:
+
+- Reihen identischer Kennzahl-Kacheln mit Symbol, Titel und Zahl
+- Große abgerundete Suchfelder als Blickfang der Startseite
+- Verlaufsflächen hinter Überschriften
+- Pillen-Beschriftungen für alles
+- Karten-Raster als Standardantwort auf jede Liste
+- Dashboards, deren Abschnitte alle gleich wichtig aussehen

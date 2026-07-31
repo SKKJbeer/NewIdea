@@ -308,7 +308,7 @@ export function ReelsStudio() {
                 <p>→ Letzte {clipDuration}s werden ausgeschnitten</p>
               )}
               <p>→ Crop auf 9:16 (Hochformat für Reels)</p>
-              <p>→ &quot;PokéMarket Intel&quot; Wasserzeichen</p>
+              <p>→ &quot;CardBeacon Intel&quot; Wasserzeichen</p>
               <p>→ KI generiert Instagram-Caption</p>
             </div>
 
