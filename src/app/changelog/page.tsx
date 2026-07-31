@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.11.0',
+    date: '31. Juli 2026',
+    label: 'Markt-Geschichten als Bild',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Vier wiederverwendbare Marktbilder in drei Formaten — staerkste Bewegung, Set gegen Set, Marktstand, Karte gegen Markt' },
+      { type: 'new',     text: 'Die Bilder nehmen keinen Text aus der Adresse entgegen; alle Zahlen stammen aus der Marktstichprobe der Startseite' },
+      { type: 'changed', text: 'Der Folienschimmer laeuft jetzt auf jedem Kartenbild statt nur bei Folien-Seltenheiten' },
+      { type: 'fixed',   text: 'Das erste Marktbild zeigte einen anderen Indexstand als die Website — es liest jetzt denselben gespeicherten Tagesstand' },
+    ],
+  },
+  {
     version: '4.10.0',
     date: '31. Juli 2026',
     label: 'Ein Kopf-Muster je Seitenart',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Zehn Datenflaechen folgen demselben Kopf-Muster: linksbuendig, Abschnittsmarke statt Pille, keine Verlaufsflaeche' },
       { type: 'changed', text: 'Marktbericht: die drei Merkmal-Zeilen unter der Ueberschrift sind entfallen — sie behaupteten Eigenschaften, statt den Bericht zu zeigen' },

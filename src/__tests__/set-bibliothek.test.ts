@@ -38,8 +38,11 @@ describe('Bewegungen zeigen den Abstand zum Markt', () => {
     expect(mod).not.toMatch(/aspect-\[63\/88\]/);
   });
 
-  it('der Folienschimmer haengt an der Seltenheit, nicht an jeder Zeile', () => {
-    expect(mod).toMatch(/hatFolie\(card\.rarity\) \? 'foil' : ''/);
+  it('der Folienschimmer laeuft auf jeder Zeile', () => {
+    // ZURUECKGENOMMEN: Zuerst haing er an der Seltenheit — als Auskunft
+    // gedacht, in der Praxis nur als Ungleichmaessigkeit wahrgenommen.
+    expect(mod).toMatch(/lift foil/);
+    expect(mod).not.toContain('hatFolie');
   });
 });
 

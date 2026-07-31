@@ -10,7 +10,7 @@ import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
-import { ambientFor, hatFolie } from '@/lib/collector';
+import { ambientFor } from '@/lib/collector';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
@@ -135,7 +135,6 @@ export default async function CardDetailPage({ params }: Props) {
   // Ambient-Ton aus dem Energietyp der Karte — eine veröffentlichte Eigenschaft,
   // keine Farbanalyse des Bildes. Ohne Typ greift der Markenton.
   const ambient = ambientFor(card.types);
-  const folie = hatFolie(card.rarity);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -191,7 +190,7 @@ export default async function CardDetailPage({ params }: Props) {
               />
               {card.imageUrlHiRes || card.imageUrl ? (
                 <div
-                  className={`lift relative aspect-[63/88] w-full overflow-hidden rounded-xl ring-1 ${ambient.ring} ${folie ? 'foil' : ''}`}
+                  className={`lift relative aspect-[63/88] w-full overflow-hidden rounded-xl ring-1 ${ambient.ring} foil`}
                 >
                   <CardImage
                     src={card.imageUrlHiRes || card.imageUrl || ''}

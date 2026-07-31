@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { ambientFor, hatFolie, AMBIENT_FALLBACK } from '@/lib/collector';
+import { ambientFor, AMBIENT_FALLBACK } from '@/lib/collector';
 import { findViolations, CAUSAL_CLAIM, HYPOTHESIS_MARKER } from '@/lib/content-rules';
 import { fearGreedLabel } from '@/lib/market-metrics';
 
@@ -51,30 +51,30 @@ describe('Ambient-Farbe kommt aus der Karte', () => {
   });
 });
 
-describe('Folienschimmer nur, wo die Karte auch glaenzt', () => {
-  it('erkennt Folien-Seltenheiten', () => {
-    expect(hatFolie('Rare Holo')).toBe(true);
-    expect(hatFolie('Special Illustration Rare')).toBe(true);
-    expect(hatFolie('Rare Secret')).toBe(true);
-  });
-
-  it('laesst gewoehnliche Karten matt', () => {
-    // Auf jeder Karte waere der Schimmer Dekoration und damit bedeutungslos.
-    expect(hatFolie('Common')).toBe(false);
-    expect(hatFolie('Uncommon')).toBe(false);
-    expect(hatFolie(undefined)).toBe(false);
+describe('Folienschimmer', () => {
+  it('laeuft auf jedem Kartenbild', () => {
+    // ZURUECKGENOMMEN: Zuerst lief er nur bei Folien-Seltenheiten, damit er
+    // eine Auskunft sei statt Dekoration. Am laufenden Produkt nahm das niemand
+    // als Auskunft wahr — es sah nur aus, als flimmerten manche Zeilen und
+    // andere nicht.
+    for (const datei of [
+      'src/components/MarketModules.tsx',
+      'src/components/SearchResultRows.tsx',
+      'src/components/CollectionGallery.tsx',
+    ]) {
+      expect(lies(datei), datei).not.toContain('hatFolie');
+    }
+    expect(lies('src/lib/collector.ts')).not.toMatch(/export function hatFolie/);
   });
 
   it('laeuft nur auf Zeigerkontakt und respektiert Reduced-Motion', () => {
     const css = lies('src/app/globals.css');
     const block = css.slice(css.indexOf('FOLIENSCHIMMER'));
-    // Der gesamte Effekt liegt im Reduced-Motion-Block — wer Bewegung
-    // abbestellt hat, verliert keine Information.
+    // Diese Bedingungen sind KEINE Geschmacksfrage und bleiben: Ohne sie wird
+    // aus einem Zitat des physischen Objekts ein Werbebanner.
     expect(block).toContain('prefers-reduced-motion: no-preference');
     expect(block).toMatch(/\.foil:hover::after/);
-    // Keine Endlosanimation: Eine dauernd glaenzende Karte ist ein Werbebanner.
     expect(block).not.toMatch(/foil-sweep[^;]*infinite/);
-    // Kein Regenbogen.
     expect(block).not.toMatch(/hsl\(|rainbow|conic-gradient/i);
   });
 });

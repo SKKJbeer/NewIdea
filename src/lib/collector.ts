@@ -75,20 +75,17 @@ export function ambientFor(types: string[] | undefined): Ambient {
   return (erster && TOENE[erster]) || AMBIENT_FALLBACK;
 }
 
-/**
- * Seltenheitsstufen, die eine Foliendarstellung rechtfertigen.
- *
- * Der Folienschimmer ist ein Zitat des physischen Objekts. Auf JEDER Karte
- * wäre er Dekoration und damit bedeutungslos — auf den Karten, die tatsächlich
- * glänzen, ist er eine Auskunft.
- */
-const FOLIEN_SELTENHEIT = [
-  'holo', 'ultra', 'secret', 'rainbow', 'illustration', 'hyper',
-  'special', 'shiny', 'amazing', 'radiant', 'gold',
-];
-
-export function hatFolie(rarity: string | undefined): boolean {
-  if (!rarity) return false;
-  const r = rarity.toLowerCase();
-  return FOLIEN_SELTENHEIT.some((s) => r.includes(s));
-}
+// FRÜHER STAND HIER `hatFolie(rarity)`.
+//
+// Der Folienschimmer lief nur auf Karten, deren Seltenheit tatsächlich glänzt.
+// Die Begründung war stimmig — auf jeder Karte sei der Effekt Dekoration, auf
+// den glänzenden eine Auskunft. In der Praxis fiel dabei aber nicht auf, dass
+// etwas eine Auskunft IST; es sah nur so aus, als flimmerten manche Zeilen und
+// andere nicht. Eine Regel, die niemand als Regel wahrnimmt, ordnet nichts —
+// sie erzeugt Ungleichmäßigkeit.
+//
+// Der Schimmer läuft jetzt auf jedem Kartenbild. Was ihn davor bewahrt,
+// Dekoration zu werden, sind die übrigen Bedingungen (`.foil` in globals.css):
+// Er läuft EINMAL und nur bei Zeigerkontakt, er ist weiß statt bunt, und er
+// liegt vollständig im `prefers-reduced-motion`-Block. Die sind keine
+// Geschmacksfrage und bleiben.

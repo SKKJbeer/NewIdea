@@ -5,7 +5,6 @@ import { ImageOff } from 'lucide-react';
 import type { PokemonCard } from '@/types';
 import { CardThumb } from './CardThumb';
 import { hasRealTrend } from '@/lib/market-metrics';
-import { hatFolie } from '@/lib/collector';
 import { formatEur, formatPercent, formatPp } from '@/lib/format';
 import { TABLE, NUM, toneClass } from '@/lib/ui';
 
@@ -69,8 +68,7 @@ export function SearchResultRows({
             href={`/karten/${card.id}`}
             className={`group grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-1 px-1 py-2.5 sm:grid-cols-[auto_1fr_auto_auto_auto] ${TABLE.row} focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-violet-500/60`}
           >
-            <span
-              className={`lift block w-10 shrink-0 overflow-hidden rounded-[3px] ${hatFolie(card.rarity) ? 'foil' : ''}`}
+            <span className="lift foil block w-10 shrink-0 overflow-hidden rounded-[3px]"
             >
               {card.imageUrl ? (
                 <CardThumb

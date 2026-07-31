@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.11.0] - 31. Juli 2026 · Markt-Geschichten als Bild
+
+### Neu
+- **Vier wiederverwendbare Marktbilder** in drei Formaten (Reel 1080×1920, Beitrag 1080×1350, Teilen-Vorschau 1200×630): staerkste Bewegung, Set gegen Set, Marktstand, Karte gegen Markt. Die Vorlagen kennen ihre Groesse nicht — das Format kommt von aussen, damit dieselbe Geschichte nicht dreimal existiert
+- **Die Bilder nehmen KEINEN Text aus der Adresse entgegen.** Alle Zahlen und Namen stammen aus derselben Marktstichprobe wie die Startseite. Eine oeffentliche Adresse, die beliebigen Text im CardBeacon-Layout setzt, waere eine Flaeche, auf der jeder eine Behauptung erzeugen kann, die aussieht wie eine Messung von uns
+- Reicht die Datenlage nicht, entsteht **kein Bild** statt eines Bildes mit erfundener Kennzahl
+
+### Geaendert
+- **Der Folienschimmer laeuft jetzt auf jedem Kartenbild.** Zuvor nur bei Folien-Seltenheiten — als Auskunft gedacht, in der Praxis aber nur als Ungleichmaessigkeit wahrgenommen. Die uebrigen Bedingungen bleiben: einmalig auf Zeigerkontakt, weiss statt bunt, vollstaendig abschaltbar ueber Reduced-Motion
+
+### Behoben
+- **Das erste gerenderte Marktbild zeigte einen anderen Indexstand als die Website** (+28,6 % gegen −0,2 %): Es rechnete sich seinen eigenen Index aus. Ein geteiltes Bild lebt laenger als der Moment, in dem es entstand — es liest jetzt denselben gespeicherten Tagesstand wie Kartenseiten und Suche
+
+---
+
 ## [4.10.0] - 31. Juli 2026 · Ein Kopf-Muster je Seitenart
 
 ### Geaendert

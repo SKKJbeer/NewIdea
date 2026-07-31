@@ -5,7 +5,6 @@ import type { SetRank } from '@/lib/market-metrics';
 import { MIN_SET_SAMPLE } from '@/lib/market-metrics';
 import { displayPrice } from '@/lib/pokemon-api';
 import { CardThumb } from './CardThumb';
-import { hatFolie } from '@/lib/collector';
 import { formatEur, formatPercent, formatPp } from '@/lib/format';
 import { SECTION_LABEL, SECTION_NUM, TABLE, NUM, THUMB, toneClass, barClass } from '@/lib/ui';
 import type { BriefSatz } from '@/lib/market-brief';
@@ -115,7 +114,7 @@ function MoverRow({ card, rang, cbi }: { card: PokemonCard; rang: number; cbi: n
         {String(rang).padStart(2, '0')}
       </span>
 
-      <span className={`lift block shrink-0 overflow-hidden rounded-[3px] ${hatFolie(card.rarity) ? 'foil' : ''}`}>
+      <span className="lift foil block shrink-0 overflow-hidden rounded-[3px]">
         <CardThumb src={card.imageUrl} width={26} height={36} className={THUMB} />
       </span>
 

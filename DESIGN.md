@@ -211,13 +211,21 @@ ersten Blick auf eine.
 ### Folienschimmer (`.foil` in `globals.css`)
 
 Ein Lichtstreifen, der **einmal** über das Kartenbild läuft, wenn der Zeiger
-darauf liegt. Vier Bedingungen, alle nicht verhandelbar:
+darauf liegt. Er läuft auf **jedem** Kartenbild.
 
 1. Nur auf Zeiger/Fokus, nie von allein — dauernde Bewegung ist ein Werbebanner
-2. Nur auf Karten, deren Seltenheit tatsächlich glänzt (`hatFolie`)
-3. Weiß, ≤ 16 % Deckkraft — kein Regenbogen, kein Schein-3D
-4. Komplett im `prefers-reduced-motion`-Block: Wer Bewegung abbestellt, verliert
+2. Weiß, ≤ 16 % Deckkraft — kein Regenbogen, kein Schein-3D
+3. Komplett im `prefers-reduced-motion`-Block: Wer Bewegung abbestellt, verliert
    keine Information
+
+Diese drei sind keine Geschmacksfrage: Ohne sie wird aus einem Zitat des
+physischen Objekts ein Werbebanner.
+
+**Zurückgenommen:** Ursprünglich lief der Schimmer nur auf Karten mit
+Folien-Seltenheit, mit der Begründung, er sei sonst bloße Dekoration. Am
+laufenden Produkt nahm das niemand als Auskunft wahr — es sah nur aus, als
+flimmerten manche Zeilen und andere nicht. Eine Regel, die niemand als Regel
+wahrnimmt, ordnet nichts; sie erzeugt Ungleichmäßigkeit.
 
 ### Hintergrund (`CollectorBackdrop`)
 
