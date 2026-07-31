@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.5] - 31. Juli 2026 · Kartenseiten geben nach einem Aussetzer nicht auf
+
+### Behoben
+- **„Karte nicht erreichbar", obwohl die Karte existiert.** Gemessen scheiterten drei von acht Kartenaufrufen an einem Serverfehler der Quelle — bei unveraenderter Anfrage. Ein einziger Wiederholungsversuch liess daraus rechnerisch jeden achten Aufruf scheitern, ausgerechnet auf der Seite, auf der Suche und Startseite landen. Jetzt vier Versuche mit wachsender Wartezeit; ein echtes 404 bleibt unveraendert eine sofortige Auskunft
+
+---
+
 ## [4.2.4] - 31. Juli 2026 · Der Marktvergleich erscheint auf jeder Kartenseite
 
 ### Behoben

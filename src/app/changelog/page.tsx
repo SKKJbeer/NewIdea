@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.2.5',
+    date: '31. Juli 2026',
+    label: 'Kartenseiten geben nach einem Aussetzer nicht auf',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„Karte nicht erreichbar" trotz existierender Karte: Drei von acht Aufrufen scheiterten an einem Serverfehler der Quelle — jetzt vier Versuche mit wachsender Wartezeit statt einem' },
+    ],
+  },
+  {
     version: '4.2.4',
     date: '31. Juli 2026',
     label: 'Der Marktvergleich erscheint auf jeder Kartenseite',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Eine Kartenseite zeigte den Marktvergleich, eine andere nicht: Der Zwischenspeicher hielt auch ein Fehlergebnis eine Stunde lang fest und verdeckte damit den gespeicherten Tagesstand' },
     ],

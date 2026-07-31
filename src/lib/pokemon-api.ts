@@ -282,8 +282,24 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
  *   sie dürfen NIE als 404 behandelt werden, sonst wird eine existierende Karte als
  *   "nicht gefunden" gecacht (Ursache des Startseiten-404-Bugs).
  */
+// VERSUCHE BEIM EINZELABRUF EINER KARTE
+//
+// Gemessen am 31.07.2026: Die Kartendatenbank beantwortete dieselbe Anfrage in
+// drei von acht Fällen mit HTTP 500 — bei unveränderter Anfrage, Sekunden
+// auseinander. Mit nur EINEM Wiederholungsversuch bleibt daraus rechnerisch
+// etwa jeder achte Kartenaufruf ein „nicht erreichbar", und weil die
+// Kartenseite die Einstiegsseite aus Suche und Startseite ist, trifft das
+// genau den ersten Eindruck.
+//
+// Vier Versuche mit wachsender Wartezeit (0,4 / 0,8 / 1,6 s) drücken das in den
+// niedrigen einstelligen Prozentbereich. Die Wartezeiten sind bewusst kurz: Sie
+// laufen VOR dem ersten Bildschirmaufbau, und eine Seite, die vier Sekunden
+// wartet und dann funktioniert, ist besser als eine, die nach einer Sekunde
+// aufgibt — aber nur, solange „vier Sekunden" die Ausnahme bleibt.
+const KARTE_VERSUCHE = 4;
+
 export async function fetchCardById(id: string): Promise<PokemonCard | null> {
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < KARTE_VERSUCHE; attempt++) {
     try {
       const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {
         headers: {
@@ -293,12 +309,10 @@ export async function fetchCardById(id: string): Promise<PokemonCard | null> {
       });
       return mapApiCardToCard(response.data.data);
     } catch (err) {
+      // Ein echtes 404 ist eine Auskunft, kein Aussetzer — nicht wiederholen.
       if (axios.isAxiosError(err) && err.response?.status === 404) return null;
-      if (attempt === 0) {
-        await new Promise((r) => setTimeout(r, 800));
-        continue;
-      }
-      throw err;
+      if (attempt === KARTE_VERSUCHE - 1) throw err;
+      await new Promise((r) => setTimeout(r, 400 * 2 ** attempt));
     }
   }
   return null;

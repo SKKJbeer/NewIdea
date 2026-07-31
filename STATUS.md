@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v4.2.4` · **Stand:** 31. Juli 2026 · **Branch:** `main`
+**Version:** `v4.2.5` · **Stand:** 31. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v4.2.4)
+## Was gebaut ist (Stand v4.2.5)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v4.2.5 | Kartenabruf mit vier Versuchen — „nicht erreichbar" trotz existierender Karte behoben |
 | v4.2.4 | Marktvergleich auf jeder Kartenseite — Zwischenspeicher hielt kein Fehlergebnis mehr fest |
 | v4.2.3 | Monitoring erkennt fehlende Tabellen wieder — eine HEAD-Abfrage meldete sie als „vorhanden, 0 Zeilen" |
 | v4.2.2 | Indexstand von Hand setzbar und nachweisbar — dynamische Studio-Route |

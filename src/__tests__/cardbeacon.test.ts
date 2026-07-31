@@ -248,6 +248,22 @@ describe('Suche und Kartenbilder funktionieren verlässlich', () => {
     expect(api).toMatch(/400 \* 2 \*\* attempt/);
   });
 
+  it('der Einzelabruf einer Karte gibt nicht nach einem Fehlversuch auf', () => {
+    // GEMESSEN am 31.07.2026: drei von acht Kartenaufrufen scheiterten an einem
+    // HTTP 500 der Quelle — bei unveraenderter Anfrage. Mit nur einem
+    // Wiederholungsversuch bleibt daraus etwa jeder achte Aufruf ein „nicht
+    // erreichbar", ausgerechnet auf der Seite, auf der Suche und Startseite
+    // landen.
+    const block = api.slice(api.indexOf('export async function fetchCardById'));
+    expect(api).toMatch(/const KARTE_VERSUCHE = [4-9]/);
+    expect(block.slice(0, 900)).toMatch(/attempt < KARTE_VERSUCHE/);
+    // Wachsende Wartezeit — flach wartende Versuche landen in derselben Stoerung.
+    expect(block.slice(0, 900)).toMatch(/400 \* 2 \*\* attempt/);
+    // Ein echtes 404 bleibt eine Auskunft und wird NICHT wiederholt
+    // (Stolperstelle 16: sonst wird eine existierende Seite als 404 gecacht).
+    expect(block.slice(0, 900)).toMatch(/status === 404\) return null/);
+  });
+
   it('die Set-Karten ebenso', () => {
     const block = api.slice(api.indexOf('export async function fetchCardsBySet'));
     expect(block.slice(0, 900)).toMatch(/tcgList\(/);
