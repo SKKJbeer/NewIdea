@@ -212,7 +212,7 @@ export function MarketMovers({
  * Gelesen werden müssen sie trotzdem — deshalb steht jeder Wert daneben, und
  * die Richtung hängt nie allein an der Farbe.
  */
-export function SetMarket({ sets }: { sets: SetRank[] }) {
+export function SetMarket({ sets, cbi = null }: { sets: SetRank[]; cbi?: number | null }) {
   if (sets.length === 0) {
     return (
       <p className="mt-5 max-w-xl text-[13px] leading-relaxed text-slate-500">
@@ -237,21 +237,25 @@ export function SetMarket({ sets }: { sets: SetRank[] }) {
 
   return (
     <div className="mt-5">
-      <div className={`${TABLE.head} grid grid-cols-[1fr_auto_auto] gap-4 border-b border-[#1c1c24] pb-2`}>
+      <div className={`${TABLE.head} grid grid-cols-[1fr_auto_auto] gap-4 border-b border-[#1c1c24] pb-2 sm:grid-cols-[1fr_auto_auto_auto]`}>
         <span>Set</span>
         <span className="w-16 text-right">Median</span>
         <span className="w-16 text-right">30 T</span>
+        <span className="hidden w-[76px] text-right sm:block">vs. Markt</span>
       </div>
 
       {nachBewegung.map((s) => {
         const gemessen = s.avgTrend !== null;
         const anteil = (Math.abs(s.avgTrend ?? 0) / maxAusschlag) * 50;
         const positiv = (s.avgTrend ?? 0) > 0;
+        // Derselbe Maßstab wie bei Karten und in der Suche: Prozentpunkte
+        // gegen den Index, und nur wenn beide Seiten gemessen sind.
+        const gegenMarkt = gemessen && cbi !== null ? (s.avgTrend as number) - cbi : null;
         return (
           <Link
             key={s.code}
             href={`/sets/${s.code}`}
-            className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-1 ${TABLE.row} ${TABLE.cell}`}
+            className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-1 sm:grid-cols-[1fr_auto_auto_auto] ${TABLE.row} ${TABLE.cell}`}
           >
             <span className="min-w-0">
               <span className="flex items-baseline gap-2">
@@ -260,6 +264,20 @@ export function SetMarket({ sets }: { sets: SetRank[] }) {
                   {s.count} Karten
                 </span>
               </span>
+              {/* DIE TRAGENDE KARTE.
+                  Eine Set-Zeile lässt sonst die wichtigste Frage offen: Bewegt
+                  sich das ganze Set oder eine einzelne Karte? Bewusst als
+                  Textzeile und nicht beim Überfahren — auf einem Telefon gibt
+                  es kein Überfahren, und eine Auskunft, die dort fehlt, ist
+                  keine Auskunft. */}
+              {s.topMover && (
+                <span className="mt-0.5 block truncate text-[11px] text-slate-600">
+                  stärkste Bewegung: {s.topMover.name}{' '}
+                  <span className={`tabular-nums ${toneClass(s.topMover.trend)}`}>
+                    {formatPercent(s.topMover.trend)}
+                  </span>
+                </span>
+              )}
               {/* Mittellinie bei 50 % — links negativ, rechts positiv. */}
               {gemessen && (
                 <span className="mt-1.5 block h-[3px] w-full max-w-[240px] bg-[#14141a]" aria-hidden>
@@ -280,6 +298,14 @@ export function SetMarket({ sets }: { sets: SetRank[] }) {
             </span>
             <span className={`${NUM.row} w-16 text-right font-semibold ${toneClass(s.avgTrend)}`}>
               {gemessen ? formatPercent(s.avgTrend as number) : '—'}
+            </span>
+            <span
+              className={`${NUM.small} hidden w-[76px] text-right sm:block ${
+                gegenMarkt === null ? 'text-slate-700' : 'text-slate-500'
+              }`}
+              title={gegenMarkt === null ? undefined : 'Abstand zum CardBeacon Index in Prozentpunkten'}
+            >
+              {gegenMarkt === null ? '—' : formatPp(gegenMarkt)}
             </span>
           </Link>
         );

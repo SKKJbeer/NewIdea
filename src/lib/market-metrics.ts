@@ -149,6 +149,18 @@ export interface SetRank {
    * überall vermeidet.
    */
   avgTrend: number | null;
+
+  /**
+   * Die am stärksten bewegte Karte des Sets — nach BETRAG, nicht nach Vorzeichen.
+   *
+   * Sie beantwortet die Frage, die eine Set-Zeile sonst offen lässt: Trägt die
+   * Bewegung das ganze Set oder eine einzelne Karte? Nach dem größten GEWINN zu
+   * suchen wäre eine Auswahl zugunsten guter Nachrichten — ein Set kann ebenso
+   * von einem Einbruch getragen sein.
+   *
+   * `null`, wenn keine Karte des Sets eine gemessene Bewegung hat.
+   */
+  topMover: { name: string; trend: number } | null;
 }
 
 /**
@@ -159,16 +171,37 @@ export interface SetRank {
  * sortiert, sondern gar nicht aufgenommen.
  */
 export function rankSets(cards: PokemonCard[], limit = 5): SetRank[] {
-  const proSet = new Map<string, { name: string; preise: number[]; trends: number[] }>();
+  interface Sammlung {
+    name: string;
+    preise: number[];
+    trends: number[];
+    /** Die am stärksten bewegte Karte des Sets — aus DENSELBEN Daten. */
+    spitze: { name: string; trend: number } | null;
+  }
+  const proSet = new Map<string, Sammlung>();
 
   for (const card of cards) {
     if (!card.setCode) continue;
     const preis = displayPrice(card);
     if (!(preis > 0)) continue;
 
-    const eintrag = proSet.get(card.setCode) ?? { name: card.set || card.setCode, preise: [], trends: [] };
+    const eintrag = proSet.get(card.setCode) ?? {
+      name: card.set || card.setCode,
+      preise: [],
+      trends: [],
+      spitze: null,
+    };
     eintrag.preise.push(preis);
-    if (hasRealTrend(card)) eintrag.trends.push(card.trendPercent as number);
+    if (hasRealTrend(card)) {
+      const trend = card.trendPercent as number;
+      eintrag.trends.push(trend);
+      // Stärkste Bewegung nach BETRAG: Ein Set kann von einem Einbruch
+      // getragen sein, und den zu verschweigen wäre eine Auswahl zugunsten
+      // guter Nachrichten.
+      if (!eintrag.spitze || Math.abs(trend) > Math.abs(eintrag.spitze.trend)) {
+        eintrag.spitze = { name: card.nameDe ?? card.name, trend };
+      }
+    }
     proSet.set(card.setCode, eintrag);
   }
 
@@ -180,6 +213,7 @@ export function rankSets(cards: PokemonCard[], limit = 5): SetRank[] {
       count: d.preise.length,
       medianPrice: median(d.preise) ?? 0,
       avgTrend: d.trends.length > 0 ? d.trends.reduce((s, t) => s + t, 0) / d.trends.length : null,
+      topMover: d.spitze,
     }))
     .sort((a, b) => b.medianPrice - a.medianPrice)
     .slice(0, limit);

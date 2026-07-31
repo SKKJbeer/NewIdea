@@ -1,7 +1,8 @@
 import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
-import { searchCards } from '@/lib/pokemon-api';
+import type { searchCards } from '@/lib/pokemon-api';
+import { cachedSearchCards } from '@/lib/search-cache';
 import { getMarketBenchmark } from '@/lib/market-context';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -41,7 +42,7 @@ export default async function SearchPage({
   let error = false;
   if (query.length >= 2) {
     try {
-      results = await searchCards(query, 40);
+      results = await cachedSearchCards(query, 40);
     } catch {
       error = true;
     }

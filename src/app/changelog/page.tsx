@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.7.0',
+    date: '31. Juli 2026',
+    label: 'Die Suche wird schnell, der Set-Markt vollstaendig',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Dieselbe Suche brauchte 7,1 s, 4,3 s und 15,7 s — zwischen identischen Anfragen wurde nichts wiederverwendet. Treffer liegen jetzt im geteilten Datenspeicher' },
+      { type: 'fixed', text: 'Leere Ergebnisse werden NICHT gespeichert: Ein Aussetzer der Quelle waere sonst zehn Minuten lang als „keine Treffer" festgeschrieben' },
+      { type: 'new',   text: 'Der Set-Markt zeigt den Abstand zum Index in Prozentpunkten' },
+      { type: 'new',   text: 'Die staerkste Bewegung je Set steht in der Zeile — nach Betrag ausgewaehlt, nicht nach groesstem Gewinn' },
+    ],
+  },
+  {
     version: '4.6.0',
     date: '31. Juli 2026',
     label: 'Suche mit Marktbezug, Sammlungsansicht',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'Suchergebnisse sind Zeilen statt Kacheln — mit Preis, 30-Tage-Bewegung und Abstand zum Index in derselben Zeile' },
       { type: 'new',   text: 'Sammlungsansicht im Portfolio: ruhige Galerie im echten Kartenformat, sortierbar nach Wert, Bewegung, Set und Zugang' },

@@ -202,7 +202,7 @@ export default async function MarketPage() {
           <h2 id="setmarkt" className="sr-only">
             Set-Markt
           </h2>
-          <SetMarket sets={sets} />
+          <SetMarket sets={sets} cbi={cbi.sufficient ? cbi.value : null} />
         </section>
 
         {/* 05 — BESTAND

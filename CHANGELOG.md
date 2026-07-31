@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.7.0] - 31. Juli 2026 · Die Suche wird schnell, der Set-Markt vollstaendig
+
+### Behoben
+- **Dieselbe Suche brauchte 7,1 s, 4,3 s und 15,7 s in drei Laeufen hintereinander.** Zwischen zwei identischen Anfragen wurde nichts wiederverwendet: Der vorhandene Zwischenspeicher liegt im Arbeitsspeicher einer Instanz, und auf Vercel beantwortet praktisch jede Anfrage eine andere. „Ist zwischengespeichert" heisst nicht „wird wiedergefunden"
+- Suchtreffer liegen jetzt im geteilten Datenspeicher — instanzuebergreifend, zehn Minuten. **Leere Ergebnisse werden bewusst NICHT gespeichert:** Ein einzelner Aussetzer der Quelle waere sonst zehn Minuten lang als „keine Treffer" festgeschrieben, fuer alle Besucher gleichzeitig
+- Auch die Vorschlaege beim Tippen nutzen ihn — sie sind der meistgenutzte Weg zur Kartendatenbank ueberhaupt
+
+### Neu
+- **Der Set-Markt zeigt den Abstand zum Index** in Prozentpunkten, mit demselben Massstab wie Karten und Suche
+- **Die staerkste Bewegung je Set** steht in der Zeile. Sie beantwortet, was eine Set-Zeile sonst offen laesst: Traegt die Bewegung das ganze Set oder eine einzelne Karte? Ausgewaehlt nach BETRAG, nicht nach groesstem Gewinn — ein Set kann ebenso von einem Einbruch getragen sein. Als Text, nicht beim Ueberfahren: Auf einem Telefon gibt es kein Ueberfahren
+
+---
+
 ## [4.6.0] - 31. Juli 2026 · Suche mit Marktbezug, Sammlungsansicht
 
 ### Neu
