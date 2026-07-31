@@ -116,7 +116,7 @@ CREATE INDEX IF NOT EXISTS price_snapshots_card_date
   // statt 250 Karten neu zu holen, und über die Zeit entsteht eine echte
   // Indexhistorie für eine spätere Kurve.
   market_index: `CREATE TABLE IF NOT EXISTS market_index (
-  captured_on TIMESTAMPTZ PRIMARY KEY,
+  captured_on DATE PRIMARY KEY,
   value       NUMERIC NOT NULL,
   card_count  INT NOT NULL,
   set_count   INT NOT NULL,
@@ -174,7 +174,7 @@ CREATE POLICY "eigene Positionen löschen" ON portfolio_holdings
   FOR DELETE USING (auth.uid() = user_id);`,
 };
 
-interface ProbeSpec {
+export interface ProbeSpec {
   table: string;
   label: string;
   effect: string;
@@ -236,7 +236,7 @@ const PROBES: ProbeSpec[] = [
   },
 ];
 
-async function probeTable(spec: ProbeSpec): Promise<TableHealth> {
+export async function probeTable(spec: ProbeSpec): Promise<TableHealth> {
   const base: TableHealth = {
     table: spec.table,
     label: spec.label,
@@ -253,42 +253,57 @@ async function probeTable(spec: ProbeSpec): Promise<TableHealth> {
   const sb = getSupabase();
   if (!sb) return { ...base, error: 'Supabase nicht konfiguriert' };
 
-  // Zeilen zählen (head: true lädt keine Daten — nur den Zähler)
-  const { count, error: countError } = await sb
-    .from(spec.table)
-    .select('*', { count: 'exact', head: true });
-
-  if (countError) {
-    const missing = isMissingTableError(countError);
-    return {
-      ...base,
-      missing,
-      error: countError.message || 'Unbekannter Datenbankfehler',
-      setupSql: missing ? SETUP_SQL[spec.table] ?? null : null,
-    };
-  }
-
-  // Neuesten Eintrag holen, um den Datenstand zu bestimmen
-  let latest: string | null = null;
-  const { data, error: latestError } = await sb
+  // ERST die Abfrage MIT Antwortkörper — sie ist die einzige, deren Fehler
+  // ankommt.
+  //
+  // Die Zählabfrage lief früher zuerst, und zwar mit `head: true`. Das ist eine
+  // HEAD-Anfrage: Fehlt die Tabelle, antwortet die Datenbankschnittstelle mit
+  // 404 und einem LEEREN Körper — es gibt also nichts zu lesen, und der Client
+  // liefert `error: null, count: null` zurück. Aus `count ?? 0` wurde dann
+  // „Tabelle vorhanden, 0 Zeilen". Genau so meldete das Monitoring die gar nicht
+  // existierende Tabelle `market_index` wochenlang als in Ordnung, während jeder
+  // Schreibversuch scheiterte — also exakt der stille Ausfall, den diese Datei
+  // verhindern soll (Stolperstelle 21).
+  const { data, error: leseFehler } = await sb
     .from(spec.table)
     .select(spec.dateColumn)
     .order(spec.dateColumn, { ascending: false })
     .limit(1);
-  if (!latestError && data && data.length > 0) {
+
+  if (leseFehler) {
+    const missing = isMissingTableError(leseFehler);
+    return {
+      ...base,
+      missing,
+      error: leseFehler.message || 'Unbekannter Datenbankfehler',
+      setupSql: missing ? SETUP_SQL[spec.table] ?? null : null,
+    };
+  }
+
+  let latest: string | null = null;
+  if (data && data.length > 0) {
     // Spaltenname ist dynamisch — Supabase kann den Typ hier nicht ableiten.
     const row = data[0] as unknown as Record<string, unknown>;
     const v = row[spec.dateColumn];
     latest = v == null ? null : String(v);
   }
 
-  const rows = count ?? 0;
+  // Erst jetzt zählen. Die Tabelle ist an dieser Stelle nachweislich lesbar,
+  // also ist ein fehlender Zähler höchstens eine unbekannte Zeilenzahl — nie
+  // eine fehlende Tabelle.
+  const { count } = await sb.from(spec.table).select('*', { count: 'exact', head: true });
+  const rows = count ?? null;
+
   return {
     ...base,
     ok: true,
     rows,
     latest,
-    freshness: rows === 0 ? 'empty' : classifyFreshness(latest, spec.maxAgeDays),
+    // Ohne Zähler entscheidet der jüngste Eintrag: Steht dort etwas, ist die
+    // Tabelle nicht leer. `null` Zeilen heißt „nicht gezählt", nicht „keine".
+    freshness: rows === 0 || (rows === null && !latest)
+      ? 'empty'
+      : classifyFreshness(latest, spec.maxAgeDays),
   };
 }
 

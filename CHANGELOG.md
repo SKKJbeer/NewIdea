@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.3] - 31. Juli 2026 · Das Monitoring hat eine fehlende Tabelle uebersehen
+
+### Behoben
+- **Eine gar nicht vorhandene Tabelle wurde als „vorhanden, 0 Zeilen" gemeldet.** Die Zaehlabfrage fragt nur den Kopf der Antwort ab — auf eine fehlende Tabelle kommt dann zwar ein Fehlerstatus, aber ein leerer Antwortkoerper, und ohne Koerper gibt es keine Fehlermeldung zu lesen. Aus „nicht gezaehlt" wurde „null Zeilen". Geprueft wird jetzt zuerst mit einer Abfrage, deren Fehler tatsaechlich ankommt; „nicht gezaehlt" bleibt als solches sichtbar statt als Null
+- **Der Indexstand konnte deshalb nirgends auffallen.** Das Anlegen der Tabelle stand seit v4.2.0 aus, das Monitoring meldete sie aber als in Ordnung — genau der stille Ausfall, den dieses Monitoring verhindern soll
+
+### Geaendert
+- **Das Anlege-SQL des Indexstands nutzt `DATE` statt `TIMESTAMPTZ`.** Der Index ist eine Tagesgroesse; als Zeitstempel gelesen waere die Altersberechnung des Standes still falsch geworden — und ein ungueltiges Datum besteht jede Altersgrenze, weil Vergleiche damit immer falsch ergeben
+- **Wanderungsdatei `supabase/migrations/0004_market_index.sql`** ergaenzt, damit die Tabelle dort steht wo die anderen auch stehen
+
+---
+
 ## [4.2.2] - 31. Juli 2026 · Der Schreibvorgang ist nachweisbar
 
 ### Behoben

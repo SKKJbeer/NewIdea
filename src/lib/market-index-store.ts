@@ -86,14 +86,21 @@ export async function loadLatestMarketIndex(maxAgeDays = 3): Promise<MarketIndex
   }
   if (!data) return null;
 
+  // Auf den Datumsteil kürzen. Die Spalte ist als DATE angelegt und liefert
+  // „2026-07-31"; wurde die Tabelle einmal als Zeitstempel angelegt, kommt
+  // „2026-07-31T00:00:00+00:00" zurück. Ungekürzt ergäbe das Anhängen von
+  // „T00:00:00Z" ein ungültiges Datum — und ein ungültiges Datum besteht jede
+  // Altersprüfung, weil Vergleiche mit NaN immer falsch sind. Ein beliebig
+  // alter Stand ginge dann als heutiger durch.
+  const tag = String(data.captured_on).slice(0, 10);
+
   // Ein zu alter Stand ist keine Auskunft über heute. Lieber selbst rechnen als
   // eine Zahl von letzter Woche als aktuellen Marktstand ausgeben.
-  const alter =
-    (Date.parse(`${heute()}T00:00:00Z`) - Date.parse(`${data.captured_on}T00:00:00Z`)) / 86_400_000;
-  if (alter > maxAgeDays) return null;
+  const alter = (Date.parse(`${heute()}T00:00:00Z`) - Date.parse(`${tag}T00:00:00Z`)) / 86_400_000;
+  if (!Number.isFinite(alter) || alter > maxAgeDays) return null;
 
   return {
-    date: data.captured_on as string,
+    date: tag,
     value: Number(data.value),
     cardCount: Number(data.card_count),
     setCount: Number(data.set_count),
@@ -124,7 +131,7 @@ export async function loadMarketIndexHistory(days = 90): Promise<MarketIndexPoin
 
   if (error || !data) return [];
   return data.map((r) => ({
-    date: r.captured_on as string,
+    date: String(r.captured_on).slice(0, 10),
     value: Number(r.value),
     cardCount: Number(r.card_count),
     setCount: Number(r.set_count),

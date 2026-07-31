@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.2.3',
+    date: '31. Juli 2026',
+    label: 'Das Monitoring hat eine fehlende Tabelle uebersehen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed',   text: 'Eine gar nicht vorhandene Tabelle wurde als „vorhanden, 0 Zeilen" gemeldet: Die Zaehlabfrage fragt nur den Antwortkopf ab, und ohne Antwortkoerper gibt es keine Fehlermeldung zu lesen' },
+      { type: 'fixed',   text: 'Geprueft wird jetzt zuerst mit einer Abfrage, deren Fehler ankommt — „nicht gezaehlt" bleibt sichtbar statt zu „null Zeilen" zu werden' },
+      { type: 'changed', text: 'Das Anlege-SQL des Indexstands nutzt DATE statt TIMESTAMPTZ; als Zeitstempel waere die Altersberechnung des Standes still falsch geworden' },
+    ],
+  },
+  {
     version: '4.2.2',
     date: '31. Juli 2026',
     label: 'Der Schreibvorgang ist nachweisbar',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auch der zweite Anlauf lief nie — die Index-Schnittstelle ist beim Bauen vorgerendert und fuehrt ihren Rumpf zur Laufzeit nicht aus' },
       { type: 'new',   text: 'Eine ausdruecklich dynamische Route zum Setzen und Nachsehen des Indexstands; ihr Ergebnis steht in der Antwort' },
