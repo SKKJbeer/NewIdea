@@ -1,6 +1,7 @@
 import { getHomepageCards } from './homepage-data';
 import { fetchCardsBySet } from './pokemon-api';
 import { computePmi, rankSets, hasRealTrend, MIN_SET_SAMPLE } from './market-metrics';
+import { loadLatestMarketIndex } from './market-index-store';
 import type { PokemonCard } from '@/types';
 
 // MARKTKONTEXT — der Gedanke, der das Produkt trägt.
@@ -65,10 +66,36 @@ export interface MarketBenchmark {
 let cache: { wert: MarketBenchmark | null; zeit: number } | null = null;
 const CACHE_MS = 60 * 60 * 1000;
 
-/** Indexstand als Vergleichsmaßstab. `null`, wenn die Datenlage nicht reicht. */
+/**
+ * Indexstand als Vergleichsmaßstab. `null`, wenn die Datenlage nicht reicht.
+ *
+ * DREI STUFEN, absteigend nach Geschwindigkeit:
+ *
+ *   1. Arbeitsspeicher dieser Instanz — kostenlos
+ *   2. GESPEICHERTER TAGESSTAND aus der Datenbank — eine Zeile, Millisekunden
+ *   3. Neuberechnung aus 250 Karten — 9 bis 17 Sekunden
+ *
+ * Stufe 2 ist der eigentliche Fortschritt. Vorher gab es sie nicht: Jede kalt
+ * gestartete Serverinstanz musste Stufe 3 gehen, für EINE Zahl, die sich einmal
+ * am Tag ändert. Auf einem Telefon war das der Unterschied zwischen „die Seite
+ * ist da" und „die Seite lädt noch".
+ */
 export async function getMarketBenchmark(): Promise<MarketBenchmark | null> {
   if (cache && Date.now() - cache.zeit < CACHE_MS) return cache.wert;
 
+  // Stufe 2: gespeicherter Stand. Eine Zeile statt 250 Karten.
+  const gespeichert = await loadLatestMarketIndex().catch(() => null);
+  if (gespeichert) {
+    const wert = {
+      value: gespeichert.value,
+      cardCount: gespeichert.cardCount,
+      setCount: gespeichert.setCount,
+    };
+    cache = { wert, zeit: Date.now() };
+    return wert;
+  }
+
+  // Stufe 3: selbst rechnen. Nur, wenn noch nichts gespeichert ist.
   try {
     const cards = await mitZeitgrenze(getHomepageCards(250), BUDGET_MS);
     if (cards === null) {

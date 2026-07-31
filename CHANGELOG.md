@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.0] - 31. Juli 2026 · Der Indexstand wird gespeichert statt nachgerechnet
+
+### Neu
+- **Taeglicher Indexstand in der Datenbank.** Der Marktkontext auf Kartenseiten liest jetzt EINE Zeile statt 250 Karten aus dem Netz zu holen. Der Index aendert sich einmal am Tag — ihn bei jedem Kartenaufruf neu auszurechnen war keine Genauigkeit, sondern Verschwendung
+- **Damit beginnt eine echte Indexhistorie.** Der Marktkopf zeigt heute die Verteilung der Messwerte statt einer Kurve, weil es keine gespeicherten Tagesstaende gab. Ab jetzt sammeln sie sich an — eine spaetere Kurve wuerde auf Messungen beruhen, nicht auf Rueckrechnung
+- Die Startseite schreibt den Stand NACH der Antwort; der Besucher wartet auf nichts
+
+### Geaendert
+- Ein gespeicherter Stand aelter als drei Tage gilt nicht als aktuell — dann wird wieder selbst gerechnet
+
+---
+
 ## [4.1.0] - 31. Juli 2026 · Die Seite ist sofort da und sofort bedienbar
 
 ### Behoben

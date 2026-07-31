@@ -112,6 +112,17 @@ const SETUP_SQL: Record<string, string> = {
 -- wachsender Tabelle immer länger — er wird pro Seite einmal ausgeführt.
 CREATE INDEX IF NOT EXISTS price_snapshots_card_date
   ON price_snapshots (card_id, captured_on DESC);`,
+  // Täglicher Indexstand. Zweck ist doppelt: Kartenseiten lesen EINE Zeile
+  // statt 250 Karten neu zu holen, und über die Zeit entsteht eine echte
+  // Indexhistorie für eine spätere Kurve.
+  market_index: `CREATE TABLE IF NOT EXISTS market_index (
+  captured_on TIMESTAMPTZ PRIMARY KEY,
+  value       NUMERIC NOT NULL,
+  card_count  INT NOT NULL,
+  set_count   INT NOT NULL,
+  window_days INT NOT NULL DEFAULT 30,
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);`,
   articles: `CREATE TABLE IF NOT EXISTS articles (
   date       DATE PRIMARY KEY,
   type       TEXT NOT NULL,
@@ -184,6 +195,13 @@ const PROBES: ProbeSpec[] = [
     label: 'Stand der Preiserfassung',
     effect: 'Flächendeckende Messpunkte über alle Karten',
     dateColumn: 'updated_at',
+    maxAgeDays: 2,
+  },
+  {
+    table: 'market_index',
+    label: 'Indexstände',
+    effect: 'Marktkontext auf Kartenseiten ohne Neuberechnung',
+    dateColumn: 'captured_on',
     maxAgeDays: 2,
   },
   {

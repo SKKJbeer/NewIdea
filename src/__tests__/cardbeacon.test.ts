@@ -305,6 +305,58 @@ describe('Die Seite ist bedienbar, bevor sie fertig ist', () => {
   });
 });
 
+describe('Der Indexstand wird gespeichert statt nachgerechnet', () => {
+  const ctx = lies('src/lib/market-context.ts');
+  const store = lies('src/lib/market-index-store.ts');
+
+  it('liest den gespeicherten Stand VOR einer Neuberechnung', () => {
+    // Vorher holte jede kalt gestartete Instanz 250 Karten aus dem Netz — fuer
+    // EINE Zahl, die sich einmal am Tag aendert.
+    const vorLaden = ctx.indexOf('loadLatestMarketIndex');
+    const vorRechnen = ctx.indexOf('getHomepageCards(250)');
+    expect(vorLaden).toBeGreaterThan(0);
+    expect(vorLaden).toBeLessThan(vorRechnen);
+  });
+
+  it('rechnet weiterhin selbst, wenn nichts gespeichert ist', () => {
+    // Der Speicher ist eine Abkuerzung, kein Ersatz. Ohne Eintrag muss die
+    // Zahl trotzdem entstehen.
+    expect(ctx).toContain('getHomepageCards(250)');
+  });
+
+  it('gibt einen zu alten Stand nicht als aktuell aus', () => {
+    // Eine Zahl von letzter Woche ist keine Auskunft ueber heute.
+    expect(store).toContain('maxAgeDays');
+    expect(store).toMatch(/alter > maxAgeDays/);
+  });
+
+  it('speichert idempotent je Tag', () => {
+    // Die Startseite wird stuendlich neu erzeugt — das darf keine zweite Zeile
+    // pro Aufruf anlegen.
+    expect(store).toMatch(/onConflict: 'captured_on'/);
+  });
+
+  it('gibt die echte Fehlermeldung zurueck', () => {
+    // Stolperstelle 21: `return false` verschluckt die Diagnose.
+    expect(store).toMatch(/return error \? error\.message : null/);
+  });
+
+  it('die Startseite schreibt NACH der Antwort', () => {
+    // Der Besucher wartet nicht auf einen Schreibvorgang, von dem er nichts hat.
+    const seite = lies('src/app/page.tsx');
+    expect(seite).toContain('saveMarketIndex');
+    expect(seite).toMatch(/after\(async \(\) => \{[\s\S]{0,200}saveMarketIndex/);
+    // Und nur, wenn der Wert ueberhaupt belastbar ist.
+    expect(seite).toMatch(/if \(cbi\.sufficient\) \{/);
+  });
+
+  it('die fehlende Tabelle ist im Monitoring sichtbar', () => {
+    const health = lies('src/lib/system-health.ts');
+    expect(health).toContain('CREATE TABLE IF NOT EXISTS market_index');
+    expect(health).toMatch(/table: 'market_index'/);
+  });
+});
+
 describe('Navigation und Adressen', () => {
   it('Research ist ein eigenes Ziel', () => {
     expect(lies('src/components/NavBar.tsx')).toContain("{ href: '/research'");

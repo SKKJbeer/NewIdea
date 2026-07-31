@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { after } from 'next/server';
 import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 
@@ -14,6 +15,7 @@ import {
 
 import { getHomepageCards } from '@/lib/homepage-data';
 import { getDataCoverage } from '@/lib/data-coverage';
+import { saveMarketIndex } from '@/lib/market-index-store';
 import { marketBrief } from '@/lib/market-brief';
 import {
   splitMovers,
@@ -104,6 +106,29 @@ export default async function MarketPage() {
   const trends = geprueft.filter(hasRealTrend).map((c) => c.trendPercent as number);
 
   const brief = marketBrief(cbi, breite, stimmung, sets);
+
+  // INDEXSTAND FESTHALTEN.
+  //
+  // Diese Seite berechnet den Index ohnehin — ihn dabei zu speichern kostet
+  // nichts und erspart jeder Kartenseite die Neuberechnung aus 250 Karten.
+  //
+  // `after` läuft NACH der Antwort: Der Besucher wartet nicht auf einen
+  // Schreibvorgang, von dem er nichts hat.
+  //
+  // Nebenbei entsteht so eine echte Indexhistorie. Der Marktkopf zeigt heute
+  // die Verteilung statt einer Kurve, weil es keine gespeicherten Tagesstände
+  // gab — ab jetzt sammeln sie sich an.
+  if (cbi.sufficient) {
+    after(async () => {
+      const fehler = await saveMarketIndex({
+        value: cbi.value,
+        cardCount: cbi.cardCount,
+        setCount: cbi.setCount,
+        windowDays: cbi.windowDays,
+      });
+      if (fehler) console.error('[Indexstand] nicht gespeichert:', fehler);
+    });
+  }
 
   const datenstand = new Date().toLocaleString('de-DE', {
     day: '2-digit',
