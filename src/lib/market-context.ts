@@ -29,6 +29,25 @@ import type { PokemonCard } from '@/types';
 /** Zeitraum aller hier verglichenen Werte. */
 export const CONTEXT_WINDOW_DAYS = 30;
 
+/**
+ * Obergrenze für den gesamten Marktkontext.
+ *
+ * Die Einzelabrufe haben eigene Zeitlimits und Wiederholungen — zusammengenommen
+ * könnten sie im ungünstigsten Fall fast eine Minute laufen. Für einen Abschnitt,
+ * der unterhalb der Kartendaten steht, ist das jenseits von allem, was jemand
+ * abwartet. Nach dieser Grenze entfällt der Vergleich einfach; die Karte selbst
+ * ist längst da.
+ */
+const BUDGET_MS = 6000;
+
+/** Bricht ein Versprechen nach `ms` ab und liefert stattdessen `null`. */
+function mitZeitgrenze<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    p,
+    new Promise<null>((auf) => setTimeout(() => auf(null), ms)),
+  ]);
+}
+
 export interface MarketBenchmark {
   /** Indexwert über `CONTEXT_WINDOW_DAYS`. */
   value: number;
@@ -51,7 +70,11 @@ export async function getMarketBenchmark(): Promise<MarketBenchmark | null> {
   if (cache && Date.now() - cache.zeit < CACHE_MS) return cache.wert;
 
   try {
-    const cards = await getHomepageCards(250);
+    const cards = await mitZeitgrenze(getHomepageCards(250), BUDGET_MS);
+    if (cards === null) {
+      console.warn('[Marktkontext] Index nicht rechtzeitig verfügbar');
+      return null;
+    }
     const cbi = computePmi(cards);
     const wert = cbi.sufficient
       ? { value: cbi.value, cardCount: cbi.cardCount, setCount: cbi.setCount }
@@ -85,7 +108,8 @@ export interface SetBenchmark {
  */
 export async function getSetBenchmark(setCode: string): Promise<SetBenchmark | null> {
   try {
-    const cards = await fetchCardsBySet(setCode);
+    const cards = await mitZeitgrenze(fetchCardsBySet(setCode), BUDGET_MS);
+    if (cards === null) return null;
     const gemessen = cards.filter(hasRealTrend);
     if (gemessen.length < MIN_SET_SAMPLE) return null;
 

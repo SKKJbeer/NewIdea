@@ -267,6 +267,44 @@ describe('Suche und Kartenbilder funktionieren verlässlich', () => {
   });
 });
 
+describe('Die Seite ist bedienbar, bevor sie fertig ist', () => {
+  it('das Lade-Skelett trägt die echte Navigation', () => {
+    // BEFUND VOM ECHTEN GERÄT: Waehrend des Ladens stand oben ein leerer
+    // Streifen. Kein Logo, kein Menue, kein Zurueck — wer weg wollte, konnte
+    // nicht. Bei einer langsamen Seite ist das genau der Moment, in dem man
+    // weg will, und dann war sie eine Sackgasse.
+    const skelett = lies('src/components/RouteSkeleton.tsx');
+    expect(skelett).toContain('<NavBar />');
+    expect(skelett).not.toMatch(/sticky top-0 z-50 h-14 border-b[^"]*"\s*\/>/);
+  });
+
+  it('der Marktkontext blockiert die Kartenseite nicht', () => {
+    // Er kostet auf einer kalt gestarteten Instanz mehrere Sekunden. Vorher
+    // wartete die GANZE Seite darauf: Kartenbild, Preis, Kaufknoepfe — alles
+    // hing an einer Zahl, die ganz unten steht.
+    const seite = lies('src/app/karten/[id]/page.tsx');
+    expect(seite).toContain('<Suspense fallback={<MarketContextSkeleton />}>');
+    // Kein Abwarten mehr im Seitenrumpf.
+    expect(seite).not.toContain('await getMarketBenchmark');
+    expect(seite).not.toContain('await Promise.all([');
+  });
+
+  it('der Vergleich hat eine Obergrenze', () => {
+    // Die Einzelabrufe koennten zusammengenommen fast eine Minute laufen.
+    const ctx = lies('src/lib/market-context.ts');
+    expect(ctx).toContain('BUDGET_MS');
+    expect(ctx).toContain('mitZeitgrenze(');
+  });
+
+  it('der Platzhalter hat die Form des Abschnitts', () => {
+    // Gleiche Hoehe wie der fertige Block — sonst springt der Inhalt beim
+    // Nachruecken.
+    const abschnitt = lies('src/components/MarketContextSection.tsx');
+    expect(abschnitt).toContain('MarketContextSkeleton');
+    expect(abschnitt).toContain('aria-busy');
+  });
+});
+
 describe('Navigation und Adressen', () => {
   it('Research ist ein eigenes Ziel', () => {
     expect(lies('src/components/NavBar.tsx')).toContain("{ href: '/research'");

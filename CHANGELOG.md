@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.1.0] - 31. Juli 2026 · Die Seite ist sofort da und sofort bedienbar
+
+### Behoben
+- **Waehrend des Ladens gab es keinen Weg zurueck.** Oben stand ein leerer Streifen statt der Navigation — kein Logo, kein Menue, kein Zurueck. Bei einer langsamen Seite ist das genau der Moment, in dem man weg will, und dann war sie eine Sackgasse. Das Lade-Skelett traegt jetzt die echte Navigation
+- **Der Marktkontext blockierte die ganze Kartenseite.** Er holt den Set-Vergleich und den Indexstand; letzterer kostet auf einer kalt gestarteten Instanz mehrere Sekunden. Weil beides vor dem Rendern abgewartet wurde, warteten Kartenbild, Preis, Verlauf und Kaufknoepfe auf eine Zahl, die ganz unten steht. Der Abschnitt laedt jetzt getrennt und stroemt nach
+- **Der Vergleich hat eine Obergrenze** von sechs Sekunden. Vorher konnten sich Zeitlimits und Wiederholungen im ungünstigsten Fall auf fast eine Minute summieren
+
+### Messung
+Zeit bis zum ersten sichtbaren Inhalt der Kartenseite: **3,5 s → 0,02–0,15 s**.
+
+---
+
 ## [4.0.2] - 31. Juli 2026 · Die Suche haelt jetzt auch aus, wenn die Quelle streikt
 
 Nachgemessen: Die Kartendatenbank antwortet auf DIESELBE Suchanfrage in zwei von drei Faellen mit HTTP 500. Wiederholungen allein reichen dagegen nicht.

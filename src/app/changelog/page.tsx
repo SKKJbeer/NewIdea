@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.1.0',
+    date: '31. Juli 2026',
+    label: 'Sofort da und sofort bedienbar',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Waehrend des Ladens gab es keinen Weg zurueck — oben stand ein leerer Streifen statt der Navigation' },
+      { type: 'fixed', text: 'Der Marktkontext blockierte die ganze Kartenseite; er stroemt jetzt nach statt sie aufzuhalten' },
+      { type: 'fixed', text: 'Zeit bis zum ersten sichtbaren Inhalt der Kartenseite: 3,5 s auf unter 0,2 s' },
+    ],
+  },
+  {
     version: '4.0.2',
     date: '31. Juli 2026',
     label: 'Die Suche haelt aus, wenn die Quelle streikt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Kartendatenbank antwortet auf dieselbe Suchanfrage in zwei von drei Faellen mit einem Fehler — jetzt drei Wiederholungen mit steigender Wartezeit' },
       { type: 'fixed', text: 'Erfolgreiche Suchergebnisse bleiben zehn Minuten verfuegbar und erscheinen bei einem Totalausfall statt eines Fehlerzustands' },

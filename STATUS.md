@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v4.0.2` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v4.1.0` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v4.0.2)
+## Was gebaut ist (Stand v4.1.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v4.1.0 | Kartenseite sofort sichtbar und bedienbar — Navigation im Lade-Skelett, Marktkontext stroemt nach |
 | v4.0.2 | Suche haelt Ausfaelle der Quelle aus — Wiederholungen mit steigender Wartezeit plus Ergebnis-Zwischenspeicher |
 | v4.0.1 | Suche mit Wiederholungsversuch · Kartenbilder haengen nicht mehr an einem Ladeereignis |
 | v4.0.0 | CardBeacon: Umbenennung, neue Informationsarchitektur, Marktkontext auf Kartenseiten, Design-System |

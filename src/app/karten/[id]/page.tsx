@@ -16,8 +16,8 @@ import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
 import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
-import { MarketContextPanel } from '@/components/MarketContextPanel';
-import { getMarketBenchmark, getSetBenchmark, buildMarketContext } from '@/lib/market-context';
+import { Suspense } from 'react';
+import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
 
 const SITE_URL = siteUrlOrLocal();
@@ -129,15 +129,6 @@ export default async function CardDetailPage({ params }: Props) {
   const perfWindows = performanceWindows(history, price);
   const marktStats = cardMarketStats(history, price);
   const score2 = pmiScore(history, price, displayTrend);
-
-  // MARKTKONTEXT: Karte gegen ihr Set gegen den Index — alle drei über
-  // denselben 30-Tage-Zeitraum. Beide Abrufe scheitern leise; fehlt eine Seite,
-  // entfaellt genau diese Zeile, nicht der ganze Block.
-  const [setBenchmark, marktBenchmark] = await Promise.all([
-    card.setCode ? getSetBenchmark(card.setCode) : Promise.resolve(null),
-    getMarketBenchmark(),
-  ]);
-  const marktkontext = buildMarketContext(card, setBenchmark, marktBenchmark);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -304,8 +295,15 @@ export default async function CardDetailPage({ params }: Props) {
 
             {/* MARKTKONTEXT — die eigentliche Produktaussage.
                 Steht bewusst VOR den Einzelkennzahlen: Die Frage „ist das viel?"
-                beantwortet der Vergleich, nicht die Zahl allein. */}
-            {marktkontext && <MarketContextPanel context={marktkontext} />}
+                beantwortet der Vergleich, nicht die Zahl allein.
+
+                In einer eigenen Ladegrenze, weil der Indexvergleich auf einer
+                kalt gestarteten Instanz mehrere Sekunden kostet. Vorher hing die
+                GANZE Seite daran — Kartenbild, Preis und Kaufknöpfe warteten auf
+                eine Zahl, die ganz unten steht. */}
+            <Suspense fallback={<MarketContextSkeleton />}>
+              <MarketContextSection card={card} />
+            </Suspense>
 
             {/* Wertentwicklung über mehrere Zeiträume — nur dort, wo eine
                 Messung vorliegt. */}

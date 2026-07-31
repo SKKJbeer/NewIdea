@@ -1,4 +1,5 @@
 import { SKELETON } from '@/lib/ui';
+import { NavBar } from './NavBar';
 
 // LADEZUSTÄNDE
 //
@@ -54,9 +55,17 @@ function Zeilen({ anzahl = 8 }: { anzahl?: number }) {
 export function RouteSkeleton({ variant = 'list' }: Props) {
   return (
     <div className="min-h-screen bg-[#08080b]">
-      {/* Kopfzeile in ihrer echten Höhe — sonst springt der ganze Inhalt,
-          sobald die fertige Seite sie ersetzt. */}
-      <div className="sticky top-0 z-50 h-14 border-b border-[#1c1c24] bg-[#08080b]" />
+      {/* DIE ECHTE NAVIGATION, kein Platzhalter.
+          
+          BEFUND AUS DEM ECHTEN GERÄT: Hier stand ein leerer Streifen in
+          Kopfzeilenhöhe. Wer während des Ladens zurückwollte, hatte dafür kein
+          einziges Bedienelement — kein Logo, kein Menü, keinen Zurück-Weg. Bei
+          einer langsamen Seite ist das der Moment, in dem man weg will, und
+          genau dann war die Seite eine Sackgasse.
+          
+          Die Navigation braucht keine Daten. Sie gehört von der ersten
+          Millisekunde an dorthin. */}
+      <NavBar />
 
       <Kopf />
 
