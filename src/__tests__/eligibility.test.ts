@@ -173,6 +173,16 @@ describe('Gewinner und Verlierer bleiben vorzeichenrein', () => {
     }
   });
 
+  it('die groessere Stichprobe bekommt auch mehr Zeit', () => {
+    // BEFUND: Die Stichprobe wurde von 50 auf 250 Karten vergroessert, das
+    // Zeitlimit blieb bei 8 Sekunden. Eine 250-Karten-Seite braucht gemessen
+    // 9 bis 17 — die Abfrage lief meistens ins Limit, und die Startseite fiel
+    // auf den gespeicherten Marktbericht zurueck: 7 statt 204 Karten.
+    const api = lies('src/lib/pokemon-api.ts');
+    expect(api).toMatch(/const timeout = limit > 100 \? 30000 : 8000;/);
+    expect(api).toMatch(/tcgList\(\{ q, pageSize: limit \}, \{ retries: 2, timeout \}\)/);
+  });
+
   it('Startseite, PMI-Schnittstelle und Marktbericht ziehen dieselbe Menge', () => {
     // Sonst nennt die Seite eine andere Kartenzahl als die Schnittstelle, die
     // denselben Index ausliefert — live standen dort 204 gegen 50.

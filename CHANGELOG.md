@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.5] - 31. Juli 2026 · Die groessere Stichprobe bekommt auch mehr Zeit
+
+### Behoben
+- **Die Startseite zeigte zeitweise 7 statt 204 auswertbarer Karten.** Mit v3.3.0 wurde die Stichprobe von 50 auf 250 Karten vergroessert, das Zeitlimit der Abfrage blieb aber bei 8 Sekunden. Eine 250-Karten-Seite braucht gemessen 9 bis 17 Sekunden — die Abfrage lief damit meistens ins Limit, und die Seite fiel auf den gespeicherten Marktbericht zurueck. Index und Set-Rangliste meldeten daraufhin korrekt „noch nicht genuegend Daten“, obwohl die Daten vorhanden waren
+
+---
+
 ## [3.3.4] - 31. Juli 2026 · Labels sagen, was die Zahl ist
 
 ### Behoben

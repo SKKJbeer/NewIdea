@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.5',
+    date: '31. Juli 2026',
+    label: 'Die groessere Stichprobe bekommt auch mehr Zeit',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Startseite zeigte zeitweise 7 statt 204 auswertbarer Karten — die vergroesserte Abfrage lief in ein Zeitlimit, das noch fuer die alte, kleinere Stichprobe bemessen war' },
+    ],
+  },
+  {
     version: '3.3.4',
     date: '31. Juli 2026',
     label: 'Labels sagen, was die Zahl ist',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Set-Tabelle war mit Durchschnittspreis beschriftet, gerechnet wurde der Median — die Spalte heisst jetzt Medianpreis' },
       { type: 'fixed', text: 'Der Markt-Ticker trug ein Live-Label neben Zahlen aus einer taeglich aktualisierten Quelle' },

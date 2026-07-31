@@ -187,10 +187,22 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
     'set.id:sv8',
   ];
 
+  // ZEITRAHMEN NACH SEITENGROESSE.
+  //
+  // BEFUND: Mit v3.3.0 wurde die Stichprobe von 50 auf 250 Karten vergroessert
+  // — das Zeitlimit blieb aber bei den 8 Sekunden, die fuer 50 Karten reichen.
+  // Eine 250-Karten-Seite braucht gemessen 9 bis 17 Sekunden. Die Abfrage lief
+  // damit meistens ins Limit, und die Startseite fiel auf den gespeicherten
+  // Marktbericht zurueck: statt 204 auswertbarer Karten standen dort 7, der
+  // Index meldete „noch nicht genuegend Marktdaten" und die Set-Rangliste war
+  // leer. Alles korrekt hergeleitet — aus einer Datenlage, die es nur wegen
+  // eines zu knappen Zeitlimits gab.
+  const timeout = limit > 100 ? 30000 : 8000;
+
   // Jede Abfrage mit Wiederholungsversuch — und erst aufgeben, wenn ALLE
   // Varianten leer bleiben. Eine leere Startseite ist der teuerste Ausgang.
   for (const q of queries) {
-    const data = await tcgList({ q, pageSize: limit });
+    const data = await tcgList({ q, pageSize: limit }, { retries: 2, timeout });
     const cards = mapAndFilter(data);
     if (cards.length > 0) return cards.sort(byPriceDesc);
   }
