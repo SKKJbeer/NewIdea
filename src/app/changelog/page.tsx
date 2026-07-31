@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.6.0',
+    date: '31. Juli 2026',
+    label: 'Suche mit Marktbezug, Sammlungsansicht',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'Suchergebnisse sind Zeilen statt Kacheln — mit Preis, 30-Tage-Bewegung und Abstand zum Index in derselben Zeile' },
+      { type: 'new',   text: 'Sammlungsansicht im Portfolio: ruhige Galerie im echten Kartenformat, sortierbar nach Wert, Bewegung, Set und Zugang' },
+      { type: 'new',   text: '/suche folgt dem gemeinsamen Seitenmuster — ohne Pillen-Etikett, Werbeueberschrift und Verlauf' },
+      { type: 'fixed', text: 'Das Kartenraster wies ungemessene Karten als 0,0 % aus — betraf Marktbericht und Set-Detailseiten' },
+      { type: 'fixed', text: 'Unerklaerte Bewertungszahl auf jeder Kachel entfernt; sie las sich als Kauf-Ampel' },
+    ],
+  },
+  {
     version: '4.5.0',
     date: '31. Juli 2026',
     label: 'Bewegungen mit Marktbezug, Set-Bibliothek',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'Die Bewegungen zeigen den Abstand zum Markt in Prozentpunkten — nur wenn Karte und Index gemessen sind' },
       { type: 'new',   text: 'Rangnummern in den Bewegungen' },

@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.6.0] - 31. Juli 2026 · Suche mit Marktbezug, Sammlungsansicht
+
+### Neu
+- **Suchergebnisse sind Zeilen statt Kacheln.** Wer sucht, will vergleichen — im Raster steht jede Zahl an einer anderen Stelle. Jede Zeile zeigt Kartenbild, Name, Set, Nummer, Seltenheit, Preis, 30-Tage-Bewegung und den Abstand zum Index
+- **Der Indexwert kommt aus EINER Datenbankzeile**, nicht aus 250 nachgeladenen Karten. Genau dafuer wurde der taegliche Indexstand angelegt
+- **Sammlungsansicht im Portfolio.** „Auswertung" beantwortet „wie steht mein Bestand", „Sammlung" beantwortet „was besitze ich eigentlich" — ruhige Galerie im echten Kartenformat, sortierbar nach Wert, Bewegung, Set und Zugang. Ein Klick fuehrt auf die Kartenseite und damit in den Marktkontext
+- **`/suche` folgt jetzt dem gemeinsamen Seitenmuster** — ohne Pillen-Etikett, ohne zentrierte Werbeueberschrift, ohne Verlauf hinter der Ueberschrift. Die Seite hatte den Umbau nie mitgemacht
+
+### Behoben
+- **Das Kartenraster wies ungemessene Karten als „0,0 %" aus** (`trendPercent || 0`) — optisch nicht von einer wirklich unbewegten Karte zu unterscheiden. Betraf Marktbericht und Set-Detailseiten
+- **Unerklaerte Bewertungszahl auf jeder Kachel entfernt** — eine farbcodierte Zahl von 0 bis 100 ohne ein Wort dazu liest sich als Kauf-Ampel. Der Wert steht weiterhin auf der Kartenseite, dort mit offengelegten Faktoren
+- **Kartenbilder im echten Format 63:88** statt 3:4, und „N/A" durch einen Strich ersetzt
+
+---
+
 ## [4.5.0] - 31. Juli 2026 · Bewegungen mit Marktbezug, Set-Bibliothek
 
 ### Neu

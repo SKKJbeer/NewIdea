@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { CardImage } from './CardImage';
 import { PokemonCard } from '@/types';
-import { TrendingUp, TrendingDown, Star, ImageOff } from 'lucide-react';
+import { TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
 import { BoosterPackImage } from './BoosterPackImage';
 import { formatEur, formatEurRounded, formatPercent } from '@/lib/format';
+import { hasRealTrend } from '@/lib/market-metrics';
 
 interface CardGridProps {
   cards: PokemonCard[];
@@ -37,18 +38,23 @@ export function CardGrid({ cards, title, compact = false, priceOverrides = {}, p
 
 function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card: PokemonCard; compact?: boolean; priceOverride?: number; priceLanguage?: string }) {
   const price = priceOverride ?? (card.prices.market || card.prices.holofoil?.market || 0);
-  const trend = card.trendPercent || 0;
-  // Genau 0 ist WEDER Gewinn noch Verlust. Vorher wurde jede unveränderte
-  // Karte rot dargestellt — dieselbe Verwechslung wie bei den Rankings.
-  const isPositive = trend > 0;
+  // NICHT `card.trendPercent || 0`.
+  //
+  // Damit wurde jede Karte OHNE Messung als „0,0 %" ausgewiesen — optisch
+  // ununterscheidbar von einer Karte, die sich tatsächlich nicht bewegt hat.
+  // Das ist dieselbe Verwechslung wie an vier anderen Stellen im Projekt, und
+  // sie verstösst gegen die Preis-Wahrheitspflicht: Eine fehlende Messung darf
+  // nie wie ein Messwert aussehen.
+  const gemessen = hasRealTrend(card);
+  const trend = gemessen ? (card.trendPercent as number) : null;
+  const isPositive = trend !== null && trend > 0;
   const unveraendert = trend === 0;
-  const score = card.investmentScore || 0;
 
   if (compact) {
     return (
       <Link href={`/karten/${card.id}`} className="block group">
         <div className="bg-[#13131e] rounded-md border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all overflow-hidden">
-          <div className="relative aspect-[3/4] bg-[#1a1a28]">
+          <div className="relative aspect-[63/88] bg-[#1a1a28]">
             {card.imageUrl ? (
               <CardImage
                 src={card.imageUrl}
@@ -75,7 +81,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
   return (
     <Link href={`/karten/${card.id}`} className="block group">
       <div className="bg-[#13131e] rounded-md border border-[#2a2a3a] hover:border-violet-500/30 active:scale-[0.97] active:border-violet-500/50 transition-all duration-200 overflow-hidden cursor-pointer">
-        <div className="relative bg-[#1a1a28] p-3 aspect-[3/4]">
+        <div className="relative bg-[#1a1a28] p-3 aspect-[63/88]">
           {card.imageUrl ? (
             <CardImage
               src={card.imageUrl}
@@ -86,11 +92,12 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-700"><ImageOff size={32} /></div>
           )}
-          <div className="absolute top-2 right-2 bg-[#13131e] border border-[#2a2a3a] rounded-full px-2 py-0.5 text-xs font-bold z-10">
-            <span className={score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-slate-600'}>
-              {score}
-            </span>
-          </div>
+          {/* KEIN PUNKTESTAND MEHR AUF DER KACHEL.
+              Hier stand eine Zahl von 0 bis 100, grün ab 70, gelb ab 50 — ohne
+              ein Wort dazu, was sie bedeutet. Eine farbcodierte Bewertung ohne
+              Erklärung liest sich als Kauf-Ampel, und genau die gibt dieses
+              Produkt nicht. Der Wert steht weiterhin auf der Kartenseite, dort
+              mit seinen offengelegten Faktoren. */}
         </div>
 
         <div className="p-3">
@@ -115,7 +122,7 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
           <div className="flex items-center justify-between mt-2">
             <div>
               <span className="text-base font-bold text-slate-200">
-                {price > 0 ? formatEur(price) : 'N/A'}
+                {price > 0 ? formatEur(price) : '—'}
               </span>
               {priceLanguage !== 'EN' && (
                 <span className="ml-1.5 text-[10px] font-bold text-violet-400">{priceLanguage}</span>
@@ -123,33 +130,36 @@ function CardItem({ card, compact, priceOverride, priceLanguage = 'EN' }: { card
             </div>
             <span
               className={`flex items-center gap-0.5 text-xs font-medium ${
-                unveraendert ? 'text-slate-500' : isPositive ? 'text-emerald-400' : 'text-rose-400'
+                trend === null
+                  ? 'text-slate-700'
+                  : unveraendert
+                    ? 'text-slate-500'
+                    : isPositive
+                      ? 'text-emerald-400'
+                      : 'text-rose-400'
               }`}
               // Der Zeitraum gehört an die Zahl — sonst weiß niemand, worauf
               // sich die Veränderung bezieht.
-              title="Veränderung über 30 Tage"
+              title={trend === null ? 'Keine Messung über 30 Tage' : 'Veränderung über 30 Tage'}
             >
-              {!unveraendert && (isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />)}
-              {formatPercent(Math.abs(trend), { withSign: false })}
+              {trend !== null && !unveraendert && (isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />)}
+              {trend === null ? '—' : formatPercent(Math.abs(trend), { withSign: false })}
               <span className="ml-0.5 text-[9px] text-slate-600">30T</span>
             </span>
           </div>
 
-          <div className="mt-2">
-            <div className="flex items-center gap-1">
-              <Star size={10} className={score >= 70 ? 'text-amber-400 fill-amber-400' : 'text-slate-700'} />
-              <div className="flex-1 bg-[#2a2a3a] rounded-full h-1">
-                <div
-                  className={`h-1 rounded-full ${score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-slate-700'}`}
-                  style={{ width: `${score}%` }}
-                />
-              </div>
-            </div>
-          </div>
+          {/* HIER LAG EIN BEWERTUNGSBALKEN.
+              Ein Stern, ein Fortschrittsbalken, grün ab 70 und gelb ab 50 — auf
+              JEDER Kachel, ohne ein Wort dazu, woraus die Zahl entsteht. Zwei
+              Gründe für den Ausbau: Er las sich als Kauf-Ampel (Abschnitt
+              „keine Kaufsignale"), und er stand in einer Liste, in der man
+              Karten VERGLEICHT — dort wiegt eine unerklärte Farbe schwerer als
+              irgendwo sonst. Der Wert steht weiterhin auf der Kartenseite, dort
+              mit seinen offengelegten Faktoren und einem Link zur Methodik.
 
-          <div className="mt-2 block w-full text-center text-xs border border-[#2a2a35] hover:border-slate-500 text-white rounded-lg py-1.5 transition-colors">
-            Details &amp; Kaufen →
-          </div>
+              Auch die Schaltfläche „Details & Kaufen →" ist weg: Die ganze
+              Kachel ist bereits ein Link, und „Kaufen" war eine Behauptung —
+              gekauft wird auf Cardmarket, nicht hier. */}
         </div>
       </div>
     </Link>

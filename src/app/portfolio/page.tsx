@@ -20,6 +20,7 @@ import { formatPercent } from '@/lib/format';
 import { AccountBar } from '@/components/AccountBar';
 import { mergeHoldings } from '@/lib/portfolio-sync';
 import { PortfolioInsights, MarketComparison } from '@/components/PortfolioInsights';
+import { CollectionGallery } from '@/components/CollectionGallery';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,8 @@ export default function PortfolioPage() {
   const [liveData,   setLiveData]   = useState<Record<string, LiveCardData>>({});
   const [loading,    setLoading]    = useState(false);
   const [priceError, setPriceError] = useState(false);
+  // Auswertung oder Sammlung — zwei Sichten auf denselben Bestand.
+  const [ansicht, setAnsicht] = useState<'auswertung' | 'sammlung'>('auswertung');
   const [showAdd,    setShowAdd]    = useState(false);
   const [showReset,  setShowReset]  = useState(false);
   const [editTarget, setEditTarget] = useState<PortfolioHolding | null>(null);
@@ -477,8 +480,44 @@ export default function PortfolioPage() {
         </div>
       </div>
 
+      {/* ── ZWEI SICHTEN AUF DIESELBE SAMMLUNG ──
+          Auswertung beantwortet „wie steht mein Bestand", Sammlung beantwortet
+          „was besitze ich eigentlich". Beides gehört zu diesem Produkt, aber
+          nicht in dieselbe Ansicht: Eine Tabelle mit großen Bildern liest sich
+          schlecht, eine Galerie mit vier Zahlen pro Karte auch. */}
+      {holdings.length > 0 && (
+        <div className="max-w-2xl mx-auto px-5 pt-5">
+          <div className="flex items-baseline gap-4 border-b border-[#1c1c24] pb-3">
+            {([
+              ['auswertung', 'Auswertung'],
+              ['sammlung', 'Sammlung'],
+            ] as const).map(([wert, beschriftung]) => (
+              <button
+                key={wert}
+                type="button"
+                onClick={() => setAnsicht(wert)}
+                aria-pressed={ansicht === wert}
+                className={`min-h-[36px] text-[13px] transition-colors ${
+                  ansicht === wert
+                    ? 'text-slate-100 underline underline-offset-[6px]'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {beschriftung}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {ansicht === 'sammlung' && holdings.length > 0 && (
+        <div className="max-w-5xl mx-auto px-5 pt-6 pb-10">
+          <CollectionGallery holdings={holdings} liveData={liveData} />
+        </div>
+      )}
+
       {/* ── Holdings list ── */}
-      <div className="max-w-2xl mx-auto px-5 pt-5 pb-10">
+      <div className={`max-w-2xl mx-auto px-5 pt-5 pb-10 ${ansicht === 'sammlung' && holdings.length > 0 ? 'hidden' : ''}`}>
         <p className="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-3">
           Positionen <span className="font-normal">({holdings.length})</span>
         </p>

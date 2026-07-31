@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import { CardGrid } from './CardGrid';
+import { SearchResultRows } from './SearchResultRows';
 import { LangPicker } from './LangPicker';
 import type { PokemonCard } from '@/types';
 import type { CardLanguage } from '@/lib/portfolio';
@@ -15,9 +15,11 @@ interface PriceResult {
 interface SearchResultsLangProps {
   cards: PokemonCard[];
   query: string;
+  /** Indexwert für den Abstand zum Markt — serverseitig aus EINER Datenbankzeile. */
+  cbi?: number | null;
 }
 
-export function SearchResultsLang({ cards, query }: SearchResultsLangProps) {
+export function SearchResultsLang({ cards, query, cbi = null }: SearchResultsLangProps) {
   const [language, setLanguage] = useState<CardLanguage>('EN');
   const [priceOverrides, setPriceOverrides] = useState<Record<string, number>>({});
   const [actualLanguages, setActualLanguages] = useState<Record<string, CardLanguage>>({});
@@ -85,7 +87,12 @@ export function SearchResultsLang({ cards, query }: SearchResultsLangProps) {
         </div>
       )}
 
-      <CardGrid cards={cards} priceOverrides={priceOverrides} priceLanguage={language} />
+      <SearchResultRows
+        cards={cards}
+        priceOverrides={priceOverrides}
+        priceLanguage={language}
+        cbi={cbi}
+      />
     </div>
   );
 }

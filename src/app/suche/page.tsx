@@ -2,10 +2,12 @@ import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
 import { searchCards } from '@/lib/pokemon-api';
+import { getMarketBenchmark } from '@/lib/market-context';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
 import { siteUrlOrLocal } from '@/lib/site';
+import { SECTION_LABEL } from '@/lib/ui';
 
 export async function generateMetadata({
   searchParams,
@@ -45,6 +47,16 @@ export default async function SearchPage({
     }
   }
 
+  // INDEXWERT FÜR DEN MARKTBEZUG DER TREFFER.
+  //
+  // Genau dafür wurde der Tagesstand in die Datenbank gelegt: EINE Zeile statt
+  // 250 Karten aus dem Netz. Ohne ihn hätte diese Seite die volle Stichprobe
+  // nachladen müssen — für eine einzige Vergleichszahl, bei jedem Tastendruck.
+  //
+  // Schlägt der Abruf fehl, bleibt die Spalte leer. Ein fehlender Vergleich ist
+  // kein Fehler der Suche; eine erfundene Null wäre einer.
+  const markt = await getMarketBenchmark().catch(() => null);
+
   const structuredData =
     results.length > 0
       ? {
@@ -72,19 +84,30 @@ export default async function SearchPage({
 
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 sm:py-14 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <Search size={10} />
-            Karten-Suche
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black mb-3 text-white">
-            Was ist deine Karte <span className="text-violet-400">wert?</span>
+      {/* KOPF NACH DEM GEMEINSAMEN MUSTER.
+          Hier standen drei Dinge, die DESIGN.md ausdrücklich ausschliesst: ein
+          Pillen-Etikett, eine zentrierte Werbeüberschrift („Was ist deine Karte
+          wert?") und ein grosses abgerundetes Suchfeld als Blickfang, dazu ein
+          Verlauf hinter der Überschrift. Diese Seite hatte den Umbau schlicht
+          nie mitgemacht — und eine Seite, die anders aussieht als die übrigen,
+          ist genau der Bruch, den ein einheitliches System verhindern soll.
+
+          Linksbündig, Abschnittsmarke, keine Pille, kein Verlauf. Das Suchfeld
+          bleibt gross genug zum Tippen, ist aber nicht mehr die Hauptaussage
+          der Seite — die Treffer sind es. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-12">
+          <p className={SECTION_LABEL}>Karten · Pokémon</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            {query ? <>Treffer für „{query}"</> : 'Kartensuche'}
           </h1>
-          <p className="text-slate-400 text-sm max-w-md mx-auto mb-6">
-            Suche eine Pokémon-Karte und sieh sofort Marktwert, Trend und 30-Tage-Preisverlauf.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Marktwert, gemessene 30-Tage-Bewegung und der Abstand zum Index — für
+            jede Karte in derselben Zeile.
           </p>
-          <SearchBox initialQuery={query} autoFocus={!query} />
+          <div className="mt-6 max-w-xl">
+            <SearchBox initialQuery={query} autoFocus={!query} />
+          </div>
         </div>
       </header>
 
@@ -106,7 +129,7 @@ export default async function SearchPage({
             <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
           </div>
         ) : (
-          <SearchResultsLang cards={results} query={query} />
+          <SearchResultsLang cards={results} query={query} cbi={markt?.value ?? null} />
         )}
       </main>
 
