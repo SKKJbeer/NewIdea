@@ -225,11 +225,27 @@ describe('Suche und Kartenbilder funktionieren verlässlich', () => {
     // ausgerechnet die Funktion, die immer funktionieren muss. Ein kurzer
     // Aussetzer der Kartendatenbank führte sofort zu „Suche momentan nicht
     // verfügbar", obwohl die Karte existiert.
-    const block = api.slice(api.indexOf('export async function searchCards'));
-    expect(block.slice(0, 1800)).toMatch(/tcgList\(/);
-    expect(block.slice(0, 1800)).toMatch(/retries: 2/);
+    const block = api.slice(api.indexOf('export async function searchCards'), api.indexOf('export async function searchCards') + 2600);
+    expect(block).toMatch(/tcgList\(/);
+    expect(block).toMatch(/retries: 3/);
     // Kein roher Abruf mehr in dieser Funktion.
-    expect(block.slice(0, 1800)).not.toMatch(/axios\.get\(/);
+    expect(block).not.toMatch(/axios\.get\(/);
+  });
+
+  it('liefert bei einem Totalausfall die letzten echten Treffer', () => {
+    // Gemessen antwortete DIESELBE Suchanfrage zweimal von drei Malen mit
+    // HTTP 500. Wiederholungen fangen das meiste ab, aber nicht alles — und
+    // eine Suche, die manchmal „nicht verfügbar" sagt, ist für die Benutzung
+    // dasselbe wie eine kaputte Suche.
+    expect(api).toContain('sucheCache');
+    expect(api).toMatch(/SUCHE_CACHE_MS/);
+    // Begrenzt, damit der Speicher nicht mit jeder Anfrage wächst.
+    expect(api).toMatch(/SUCHE_CACHE_MAX/);
+  });
+
+  it('wartet zwischen den Versuchen länger statt gleich lang', () => {
+    // Bei flacher Wartezeit landen alle Versuche in derselben Störung.
+    expect(api).toMatch(/400 \* 2 \*\* attempt/);
   });
 
   it('die Set-Karten ebenso', () => {

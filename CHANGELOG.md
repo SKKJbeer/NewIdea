@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.0.2] - 31. Juli 2026 · Die Suche haelt jetzt auch aus, wenn die Quelle streikt
+
+Nachgemessen: Die Kartendatenbank antwortet auf DIESELBE Suchanfrage in zwei von drei Faellen mit HTTP 500. Wiederholungen allein reichen dagegen nicht.
+
+### Behoben
+- **Drei statt zwei Wiederholungen, mit steigender Wartezeit.** Bei gleichbleibender Wartezeit landen alle Versuche in derselben Stoerung
+- **Erfolgreiche Suchergebnisse bleiben zehn Minuten verfuegbar.** Faellt die Quelle vollstaendig aus, erscheinen die zuletzt geholten echten Treffer statt eines Fehlerzustands — dieselben Karten, wenige Minuten alt
+
+---
+
 ## [4.0.1] - 31. Juli 2026 · Suche und Kartenbilder
 
 ### Behoben

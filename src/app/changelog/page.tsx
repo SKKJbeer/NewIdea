@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.0.2',
+    date: '31. Juli 2026',
+    label: 'Die Suche haelt aus, wenn die Quelle streikt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Kartendatenbank antwortet auf dieselbe Suchanfrage in zwei von drei Faellen mit einem Fehler — jetzt drei Wiederholungen mit steigender Wartezeit' },
+      { type: 'fixed', text: 'Erfolgreiche Suchergebnisse bleiben zehn Minuten verfuegbar und erscheinen bei einem Totalausfall statt eines Fehlerzustands' },
+    ],
+  },
+  {
     version: '4.0.1',
     date: '31. Juli 2026',
     label: 'Suche und Kartenbilder',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Suche gab bei einem Aussetzer der Kartendatenbank sofort auf — sie war der einzige Abruf ohne Wiederholungsversuch' },
       { type: 'fixed', text: 'Kartenbilder blieben teilweise unsichtbar: Das Bild wartete auf ein Ladeereignis, das bei bereits geladenen Bildern nie kommt' },

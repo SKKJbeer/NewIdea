@@ -39,8 +39,10 @@ async function tcgList(
     } catch (err) {
       lastError = err;
     }
-    // Kurz warten — die Aussetzer sind meist sehr kurzlebig.
-    if (attempt < retries) await new Promise((r) => setTimeout(r, 400));
+    // Wartezeit steigern. Die Aussetzer sind kurzlebig, kommen aber in Serie:
+    // Gemessen antwortete dieselbe Abfrage zweimal von drei Malen mit HTTP 500.
+    // Bei flacher Wartezeit landen alle Versuche in derselben Störung.
+    if (attempt < retries) await new Promise((r) => setTimeout(r, 400 * 2 ** attempt));
   }
   if (lastError) {
     console.warn(
@@ -201,6 +203,22 @@ export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
   return [];
 }
 
+// LETZTE ERFOLGREICHE SUCHERGEBNISSE.
+//
+// WARUM DAS NÖTIG IST: Die Kartendatenbank antwortet auf dieselbe Suchanfrage
+// gemessen in zwei von drei Fällen mit HTTP 500. Wiederholungen fangen das
+// meiste ab, aber nicht alles — und eine Suche, die manchmal „nicht verfügbar"
+// sagt, ist für die Benutzung dasselbe wie eine kaputte Suche.
+//
+// Deshalb: Was einmal erfolgreich geholt wurde, bleibt kurz verfügbar. Bei
+// einem Totalausfall der Abfrage werden diese Karten ausgeliefert statt eines
+// Fehlers. Das sind ECHTE Ergebnisse, nur wenige Minuten alt — Kartenpreise
+// ändern sich nicht im Minutentakt.
+const sucheCache = new Map<string, { cards: PokemonCard[]; zeit: number }>();
+const SUCHE_CACHE_MS = 10 * 60 * 1000;
+/** Begrenzt den Speicher — die Karte wächst sonst mit jeder neuen Anfrage. */
+const SUCHE_CACHE_MAX = 200;
+
 export async function searchCards(query: string, limit = 30): Promise<PokemonCard[]> {
   const term = query.trim();
   if (!term) return [];
@@ -224,13 +242,37 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   // Zwei Wiederholungen und ein etwas großzügigeres Zeitlimit: Die Aussetzer
   // sind kurzlebig, und eine Suche, die eine Sekunde später antwortet, ist
   // unendlich viel besser als eine, die aufgibt.
+  const schluessel = `${escaped.toLowerCase()}|${limit}`;
+
   const data = await tcgList(
     { q: `name:"*${escaped}*"`, pageSize: limit, orderBy: '-set.releaseDate' },
-    { retries: 2, timeout: 12000 },
+    { retries: 3, timeout: 12000 },
   );
 
   // Nur vollständige, handelbare Karten (Preis + Bild) — nach Marktpreis absteigend.
-  return mapAndFilter(data).sort(byPriceDesc);
+  const cards = mapAndFilter(data).sort(byPriceDesc);
+
+  if (cards.length > 0) {
+    if (sucheCache.size >= SUCHE_CACHE_MAX) {
+      // Ältesten Eintrag entfernen — Map merkt sich die Einfügereihenfolge.
+      const aeltester = sucheCache.keys().next().value;
+      if (aeltester !== undefined) sucheCache.delete(aeltester);
+    }
+    sucheCache.set(schluessel, { cards, zeit: Date.now() });
+    return cards;
+  }
+
+  // Abfrage ohne Ergebnis: Das kann bedeuten, dass es die Karte nicht gibt —
+  // oder dass die Quelle gerade streikt. Unterscheiden lässt sich das nicht.
+  // Hatten wir für genau diese Suche schon einmal Treffer, sind sie die
+  // bessere Antwort als ein Fehlerzustand.
+  const gemerkt = sucheCache.get(schluessel);
+  if (gemerkt && Date.now() - gemerkt.zeit < SUCHE_CACHE_MS) {
+    console.warn(`[Suche] „${escaped}" ohne Antwort — letzte Treffer werden ausgeliefert`);
+    return gemerkt.cards;
+  }
+
+  return cards;
 }
 
 /**
