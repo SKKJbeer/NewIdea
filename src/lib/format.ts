@@ -71,3 +71,29 @@ export function formatCompactEur(value: number): string {
   }
   return `${Math.round(value)} €`;
 }
+
+
+/**
+ * Prozentpunkte — der Abstand zwischen zwei Prozentwerten.
+ *
+ * WARUM EIGEN: Die Differenz zweier Prozentwerte ist KEIN Prozentwert. Eine
+ * Karte bei +22,2 % und ein Markt bei −0,2 % liegen 22,4 PROZENTPUNKTE
+ * auseinander, nicht 22,4 Prozent. Die Einheit falsch zu benennen ist keine
+ * Wortklauberei — sie legt nahe, man könne den Abstand auf den Kartenpreis
+ * anwenden, und das ergäbe eine andere Zahl.
+ *
+ * WARUM NICHT AUS formatPercent GEBASTELT: Der erste Anlauf nahm
+ * `formatPercent(x).replace(' %', '')` und ergab „+55,9 % pp" — sichtbar in
+ * der Movers-Spalte. `Intl` setzt vor das Prozentzeichen ein GESCHÜTZTES
+ * Leerzeichen (U+00A0), kein gewöhnliches; die Ersetzung lief ins Leere.
+ * Genau diese Falle steht seit v2.x in den Projektnotizen — sie kostet jedes
+ * Mal denselben Nachmittag, wenn man Zahlen von Hand zusammensetzt.
+ */
+export function formatPp(value: number, { digits = 1 } = {}): string {
+  const formatted = new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${formatted}\u00a0pp`;
+}

@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v4.4.1` · **Stand:** 31. Juli 2026 · **Branch:** `main`
+**Version:** `v4.5.0` · **Stand:** 31. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v4.4.1)
+## Was gebaut ist (Stand v4.5.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v4.5.0 | Bewegungen mit Abstand zum Markt (pp), Set-Bibliothek mit echten Epochen-Filtern |
 | v4.4.1 | Sichtpruefung: doppelte Klammer, Mobil-Verteilung, Merklisten-Knopf gedeckt |
 | v4.4.0 | Sammler-Ebene: Ambient-Ton aus dem Energietyp, Folienschimmer, Hintergrund-Identitaet, Markttemperatur |
 | v4.3.1 | Doppeltitel in Portfolio/Merkliste behoben, Startseiten-Titel korrigiert |

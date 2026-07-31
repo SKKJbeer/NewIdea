@@ -5,7 +5,8 @@ import type { SetRank } from '@/lib/market-metrics';
 import { MIN_SET_SAMPLE } from '@/lib/market-metrics';
 import { displayPrice } from '@/lib/pokemon-api';
 import { cachedImg } from '@/lib/cached-image';
-import { formatEur, formatPercent } from '@/lib/format';
+import { hatFolie } from '@/lib/collector';
+import { formatEur, formatPercent, formatPp } from '@/lib/format';
 import { SECTION_LABEL, SECTION_NUM, TABLE, NUM, THUMB, toneClass, barClass } from '@/lib/ui';
 import type { BriefSatz } from '@/lib/market-brief';
 
@@ -77,24 +78,48 @@ export function MarketBriefBlock({ saetze }: { saetze: BriefSatz[] }) {
 
 // ── Bewegungen ──────────────────────────────────────────────────────────────
 
-function MoverRow({ card }: { card: PokemonCard }) {
+/**
+ * Eine Bewegungszeile.
+ *
+ * DREI ENTSCHEIDUNGEN:
+ *
+ * 1. RANG. Ohne Nummer ist eine Liste eine Aufzählung; mit Nummer ist sie eine
+ *    Rangfolge. Der Unterschied kostet nichts und beantwortet „wie weit oben
+ *    steht das" ohne Zählen.
+ *
+ * 2. VERGLEICH ZUM INDEX in derselben Zeile. Das ist der Punkt, an dem sich
+ *    CardBeacon von einer Preisliste unterscheidet: „+22,2 %" ist eine Zahl,
+ *    „+22,4 Prozentpunkte über dem Markt" ist eine Aussage. Die Spalte steht
+ *    NUR da, wenn beides gemessen ist — ohne Indexwert bleibt sie leer statt
+ *    eine Null zu zeigen.
+ *
+ * 3. KEINE GROSSE KACHEL. Das Kartenbild identifiziert die Zeile, es füllt sie
+ *    nicht. Große Kartenkacheln machen aus Marktdaten einen Katalog. Die
+ *    Sammler-Ebene steckt hier im Detail: leichtes Anheben und der
+ *    Folienschimmer auf Karten, die auch wirklich glänzen.
+ */
+function MoverRow({ card, rang, cbi }: { card: PokemonCard; rang: number; cbi: number | null }) {
   const trend = card.trendPercent;
   const preis = displayPrice(card);
+  const gemessen = typeof trend === 'number';
+  // Prozentpunkte, nicht Prozent: Die Differenz zweier Prozentwerte ist kein
+  // Prozentwert. Wer das vermischt, rechnet falsch und merkt es nie.
+  const gegenMarkt = gemessen && cbi !== null ? trend - cbi : null;
 
   return (
     <Link
       href={`/karten/${card.id}`}
-      className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 px-1 ${TABLE.row} ${TABLE.cell}`}
+      className={`group grid grid-cols-[auto_auto_1fr_auto] items-center gap-x-3 gap-y-1 px-1 sm:grid-cols-[auto_auto_1fr_auto_auto_auto] ${TABLE.row} ${TABLE.cell}`}
     >
-      {/* Kartenbild als Miniatur — es identifiziert die Zeile, es füllt sie
-          nicht. Große Kartenkacheln machen aus Marktdaten einen Katalog. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={cachedImg(card.imageUrl)}
-        alt=""
-        loading="lazy"
-        className={THUMB}
-      />
+      <span className="w-4 text-[10px] font-mono tabular-nums text-slate-700">
+        {String(rang).padStart(2, '0')}
+      </span>
+
+      <span className={`lift block shrink-0 overflow-hidden rounded-[3px] ${hatFolie(card.rarity) ? 'foil' : ''}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={cachedImg(card.imageUrl)} alt="" loading="lazy" className={THUMB} />
+      </span>
+
       <span className="min-w-0">
         <span className="block truncate text-[13px] text-slate-200">
           {card.nameDe ?? card.name}
@@ -102,11 +127,26 @@ function MoverRow({ card }: { card: PokemonCard }) {
         <span className="block truncate text-[11px] text-slate-600">
           {card.set}
           {card.number ? ` · ${card.number}` : ''}
+          {/* Auf dem Telefon gibt es keine eigene Preisspalte — der Preis
+              rückt in die zweite Zeile, statt die Namen auf acht Zeichen zu
+              stauchen. */}
+          <span className="sm:hidden"> · {formatEur(preis)}</span>
         </span>
       </span>
-      <span className={`${NUM.row} w-20 text-right text-slate-400`}>{formatEur(preis)}</span>
-      <span className={`${NUM.row} w-20 text-right font-semibold ${toneClass(trend)}`}>
-        {typeof trend === 'number' ? formatPercent(trend) : '—'}
+
+      <span className={`${NUM.row} hidden w-20 text-right text-slate-400 sm:block`}>
+        {formatEur(preis)}
+      </span>
+      <span className={`${NUM.row} w-[68px] text-right font-semibold ${toneClass(trend)}`}>
+        {gemessen ? formatPercent(trend) : '—'}
+      </span>
+      <span
+        className={`${NUM.small} hidden w-[76px] text-right sm:block ${
+          gegenMarkt === null ? 'text-slate-700' : 'text-slate-500'
+        }`}
+        title={gegenMarkt === null ? undefined : 'Abstand zum CardBeacon Index in Prozentpunkten'}
+      >
+        {gegenMarkt === null ? '—' : formatPp(gegenMarkt)}
       </span>
     </Link>
   );
@@ -115,37 +155,45 @@ function MoverRow({ card }: { card: PokemonCard }) {
 export function MarketMovers({
   gainers,
   losers,
+  cbi = null,
 }: {
   gainers: PokemonCard[];
   losers: PokemonCard[];
+  /** Indexwert für die Spalte „gegen Markt". `null` = kein belastbarer Wert. */
+  cbi?: number | null;
 }) {
   if (gainers.length === 0 && losers.length === 0) return null;
 
+  const kopf = (
+    <>
+      <span className="hidden w-20 text-right sm:block">Preis</span>
+      <span className="w-[68px] text-right tabular-nums">30 T</span>
+      <span className="hidden w-[76px] text-right sm:block">vs. Markt</span>
+    </>
+  );
+
   return (
     <div className="mt-5 grid gap-x-10 gap-y-8 md:grid-cols-2">
-      <div>
-        <div className={`${TABLE.head} flex items-center justify-between border-b border-[#1c1c24] pb-2`}>
-          <span>Gewinner</span>
-          <span className="tabular-nums">30 T</span>
+      {[
+        ['Gewinner', gainers, 'Keine gemessene Aufwärtsbewegung.'] as const,
+        ['Verlierer', losers, 'Keine gemessene Abwärtsbewegung.'] as const,
+      ].map(([titel, karten, leer]) => (
+        <div key={titel}>
+          <div
+            className={`${TABLE.head} grid grid-cols-[auto_auto_1fr_auto] items-center gap-x-3 border-b border-[#1c1c24] px-1 pb-2 sm:grid-cols-[auto_auto_1fr_auto_auto_auto]`}
+          >
+            <span className="w-4" />
+            <span className="w-[26px]" />
+            <span>{titel}</span>
+            {kopf}
+          </div>
+          {karten.length > 0 ? (
+            karten.map((c, i) => <MoverRow key={c.id} card={c} rang={i + 1} cbi={cbi} />)
+          ) : (
+            <p className="py-4 text-[12px] text-slate-600">{leer}</p>
+          )}
         </div>
-        {gainers.length > 0 ? (
-          gainers.map((c) => <MoverRow key={c.id} card={c} />)
-        ) : (
-          <p className="py-4 text-[12px] text-slate-600">Keine gemessene Aufwärtsbewegung.</p>
-        )}
-      </div>
-
-      <div>
-        <div className={`${TABLE.head} flex items-center justify-between border-b border-[#1c1c24] pb-2`}>
-          <span>Verlierer</span>
-          <span className="tabular-nums">30 T</span>
-        </div>
-        {losers.length > 0 ? (
-          losers.map((c) => <MoverRow key={c.id} card={c} />)
-        ) : (
-          <p className="py-4 text-[12px] text-slate-600">Keine gemessene Abwärtsbewegung.</p>
-        )}
-      </div>
+      ))}
     </div>
   );
 }

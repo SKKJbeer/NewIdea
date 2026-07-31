@@ -183,7 +183,11 @@ export default async function MarketPage() {
           <h2 id="bewegungen" className="sr-only">
             Stärkste Bewegungen
           </h2>
-          <MarketMovers gainers={gainers} losers={losers} />
+          <MarketMovers
+            gainers={gainers}
+            losers={losers}
+            cbi={cbi.sufficient ? cbi.value : null}
+          />
         </section>
 
         {/* 04 — SET-MARKT */}

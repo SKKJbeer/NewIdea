@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.5.0',
+    date: '31. Juli 2026',
+    label: 'Bewegungen mit Marktbezug, Set-Bibliothek',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'Die Bewegungen zeigen den Abstand zum Markt in Prozentpunkten — nur wenn Karte und Index gemessen sind' },
+      { type: 'new',   text: 'Rangnummern in den Bewegungen' },
+      { type: 'new',   text: '/sets ist eine Set-Bibliothek: Epochen-Filter aus dem echten series-Feld, vier Sortierungen, groessere Set-Logos' },
+      { type: 'fixed', text: '„+55,9 % pp" in der Bewegungsspalte — Intl setzt ein geschuetztes Leerzeichen, die Ersetzung lief ins Leere' },
+      { type: 'fixed', text: '„keine Stichprobe" stand neben einem gemessenen Medianpreis; das sind drei Zustaende, nicht zwei' },
+    ],
+  },
+  {
     version: '4.4.1',
     date: '31. Juli 2026',
     label: 'Drei Befunde aus der Sichtpruefung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Doppelte Klammer im Einordnungstext der Startseite' },
       { type: 'fixed', text: 'Auf dem Telefon quetschte sich die Verteilung neben den Indexwert — sie steht jetzt darunter' },

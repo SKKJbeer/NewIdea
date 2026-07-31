@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.5.0] - 31. Juli 2026 · Bewegungen mit Marktbezug, Set-Bibliothek
+
+### Neu
+- **Die Bewegungen zeigen den Abstand zum Markt** in derselben Zeile. „+22,2 %" ist eine Zahl; „+22,4 Prozentpunkte ueber dem Markt" ist eine Aussage — und genau der Punkt, an dem sich CardBeacon von einer Preisliste unterscheidet. Die Spalte steht nur, wenn Karte UND Index gemessen sind
+- **Rangnummern in den Bewegungen** — ohne Nummer ist eine Liste eine Aufzaehlung, mit Nummer eine Rangfolge
+- **`/sets` ist eine Set-Bibliothek geworden:** Epochen-Filter aus dem echten `series`-Feld der Kartendatenbank, Sortierung nach Erscheinen, Bewegung, typischem Preis und Umfang, groessere Set-Logos als Blickfang. Sets ohne gemessene Bewegung wandern beim Sortieren ans Ende, statt mit einer gedachten Null in der Rangfolge zu stehen
+- **`formatPp()`** in `format.ts` — Prozentpunkte sind eine eigene Einheit
+
+### Behoben
+- **„+55,9 % pp" in der Bewegungsspalte.** Der Wert wurde aus `formatPercent(x).replace(' %', '')` gebaut; `Intl` setzt vor das Prozentzeichen aber ein geschuetztes Leerzeichen (U+00A0), die Ersetzung lief ins Leere
+- **„keine Stichprobe" neben einem gemessenen Medianpreis.** Ein Set kann eine Stichprobe haben und trotzdem keine gemessene BEWEGUNG — das sind drei Zustaende, nicht zwei
+
+---
+
 ## [4.4.1] - 31. Juli 2026 · Drei Befunde aus der Sichtpruefung
 
 ### Behoben

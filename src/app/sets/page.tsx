@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
-import { BoosterPackImage } from '@/components/BoosterPackImage';
-import { Calendar, Layers } from 'lucide-react';
+import { SetLibrary, type SetEintrag } from '@/components/SetLibrary';
 import { fetchRecentSets } from '@/lib/pokemon-api';
+import { getHomepageCards } from '@/lib/homepage-data';
+import { rankSets, validateMarketData, type SetRank } from '@/lib/market-metrics';
 import type { Metadata } from 'next';
 import { SECTION_LABEL } from '@/lib/ui';
 import { LEGAL_NO_ADVICE, LEGAL_UNOFFICIAL } from '@/lib/brand';
@@ -15,12 +16,6 @@ export const metadata: Metadata = {
     'Alle aktuellen Pokémon-TCG-Sets im Überblick: Erscheinungsdatum, Kartenanzahl und die wertvollsten Karten jedes Sets mit aktuellen Cardmarket-Preisen.',
 };
 
-function formatReleaseDate(dateStr: string): string {
-  if (!dateStr) return '';
-  const d = new Date(dateStr.replace(/\//g, '-') + 'T12:00:00');
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-}
 
 export default async function SetsPage() {
   // BEWUSST OHNE pauschales `.catch(() => [])`: Ein verschluckter Fehler wurde
@@ -45,6 +40,34 @@ export default async function SetsPage() {
   });
   sets = sets ?? [];
 
+  // MARKTBEWEGUNG JE SET — aus derselben Stichprobe wie die Marktübersicht.
+  //
+  // Nicht je Set einzeln abgerufen: 24 Sets × ein Abruf wären bei einer Quelle,
+  // die regelmäßig aussetzt, mehrere Minuten und mehrere Fehlschläge. Die
+  // Stichprobe der Startseite deckt die handelsrelevanten Sets ohnehin ab.
+  //
+  // Sets ohne ausreichende Stichprobe bekommen `null` — NICHT null Prozent.
+  // „Bewegt sich nicht" und „nicht gemessen" sind zwei verschiedene Aussagen,
+  // und nur eine davon dürfen wir treffen.
+  const marktdaten = await getHomepageCards(250).catch(() => []);
+  const proSet = new Map<string, SetRank>();
+  for (const r of rankSets(validateMarketData(marktdaten).clean, 999)) proSet.set(r.code, r);
+
+  const eintraege: SetEintrag[] = sets.map((set) => {
+    const rang = proSet.get(set.id);
+    return {
+      id: set.id,
+      name: set.name,
+      series: set.series ?? '',
+      releaseDate: set.releaseDate ?? '',
+      total: set.total ?? 0,
+      logoUrl: set.logoUrl,
+      trend: rang?.avgTrend ?? null,
+      median: rang?.medianPrice ?? null,
+      gemessen: rang?.count ?? 0,
+    };
+  });
+
   return (
     <div className="min-h-screen bg-[#08080b] text-slate-300">
       <NavBar />
@@ -58,8 +81,9 @@ export default async function SetsPage() {
             Erweiterungen
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
-            Die aktuellen Sets mit Erscheinungsdatum und Umfang. Bewegung und
-            typischer Kartenpreis je Set stehen im Set-Markt der Übersicht.
+            Erscheinungsdatum, Umfang und — wo die Datenlage es hergibt —
+            Bewegung und typischer Kartenpreis je Set. Filter und Sortierung
+            arbeiten ausschließlich auf gemessenen Werten.
           </p>
         </div>
       </header>
@@ -79,50 +103,7 @@ export default async function SetsPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sets.map((set) => (
-              <Link
-                key={set.id}
-                href={`/sets/${set.id}`}
-                className="group flex flex-col border-t border-[#1c1c24] pt-4 transition-colors hover:border-slate-600"
-              >
-                {/* Logo-Feld in einheitlicher Höhe — ohne Fläche und ohne
-                    Verlauf, damit das Logo selbst die Farbe liefert. */}
-                <div className="flex h-20 items-center justify-start">
-                  <BoosterPackImage
-                    setCode={set.id}
-                    setName={set.name}
-                    logoUrl={set.logoUrl}
-                    className="max-h-16 w-auto max-w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-[1.04]"
-                  />
-                </div>
-
-                {/* Metadaten: klare Hierarchie, dezente Meta-Pillen */}
-                <div className="mt-3 flex flex-1 flex-col gap-2">
-                  <div>
-                    <p className="truncate text-[15px] text-slate-200 group-hover:text-white">{set.name}</p>
-                    {set.series && (
-                      <p className="mt-0.5 truncate text-xs text-slate-500">{set.series}</p>
-                    )}
-                  </div>
-                  <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
-                    {formatReleaseDate(set.releaseDate) && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-[#2a2a3a] bg-[#0d0d18] px-2 py-0.5 text-[11px] text-slate-400">
-                        <Calendar size={10} className="text-slate-500" />
-                        {formatReleaseDate(set.releaseDate)}
-                      </span>
-                    )}
-                    {set.total > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-[#2a2a3a] bg-[#0d0d18] px-2 py-0.5 text-[11px] text-slate-400">
-                        <Layers size={10} className="text-slate-500" />
-                        {set.total} Karten
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <SetLibrary sets={eintraege} />
         )}
 
         <div className="mt-12 border-t border-[#1c1c24] pt-6">
