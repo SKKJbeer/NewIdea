@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.13.0] - 31. Juli 2026 · Eigener Kartenindex — die Suche geht nicht mehr nach aussen
+
+### Neu
+- **Eigener Kartenindex in der Datenbank.** Jede Suche fragte bisher die Kartendatenbank von aussen: gemessen 6 bis 13 Sekunden beim ersten Aufruf eines Begriffs, mit zeitweise jedem zweiten Versuch als Fehler. Zwischenspeicher haben das gemildert — sie helfen aber erst ab dem ZWEITEN Aufruf, der erste Besucher zahlte weiterhin voll
+- **Die Daten lagen laengst vor.** Der taegliche Preis-Durchlauf holt ohnehin JEDE Seite der Kartendatenbank (rund 20.500 Karten) und warf davon alles ausser dem Preis weg. Der Index behaelt den Rest: Name, deutscher Name, Set, Nummer, Seltenheit, Bild, Preis, Trend. Kein einziger zusaetzlicher Abruf
+- **Die Suche fragt zuerst den Index**, der Abruf von aussen bleibt als Rueckfall — der Index kennt nicht jeden Begriff, vor allem nicht, solange der Durchlauf noch nicht durch ist
+- **Studio-Route zum sofortigen Fuellen**, damit die Suche nicht bis zum naechsten Morgen langsam bleibt
+- Der Datenstand des Index steht im Monitoring: Er ist eine Kopie, kein zweiter Wahrheitsanspruch
+
+---
+
 ## [4.12.1] - 31. Juli 2026 · Das Studio ueberlebt eine abgelaufene Sitzung
 
 ### Behoben

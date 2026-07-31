@@ -1,5 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { searchCards } from './pokemon-api';
+import { searchCardIndex } from './card-index';
 import type { PokemonCard } from '@/types';
 
 // GETEILTER ZWISCHENSPEICHER FÜR SUCHTREFFER
@@ -51,6 +52,19 @@ const FRIST_SEKUNDEN = 3600;
 export async function cachedSearchCards(query: string, limit = 40): Promise<PokemonCard[]> {
   const normalisiert = query.trim().toLowerCase();
   if (normalisiert.length < 2) return [];
+
+  // ZUERST DER EIGENE KARTENINDEX.
+  //
+  // Er enthält, was der Tages-Durchlauf ohnehin geholt hat. Eine
+  // Datenbankabfrage über wenige Millisekunden ersetzt damit einen Netzaufruf
+  // über mehrere Sekunden — und sie kann nicht ausfallen, weil eine fremde
+  // Schnittstelle gerade streikt.
+  //
+  // Kein Zwischenspeicher davor: Die Abfrage ist bereits schnell, und ein
+  // Zwischenspeicher über einer schnellen Quelle bringt nichts außer einer
+  // weiteren Stelle, an der etwas veralten kann.
+  const ausIndex = await searchCardIndex(normalisiert, limit).catch(() => []);
+  if (ausIndex.length > 0) return ausIndex;
 
   const laden = unstable_cache(
     async () => {

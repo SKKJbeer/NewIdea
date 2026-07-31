@@ -1,4 +1,5 @@
 import { getSupabase } from './supabase';
+import { upsertCardIndex } from './card-index';
 import { fetchCardPage } from './pokemon-api';
 import { displayPrice } from './pokemon-api';
 import type { PokemonCard } from '@/types';
@@ -278,6 +279,15 @@ export async function sweepChunk({
     try {
       const { cards, rawCount, totalCount } = await fetchCardPage(state.nextPage, pageSize);
       if (totalCount > 0) state.totalCards = totalCount;
+
+      // KARTENINDEX MITSCHREIBEN.
+      //
+      // Diese Seite ist ohnehin geholt; ihre Karten wegzuwerfen und die Suche
+      // später erneut nach außen gehen zu lassen, war die eigentliche Ursache
+      // der langen Wartezeiten. Ein Fehler hier darf den Preis-Durchlauf NICHT
+      // aufhalten — der ist der Pflichtteil, der Index die Zugabe.
+      const indexFehler = await upsertCardIndex(cards).catch((e) => String(e));
+      if (indexFehler) console.warn('[Kartenindex] nicht geschrieben:', indexFehler);
 
       const vergleich = await letzteMesspunkte(cards.map((c) => c.id));
       const faellig = cards.filter((c) => needsSnapshot(displayPrice(c), vergleich.get(c.id), datum));

@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.13.0',
+    date: '31. Juli 2026',
+    label: 'Eigener Kartenindex — die Suche geht nicht mehr nach aussen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Eigener Kartenindex in der Datenbank: Die Suche antwortet aus Millisekunden statt aus einem Netzaufruf ueber Sekunden' },
+      { type: 'new', text: 'Gefuellt vom taeglichen Preis-Durchlauf, der die Seiten ohnehin holt — kein einziger zusaetzlicher Abruf' },
+      { type: 'new', text: 'Der Abruf von aussen bleibt als Rueckfall; der Datenstand des Index steht im Monitoring' },
+    ],
+  },
+  {
     version: '4.12.1',
     date: '31. Juli 2026',
     label: 'Das Studio ueberlebt eine abgelaufene Sitzung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Bei abgelaufener Sitzung erschien die weisse Browser-Fehlerseite statt der Anmeldung — die Statusantwort wurde ohne Pruefung uebernommen' },
       { type: 'fixed', text: 'Die vier Marktbild-Vorschauen luden gleichzeitig; sie laden jetzt einzeln auf Anforderung' },

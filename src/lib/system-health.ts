@@ -123,6 +123,34 @@ CREATE INDEX IF NOT EXISTS price_snapshots_card_date
   window_days INT NOT NULL DEFAULT 30,
   updated_at  TIMESTAMPTZ DEFAULT now()
 );`,
+  // Eigener Kartenindex. Ohne ihn geht JEDE Suche nach außen — gemessen 6 bis
+  // 13 Sekunden beim ersten Aufruf eines Begriffs.
+  cards_index: `CREATE TABLE IF NOT EXISTS cards_index (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  name_de    TEXT,
+  set_name   TEXT NOT NULL DEFAULT '',
+  set_code   TEXT NOT NULL DEFAULT '',
+  number     TEXT,
+  rarity     TEXT NOT NULL DEFAULT '',
+  image_url  TEXT NOT NULL DEFAULT '',
+  price      NUMERIC NOT NULL DEFAULT 0,
+  trend      NUMERIC,
+  real_data  BOOLEAN NOT NULL DEFAULT false,
+  types      TEXT[],
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Ohne diese Indizes durchsucht jede Anfrage die gesamte Tabelle.
+-- pg_trgm macht aus ILIKE '%text%' eine indexgestuetzte Suche.
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX IF NOT EXISTS cards_index_name_trgm
+  ON cards_index USING gin (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS cards_index_name_de_trgm
+  ON cards_index USING gin (name_de gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS cards_index_preis ON cards_index (price DESC);
+
+ALTER TABLE cards_index ENABLE ROW LEVEL SECURITY;`,
   articles: `CREATE TABLE IF NOT EXISTS articles (
   date       DATE PRIMARY KEY,
   type       TEXT NOT NULL,
@@ -203,6 +231,13 @@ const PROBES: ProbeSpec[] = [
     effect: 'Marktkontext auf Kartenseiten ohne Neuberechnung',
     dateColumn: 'captured_on',
     maxAgeDays: 2,
+  },
+  {
+    table: 'cards_index',
+    label: 'Kartenindex',
+    effect: 'Suche ohne Abruf bei der Kartendatenbank',
+    dateColumn: 'updated_at',
+    maxAgeDays: 3,
   },
   {
     table: 'articles',
