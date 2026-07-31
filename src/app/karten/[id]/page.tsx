@@ -10,6 +10,7 @@ import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
+import { ambientFor, hatFolie } from '@/lib/collector';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
@@ -131,6 +132,11 @@ export default async function CardDetailPage({ params }: Props) {
   const marktStats = cardMarketStats(history, price);
   const score2 = pmiScore(history, price, displayTrend);
 
+  // Ambient-Ton aus dem Energietyp der Karte — eine veröffentlichte Eigenschaft,
+  // keine Farbanalyse des Bildes. Ohne Typ greift der Markenton.
+  const ambient = ambientFor(card.types);
+  const folie = hatFolie(card.rarity);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -168,20 +174,37 @@ export default async function CardDetailPage({ params }: Props) {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border-t border-[#1c1c24] p-6 flex flex-col items-center">
-            <div className="bg-[#1a1a28] rounded-md p-4 w-full max-w-xs">
+          {/* DIE KARTE ALS OBJEKT.
+              Vorher lag das Bild in einem grauen Kasten mit dem Seitenverhältnis
+              3:4 — beides falsch. Eine Sammelkarte misst 63×88 mm, das ist
+              schmaler; im 3:4-Rahmen stand links und rechts graue Fläche, und
+              der Kasten sah aus wie ein Datei-Vorschaufeld.
+              Jetzt: echtes Kartenformat, kein Rahmen, dahinter ein sehr
+              schwacher Schimmer im Energieton der Karte (siehe collector.ts).
+              Der Folienstreifen läuft nur auf Karten, die auch wirklich
+              glänzen. */}
+          <div className="group border-t border-[#1c1c24] p-6 flex flex-col items-center">
+            <div className="relative w-full max-w-[340px]">
+              <div
+                aria-hidden
+                className={`absolute -inset-6 rounded-[50%] blur-3xl ${ambient.glow}`}
+              />
               {card.imageUrlHiRes || card.imageUrl ? (
-                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden">
+                <div
+                  className={`lift relative aspect-[63/88] w-full overflow-hidden rounded-xl ring-1 ${ambient.ring} ${folie ? 'foil' : ''}`}
+                >
                   <CardImage
                     src={card.imageUrlHiRes || card.imageUrl || ''}
                     alt={`${card.name} Pokémon Karte`}
-                    sizes="(max-width: 768px) 80vw, 320px"
-                    className="object-contain rounded-lg shadow-md"
+                    sizes="(max-width: 768px) 80vw, 340px"
+                    className="object-contain"
                     priority
                   />
                 </div>
               ) : (
-                <div className="aspect-[3/4] flex items-center justify-center text-slate-700"><ImageOff size={48} /></div>
+                <div className="relative flex aspect-[63/88] items-center justify-center rounded-xl bg-[#0e0e13] text-slate-700">
+                  <ImageOff size={48} />
+                </div>
               )}
             </div>
             <div className="mt-4 w-full space-y-3">

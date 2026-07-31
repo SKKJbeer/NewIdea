@@ -13,12 +13,26 @@ import { useInView, EASE_OUT } from '@/lib/use-in-view';
 // Info-Knopf sind jetzt alle drei Teilwerte, ihre Gewichte und ihre Herkunft
 // einsehbar; die Summe ergibt exakt den angezeigten Wert.
 
+/**
+ * Farbe der Markttemperatur — KALT bis HEISS, nicht schlecht bis gut.
+ *
+ * Vorher lief die Skala von Rot über Gelb nach Grün. Damit stand da eine
+ * Bewertung: unten schlecht, oben gut. Ein ruhiger Markt ist aber nicht
+ * schlechter als ein heißer — für jemanden, der kaufen will, ist er sogar der
+ * angenehmere. Die Seite gibt keine Kaufempfehlungen, also darf auch die Farbe
+ * keine geben.
+ *
+ * Die neue Skala ist eine Temperaturskala: Blau (kalt) über Grau (ruhig) nach
+ * Orange (heiß). Sie sagt, wie viel los ist, und überlässt die Bewertung dem
+ * Leser. Grün und Rot bleiben ausschließlich der Richtung von Preisen
+ * vorbehalten — sonst bedeuten dieselben zwei Farben auf einer Seite zweierlei.
+ */
 function farbeZu(value: number): string {
-  if (value >= 75) return '#34d399';
-  if (value >= 60) return '#86efac';
-  if (value >= 40) return '#fbbf24';
-  if (value >= 25) return '#fb7185';
-  return '#ef4444';
+  if (value >= 75) return '#fb923c';
+  if (value >= 60) return '#fcd34d';
+  if (value >= 40) return '#94a3b8';
+  if (value >= 25) return '#7dd3fc';
+  return '#38bdf8';
 }
 
 export function FearGreedPanel({ result }: { result: FearGreedResult }) {
@@ -30,7 +44,7 @@ export function FearGreedPanel({ result }: { result: FearGreedResult }) {
       <div>
         <p className="text-lg font-black leading-tight text-slate-500">—</p>
         <p className="mt-1.5 text-[10px] leading-snug text-slate-600">
-          Noch nicht genügend Marktdaten für eine belastbare Stimmung.
+          Noch nicht genügend Marktdaten für eine belastbare Temperatur.
         </p>
       </div>
     );
@@ -61,7 +75,7 @@ export function FearGreedPanel({ result }: { result: FearGreedResult }) {
           style={{
             width: sichtbar ? `${result.value}%` : '0%',
             transition: `width 1000ms ${EASE_OUT}`,
-            background: 'linear-gradient(to right, #ef4444, #fbbf24, #34d399)',
+            background: 'linear-gradient(to right, #38bdf8, #94a3b8, #fb923c)',
           }}
         />
       </div>
@@ -72,7 +86,7 @@ export function FearGreedPanel({ result }: { result: FearGreedResult }) {
           onClick={() => setOffen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Berechnung von Angst und Gier"
+          aria-label="Berechnung der Markttemperatur"
         >
           <div
             className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-5"

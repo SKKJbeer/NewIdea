@@ -1,4 +1,5 @@
 import { INDEX_SHORT, INDEX_LONG } from '@/lib/brand';
+import { CollectorBackdrop } from './CollectorBackdrop';
 import { NUM, SECTION_LABEL, toneClass, barClass } from '@/lib/ui';
 import { formatPercent } from '@/lib/format';
 import type { PmiResult, Breadth, FearGreedResult } from '@/lib/market-metrics';
@@ -66,8 +67,13 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
   const maxKlasse = Math.max(...klassen.map((k) => k.anzahl), 1);
 
   return (
-    <section aria-labelledby="marktkopf" className="border-b border-[#1c1c24]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+    <section aria-labelledby="marktkopf" className="relative border-b border-[#1c1c24]">
+      {/* Die Sammler-Struktur liegt NUR hier, im Kopf. Über die ganze Seite
+          gezogen würde sie zur Tapete; im Kopf gibt sie dem ersten Bildschirm
+          eine Anmutung, ohne einer einzigen Zahl in die Quere zu kommen. */}
+      <CollectorBackdrop variante="hero" />
+
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
         <h1 id="marktkopf" className={SECTION_LABEL}>
           Marktübersicht · Pokémon
         </h1>
@@ -137,7 +143,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
           </div>
 
           <div className="px-4 py-4">
-            <dt className={SECTION_LABEL}>Stimmung</dt>
+            <dt className={SECTION_LABEL}>Temperatur</dt>
             <dd className={`${NUM.large} mt-2 ${stimmung.sufficient ? 'text-slate-200' : 'text-slate-700'}`}>
               {stimmung.sufficient ? stimmung.value : '—'}
             </dd>

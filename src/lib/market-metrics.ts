@@ -322,12 +322,37 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
   return { value, label: fearGreedLabel(value), sufficient: true, components };
 }
 
+/**
+ * MARKTTEMPERATUR statt „Angst & Gier".
+ *
+ * WARUM UMBENANNT: „Angst" und „Gier" beschreiben Gefühle von Anlegern. Gemessen
+ * werden aber drei Preisgrößen — Marktbreite, Momentum, Verhältnis von Gewinnern
+ * zu Verlierern. Aus Preisen auf Gefühle zu schließen ist eine Behauptung, die
+ * die Daten nicht hergeben, und der Begriff stammt erkennbar aus dem
+ * Krypto-Umfeld. Nebenbei klingt „Extreme Gier" wie eine Handlungsaufforderung,
+ * und Handlungsaufforderungen gibt dieses Produkt nicht.
+ *
+ * „Temperatur" beschreibt genau das, was tatsächlich gemessen wird: wie viel
+ * Bewegung im Markt ist. Kalt heißt nicht schlecht und heiß nicht gut.
+ *
+ * DIE RECHNUNG IST UNVERÄNDERT. Gewichte, Teilwerte und Skala 0–100 sind
+ * dieselben wie vorher — geändert hat sich, wie das Ergebnis heißt.
+ */
 export function fearGreedLabel(value: number): string {
-  if (value >= 75) return 'Extreme Gier';
-  if (value >= 60) return 'Gier';
-  if (value >= 40) return 'Neutral';
-  if (value >= 25) return 'Angst';
-  return 'Extreme Angst';
+  if (value >= 75) return 'Heiß';
+  if (value >= 60) return 'Anziehend';
+  if (value >= 40) return 'Ruhig';
+  if (value >= 25) return 'Abkühlend';
+  return 'Kalt';
+}
+
+/** Klartext zur Temperatur — ohne Handlungsempfehlung, nur Beschreibung. */
+export function temperaturErklaerung(value: number): string {
+  if (value >= 75) return 'Breite Aufwärtsbewegung über viele Karten hinweg.';
+  if (value >= 60) return 'Mehr Karten steigen als fallen, die Bewegung nimmt zu.';
+  if (value >= 40) return 'Steigende und fallende Karten halten sich weitgehend die Waage.';
+  if (value >= 25) return 'Mehr Karten fallen als steigen, die Bewegung lässt nach.';
+  return 'Breite Abwärtsbewegung über viele Karten hinweg.';
 }
 
 // ── Datenqualität ───────────────────────────────────────────────────────────

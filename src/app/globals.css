@@ -59,3 +59,61 @@ body {
   }
   .animate-floaty-slow { animation: floaty-slow 10s ease-in-out infinite; }
 }
+
+/* FOLIENSCHIMMER — das Zitat des physischen Objekts.
+   ==================================================================
+   Ein Lichtstreifen läuft EINMAL über das Kartenbild, wenn der Zeiger darauf
+   liegt. Nicht dauerhaft: Eine Endlosanimation auf einer Karte ist ein
+   Werbebanner, kein Sammlerstück.
+
+   Vier Entscheidungen, die den Unterschied machen:
+
+   1. NUR AUF BERÜHRUNG/ZEIGER, nie von allein — dauerhafte Bewegung zieht den
+      Blick von den Zahlen ab, und die Zahlen sind der Zweck der Seite.
+   2. NUR AUF FOLIENKARTEN (siehe hatFolie in collector.ts). Auf jeder Karte
+      wäre der Schimmer Dekoration; auf den Karten, die wirklich glänzen, ist
+      er eine Auskunft.
+   3. KEIN REGENBOGEN. Ein weißer Streifen mit sehr geringer Deckkraft. Bunte
+      Verläufe sehen nach Jahrmarkt aus.
+   4. NICHTS HÄNGT DARAN. Der Effekt ist rein visuell; ohne ihn fehlt keine
+      Information. Deshalb liegt er komplett in diesem Reduced-Motion-Block —
+      wer Bewegung abbestellt hat, verliert nichts.
+
+   Die Bewegung läuft über `transform`, nicht über `background-position`:
+   Letzteres zwingt den Browser bei jedem Bild zum Neuzeichnen der Fläche. */
+@media (prefers-reduced-motion: no-preference) {
+  .foil { position: relative; overflow: hidden; }
+
+  .foil::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: linear-gradient(
+      105deg,
+      transparent 42%,
+      rgba(255, 255, 255, 0.16) 50%,
+      transparent 58%
+    );
+    transform: translateX(-120%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .foil:hover::after,
+  .foil:focus-visible::after,
+  .group:hover .foil::after,
+  .group:focus-visible .foil::after {
+    opacity: 1;
+    animation: foil-sweep 720ms ease-out;
+  }
+
+  @keyframes foil-sweep {
+    from { transform: translateX(-120%); }
+    to   { transform: translateX(120%); }
+  }
+
+  /* Anheben um 2 px — gerade genug, dass die Karte greifbar wirkt. Mehr
+     erzeugt einen Schatten-Sprung, und der liest sich als Fehler. */
+  .lift { transition: transform 180ms ease-out; }
+  .group:hover .lift, .lift:hover { transform: translateY(-2px); }
+}

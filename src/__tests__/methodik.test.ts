@@ -33,7 +33,7 @@ describe('Methodik-Seite', () => {
       'Wie oft die Daten aktualisiert werden',
       'Wie Preisänderungen berechnet werden',
       'CardBeacon Index',
-      'Angst &amp; Gier',
+      'Markttemperatur',
       'Markt-Score',
       'Datenprüfung',
       'Grenzen dieser Daten',
@@ -69,7 +69,7 @@ describe('Methodik-Seite', () => {
 
 describe('Die Kennzahlen verweisen auf die Methodik', () => {
   it.each([
-    ['src/components/FearGreedPanel.tsx', 'Angst & Gier'],
+    ['src/components/FearGreedPanel.tsx', 'Markttemperatur'],
     ['src/components/CardMetricPanels.tsx', 'PMI Score'],
   ])('%s verlinkt die Erklärung', (datei) => {
     expect(lies(datei)).toContain('/methodik');

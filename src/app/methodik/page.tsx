@@ -26,7 +26,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Methodik — wie unsere Marktkennzahlen entstehen',
   description:
-    'Offenlegung der Berechnung: CardBeacon Index (CBI), Angst & Gier, Markt-Score, Preisquellen, Aktualisierungsintervalle und die Grenzen der Datenlage.',
+    'Offenlegung der Berechnung: CardBeacon Index (CBI), Markttemperatur, Markt-Score, Preisquellen, Aktualisierungsintervalle und die Grenzen der Datenlage.',
   alternates: { canonical: '/methodik' },
 };
 
@@ -159,8 +159,8 @@ export default function MethodikPage() {
           </p>
         </Abschnitt>
 
-        <Abschnitt nummer={5} titel="Angst &amp; Gier">
-          <p>Der Stimmungswert von 0 bis 100 entsteht aus drei Teilwerten:</p>
+        <Abschnitt nummer={5} titel="Markttemperatur">
+          <p>Die Temperatur von 0 bis 100 entsteht aus drei Teilwerten:</p>
           <Formel>
             {Math.round(gewichte.breadth * 100)} % Marktbreite ·{' '}
             {Math.round(gewichte.momentum * 100)} % Momentum ·{' '}

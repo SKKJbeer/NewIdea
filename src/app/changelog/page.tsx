@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.4.0',
+    date: '31. Juli 2026',
+    label: 'Die Sammler-Ebene',
+    isLatest: true,
+    changes: [
+      { type: 'new',     text: 'Ambient-Ton hinter dem Kartenbild, abgeleitet aus dem Energietyp der Karte — nicht aus einer Farbanalyse des Bildes' },
+      { type: 'new',     text: 'Folienschimmer auf Karten, deren Seltenheit auch wirklich glaenzt — nur auf Zeigerkontakt, abschaltbar ueber Reduced-Motion' },
+      { type: 'new',     text: 'Hintergrund-Identitaet im Marktkopf: abstrakte Hoehenlinien bei rund 3 % Deckkraft, kein nachgezeichnetes Artwork' },
+      { type: 'changed', text: '„Angst & Gier" heisst jetzt Markttemperatur (Kalt bis Heiss) — gemessen werden Preisgroessen, keine Gefuehle. Die Rechnung ist unveraendert' },
+      { type: 'changed', text: 'Die Temperaturfarbe ist keine Ampel mehr; Gruen und Rot bleiben der Richtung von Preisen vorbehalten' },
+      { type: 'changed', text: 'Das Kartenbild steht im echten Kartenformat 63:88 statt 3:4 und ohne grauen Kasten' },
+      { type: 'fixed',   text: 'Der Marktbericht behauptete Ursachen, die die Preisdaten nicht hergeben — Beobachtung und Deutung sind jetzt getrennt' },
+    ],
+  },
+  {
     version: '4.3.1',
     date: '31. Juli 2026',
     label: 'Die letzten zwei Doppeltitel',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Portfolio und Merkliste trugen die Marke weiterhin doppelt im Titel — ihre Metadaten liegen im Layout, die Pruefung sah nur die Seitendateien an' },
       { type: 'fixed', text: 'Der Startseiten-Titel las sich fehlerhaft: zweimal „fuer" in einer Zeile' },

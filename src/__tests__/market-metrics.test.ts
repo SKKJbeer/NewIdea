@@ -254,15 +254,25 @@ describe('computeFearGreed', () => {
   });
 });
 
-describe('fearGreedLabel', () => {
+describe('fearGreedLabel — Markttemperatur', () => {
+  // Umbenannt von „Angst & Gier": Gemessen werden drei Preisgroessen, nicht
+  // Gefuehle. Aus Preisen auf Gefuehle zu schliessen ist eine Behauptung, die
+  // die Daten nicht hergeben — und „Extreme Gier" klingt wie eine
+  // Handlungsaufforderung. Die RECHNUNG ist unveraendert, nur das Wort nicht.
   it.each([
-    [90, 'Extreme Gier'],
-    [65, 'Gier'],
-    [50, 'Neutral'],
-    [30, 'Angst'],
-    [10, 'Extreme Angst'],
+    [90, 'Heiß'],
+    [65, 'Anziehend'],
+    [50, 'Ruhig'],
+    [30, 'Abkühlend'],
+    [10, 'Kalt'],
   ])('%i ist „%s"', (wert, label) => {
     expect(fearGreedLabel(wert)).toBe(label);
+  });
+
+  it('kein Begriff bewertet den Markt oder fordert zum Handeln auf', () => {
+    for (const wert of [0, 10, 30, 50, 65, 90, 100]) {
+      expect(fearGreedLabel(wert)).not.toMatch(/Gier|Angst|kaufen|verkaufen|stark|schwach/i);
+    }
   });
 });
 

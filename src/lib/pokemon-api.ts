@@ -549,6 +549,11 @@ function mapApiCardToCard(apiCard: Record<string, unknown>): PokemonCard {
     number: (apiCard.number as string) || undefined,
     printedTotal: (setData?.printedTotal as number) || undefined,
     rarity: (apiCard.rarity as string) || 'Unknown',
+    // Nur übernehmen, wenn die Quelle wirklich Typen liefert — ein leeres Feld
+    // ist eine ehrlichere Auskunft als ein erfundener Standardtyp.
+    types: Array.isArray(apiCard.types) && apiCard.types.length > 0
+      ? (apiCard.types as string[])
+      : undefined,
     imageUrl: images?.small || '',
     imageUrlHiRes: images?.large,
     prices,

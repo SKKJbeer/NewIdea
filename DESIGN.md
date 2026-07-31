@@ -175,6 +175,84 @@ Die mobile Fassung wird eigens entworfen, nicht gestapelt.
 
 ---
 
+## 13. Die Sammler-Ebene
+
+**Grundsatz: Daten zuerst. Artwork respektiert.**
+
+Die erste Fassung war fachlich richtig und emotional tot — ein dunkles Terminal
+mit Zahlen, austauschbar mit jedem Krypto-Dashboard. Sammeln ist aber keine
+Tabellenkalkulation. Der Ausgleich ist bewusst schief gewichtet:
+
+| Fläche | Intelligenz | Sammler-Emotion |
+|---|---|---|
+| Marktübersicht | 80 % | 20 % |
+| Set-Seiten | 65 % | 35 % |
+| Kartenseite | 60 % | 40 % |
+| Sammlung | 50 % | 50 % |
+| Research | 95 % | 5 % |
+
+**Farbe kommt aus der Karte, nie aus der Oberfläche.** Die Oberfläche bleibt
+dunkel und zurückhaltend; sie stellt die Karte aus, statt mit ihr zu
+konkurrieren. Es gibt keine Markenpalette in Pokémon-Gelb.
+
+### Ambient-Ton (`src/lib/collector.ts`)
+
+Abgeleitet aus dem **Energietyp** der Karte — einer veröffentlichten
+Eigenschaft, die in der Kartendatenbank steht. Bewusst NICHT aus einer
+Farbanalyse des Kartenbilds: Die wäre teuer (Bild laden, dekodieren, Pixel
+mitteln), unzuverlässig (Folie liefert je nach Kompression andere Mittelwerte)
+und nicht prüfbar. Ohne Typ greift der Markenton — dort zeigt CardBeacon sich
+selbst, statt eine Eigenschaft zu erfinden.
+
+Alle Töne liegen bei **≤ 8 % Deckkraft**. Der Unterschied zwischen Feuer und
+Wasser soll auffallen, wenn man zwei Karten nacheinander öffnet, nicht beim
+ersten Blick auf eine.
+
+### Folienschimmer (`.foil` in `globals.css`)
+
+Ein Lichtstreifen, der **einmal** über das Kartenbild läuft, wenn der Zeiger
+darauf liegt. Vier Bedingungen, alle nicht verhandelbar:
+
+1. Nur auf Zeiger/Fokus, nie von allein — dauernde Bewegung ist ein Werbebanner
+2. Nur auf Karten, deren Seltenheit tatsächlich glänzt (`hatFolie`)
+3. Weiß, ≤ 16 % Deckkraft — kein Regenbogen, kein Schein-3D
+4. Komplett im `prefers-reduced-motion`-Block: Wer Bewegung abbestellt, verliert
+   keine Information
+
+### Hintergrund (`CollectorBackdrop`)
+
+Abstrakte Höhenlinien plus zwei weiche Lichthöfe, rund 3 % Deckkraft, nur im
+Seitenkopf. Über die ganze Seite gezogen wird daraus Tapete.
+
+**Kein nachgezeichnetes Pokémon-Artwork, keine Kreatur-Umrisse, keine Pokébälle
+als Dekoration.** Die Formensprache kommt von Energie und Folie. Das ist nicht
+nur eine Rechtsfrage: Ein angedeuteter Kreatur-Umriss im Hintergrund wäre genau
+die Fan-Seiten-Anmutung, die dieses Produkt nicht haben soll.
+
+### Kartenformat
+
+Sammelkarten messen 63 × 88 mm — `aspect-[63/88]`, **nie** `3/4` oder `2/3`. Im
+falschen Rahmen steht links und rechts leere Fläche, und das Bild sieht aus wie
+eine Datei-Vorschau statt wie ein Objekt.
+
+---
+
+## 14. Markttemperatur statt Angst und Gier
+
+„Angst" und „Gier" beschreiben Gefühle. Gemessen werden drei Preisgrößen.
+Aus Preisen auf Gefühle zu schließen ist eine Behauptung, die die Daten nicht
+hergeben — und „Extreme Gier" klingt wie eine Handlungsaufforderung.
+
+Die Skala heißt **Temperatur** und läuft **Kalt → Abkühlend → Ruhig →
+Anziehend → Heiß**. Ihre Farben sind Blau → Grau → Orange, nie eine Ampel:
+Ein ruhiger Markt ist nicht schlechter als ein heißer. **Grün und Rot bleiben
+ausschließlich der Richtung von Preisen vorbehalten** — sonst bedeuten dieselben
+zwei Farben auf einer Seite zweierlei.
+
+Die Rechnung ist unverändert. Geändert hat sich, wie das Ergebnis heißt.
+
+---
+
 ## 12. Was diese Oberfläche NICHT sein soll
 
 Vor jedem neuen Bauteil eine Frage: **Könnte ein Bildschirmfoto davon für ein

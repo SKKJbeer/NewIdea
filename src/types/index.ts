@@ -9,6 +9,16 @@ export interface PokemonCard {
   /** Gedruckte Gesamtzahl des Sets, etwa `165` — ergibt „199/165". */
   printedTotal?: number;
   rarity: string;
+  /**
+   * Energietypen der Karte (`Fire`, `Water`, `Psychic` …) — direkt aus der
+   * Kartendatenbank.
+   *
+   * Er ist die Grundlage der Ambient-Farbe auf der Kartenseite. Bewusst dieses
+   * Feld und NICHT eine Farbanalyse des Kartenbilds: Der Typ ist eine
+   * veröffentlichte Eigenschaft der Karte, steht ohne Bildverarbeitung zur
+   * Verfügung und liefert bei jedem Aufruf dasselbe Ergebnis.
+   */
+  types?: string[];
   imageUrl: string;
   imageUrlHiRes?: string;
   prices: CardPrices;

@@ -407,7 +407,12 @@ export const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel)
 1. WAHRHEIT: Verwende Zahlen und Preise AUSSCHLIESSLICH aus den unten gelieferten Marktdaten. Erfinde NIEMALS Preise, Preisverläufe, Prozentbewegungen, Auktionsergebnisse, Turnierergebnisse, Ankündigungen, Druckraten oder Illustratoren-Namen. Wenn du eine Zahl nicht aus den Daten belegen kannst, formuliere qualitativ ("zeigt zunehmende Nachfrage", "notiert stabil").
 2. KEINE ANLAGEBERATUNG: Keine Kaufempfehlungen ("kaufenswert", "jetzt kaufen", "Pflichtkauf", "Kaufchance"), keine Budget-Aufteilungen, keine Renditeversprechen, keine Kauf-/Verkaufszeitpunkte als Handlungsanweisung. Nur Marktbeobachtungen, historische Muster und sachliche Einschätzungen.
 3. KEINE PERSONA: Keine Ich-Form, kein Erzähler-Name. Impersonale Analyse ("Der Markt zeigt", "Die Daten bestätigen").
-4. QUELLEN: Im sources-Array nur echte, existierende URLs (Cardmarket, Bulbapedia, pokemon.com, Limitless TCG, PSA). Keine erfundenen Links.`;
+4. QUELLEN: Im sources-Array nur echte, existierende URLs (Cardmarket, Bulbapedia, pokemon.com, Limitless TCG, PSA). Keine erfundenen Links.
+5. BEOBACHTUNG UND DEUTUNG TRENNEN — die wichtigste Regel für Marktberichte.
+   Gemessen werden PREISE. Angebot, Nachfrage, Aufmerksamkeit, Metagame und Sammlerverhalten werden NICHT gemessen. Eine Preisänderung mit einer Ursache zu erklären ist deshalb eine Vermutung, auch wenn sie plausibel klingt.
+   VERBOTEN (als Tatsache behauptet): "Der Grund liegt in der frühen Set-Phase", "weil die Nachfrage anzieht", "das Angebot deckt die Nachfrage", "getrieben von", "bestätigt, wo die Aufmerksamkeit liegt", "beweist, dass".
+   ERLAUBT (als Deutung gekennzeichnet): "Eine mögliche Erklärung ist die frühe Set-Phase.", "Das könnte damit zusammenhängen, dass ...", "Historisch geben die teuersten Karten eines Sets nach der Öffnungswelle häufig nach."
+   Faustregel: Steht im Satz eine Ursache, muss im selben Absatz ein Kennzeichen der Vermutung stehen (möglich, könnte, häufig, oft, historisch, typischerweise, deutet darauf hin). Ohne Kennzeichen: nur die Bewegung nennen und den Satz beenden.`;
 
 // Schreibstil-Regeln gegen KI-Klang — Kurzform von .claude/commands/schreibstil.md.
 // Werden jedem Generierungs-Prompt vorangestellt.

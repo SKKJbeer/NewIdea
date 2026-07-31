@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.4.0] - 31. Juli 2026 · Die Sammler-Ebene
+
+### Neu
+- **Ambient-Ton aus dem Energietyp der Karte.** Hinter dem Kartenbild liegt ein sehr schwacher Schimmer in der Farbe ihres Typs — Feuer warm, Wasser kuehl, Psycho violett. Abgeleitet aus einer veroeffentlichten Eigenschaft der Karte, NICHT aus einer Farbanalyse des Bildes: Die waere teuer, unzuverlaessig und nicht pruefbar
+- **Folienschimmer auf Karten, die auch wirklich glaenzen.** Ein Lichtstreifen laeuft einmal ueber das Bild, wenn der Zeiger darauf liegt — nur bei Folien-Seltenheiten, nie von allein, komplett abschaltbar ueber die Reduced-Motion-Einstellung
+- **Hintergrund-Identitaet im Marktkopf:** abstrakte Hoehenlinien und zwei weiche Lichthoefe bei rund 3 % Deckkraft. Kein nachgezeichnetes Pokémon-Artwork, keine Kreatur-Umrisse
+- **DESIGN.md um zwei Kapitel erweitert** (Sammler-Ebene, Markttemperatur) mit dem Mischungsverhaeltnis je Flaeche
+
+### Geaendert
+- **„Angst & Gier" heisst jetzt Markttemperatur** — Kalt, Abkuehlend, Ruhig, Anziehend, Heiss. Gemessen werden drei Preisgroessen, keine Gefuehle; „Extreme Gier" klang ausserdem wie eine Handlungsaufforderung. **Die Rechnung ist unveraendert**
+- **Die Temperaturfarbe ist keine Ampel mehr** (Blau → Grau → Orange statt Rot → Gelb → Gruen). Ein ruhiger Markt ist nicht schlechter als ein heisser. Gruen und Rot bleiben ausschliesslich der Richtung von Preisen vorbehalten
+- **Das Kartenbild auf der Detailseite steht im echten Kartenformat** (63:88 statt 3:4) und ohne grauen Kasten — es sah aus wie eine Datei-Vorschau statt wie ein Objekt
+
+### Behoben
+- **Der Marktbericht behauptete Ursachen, die die Daten nicht hergeben** („Der Grund liegt in der fruehen Set-Phase", „das Angebot deckt die Nachfrage", „bestaetigt, wo die Aufmerksamkeit liegt"). Gemessen werden Preise — Angebot, Nachfrage und Aufmerksamkeit nicht. Beobachtung und Deutung sind jetzt getrennt: Dieselbe Ueberlegung ist erlaubt, wenn sie als Deutung gekennzeichnet ist
+
+---
+
 ## [4.3.1] - 31. Juli 2026 · Die letzten zwei Doppeltitel
 
 ### Behoben
