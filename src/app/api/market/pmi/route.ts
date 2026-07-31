@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
+import { saveMarketIndex } from '@/lib/market-index-store';
 
 // Liefert den CardBeacon Index als Zahl — Grundlage für den Vergleich
 // „mein Bestand gegen den Markt" auf der Portfolio-Seite.
@@ -23,6 +24,28 @@ export async function GET() {
     // Dieselbe Prüfung wie auf der Startseite — sonst könnten hier andere
     // Zahlen stehen als dort.
     const pmi = computePmi(validateMarketData(cards).clean);
+
+    // TAGESSTAND FESTHALTEN.
+    //
+    // WARUM HIER UND NICHT NUR AUF DER STARTSEITE: Die Startseite wird aus dem
+    // Zwischenspeicher ausgeliefert — ihre Funktion läuft dann gar nicht, und
+    // es wird nichts geschrieben. Diese Route rechnet den Index ohnehin und
+    // wird von Portfolio und Prüfläufen aufgerufen; hier ist der Schreibvorgang
+    // verlässlich.
+    //
+    // `after` läuft NACH der Antwort — die Schnittstelle wird dadurch nicht
+    // langsamer.
+    if (pmi.sufficient) {
+      after(async () => {
+        const fehler = await saveMarketIndex({
+          value: pmi.value,
+          cardCount: pmi.cardCount,
+          setCount: pmi.setCount,
+          windowDays: pmi.windowDays,
+        });
+        if (fehler) console.error('[Indexstand] nicht gespeichert:', fehler);
+      });
+    }
 
     return NextResponse.json(
       {

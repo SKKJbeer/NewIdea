@@ -5,6 +5,9 @@ import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
 import { generateNextGuide } from '@/lib/guide-generator';
+import { getHomepageCards } from '@/lib/homepage-data';
+import { computePmi, validateMarketData } from '@/lib/market-metrics';
+import { saveMarketIndex } from '@/lib/market-index-store';
 
 // Guide-Generierung: dienstags + freitags — versetzt zu den Artikel-Tagen (So/Do),
 // damit über die Woche verteilt frischer Content erscheint.
@@ -36,6 +39,31 @@ export async function GET(request: Request) {
     } catch (err) {
       results.priceSnapshotError = String(err);
       console.error('Failed to record price snapshots:', err);
+    }
+
+    // INDEXSTAND DES TAGES FESTHALTEN.
+    //
+    // Die Startseite und die Index-Schnittstelle schreiben ihn ebenfalls, aber
+    // beide nur, wenn sie tatsächlich ausgeführt werden — aus dem
+    // Zwischenspeicher ausgelieferte Seiten schreiben nichts. Dieser Cron läuft
+    // garantiert einmal am Tag und ist damit die verlässliche Untergrenze.
+    try {
+      const cards = await getHomepageCards(250);
+      const index = computePmi(validateMarketData(cards).clean);
+      if (index.sufficient) {
+        const fehler = await saveMarketIndex({
+          value: index.value,
+          cardCount: index.cardCount,
+          setCount: index.setCount,
+          windowDays: index.windowDays,
+        });
+        results.marketIndex = fehler ? `Fehler: ${fehler}` : index.value;
+      } else {
+        results.marketIndex = `zu wenig Daten (${index.cardCount}/${index.minCards})`;
+      }
+    } catch (err) {
+      results.marketIndexError = err instanceof Error ? err.message : 'unbekannt';
+      console.error('Indexstand nicht gespeichert:', err);
     }
 
     // FLÄCHENDECKENDE ERFASSUNG ANSTOSSEN.

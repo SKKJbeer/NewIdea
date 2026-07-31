@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.1] - 31. Juli 2026 · Der Indexstand wird auch tatsaechlich geschrieben
+
+### Behoben
+- **Der in v4.2.0 eingefuehrte Schreibvorgang lief nie.** Er haengt an der Startseite — und die wird aus dem Zwischenspeicher ausgeliefert, ihre Funktion laeuft dann gar nicht. Nach dem Deployment blieb die Tabelle leer. Geschrieben wird jetzt zusaetzlich von der Index-Schnittstelle (die den Wert ohnehin berechnet) und vom Tages-Cron als verlaesslicher Untergrenze
+
+---
+
 ## [4.2.0] - 31. Juli 2026 · Der Indexstand wird gespeichert statt nachgerechnet
 
 ### Neu

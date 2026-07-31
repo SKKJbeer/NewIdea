@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.2.1',
+    date: '31. Juli 2026',
+    label: 'Der Indexstand wird auch tatsaechlich geschrieben',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Der Schreibvorgang haengt an der Startseite — die aus dem Zwischenspeicher kommt und ihre Funktion dann gar nicht ausfuehrt. Jetzt schreiben zusaetzlich die Index-Schnittstelle und der Tages-Cron' },
+    ],
+  },
+  {
     version: '4.2.0',
     date: '31. Juli 2026',
     label: 'Indexstand gespeichert statt nachgerechnet',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Der Marktkontext auf Kartenseiten liest den taeglichen Indexstand aus der Datenbank statt 250 Karten aus dem Netz zu holen' },
       { type: 'new',     text: 'Damit beginnt eine echte Indexhistorie — Grundlage fuer eine spaetere Kurve, die auf Messungen beruht statt auf Rueckrechnung' },
