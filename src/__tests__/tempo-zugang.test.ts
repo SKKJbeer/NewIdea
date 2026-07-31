@@ -136,3 +136,50 @@ describe('Vorwaermen der Suche', () => {
     expect(cron).toMatch(/suchVorwaermungFehler/);
   });
 });
+
+describe('Ein Kopf-Muster je Seitenart', () => {
+  const DATENFLAECHEN = [
+    'src/app/artikel/page.tsx',
+    'src/app/guides/page.tsx',
+    'src/app/merkliste/page.tsx',
+    'src/app/methodik/page.tsx',
+    'src/app/marktbericht/page.tsx',
+    'src/app/marktbericht/archiv/page.tsx',
+    'src/app/einsteiger/page.tsx',
+    'src/app/sets/[setCode]/page.tsx',
+    'src/app/suche/page.tsx',
+    'src/app/sets/page.tsx',
+  ];
+
+  it('keine Datenflaeche traegt Pille oder Verlaufskopf', () => {
+    // Beides steht ausdruecklich auf der Verbotsliste in DESIGN.md §4/§5 —
+    // stand aber trotzdem auf zehn Seiten, weil sie den Umbau nie mitgemacht
+    // hatten.
+    for (const datei of DATENFLAECHEN) {
+      const q = lies(datei);
+      expect(q, `${datei}: Pillen-Etikett`).not.toContain(
+        'rounded-full border border-violet-500/20 bg-violet-500/10',
+      );
+      expect(q, `${datei}: Verlaufskopf`).not.toContain('from-[#0f0f1c] to-[#0a0a0f]');
+    }
+  });
+
+  it('jede Datenflaeche nutzt die Abschnittsmarke', () => {
+    for (const datei of DATENFLAECHEN) {
+      expect(lies(datei), datei).toContain('SECTION_LABEL');
+    }
+  });
+
+  it('Lese-Flaechen behalten ihren Ambient-Kopf — und das ist dokumentiert', () => {
+    // Zwei Regeln standen im Widerspruch: DESIGN.md verbietet Verlaufsflaechen,
+    // CLAUDE.md verlangt fuer Lese-Flaechen einen Kopf MIT Ambient-Glow. Die
+    // Aufloesung folgt der Aufgabe der Seite und ist festgehalten, damit sie
+    // niemand als Versaeumnis "repariert".
+    for (const datei of ['src/app/artikel/[date]/page.tsx', 'src/app/guides/[slug]/page.tsx']) {
+      expect(lies(datei), datei).toContain('blur-[100px]');
+    }
+    const design = lies('DESIGN.md');
+    expect(design).toContain('Zwei Arten von Seiten');
+    expect(design).toMatch(/Steht unter\s*\n?dem Kopf eine Tabelle oder ein Text\?/);
+  });
+});

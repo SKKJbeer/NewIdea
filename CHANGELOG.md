@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.10.0] - 31. Juli 2026 · Ein Kopf-Muster je Seitenart
+
+### Geaendert
+- **Zehn Datenflaechen folgen jetzt demselben Kopf-Muster** — Marktbericht, Archiv, Einstieg, Set-Detail zusaetzlich zu den vier aus v4.9.0. Linksbuendig, Abschnittsmarke statt Pille, keine Verlaufsflaeche, keine Farbhervorhebung im Titel
+- **Marktbericht:** Die drei Merkmal-Zeilen unter der Ueberschrift („Marktanalyse · Cardmarket-Preise · Woechentlich neu") sind entfallen. Sie behaupteten Eigenschaften, statt den Bericht zu zeigen. Der Zeitraum steht jetzt als Datenangabe neben der Abschnittsmarke
+- **Set-Detail:** Der gelbe Vollflaechen-Kaufknopf ist gedeckt wie der Rest der Seite. Er war der lauteste Gegenstand der Seite und gehoert einer Nebenhandlung
+
+### Neu
+- **DESIGN.md §15 loest einen Widerspruch auf**, der beim Vereinheitlichen sichtbar wurde: DESIGN.md verbot Verlaufsflaechen hinter Ueberschriften, CLAUDE.md verlangte fuer Lese-Flaechen einen Kopf MIT Ambient-Glow. Die Grenze verlaeuft nicht nach Geschmack, sondern nach der Frage, ob unter dem Kopf eine Tabelle oder ein Text steht. Artikel- und Guide-Detailseiten behalten ihren Ambient-Kopf ausdruecklich — damit es niemand als Versaeumnis „repariert"
+
+---
+
 ## [4.9.1] - 31. Juli 2026 · Wiederholungen haben ein Ende
 
 ### Behoben

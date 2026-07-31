@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { SECTION_LABEL } from '@/lib/ui';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
@@ -89,7 +90,7 @@ export default async function SetDetailPage({ params }: Props) {
       />
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
+      <header className="border-b border-[#1c1c24] ">
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-12 sm:py-14">
           <Link href="/sets" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-6 transition-colors">
             <ArrowLeft size={12} /> Alle Sets
@@ -101,10 +102,8 @@ export default async function SetDetailPage({ params }: Props) {
               className="h-40 w-auto object-contain drop-shadow-xl shrink-0"
             />
             <div className="text-center sm:text-left">
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-                <Package size={10} /> Set-Analyse
-              </div>
-              <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight">{setName}</h1>
+              <p className={SECTION_LABEL}>Set-Analyse · Pokémon</p>
+              <h1 className="mt-3 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">{setName}</h1>
               <p className="text-slate-500 text-sm mt-2">
                 {cards.length} handelbare Karten · Gesamtwert der Einzelkarten ca. {formatEurRounded(topValue)}
               </p>
@@ -112,7 +111,7 @@ export default async function SetDetailPage({ params }: Props) {
                 href={amazonUrl}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                className="mt-4 inline-flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-md px-5 py-2.5 font-semibold text-sm transition-colors"
+                className="mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 border border-[#2a2a35] px-5 text-[13px] font-semibold text-slate-300 transition-colors hover:border-violet-500/40 hover:text-violet-300"
               >
                 <ShoppingCart size={15} /> Booster kaufen <ExternalLink size={12} />
               </a>

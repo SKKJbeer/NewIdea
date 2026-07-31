@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SECTION_LABEL } from '@/lib/ui';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
 import { NavBar } from '@/components/NavBar';
@@ -51,24 +52,24 @@ export default async function MarktberichtPage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div aria-hidden className="pointer-events-none absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[110px] animate-floaty" />
-        <div className="relative max-w-4xl mx-auto px-4 pt-10 pb-16 sm:py-20 text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1.5 text-violet-400 text-xs">
-            <Calendar size={12} />
-            {report ? `KW ${report.weekNumber} · ${formatWeekDate(report.weekStart)}` : 'Wöchentlich aktualisiert'}
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 leading-tight text-white">
-            Wöchentliche<br /><span className="text-violet-400">Marktanalyse</span>
-          </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-6">
-            Datenbasierte Marktanalyse für Pokémon-Karten-Sammler.
+      {/* Gemeinsames Kopf-Muster. Der Leuchtfleck, die zentrierte Zweizeilen-
+          Überschrift mit Farbhervorhebung und die drei Merkmal-Zeilen darunter
+          („Marktanalyse · Cardmarket-Preise · Wöchentlich neu") sind entfallen:
+          Sie behaupteten Eigenschaften, statt den Bericht zu zeigen. Der
+          Zeitraum steht jetzt dort, wo er hingehört — als Datenangabe neben der
+          Abschnittsmarke. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>
+            Marktbericht · {report ? `KW ${report.weekNumber} · ${formatWeekDate(report.weekStart)}` : 'Pokémon'}
           </p>
-          <div className="flex justify-center gap-6 text-slate-600 text-xs">
-            <div className="flex items-center gap-1.5"><BarChart3 size={12} />Marktanalyse</div>
-            <div className="flex items-center gap-1.5"><TrendingUp size={12} />Cardmarket-Preise</div>
-            <div className="flex items-center gap-1.5"><Zap size={12} />Wöchentlich neu</div>
-          </div>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Wöchentliche Marktanalyse
+          </h1>
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Was sich in der vergangenen Woche bewegt hat — auf Basis der
+            Cardmarket-Preise, mit offengelegter Methodik.
+          </p>
         </div>
       </header>
 

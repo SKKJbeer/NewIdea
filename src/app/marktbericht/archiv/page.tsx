@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SECTION_LABEL } from '@/lib/ui';
 import { NavBar } from '@/components/NavBar';
 import { Calendar, ChevronRight, TrendingUp } from 'lucide-react';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
@@ -36,23 +37,20 @@ export default async function MarktberichtArchivPage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-12 sm:py-14">
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
           <Link
             href="/marktbericht"
-            className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-5 transition-colors"
+            className="mb-6 inline-flex min-h-[32px] items-center gap-1.5 text-xs text-slate-600 transition-colors hover:text-slate-200"
           >
             ← Aktueller Bericht
           </Link>
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp size={18} className="text-violet-400" />
-            <span className="text-slate-600 text-sm font-semibold">Archiv</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white">
-            Alle <span className="text-violet-400">Marktberichte</span>
+          <p className={SECTION_LABEL}>Archiv · Marktbericht</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Alle Marktberichte
           </h1>
-          <p className="text-slate-600 text-sm mt-2">
-            {allMeta.length} {allMeta.length === 1 ? 'Bericht' : 'Berichte'} gespeichert
+          <p className="mt-4 text-[15px] leading-relaxed text-slate-400">
+            {allMeta.length} {allMeta.length === 1 ? 'Bericht' : 'Berichte'} gespeichert.
           </p>
         </div>
       </header>

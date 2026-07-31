@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SECTION_LABEL } from '@/lib/ui';
 import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
@@ -24,22 +25,21 @@ export default function EinsteigerPage() {
       <NavBar />
 
       {/* Hero */}
-      <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px]" />
-        <div className="relative max-w-3xl mx-auto px-4 pt-12 pb-14 sm:py-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <Sparkles size={11} /> Neu hier? Fang genau hier an
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-black mb-4 text-white leading-tight text-balance">
-            Was sind deine <span className="text-violet-400">Pokémon-Karten</span> wert?
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>Einstieg · Pokémon</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Was sind deine Pokémon-Karten wert?
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-7">
-            Kein Vorwissen nötig. Gib den Namen einer Karte ein — du siehst sofort den aktuellen Marktpreis, den Verlauf und ähnliche Karten. Deutsche Namen funktionieren.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Kein Vorwissen nötig. Gib den Namen einer Karte ein — du siehst
+            Marktpreis, Verlauf und den Abstand zum Gesamtmarkt. Deutsche Namen
+            funktionieren.
           </p>
-          <div className="max-w-md mx-auto text-left">
+          <div className="mt-6 max-w-xl">
             <SearchBox />
           </div>
-          <p className="text-[11px] text-slate-600 mt-3">Zum Beispiel: „Glurak", „Pikachu", „Mewtu"</p>
+          <p className="mt-3 text-[11px] text-slate-600">Zum Beispiel: „Glurak", „Pikachu", „Mewtu"</p>
         </div>
       </header>
 

@@ -251,6 +251,35 @@ zwei Farben auf einer Seite zweierlei.
 
 Die Rechnung ist unverändert. Geändert hat sich, wie das Ergebnis heißt.
 
+
+---
+
+## 15. Zwei Arten von Seiten — und warum sie verschieden aussehen dürfen
+
+In diesem Projekt standen zwei Regeln nebeneinander, die sich widersprachen:
+DESIGN.md verbietet „Verlaufsflächen hinter Überschriften", CLAUDE.md verlangt
+für Lese-Flächen einen Kopf **mit** Ambient-Glow. Beim Vereinheitlichen der
+Seitenköpfe wurde das sichtbar. Die Auflösung ist keine Formsache, sondern
+folgt der Aufgabe der jeweiligen Seite:
+
+| | **Datenflächen** | **Lese-Flächen** |
+|---|---|---|
+| Beispiele | Markt, Sets, Suche, Portfolio, Merkliste, Methodik, Marktbericht | Artikel, Guides |
+| Aufgabe | vergleichen, einordnen | lesen, verweilen |
+| Kopf | linksbündig, Abschnittsmarke, keine Fläche, keine Farbhervorhebung | Ambient-Glow, Icon-Medaillon, größere Typografie |
+| Warum | Jedes Gestaltungselement im Kopf konkurriert mit den Zahlen darunter | Ein nüchterner Kopf über 1.500 Wörtern liest sich wie ein Formular |
+
+**Die Grenze verläuft nicht nach Geschmack, sondern nach der Frage: Steht unter
+dem Kopf eine Tabelle oder ein Text?** Bei einer Tabelle gewinnt Zurückhaltung,
+bei einem Text gewinnt Einladung.
+
+Wer eine dieser Seiten anfasst, ändert also nicht „den Kopf", sondern den Kopf
+**ihrer Art**. Ein Artikel-Kopf im Datenflächen-Muster wäre genauso falsch wie
+ein Leuchtfleck über der Marktübersicht.
+
+**Ausgenommen:** `/changelog` ist eine Entwicklerhistorie mit `noindex` und
+folgt keiner der beiden Regeln — dort ist die Form gleichgültig.
+
 ---
 
 ## 12. Was diese Oberfläche NICHT sein soll

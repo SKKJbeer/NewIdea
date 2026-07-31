@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.10.0',
+    date: '31. Juli 2026',
+    label: 'Ein Kopf-Muster je Seitenart',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Zehn Datenflaechen folgen demselben Kopf-Muster: linksbuendig, Abschnittsmarke statt Pille, keine Verlaufsflaeche' },
+      { type: 'changed', text: 'Marktbericht: die drei Merkmal-Zeilen unter der Ueberschrift sind entfallen — sie behaupteten Eigenschaften, statt den Bericht zu zeigen' },
+      { type: 'changed', text: 'Set-Detail: der gelbe Vollflaechen-Kaufknopf ist gedeckt wie der Rest der Seite' },
+      { type: 'new',     text: 'DESIGN.md §15 loest den Widerspruch zwischen Verlaufsverbot und Ambient-Kopf auf: Steht unter dem Kopf eine Tabelle oder ein Text?' },
+    ],
+  },
+  {
     version: '4.9.1',
     date: '31. Juli 2026',
     label: 'Wiederholungen haben ein Ende',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Bei einem Ausfall der Kartendatenbank wartete die Suche bis zu 40 Sekunden — jetzt Gesamtfrist von neun Sekunden ueber alle Versuche' },
     ],
