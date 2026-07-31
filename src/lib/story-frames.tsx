@@ -2,6 +2,10 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { formatEur, formatPercent, formatPp } from '@/lib/format';
+import { STORY_FORMATE, type StoryFormat } from '@/lib/story-formats';
+
+export { STORY_FORMATE };
+export type { StoryFormat };
 
 // MARKT-GESCHICHTEN — die Website als Quelle für alles, was nach außen geht.
 //
@@ -29,16 +33,6 @@ import { formatEur, formatPercent, formatPp } from '@/lib/format';
 //   · jedes Element mit mehreren Kindern braucht ein ausdrückliches `display`
 //   · Ergebnis IMMER ansehen — nicht unterstützte Kombinationen scheitern still
 
-export const STORY_FORMATE = {
-  /** Instagram Reel / Story — hochkant, volle Höhe. */
-  reel: { width: 1080, height: 1920 },
-  /** Instagram Beitrag / Karussell — das Format mit der größten Reichweite. */
-  post: { width: 1080, height: 1350 },
-  /** Teilen-Vorschau für Verlinkungen (OpenGraph, X). */
-  og: { width: 1200, height: 630 },
-} as const;
-
-export type StoryFormat = keyof typeof STORY_FORMATE;
 
 const BG = '#08080b';
 const LINIE = '#1c1c24';

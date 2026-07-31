@@ -12,6 +12,7 @@ import type { MarketSummary } from '@/types';
 import { MonitoringPanel } from '@/components/MonitoringPanel';
 import { ReelsStudio } from '@/components/ReelsStudio';
 import { AutoReelPanel } from '@/components/AutoReelPanel';
+import { StoryPanel } from '@/components/StoryPanel';
 
 interface Integration {
   name: string;
@@ -314,6 +315,7 @@ export default function StudioPage() {
           <MonitoringPanel />
         ) : tab === 'reels' ? (
           <>
+            <StoryPanel />
             <AutoReelPanel />
             <ReelsStudio />
           </>

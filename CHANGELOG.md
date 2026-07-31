@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.12.0] - 31. Juli 2026 · Marktbilder im Studio
+
+### Neu
+- **Die vier Marktbilder stehen jetzt im Studio** (Reels-Tab): Vorschau aller Vorlagen, Formatwahl zwischen Beitrag, Reel/Story und Teilen-Vorschau, Herunterladen mit sprechendem Dateinamen. Zuvor gab es sie nur unter einer Adresse, die man auswendig kennen musste — ein Werkzeug, das nur mit Vorwissen bedienbar ist, wird nicht benutzt
+- **Kein Veroeffentlichen-Knopf, und das mit Absicht.** Der Schritt nach Instagram bleibt von Hand: Ein Bild, das automatisch hinausgeht, sieht sich niemand mehr an — und bei Inhalten, die Marktzahlen behaupten, ist der Blick davor der eigentliche Schutz
+
+### Behoben
+- **Die Formatmasse liegen jetzt in einer Datei ohne Abhaengigkeiten.** Importiert ein Client-Bauteil sie aus der Renderdatei, zieht es `next/og` und `fs/promises` ins Browser-Paket — der Bau bricht dann mit „module not found" ab, und zwar erst beim Buendeln, nicht bei der Typpruefung
+
+---
+
 ## [4.11.1] - 31. Juli 2026 · Abgeschnittene Kennzahl im Marktbild
 
 ### Behoben

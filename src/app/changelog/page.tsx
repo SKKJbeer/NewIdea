@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.12.0',
+    date: '31. Juli 2026',
+    label: 'Marktbilder im Studio',
+    isLatest: true,
+    changes: [
+      { type: 'new',   text: 'Die vier Marktbilder stehen im Studio: Vorschau, Formatwahl, Herunterladen' },
+      { type: 'new',   text: 'Kein Veroeffentlichen-Knopf — der Schritt nach Instagram bleibt bewusst von Hand' },
+      { type: 'fixed', text: 'Die Formatmasse liegen in einer Datei ohne Abhaengigkeiten; sonst zieht der Browser das Bild-Rendering mit ins Paket' },
+    ],
+  },
+  {
     version: '4.11.1',
     date: '31. Juli 2026',
     label: 'Abgeschnittene Kennzahl im Marktbild',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '„204 Karten" lief im Marktbild aus dem Bild — die Spalten teilen sich die Breite jetzt gleichmaessig' },
       { type: 'fixed', text: 'Die leere Bildmitte ist weg: Der Kennzahlenblock sitzt am unteren Rand' },

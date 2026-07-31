@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { STORY_FORMATE } from '@/lib/story-frames';
+import { STORY_FORMATE } from '@/lib/story-formats';
 
 const lies = (p: string) => readFileSync(join(process.cwd(), p), 'utf-8');
 const ohneKommentare = (p: string) =>
@@ -82,5 +82,39 @@ describe('Die Bilder nutzen dieselbe Formatierung wie die Seite', () => {
   it('Gruen und Rot bleiben der Richtung vorbehalten', () => {
     const frames = ohneKommentare('src/lib/story-frames.tsx');
     expect(frames).toMatch(/wert > 0 \? UP : wert < 0 \? DOWN : HELL/);
+  });
+});
+
+describe('Marktbilder im Studio', () => {
+  const panel = ohneKommentare('src/components/StoryPanel.tsx');
+  const formate = ohneKommentare('src/lib/story-formats.ts');
+
+  it('die Masse liegen in einer Datei ohne Abhaengigkeiten', () => {
+    // BEFUND: Importiert ein Client-Bauteil sie aus der Renderdatei, zieht es
+    // `next/og` und `fs/promises` ins Browser-Paket — der Bau bricht dann mit
+    // "module not found" ab, und zwar erst beim Buendeln, nicht bei der
+    // Typpruefung.
+    expect(formate).not.toMatch(/import .*(next\/og|fs\/promises)/);
+    expect(panel).toContain("from '@/lib/story-formats'");
+    expect(panel).not.toContain("from '@/lib/story-frames'");
+  });
+
+  it('das Vorschaufeld reserviert das Seitenverhaeltnis', () => {
+    // Sonst springt es, sobald das Bild eintrifft.
+    expect(panel).toMatch(/aspectRatio/);
+  });
+
+  it('erzwingt beim Neuladen ein frisches Bild', () => {
+    // Ohne Zaehler liefert der Browser dasselbe Bild aus seinem
+    // Zwischenspeicher, und man glaubt, die Erneuerung habe nicht gewirkt.
+    expect(panel).toMatch(/&v=\$\{stand\}/);
+  });
+
+  it('bietet Herunterladen, aber KEIN Veroeffentlichen', () => {
+    // Ein Bild, das automatisch hinausgeht, sieht sich niemand mehr an — und
+    // bei Inhalten, die Marktzahlen behaupten, ist der Blick davor der
+    // eigentliche Schutz.
+    expect(panel).toContain('download=');
+    expect(panel).not.toMatch(/instagram|publish|veroeffentlich/i);
   });
 });
