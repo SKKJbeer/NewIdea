@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.9.0',
+    date: '31. Juli 2026',
+    label: 'Suchfrist, Methodik, einheitliche Koepfe',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Die Frist des Such-Zwischenspeichers steigt von zehn Minuten auf eine Stunde — an die der Kartenseite gekoppelt, damit beide nie unterschiedliche Preise zeigen' },
+      { type: 'changed', text: 'Der Tages-Cron waermt die 20 gefragtesten Begriffe vor; sie kommen aus den Daten, nicht aus einer Liste im Code' },
+      { type: 'new',     text: 'Methodik: die Stufen der Markttemperatur sind dokumentiert — samt der Feststellung, dass kalt nicht schlecht heisst' },
+      { type: 'new',     text: 'Methodik: eigener Abschnitt zum Abstand zum Markt — Prozentpunkte, gleiche Zeitraeume, und was er NICHT sagt' },
+      { type: 'fixed',   text: 'Analysen, Guides, Merkliste und Methodik folgen jetzt dem gemeinsamen Kopf-Muster' },
+    ],
+  },
+  {
     version: '4.8.0',
     date: '31. Juli 2026',
     label: 'Bildlast und Layout-Versatz',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Startseite lud 2.211 KB Bilder fuer zwoelf 26-Pixel-Miniaturen — der Bildoptimierer kam nie zum Zug. Jetzt 2.596 KB → 453 KB' },
       { type: 'fixed', text: '/sets: 2.278 KB → 512 KB, Layout-Versatz 0,41 → 0' },

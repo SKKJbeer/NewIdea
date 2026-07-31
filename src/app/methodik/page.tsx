@@ -10,6 +10,7 @@ import {
   MAX_PLAUSIBLE_PRICE,
 } from '@/lib/market-metrics';
 import { MIN_POINTS_FOR_SCORE, MIN_POINTS_FOR_VOLATILITY, PERFORMANCE_WINDOWS } from '@/lib/card-metrics';
+import { SECTION_LABEL } from '@/lib/ui';
 
 // METHODIK-SEITE
 //
@@ -67,17 +68,17 @@ export default function MethodikPage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="mx-auto max-w-3xl px-4 pb-14 pt-10 text-center sm:py-16">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <ScrollText size={10} /> Offenlegung
-          </div>
-          <h1 className="mb-3 text-3xl font-black text-white sm:text-4xl">
-            Methodik &amp; <span className="text-violet-400">Datenherkunft</span>
+      {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
+          Abschnittsmarke statt Pille, keine Verlaufsfläche, keine
+          Farbhervorhebung im Titel. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>'Transparenz · CardBeacon'</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Methodik & Datenherkunft
           </h1>
-          <p className="mx-auto max-w-lg text-sm text-slate-400">
-            Wie die Kennzahlen auf dieser Seite entstehen, worauf sie beruhen — und wo ihre Grenzen
-            liegen.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Wie die Kennzahlen entstehen, worauf sie beruhen — und wo ihre Grenzen liegen.
           </p>
         </div>
       </header>
@@ -187,6 +188,27 @@ export default function MethodikPage() {
           <p className="text-slate-500">
             Unterhalb derselben Mindestdatenlage wie beim CBI wird auch hier kein Wert ausgewiesen.
           </p>
+
+          <p className="pt-1 font-semibold text-slate-300">Was die Stufen bedeuten</p>
+          <ul className="list-inside list-disc space-y-1.5 marker:text-violet-500">
+            <li><strong className="text-slate-300">0–24 Kalt</strong> — breite Abwärtsbewegung über viele Karten hinweg</li>
+            <li><strong className="text-slate-300">25–39 Abkühlend</strong> — mehr Karten fallen als steigen, die Bewegung lässt nach</li>
+            <li><strong className="text-slate-300">40–59 Ruhig</strong> — steigende und fallende Karten halten sich weitgehend die Waage</li>
+            <li><strong className="text-slate-300">60–74 Anziehend</strong> — mehr Karten steigen als fallen, die Bewegung nimmt zu</li>
+            <li><strong className="text-slate-300">75–100 Heiß</strong> — breite Aufwärtsbewegung über viele Karten hinweg</li>
+          </ul>
+          <p>
+            <strong className="text-slate-300">Kalt heißt nicht schlecht und heiß nicht gut.</strong>{' '}
+            Die Skala misst, wie viel Bewegung im Markt ist — nicht, ob das für jemanden günstig
+            ist. Für wen kaufen möchte, ist ein ruhiger Markt eher angenehm. Deshalb läuft die
+            Farbskala von Blau über Grau nach Orange und nicht als Ampel: Grün und Rot bleiben auf
+            dieser Seite ausschließlich der Richtung von Preisen vorbehalten.
+          </p>
+          <p className="text-slate-500">
+            Diese Kennzahl hieß bis Juli 2026 „Angst &amp; Gier". Der Name stammte aus dem
+            Krypto-Umfeld und beschrieb Gefühle, während gemessen ausschließlich Preisgrößen
+            werden. Die Rechnung ist unverändert geblieben, nur die Bezeichnung nicht.
+          </p>
         </Abschnitt>
 
         <Abschnitt nummer={6} titel="Markt-Score einer einzelnen Karte">
@@ -267,6 +289,35 @@ export default function MethodikPage() {
               Pokémon-TCG-Markt.
             </li>
           </ul>
+        </Abschnitt>
+
+        <Abschnitt nummer={9} titel="Abstand zum Markt (Prozentpunkte)">
+          <p>
+            In den Bewegungen, in der Suche, im Set-Markt und auf jeder Kartenseite steht neben der
+            Bewegung eine zweite Zahl: der Abstand zum CardBeacon Index.
+          </p>
+          <Formel>Abstand = Bewegung der Karte − CBI</Formel>
+          <p>
+            <strong className="text-slate-300">Die Einheit ist Prozentpunkt (pp), nicht Prozent.</strong>{' '}
+            Eine Karte bei +22,2 % und ein Markt bei −0,2 % liegen 22,4 Prozentpunkte auseinander —
+            nicht 22,4 Prozent. Die Verwechslung ist nicht sprachlich: Sie legt nahe, man könne den
+            Abstand auf den Kartenpreis anwenden, und das ergäbe eine andere Zahl.
+          </p>
+          <p>
+            <strong className="text-slate-300">Beide Seiten müssen denselben Zeitraum haben.</strong>{' '}
+            Verglichen wird ausschließlich über 30 Tage gegen 30 Tage. Eine Karte über sieben Tage
+            gegen einen Index über dreißig zu stellen wäre eine Zahl ohne Aussage.
+          </p>
+          <p>
+            <strong className="text-slate-300">Fehlt eine Seite, entfällt der Vergleich.</strong>{' '}
+            Ist die Karte nicht gemessen oder liegt kein belastbarer Indexwert vor, steht dort ein
+            Strich. Ein Abstand gegen eine angenommene Null wäre eine erfundene Aussage.
+          </p>
+          <p className="text-slate-500">
+            Was der Abstand NICHT sagt: dass eine Karte „besser" ist. Er sagt, dass sie sich anders
+            bewegt hat als der Markt — mehr nicht. Die Ursache dieser Abweichung wird hier nicht
+            gemessen und deshalb auch nicht behauptet.
+          </p>
         </Abschnitt>
 
         <div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 px-4 py-4 text-center">

@@ -8,6 +8,7 @@ import { generateNextGuide } from '@/lib/guide-generator';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
 import { saveMarketIndex } from '@/lib/market-index-store';
+import { warmSearchCache } from '@/lib/search-cache';
 
 // Guide-Generierung: dienstags + freitags — versetzt zu den Artikel-Tagen (So/Do),
 // damit über die Woche verteilt frischer Content erscheint.
@@ -64,6 +65,30 @@ export async function GET(request: Request) {
     } catch (err) {
       results.marketIndexError = err instanceof Error ? err.message : 'unbekannt';
       console.error('Indexstand nicht gespeichert:', err);
+    }
+
+    // SUCHE VORWÄRMEN.
+    //
+    // Der erste Aufruf eines Suchbegriffs kostet gemessen 6 bis 13 Sekunden,
+    // jeder weitere 0,3. Diesen Preis zahlt sonst der Besucher, der zuerst
+    // kommt — hier zahlt ihn der Cron stellvertretend.
+    //
+    // Die Begriffe kommen aus den Kartennamen der aktuellen Marktstichprobe,
+    // nicht aus einer Liste im Code: Was auf der Startseite steht, wird als
+    // Nächstes gesucht. Eine fest verdrahtete Liste wäre eine Vermutung und
+    // würde mit jedem neuen Set veralten.
+    //
+    // Wirkt eine Stunde (die Frist des Zwischenspeichers). Der Cron kann das
+    // nicht den ganzen Tag halten — er nimmt der ersten Stunde nach dem
+    // Datenabgleich die Spitze, mehr nicht. Das ehrlich zu benennen ist besser,
+    // als eine Dauerwirkung zu behaupten.
+    try {
+      const stichprobe = await getHomepageCards(60);
+      const namen = [...new Set(stichprobe.map((c) => c.name).filter(Boolean))].slice(0, 20);
+      const { warm, fehler } = await warmSearchCache(namen);
+      results.suchVorwaermung = `${warm} von ${namen.length} Begriffen (${fehler} ohne Treffer)`;
+    } catch (err) {
+      results.suchVorwaermungFehler = err instanceof Error ? err.message : 'unbekannt';
     }
 
     // FLÄCHENDECKENDE ERFASSUNG ANSTOSSEN.

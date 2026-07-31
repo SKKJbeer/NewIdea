@@ -5,6 +5,7 @@ import { GUIDES } from '@/lib/guides';
 import { listGeneratedGuides } from '@/lib/guide-storage';
 import { Clock, ChevronRight, BookOpen } from 'lucide-react';
 import type { Metadata } from 'next';
+import { SECTION_LABEL } from '@/lib/ui';
 
 export const revalidate = 86400;
 
@@ -24,17 +25,17 @@ export default async function GuidesPage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-3xl mx-auto px-4 pt-10 pb-14 sm:py-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <BookOpen size={10} />
-            Expertenwissen, leicht erklärt
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white">
-            Pokémon Karten<br /><span className="text-violet-400">Guides</span>
+      {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
+          Abschnittsmarke statt Pille, keine Verlaufsfläche, keine
+          Farbhervorhebung im Titel. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>'Guides · Pokémon'</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Guides
           </h1>
-          <p className="text-slate-400 text-sm max-w-sm mx-auto">
-            Alles was du über Pokémon-Karten wissen musst — von Seltenheitsstufen über Grading bis zur richtigen Markt-Strategie.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Von Seltenheitsstufen über Grading bis zur Lagerung — Grundlagen, die dauerhaft gelten.
           </p>
         </div>
       </header>

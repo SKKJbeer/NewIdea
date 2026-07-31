@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.9.0] - 31. Juli 2026 · Suchfrist, Methodik, einheitliche Koepfe
+
+### Geaendert
+- **Die Frist des Such-Zwischenspeichers steigt von zehn Minuten auf eine Stunde.** Der erste Aufruf eines Begriffs kostet gemessen 6 bis 13 Sekunden, jeder weitere 0,3. Bei zehn Minuten zahlt ein gefragter Begriff diesen Preis bis zu 144-mal am Tag, bei einer Stunde 24-mal. **Nicht laenger:** Die Suchtreffer enthalten Preise, und die Kartenseite wird stuendlich neu erzeugt — waere die Suche laenger gueltig, koennten beide Seiten unterschiedliche Preise derselben Karte zeigen
+- **Der Tages-Cron waermt die 20 gefragtesten Begriffe vor.** Sie kommen aus den Kartennamen der aktuellen Marktstichprobe, nicht aus einer Liste im Code: Was auf der Startseite steht, wird als Naechstes gesucht. Wirkt eine Stunde — das nimmt der ersten Stunde nach dem Datenabgleich die Spitze, mehr nicht
+
+### Neu
+- **Methodik: die Stufen der Markttemperatur sind dokumentiert** (Kalt 0–24 bis Heiss 75–100) samt der ausdruecklichen Feststellung, dass kalt nicht schlecht und heiss nicht gut heisst. Das Vokabular war in v4.4.0 eingefuehrt worden, ohne die Zuordnung offenzulegen — auf einer Seite, deren Zweck Offenlegung ist
+- **Methodik: eigener Abschnitt zum Abstand zum Markt** — warum Prozentpunkte und nicht Prozent, warum nur gleiche Zeitraeume verglichen werden, und was der Abstand ausdruecklich NICHT sagt
+
+### Behoben
+- **Vier Seiten folgen jetzt dem gemeinsamen Kopf-Muster** (Analysen, Guides, Merkliste, Methodik): linksbuendig, Abschnittsmarke statt Pille, keine Verlaufsflaeche, keine Farbhervorhebung im Titel
+
+---
+
 ## [4.8.0] - 31. Juli 2026 · Bildlast und Layout-Versatz
 
 ### Behoben

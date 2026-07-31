@@ -8,6 +8,7 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { formatEur } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
 import { formatPercent } from '@/lib/format';
+import { SECTION_LABEL } from '@/lib/ui';
 import {
   WATCHLIST_KEY, parseWatchlist, watchChange,
   type WatchlistItem,
@@ -70,16 +71,17 @@ export default function MerklistePage() {
     <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
       <NavBar />
 
-      <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
-        <div className="max-w-2xl mx-auto px-4 pt-10 pb-12 sm:py-14 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold text-violet-400">
-            <Star size={10} /> Merkliste
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white">
-            Karten <span className="text-violet-400">beobachten</span>
+      {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
+          Abschnittsmarke statt Pille, keine Verlaufsfläche, keine
+          Farbhervorhebung im Titel. */}
+      <header className="border-b border-[#1c1c24]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+          <p className={SECTION_LABEL}>'Merkliste · Pokémon'</p>
+          <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
+            Beobachtete Karten
           </h1>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">
-            Preisveränderung seit Vormerkung — lokal gespeichert, kein Login nötig.
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
+            Preisveränderung seit dem Vormerken — in diesem Browser gespeichert, ohne Anmeldung.
           </p>
         </div>
       </header>

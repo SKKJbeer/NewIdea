@@ -77,3 +77,62 @@ describe('Trefferflaechen', () => {
     }
   });
 });
+
+describe('Die Methodik erklaert, was neu hinzugekommen ist', () => {
+  const seite = lies('src/app/methodik/page.tsx');
+
+  it('dokumentiert die Stufen der Markttemperatur', () => {
+    // Bringschuld: Das Vokabular wurde eingefuehrt, ohne die Zuordnung
+    // offenzulegen — bei einer Seite, deren Zweck Offenlegung ist.
+    for (const stufe of ['Kalt', 'Abkühlend', 'Ruhig', 'Anziehend', 'Heiß']) {
+      expect(seite, stufe).toContain(stufe);
+    }
+    expect(seite).toMatch(/0–24|25–39|40–59|60–74|75–100/);
+  });
+
+  it('sagt ausdruecklich, dass die Temperatur keine Bewertung ist', () => {
+    expect(seite).toContain('Kalt heißt nicht schlecht');
+  });
+
+  it('erklaert Prozentpunkte als eigene Einheit', () => {
+    expect(seite).toContain('Prozentpunkt');
+    expect(seite).toMatch(/nicht 22,4 Prozent/);
+  });
+
+  it('nennt zu jeder neuen Kennzahl auch ihre Grenze', () => {
+    // Die vierte Frage der Offenlegung: Was sagt sie NICHT?
+    expect(seite).toMatch(/Was der Abstand NICHT sagt/);
+    expect(seite).toMatch(/Fehlt eine Seite, entfällt der Vergleich/);
+  });
+
+  it('haelt fest, dass nur gleiche Zeitraeume verglichen werden', () => {
+    expect(seite).toMatch(/30 Tage gegen 30 Tage|dreißig/);
+  });
+});
+
+describe('Vorwaermen der Suche', () => {
+  const cache = ohneKommentare('src/lib/search-cache.ts');
+  const cron = ohneKommentare('src/app/api/cron/daily/route.ts');
+
+  it('die Frist ist an die der Kartenseite gekoppelt', () => {
+    // Waere die Suche laenger gueltig, koennten Suchliste und Kartenseite
+    // unterschiedliche Preise derselben Karte zeigen.
+    expect(cache).toMatch(/FRIST_SEKUNDEN = 3600/);
+  });
+
+  it('waermt nacheinander, nicht parallel', () => {
+    // Der Zweck ist, die Quelle zu entlasten — nicht sie mit zwanzig
+    // gleichzeitigen Abfragen zu belegen.
+    expect(cache).toMatch(/for \(const b of begriffe\)/);
+    expect(cache).not.toMatch(/Promise\.all\([\s\S]{0,80}begriffe/);
+  });
+
+  it('nimmt die Begriffe aus den Daten, nicht aus einer Liste im Code', () => {
+    expect(cron).toContain('getHomepageCards(60)');
+    expect(cron).not.toMatch(/\['Charizard', 'Pikachu'/);
+  });
+
+  it('ein Fehlschlag reisst den Cron nicht mit', () => {
+    expect(cron).toMatch(/suchVorwaermungFehler/);
+  });
+});

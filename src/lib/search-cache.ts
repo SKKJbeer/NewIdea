@@ -18,12 +18,20 @@ import type { PokemonCard } from '@/types';
 // Anwendung — instanzübergreifend und über Deployments hinweg, bis die Frist
 // abläuft.
 //
-// WARUM ZEHN MINUTEN: Preise ändern sich einmal am Tag; die Suche ist eine
-// Trefferliste, keine Kursabfrage. Zehn Minuten sind kurz genug, dass eine
-// neu erschienene Karte zeitnah auftaucht, und lang genug, dass die üblichen
-// Suchen (Charizard, Pikachu, das Set der Woche) den Aussetzern der Quelle
-// entzogen sind.
-const FRIST_SEKUNDEN = 600;
+// WARUM EINE STUNDE — und nicht zehn Minuten, wie zuerst gesetzt:
+//
+// Gemessen kostet der ERSTE Aufruf eines Begriffs 6 bis 13 Sekunden; jeder
+// weitere 0,3. Bei zehn Minuten Frist zahlt ein gefragter Begriff diesen Preis
+// bis zu 144-mal am Tag, bei einer Stunde 24-mal. Das ist der wirksamste Hebel
+// überhaupt, und er kostet nichts.
+//
+// Warum nicht länger: Die Suchtreffer enthalten PREISE, und die Kartenseite
+// wird stündlich neu erzeugt. Wäre die Suche länger gültig, könnten Suchliste
+// und Kartenseite unterschiedliche Preise derselben Karte zeigen. Ein
+// Widerspruch zwischen zwei Seiten desselben Produkts wiegt schwerer als eine
+// Sekunde Ladezeit — deshalb ist die Frist an die der Kartenseite gekoppelt und
+// nicht frei gewählt.
+const FRIST_SEKUNDEN = 3600;
 
 /**
  * Suche mit geteiltem Zwischenspeicher.
@@ -64,4 +72,38 @@ export async function cachedSearchCards(query: string, limit = 40): Promise<Poke
     // der Seite — und der Grund steht bereits im Log von `searchCards`.
     return [];
   }
+}
+
+/**
+ * Häufige Begriffe vorwärmen.
+ *
+ * ZWECK: Der erste Aufruf eines Begriffs kostet 6 bis 13 Sekunden — das trifft
+ * genau den Besucher, der zuerst kommt. Wenn ohnehin ein Cron läuft, kann er
+ * diesen Preis stellvertretend zahlen.
+ *
+ * DIE BEGRIFFE KOMMEN AUS DEN DATEN, nicht aus einer Liste im Code. Eine fest
+ * verdrahtete Liste („Charizard, Pikachu, …") wäre eine Vermutung darüber, was
+ * gesucht wird, und sie veraltet mit jedem neuen Set. Die Kartennamen aus der
+ * aktuellen Marktstichprobe sind dagegen genau die, die auf der Startseite
+ * stehen — und was dort steht, wird als Nächstes gesucht.
+ *
+ * Läuft NACHEINANDER, nicht parallel: Der Zweck ist, die Quelle zu entlasten,
+ * nicht sie mit zwanzig gleichzeitigen Abfragen zu belegen. Fehler werden
+ * gezählt, nicht geworfen — ein misslungenes Vorwärmen ist kein Grund, den
+ * Cron scheitern zu lassen.
+ */
+export async function warmSearchCache(begriffe: string[]): Promise<{ warm: number; fehler: number }> {
+  let warm = 0;
+  let fehler = 0;
+  for (const b of begriffe) {
+    try {
+      const treffer = await cachedSearchCards(b, 40);
+      if (treffer.length > 0) warm++;
+      else fehler++;
+    } catch {
+      // catch erlaubt: Vorwärmen ist eine Zugabe — siehe oben.
+      fehler++;
+    }
+  }
+  return { warm, fehler };
 }
