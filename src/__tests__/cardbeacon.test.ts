@@ -324,6 +324,21 @@ describe('Der Indexstand wird gespeichert statt nachgerechnet', () => {
     expect(ctx).toContain('getHomepageCards(250)');
   });
 
+  it('haelt kein Fehlergebnis eine Stunde lang fest', () => {
+    // ANLASS: Nach dem Anlegen der Tabelle zeigte eine Kartenseite den
+    // Marktvergleich und eine andere nicht. Ursache war der Zwischenspeicher im
+    // Arbeitsspeicher: Er wurde auch mit `null` befuellt, galt eine Stunde und
+    // wird VOR der Datenbankstufe geprueft — eine Instanz, die einmal zu wenig
+    // Daten hatte, sah den gespeicherten Tagesstand danach gar nicht mehr an.
+    // Zwischengespeichert wird nur, was auch eine Auskunft ist.
+    // Die duenne Datenlage fuehrt zu einem Rueckgabewert OHNE Zwischenspeichern.
+    expect(ctx).toMatch(/if \(!cbi\.sufficient\) \{[\s\S]{0,800}?return null;\s*\n\s*\}/);
+    // Und der frueher benutzte Dreiklang „null oder Wert, dann ablegen" ist weg.
+    expect(ctx).not.toContain('cbi.sufficient\n      ?');
+    // Der Werttyp des Zwischenspeichers laesst `null` gar nicht erst zu.
+    expect(ctx).toMatch(/let cache: \{ wert: MarketBenchmark; zeit: number \} \| null/);
+  });
+
   it('gibt einen zu alten Stand nicht als aktuell aus', () => {
     // Eine Zahl von letzter Woche ist keine Auskunft ueber heute.
     expect(store).toContain('maxAgeDays');

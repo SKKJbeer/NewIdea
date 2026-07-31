@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.2.4] - 31. Juli 2026 · Der Marktvergleich erscheint auf jeder Kartenseite
+
+### Behoben
+- **Nach dem Anlegen der Tabelle zeigte eine Kartenseite den Marktvergleich und eine andere nicht.** Der Zwischenspeicher im Arbeitsspeicher wurde auch mit einem Fehlergebnis befuellt, galt dann eine Stunde — und weil er VOR der Datenbankstufe geprueft wird, sah eine Instanz, die einmal zu wenig Daten hatte, den gespeicherten Tagesstand danach gar nicht mehr an. Zwischengespeichert wird jetzt nur, was auch eine Auskunft ist
+
+---
+
 ## [4.2.3] - 31. Juli 2026 · Das Monitoring hat eine fehlende Tabelle uebersehen
 
 ### Behoben

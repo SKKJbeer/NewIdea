@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.2.4',
+    date: '31. Juli 2026',
+    label: 'Der Marktvergleich erscheint auf jeder Kartenseite',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Eine Kartenseite zeigte den Marktvergleich, eine andere nicht: Der Zwischenspeicher hielt auch ein Fehlergebnis eine Stunde lang fest und verdeckte damit den gespeicherten Tagesstand' },
+    ],
+  },
+  {
     version: '4.2.3',
     date: '31. Juli 2026',
     label: 'Das Monitoring hat eine fehlende Tabelle uebersehen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed',   text: 'Eine gar nicht vorhandene Tabelle wurde als „vorhanden, 0 Zeilen" gemeldet: Die Zaehlabfrage fragt nur den Antwortkopf ab, und ohne Antwortkoerper gibt es keine Fehlermeldung zu lesen' },
       { type: 'fixed',   text: 'Geprueft wird jetzt zuerst mit einer Abfrage, deren Fehler ankommt — „nicht gezaehlt" bleibt sichtbar statt zu „null Zeilen" zu werden' },

@@ -63,7 +63,10 @@ export interface MarketBenchmark {
 // nachladen — ein Abruf von 250 Karten, gemessen 9 bis 17 Sekunden. Der Index
 // ändert sich stündlich, nicht sekündlich; ein Wert dieser Stunde ist derselbe
 // Wert.
-let cache: { wert: MarketBenchmark | null; zeit: number } | null = null;
+// Absichtlich OHNE `null` im Werttyp: Der Zwischenspeicher hält nur echte
+// Auskünfte. „Gerade nicht ermittelbar" ist keine, und sie eine Stunde lang
+// festzuhalten hat den gespeicherten Tagesstand unerreichbar gemacht.
+let cache: { wert: MarketBenchmark; zeit: number } | null = null;
 const CACHE_MS = 60 * 60 * 1000;
 
 /**
@@ -103,9 +106,17 @@ export async function getMarketBenchmark(): Promise<MarketBenchmark | null> {
       return null;
     }
     const cbi = computePmi(cards);
-    const wert = cbi.sufficient
-      ? { value: cbi.value, cardCount: cbi.cardCount, setCount: cbi.setCount }
-      : null;
+    if (!cbi.sufficient) {
+      // NICHT zwischenspeichern. Ein `null` hier galt früher eine volle Stunde
+      // — und weil der Zwischenspeicher VOR der Datenbankstufe geprüft wird,
+      // hat eine Instanz, die einmal zu wenig Daten hatte, den gespeicherten
+      // Tagesstand danach gar nicht mehr angesehen. Genau das war nach dem
+      // Anlegen der Tabelle zu sehen: Eine Kartenseite zeigte den Vergleich,
+      // eine andere nicht, je nachdem welche Instanz sie beantwortete.
+      // Zwischengespeichert wird nur, was auch eine Auskunft ist.
+      return null;
+    }
+    const wert = { value: cbi.value, cardCount: cbi.cardCount, setCount: cbi.setCount };
     cache = { wert, zeit: Date.now() };
     return wert;
   } catch (err) {
