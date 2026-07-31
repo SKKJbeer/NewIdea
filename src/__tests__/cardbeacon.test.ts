@@ -457,6 +457,12 @@ const SEITEN_MIT_TITEL = [
   'src/app/guides/[slug]/page.tsx',
   'src/app/karten/[id]/page.tsx',
   'src/app/marktbericht/[week]/page.tsx',
+  // Portfolio und Merkliste sind Client-Komponenten; ihre Metadaten liegen im
+  // Layout daneben. Genau deshalb sind sie beim ersten Durchgang durchgerutscht
+  // — die Pruefung sah nur `page.tsx` an, und beide trugen die Marke weiterhin
+  // doppelt im Titel.
+  'src/app/portfolio/layout.tsx',
+  'src/app/merkliste/layout.tsx',
 ];
 
 describe('Marke und Titel', () => {

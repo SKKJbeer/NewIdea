@@ -57,7 +57,10 @@ export const metadata: Metadata = {
   // `absolute` statt eines gewoehnlichen Titels: Das Root-Layout haengt an jeden
   // Seitentitel `| CardBeacon` an. Die Startseite fuehrt die Marke bereits im
   // Titel — ohne `absolute` stuende sie zweimal darin.
-  title: { absolute: `${BRAND} — ${DESCRIPTOR_DE} für Pokémon-Karten` },
+  // Nicht aus DESCRIPTOR_DE zusammengesetzt: Das ergab „Marktanalyse für
+  // Sammelkarten für Pokémon-Karten" — zweimal „für" in einem Titel, der in
+  // jedem Suchergebnis steht.
+  title: { absolute: `${BRAND} — Marktanalyse für Pokémon-Sammelkarten` },
   description:
     'Marktindex, Marktbreite und Preisbewegungen für Pokémon-Sammelkarten auf Basis aktueller Cardmarket-Daten. Offengelegte Methodik, keine Anlageberatung.',
   // Die geerbte relative Angabe (`./`) loest auf der Wurzelroute zu `/index`

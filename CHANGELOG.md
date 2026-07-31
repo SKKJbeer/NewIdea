@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.3.1] - 31. Juli 2026 · Die letzten zwei Doppeltitel
+
+### Behoben
+- **Portfolio und Merkliste trugen die Marke weiterhin doppelt im Titel.** Beide sind Client-Komponenten, ihre Metadaten liegen im Layout daneben — die Pruefung sah nur `page.tsx` an und uebersah sie deshalb. Die Pruefung deckt jetzt beide Ablagen ab
+- **Der Startseiten-Titel las sich fehlerhaft** („Marktanalyse fuer Sammelkarten fuer Pokémon-Karten") — zweimal „fuer" in dem Titel, der in jedem Suchergebnis steht
+
+---
+
 ## [4.3.0] - 31. Juli 2026 · Eine Marke, ein Titelmuster, keine falschen Aussagen
 
 ### Behoben
