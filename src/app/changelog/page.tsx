@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.12.1',
+    date: '31. Juli 2026',
+    label: 'Das Studio ueberlebt eine abgelaufene Sitzung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Bei abgelaufener Sitzung erschien die weisse Browser-Fehlerseite statt der Anmeldung — die Statusantwort wurde ohne Pruefung uebernommen' },
+      { type: 'fixed', text: 'Die vier Marktbild-Vorschauen luden gleichzeitig; sie laden jetzt einzeln auf Anforderung' },
+    ],
+  },
+  {
     version: '4.12.0',
     date: '31. Juli 2026',
     label: 'Marktbilder im Studio',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',   text: 'Die vier Marktbilder stehen im Studio: Vorschau, Formatwahl, Herunterladen' },
       { type: 'new',   text: 'Kein Veroeffentlichen-Knopf — der Schritt nach Instagram bleibt bewusst von Hand' },

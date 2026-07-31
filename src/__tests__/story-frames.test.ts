@@ -104,6 +104,17 @@ describe('Marktbilder im Studio', () => {
     expect(panel).toMatch(/aspectRatio/);
   });
 
+  it('laedt die Vorschauen einzeln auf Anforderung', () => {
+    // BEFUND: Alle vier gleichzeitig — vier PNGs mit je 1,4 Megapixeln, jedes
+    // aus einem eigenen Bildaufbau am Server. Der Browser im Test ist dabei
+    // abgestuerzt; auf einem Telefon waere es minutenlanges Warten fuer vier
+    // Bilder, von denen man eines braucht.
+    expect(panel).toContain('Vorschau laden');
+    expect(panel).toMatch(/geladen\.has\(v\.id\)/);
+    // Das Herunterladen bleibt ohne Vorschau moeglich.
+    expect(panel).toContain('download=');
+  });
+
   it('erzwingt beim Neuladen ein frisches Bild', () => {
     // Ohne Zaehler liefert der Browser dasselbe Bild aus seinem
     // Zwischenspeicher, und man glaubt, die Erneuerung habe nicht gewirkt.

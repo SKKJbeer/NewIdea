@@ -177,8 +177,31 @@ export default function StudioPage() {
     setLoadingStatus(true);
     try {
       const res = await fetch('/api/status');
-      setStatus(await res.json());
-    } catch {
+
+      // ANTWORTSTATUS PRUEFEN, BEVOR DER KOERPER IN DEN ZUSTAND GEHT.
+      //
+      // BEFUND: Hier stand `setStatus(await res.json())` ohne jede Pruefung.
+      // Bei einer 401 — abgelaufene Sitzung, sieben Tage sind schnell um —
+      // landete `{ error: 'unauthorized' }` im Zustand. Weiter unten steht
+      // `Object.entries(status.integrations)`, und `Object.entries(undefined)`
+      // wirft. Das Ergebnis war keine Fehlermeldung, sondern die WEISSE
+      // Browser-Seite „This page couldn't load": Wer nach einer Woche das
+      // Studio oeffnete, sah nicht „bitte anmelden", sondern gar nichts.
+      //
+      // Genau der Fall, den die Projektregel meint: `if (!res.ok)` gehoert vor
+      // jede Verwendung des Koerpers.
+      if (res.status === 401) {
+        setStatus(null);
+        setAuthed(false);
+        return;
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const daten = (await res.json()) as Partial<StatusResponse>;
+      if (!daten.integrations) throw new Error('unerwartete Antwort');
+      setStatus(daten as StatusResponse);
+    } catch (err) {
+      console.warn('Status konnte nicht geladen werden:', err);
       setError('Status konnte nicht geladen werden');
     } finally {
       setLoadingStatus(false);
@@ -333,7 +356,7 @@ export default function StudioPage() {
               {loadingStatus && <div className="flex items-center gap-2 text-slate-500 py-6 justify-center text-sm"><Loader2 className="animate-spin" size={16} /> Lade...</div>}
               {status && (
                 <div className="divide-y divide-[#1e1e30]">
-                  {Object.entries(status.integrations).map(([key, integration]) => (
+                  {Object.entries(status.integrations ?? {}).map(([key, integration]) => (
                     <div key={key} className="flex items-center justify-between px-4 py-3">
                       <div className="flex items-center gap-3">
                         {integration.configured ? <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> : <XCircle size={18} className="text-slate-600 shrink-0" />}

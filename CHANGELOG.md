@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.12.1] - 31. Juli 2026 · Das Studio ueberlebt eine abgelaufene Sitzung
+
+### Behoben
+- **Bei abgelaufener Studio-Sitzung erschien die weisse Browser-Seite „This page couldn't load"** statt der Anmeldung. `loadStatus()` uebernahm die Antwort ohne Statuspruefung; bei einer 401 landete `{ error: 'unauthorized' }` im Zustand, und `Object.entries(status.integrations)` warf. Wer nach einer Woche das Studio oeffnete, sah nicht „bitte anmelden", sondern gar nichts. Jetzt faellt die Seite bei 401 auf die Anmeldung zurueck; ein zweiter Riegel beim Rendern verhindert den Absturz auch bei unerwarteten Antworten
+- **Die vier Vorschauen im Marktbild-Feld luden gleichzeitig** — vier PNGs mit je 1,4 Megapixeln, jedes aus einem eigenen Bildaufbau am Server. Sie laden jetzt einzeln auf Anforderung; das Herunterladen geht weiterhin ohne Vorschau
+
+---
+
 ## [4.12.0] - 31. Juli 2026 · Marktbilder im Studio
 
 ### Neu

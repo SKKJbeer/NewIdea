@@ -48,6 +48,18 @@ const FORMAT_TEXT: Record<StoryFormat, string> = {
 
 export function StoryPanel() {
   const [format, setFormat] = useState<StoryFormat>('post');
+  // WELCHE VORSCHAU GELADEN IST.
+  //
+  // BEFUND beim ersten Ausprobieren: Alle vier Vorschauen luden gleichzeitig —
+  // vier PNGs mit je 1,4 Megapixeln, jedes aus einem eigenen Bildaufbau am
+  // Server. Der Browser im Test ist dabei abgestürzt, und auf einem Telefon
+  // wäre es dasselbe Bild: minutenlanges Warten für vier Bilder, von denen man
+  // eines braucht.
+  //
+  // Jetzt lädt jede Vorschau erst auf Anforderung. Das Herunterladen geht
+  // weiterhin ohne Vorschau — wer weiß, was er will, soll nicht erst
+  // zusehen müssen.
+  const [geladen, setGeladen] = useState<Set<string>>(new Set());
   // Zählt bei jedem Neuladen hoch und hängt sich an die Adresse. Ohne das
   // liefert der Browser dasselbe Bild aus seinem Zwischenspeicher, und man
   // glaubt, die Erneuerung habe nicht funktioniert.
@@ -64,7 +76,10 @@ export function StoryPanel() {
         </p>
         <button
           type="button"
-          onClick={() => setStand((s) => s + 1)}
+          onClick={() => {
+            setStand((s) => s + 1);
+            setGeladen(new Set());
+          }}
           className="ml-auto inline-flex min-h-[32px] items-center gap-1.5 text-[11px] text-slate-500 transition-colors hover:text-violet-400"
         >
           <RefreshCw size={11} /> Neu erzeugen
@@ -114,14 +129,23 @@ export function StoryPanel() {
                 aspectRatio: `${STORY_FORMATE[format].width} / ${STORY_FORMATE[format].height}`,
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                key={`${v.id}-${format}-${stand}`}
-                src={adresse(v.id)}
-                alt={`${v.titel} als ${FORMAT_TEXT[format]}`}
-                loading="lazy"
-                className="h-full w-full object-contain"
-              />
+              {geladen.has(v.id) ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={`${v.id}-${format}-${stand}`}
+                  src={adresse(v.id)}
+                  alt={`${v.titel} als ${FORMAT_TEXT[format]}`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setGeladen((g) => new Set(g).add(v.id))}
+                  className="flex h-full w-full items-center justify-center text-[12px] text-slate-500 transition-colors hover:text-violet-400"
+                >
+                  Vorschau laden
+                </button>
+              )}
             </div>
           </div>
         ))}
