@@ -11,10 +11,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.9.1',
+    date: '31. Juli 2026',
+    label: 'Wiederholungen haben ein Ende',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Bei einem Ausfall der Kartendatenbank wartete die Suche bis zu 40 Sekunden — jetzt Gesamtfrist von neun Sekunden ueber alle Versuche' },
+    ],
+  },
+  {
     version: '4.9.0',
     date: '31. Juli 2026',
     label: 'Suchfrist, Methodik, einheitliche Koepfe',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Die Frist des Such-Zwischenspeichers steigt von zehn Minuten auf eine Stunde — an die der Kartenseite gekoppelt, damit beide nie unterschiedliche Preise zeigen' },
       { type: 'changed', text: 'Der Tages-Cron waermt die 20 gefragtesten Begriffe vor; sie kommen aus den Daten, nicht aus einer Liste im Code' },

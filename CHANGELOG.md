@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.9.1] - 31. Juli 2026 · Wiederholungen haben ein Ende
+
+### Behoben
+- **Bei einem Ausfall der Kartendatenbank wartete die Suche bis zu 40 Sekunden.** Drei Wiederholungen mit je zwoelf Sekunden Zeitlimit plus Wartezeiten summieren sich; gemessen waren es 15 bis 18 Sekunden, waehrend die Quelle streikte. Jetzt gilt eine Gesamtfrist von neun Sekunden ueber ALLE Versuche — danach ist ein ehrliches „gerade nicht verfuegbar" die bessere Antwort als weiteres Warten. Die flaechendeckende Erfassung im Hintergrund ist ausgenommen: Dort ist Warten billiger als ein Loch in den Messpunkten
+
+---
+
 ## [4.9.0] - 31. Juli 2026 · Suchfrist, Methodik, einheitliche Koepfe
 
 ### Geaendert

@@ -81,3 +81,32 @@ describe('Set-Markt verbindet Set und Markt', () => {
     expect(mod).not.toMatch(/group-hover:[^\s'"`]*\btopMover/);
   });
 });
+
+describe('Wiederholungen haben ein Ende', () => {
+  const api = ohneKommentare('src/lib/pokemon-api.ts');
+
+  it('die Suche hat eine Gesamtfrist ueber alle Versuche', () => {
+    // BEFUND: Drei Versuche à 12 Sekunden plus Wartezeiten ergeben im
+    // schlimmsten Fall fast 40 Sekunden. Gemessen wurden 15 bis 18, waehrend
+    // die Kartendatenbank streikte — so lange sitzt niemand vor einer Suche.
+    const block = api.slice(api.indexOf('export async function searchCards'));
+    expect(block.slice(0, 1800)).toMatch(/gesamtbudgetMs: 9000/);
+  });
+
+  it('die Frist zaehlt die Summe, nicht den einzelnen Versuch', () => {
+    expect(api).toMatch(/Date\.now\(\) - begonnen > gesamtbudgetMs/);
+  });
+
+  it('bricht erst NACH dem ersten Versuch ab', () => {
+    // Sonst wuerde eine langsame Verbindung die Suche ganz verhindern, statt
+    // sie nur zu begrenzen.
+    expect(api).toMatch(/attempt > 0 && Date\.now\(\) - begonnen/);
+  });
+
+  it('gilt nicht fuer die flaechendeckende Erfassung', () => {
+    // Der Durchlauf laeuft im Hintergrund; dort ist Warten billiger als ein Loch
+    // in den Messpunkten.
+    const sweep = api.slice(api.indexOf('export async function fetchCardPage'));
+    expect(sweep.slice(0, 900)).not.toMatch(/gesamtbudgetMs/);
+  });
+});

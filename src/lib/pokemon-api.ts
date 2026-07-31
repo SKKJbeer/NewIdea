@@ -36,10 +36,31 @@ type BeiAusfall = 'leer' | 'werfen';
 
 async function tcgList(
   params: Record<string, string | number>,
-  { retries = 1, timeout = 8000, beiAusfall = 'leer' as BeiAusfall } = {},
+  {
+    retries = 1,
+    timeout = 8000,
+    beiAusfall = 'leer' as BeiAusfall,
+    gesamtbudgetMs = 0,
+  } = {},
 ): Promise<unknown[]> {
   let lastError: unknown;
+  const begonnen = Date.now();
   for (let attempt = 0; attempt <= retries; attempt++) {
+    // GESAMTFRIST — die Summe der Versuche, nicht jeder einzelne.
+    //
+    // BEFUND: Drei Wiederholungen mit je 12 Sekunden Zeitlimit plus Wartezeiten
+    // ergeben im schlimmsten Fall fast 40 Sekunden. Gemessen wurden 15 bis 18,
+    // während die Kartendatenbank streikte — so lange sitzt niemand vor einer
+    // Suchseite. Wiederholungen sind richtig, aber sie brauchen ein Ende:
+    // Nach der Frist ist ein ehrliches „gerade nicht verfügbar" die bessere
+    // Antwort als weiteres Warten.
+    if (gesamtbudgetMs > 0 && attempt > 0 && Date.now() - begonnen > gesamtbudgetMs) {
+      console.warn(
+        `TCG-Abfrage nach ${Math.round((Date.now() - begonnen) / 1000)} s abgebrochen ` +
+          `(Budget ${Math.round(gesamtbudgetMs / 1000)} s)`,
+      );
+      break;
+    }
     try {
       const response = await axios.get(`${TCG_API_BASE}/cards`, {
         headers: { ...tcgHeaders() },
@@ -275,9 +296,13 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
   // unendlich viel besser als eine, die aufgibt.
   const schluessel = `${escaped.toLowerCase()}|${limit}`;
 
+  // Gesamtfrist 9 Sekunden: Drei Versuche à 12 Sekunden könnten sonst fast 40
+  // Sekunden dauern — gemessen 15 bis 18, während die Quelle streikte. Die
+  // Wiederholungen fangen kurze Aussetzer ab; ein längerer Ausfall soll den
+  // Besucher nicht warten lassen, sondern ihm gesagt werden.
   const data = await tcgList(
     { q: `name:"*${escaped}*"`, pageSize: limit, orderBy: '-set.releaseDate' },
-    { retries: 3, timeout: 12000 },
+    { retries: 3, timeout: 12000, gesamtbudgetMs: 9000 },
   );
 
   // Nur vollständige, handelbare Karten (Preis + Bild) — nach Marktpreis absteigend.
