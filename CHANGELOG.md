@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.11.1] - 31. Juli 2026 · Abgeschnittene Kennzahl im Marktbild
+
+### Behoben
+- **„204 Karten" lief im Marktbild aus dem Bild.** Die drei Kennzahlen standen mit festem Abstand nebeneinander; die dritte passte nicht mehr. Ein abgeschnittenes Wort in einem Beitrag, der geteilt wird, ist schlimmer als eine kleinere Schrift — die Spalten teilen sich die Breite jetzt gleichmaessig, und die Einheit steht in der Beschriftung statt im Wert
+- **Die leere Bildmitte** ist weg: Der Kennzahlenblock sitzt am unteren Rand statt direkt unter der grossen Zahl
+
+---
+
 ## [4.11.0] - 31. Juli 2026 · Markt-Geschichten als Bild
 
 ### Neu

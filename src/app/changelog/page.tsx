@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.11.1',
+    date: '31. Juli 2026',
+    label: 'Abgeschnittene Kennzahl im Marktbild',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„204 Karten" lief im Marktbild aus dem Bild — die Spalten teilen sich die Breite jetzt gleichmaessig' },
+      { type: 'fixed', text: 'Die leere Bildmitte ist weg: Der Kennzahlenblock sitzt am unteren Rand' },
+    ],
+  },
+  {
     version: '4.11.0',
     date: '31. Juli 2026',
     label: 'Markt-Geschichten als Bild',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Vier wiederverwendbare Marktbilder in drei Formaten — staerkste Bewegung, Set gegen Set, Marktstand, Karte gegen Markt' },
       { type: 'new',     text: 'Die Bilder nehmen keinen Text aus der Adresse entgegen; alle Zahlen stammen aus der Marktstichprobe der Startseite' },

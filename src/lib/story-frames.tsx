@@ -122,7 +122,7 @@ function Fuss({ kompakt, datenstand }: { kompakt: boolean; datenstand: string })
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        marginTop: 'auto',
+        marginTop: kompakt ? 28 : 48,
         paddingTop: kompakt ? 24 : 40,
         borderTop: `2px solid ${LINIE}`,
       }}
@@ -171,6 +171,7 @@ export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; for
         {karte.set} · {formatEur(karte.preis)}
         {karte.gegenMarkt !== null ? ` · ${formatPp(karte.gegenMarkt)} zum Markt` : ''}
       </div>
+      <div style={{ display: 'flex', flexGrow: 1 }} />
       <Fuss kompakt={kompakt} datenstand={datenstand} />
     </Buehne>
   );
@@ -200,6 +201,7 @@ export function SetBattle({ a, b, format, datenstand }: { a: SetDaten; b: SetDat
         gegen
       </div>
       {zeile(b)}
+      <div style={{ display: 'flex', flexGrow: 1 }} />
       <Fuss kompakt={kompakt} datenstand={datenstand} />
     </Buehne>
   );
@@ -230,17 +232,32 @@ export function MarketState({ markt, format, datenstand }: { markt: MarktDaten; 
       >
         {formatPercent(markt.cbi)}
       </div>
-      <div style={{ display: 'flex', gap: kompakt ? 44 : 80, marginTop: kompakt ? 28 : 60 }}>
+      {/* DREI SPALTEN MIT FESTEM ANTEIL.
+          Vorher standen sie mit festem Abstand nebeneinander — die dritte
+          („204 Karten") lief dadurch aus dem Bild. Ein abgeschnittenes Wort in
+          einem Beitrag, der geteilt wird, ist schlimmer als eine kleinere
+          Schrift. Die Einheit steht jetzt in der Beschriftung, damit der Wert
+          selbst kurz bleibt.
+          Der Block sitzt unten am Rand (`marginTop: auto`), sonst klafft
+          zwischen Kennzahl und Fußzeile eine leere Hälfte. */}
+      <div
+        style={{
+          display: 'flex',
+          width: '100%',
+          marginTop: 'auto',
+          paddingTop: kompakt ? 24 : 48,
+        }}
+      >
         {[
           ['Marktbreite', `${Math.round(markt.breite)} %`],
           ['Temperatur', markt.temperatur],
-          ['Stichprobe', `${markt.karten} Karten`],
+          [`Stichprobe · ${markt.sets} Sets`, `${markt.karten}`],
         ].map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', fontSize: kompakt ? 18 : 26, color: MUTED, letterSpacing: 3 }}>
+          <div key={k} style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', fontSize: kompakt ? 16 : 22, color: MUTED, letterSpacing: 2 }}>
               {k.toUpperCase()}
             </div>
-            <div style={{ display: 'flex', fontSize: kompakt ? 40 : 62, marginTop: 8 }}>{v}</div>
+            <div style={{ display: 'flex', fontSize: kompakt ? 34 : 54, marginTop: 8 }}>{v}</div>
           </div>
         ))}
       </div>
@@ -302,6 +319,7 @@ export function CardVsMarket({
           {formatPp(karte.trend - cbi)}
         </div>
       </div>
+      <div style={{ display: 'flex', flexGrow: 1 }} />
       <Fuss kompakt={kompakt} datenstand={datenstand} />
     </Buehne>
   );
