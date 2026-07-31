@@ -41,14 +41,26 @@ export function WatchButton({ cardId, cardName, setName, setCode, imageUrl, pric
     } catch {}
   }
 
+  // GEDECKT STATT LAUT.
+  //
+  // Vorher war das eine vollflächig violette Schaltfläche über die ganze
+  // Spaltenbreite — auf einem Bildschirmfoto der lauteste Gegenstand der Seite,
+  // lauter als das Kartenbild darüber. Genau daran ist ein Produkt als
+  // beliebige Vorlage zu erkennen: Die auffälligste Fläche gehört einer
+  // Nebenfunktion.
+  //
+  // Die Karte ist der Blickfang. Das Merken ist eine Nebenhandlung und sieht
+  // jetzt auch so aus — sichtbar, erreichbar, aber nicht schreiend. Der
+  // gemerkte Zustand ist bewusst der farbigere von beiden: Dass etwas AUF der
+  // Merkliste steht, ist die Auskunft; die Einladung ist es nicht.
   return (
     <button
       onClick={toggle}
       disabled={!mounted}
-      className={`flex items-center justify-center gap-2 w-full rounded-xl py-3 font-bold text-sm transition-all border ${
+      className={`flex min-h-[44px] w-full items-center justify-center gap-2 border text-[13px] font-semibold transition-colors ${
         watched
-          ? 'border-violet-500/40 bg-violet-500/15 text-violet-300 hover:bg-violet-500/25'
-          : 'border-violet-600 bg-violet-600 text-white hover:bg-violet-500'
+          ? 'border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/15'
+          : 'border-[#2a2a35] bg-transparent text-slate-300 hover:border-violet-500/40 hover:text-violet-300'
       }`}
     >
       <Star size={15} className={watched ? 'fill-violet-400 text-violet-400' : ''} />

@@ -63,8 +63,11 @@ export function MarketBriefBlock({ saetze }: { saetze: BriefSatz[] }) {
           {s.text}{' '}
           {/* Der Beleg steht IM Satz, nicht in einer Fußnote: Eine Aussage und
               die Zahl, auf der sie beruht, gehören zusammen. */}
+          {/* Klammern NUR setzen, wenn der Beleg nicht schon welche mitbringt.
+              Sonst stand da „(32 % im Plus (66 von 204))" — eine doppelte
+              Klammer mitten im wichtigsten Absatz der Startseite. */}
           <span className="whitespace-nowrap text-[12px] tabular-nums text-slate-600">
-            ({s.beleg})
+            {s.beleg.includes('(') ? s.beleg : `(${s.beleg})`}
           </span>
         </p>
       ))}

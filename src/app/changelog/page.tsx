@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.4.1',
+    date: '31. Juli 2026',
+    label: 'Drei Befunde aus der Sichtpruefung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Doppelte Klammer im Einordnungstext der Startseite' },
+      { type: 'fixed', text: 'Auf dem Telefon quetschte sich die Verteilung neben den Indexwert — sie steht jetzt darunter' },
+      { type: 'fixed', text: 'Der Merklisten-Knopf war auffaelliger als das Kartenbild; die Karte ist der Blickfang' },
+    ],
+  },
+  {
     version: '4.4.0',
     date: '31. Juli 2026',
     label: 'Die Sammler-Ebene',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new',     text: 'Ambient-Ton hinter dem Kartenbild, abgeleitet aus dem Energietyp der Karte — nicht aus einer Farbanalyse des Bildes' },
       { type: 'new',     text: 'Folienschimmer auf Karten, deren Seltenheit auch wirklich glaenzt — nur auf Zeigerkontakt, abschaltbar ueber Reduced-Motion' },

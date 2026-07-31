@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.4.1] - 31. Juli 2026 · Drei Befunde aus der Sichtpruefung
+
+### Behoben
+- **Doppelte Klammer im wichtigsten Absatz der Startseite** — „(32 % im Plus (66 von 204))". Der Beleg brachte seine Klammern schon mit und bekam noch einmal welche
+- **Auf dem Telefon quetschte sich die Verteilung neben den Indexwert.** Die Ueberschrift brach mitten im Wort um, die Achsenbeschriftung lag auf den Balken. Sie steht jetzt unter der Zahl statt daneben
+- **Der Merklisten-Knopf war der lauteste Gegenstand der Kartenseite** — eine vollflaechig violette Schaltflaeche ueber die ganze Spaltenbreite, auffaelliger als das Kartenbild darueber. Die Karte ist der Blickfang; das Merken ist eine Nebenhandlung und sieht jetzt auch so aus
+
+---
+
 ## [4.4.0] - 31. Juli 2026 · Die Sammler-Ebene
 
 ### Neu

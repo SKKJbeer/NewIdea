@@ -101,9 +101,13 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             </p>
           </div>
 
-          {/* Verteilung statt Kurve — siehe Kommentar oben. */}
+          {/* Verteilung statt Kurve — siehe Kommentar oben.
+              `basis-full` bis zum sm-Bereich: Auf 390 px quetschte sich die
+              Verteilung neben den Indexwert, die Überschrift brach mitten im
+              Wort um und die Achsenbeschriftung lag auf den Balken. Auf dem
+              Telefon gehört sie unter die Zahl, nicht daneben. */}
           {cbi.sufficient && trends.length > 0 && (
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
               <p className={SECTION_LABEL}>Verteilung der 30-Tage-Bewegung</p>
               <div className="mt-3 flex h-24 items-end gap-1" role="img"
                 aria-label={klassen.map((k) => `${k.label} Prozent: ${k.anzahl} Karten`).join(', ')}>
