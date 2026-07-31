@@ -202,9 +202,16 @@ export interface PmiResult {
 /**
  * Preisgewichteter Markttrend.
  *
- * Gewichtet nach Preis, weil eine 400-€-Karte den Markt stärker bewegt als eine
- * 2-€-Karte. Ohne Gewichtung würde eine große Zahl billiger Karten den Index
- * bestimmen.
+ * Der PMI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein
+ * größeres Gewicht im Index, und eine große Anzahl sehr günstiger Karten
+ * dominiert die Kennzahl nicht.
+ *
+ * BEWUSST NICHT BEHAUPTET: Ein höherer Preis heißt nicht, dass eine Karte den
+ * Markt stärker bewegt oder häufiger gehandelt wird. Genau das stand hier
+ * vorher („eine 400-€-Karte bewegt den Markt stärker als eine 2-€-Karte") —
+ * eine Aussage über Marktbedeutung und Liquidität, für die es in den Daten
+ * keinen Beleg gibt. Die Gewichtung ist eine Entscheidung über die Konstruktion
+ * des Index, keine Erkenntnis über den Markt.
  */
 export function computePmi(cards: PokemonCard[]): PmiResult {
   const mitTrend = cards.filter(hasRealTrend);

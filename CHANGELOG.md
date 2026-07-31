@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [3.3.4] - 31. Juli 2026 · Labels sagen, was die Zahl ist
+
+### Behoben
+- **Die Set-Tabelle war mit „Ø Preis“ beschriftet, gerechnet wurde aber der Median.** Zwei verschiedene Aussagen ueber dieselbe Zahl. Die Spalte heisst jetzt „Medianpreis“; an der Berechnung aendert sich nichts
+- **Der Markt-Ticker trug das Label „Live“** neben Zahlen aus einer taeglich aktualisierten Quelle. Er heisst jetzt „Marktbewegungen“
+- **Die Methodik begruendete die Preisgewichtung des Index damit, dass teure Karten den Markt staerker bewegen.** Das ist eine Aussage ueber Marktbedeutung und Handelshaeufigkeit, fuer die es in den Daten keinen Beleg gibt. Die Erklaerung beschreibt jetzt, was die Gewichtung tut, ohne etwas ueber den Markt zu behaupten
+
+### Neu
+- `DOMAIN.md` — die Schritte fuer den Domainwechsel, von DNS bis Search Console. Am Code ist dafuer nichts zu aendern
+
+---
+
 ## [3.3.3] - 30. Juli 2026 · Keine Null aus einer gescheiterten Zaehlung
 
 ### Behoben

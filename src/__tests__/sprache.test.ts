@@ -54,6 +54,34 @@ describe('Kein Versprechen von Echtzeit-Daten', () => {
   });
 });
 
+describe('Labels sagen, was die Zahl darunter ist', () => {
+  it('der Ticker verspricht keine Aktualisierung in Echtzeit', () => {
+    // Vorher stand dort schlicht „Live" — neben Zahlen aus einer täglich
+    // aktualisierten Quelle.
+    const seite = lies('src/app/page.tsx');
+    expect(seite).toContain('Marktbewegungen');
+    expect(seite).not.toMatch(/<Activity size=\{10\} \/> Live$/m);
+  });
+
+  it('die Set-Tabelle nennt den Median beim Namen', () => {
+    // Gerechnet wird der Median (rankSets), in der Spalte stand aber
+    // „Ø Preis“ — zwei verschiedene Aussagen über dieselbe Zahl.
+    const seite = lies('src/app/page.tsx');
+    expect(seite).toContain('Medianpreis');
+    expect(seite).not.toContain('Ø Preis');
+    expect(lies('src/lib/market-metrics.ts')).toContain('medianPrice: median(');
+  });
+
+  it('die Methodik erklärt die Gewichtung ohne Behauptung über den Markt', () => {
+    // Vorher: „weil eine 400-€-Karte den Markt stärker bewegt“ — eine Aussage
+    // über Marktbedeutung und Liquidität, für die es keinen Beleg gibt.
+    const methodik = lies('src/app/methodik/page.tsx');
+    expect(methodik).toContain('preisgewichtet');
+    expect(methodik).not.toMatch(/bewegt den Markt|Markt stärker bewegt/);
+    expect(methodik).toMatch(/dominiert die Kennzahl\s*\n?\s*nicht/);
+  });
+});
+
 describe('Positionierung: Marktanalyse statt Anlage-Vokabular', () => {
   it('keine Investment-Begriffe in sichtbaren Texten', () => {
     // Die Plattform analysiert einen Markt; sie berät nicht bei Geldanlagen.

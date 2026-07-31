@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '3.3.4',
+    date: '31. Juli 2026',
+    label: 'Labels sagen, was die Zahl ist',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Set-Tabelle war mit Durchschnittspreis beschriftet, gerechnet wurde der Median — die Spalte heisst jetzt Medianpreis' },
+      { type: 'fixed', text: 'Der Markt-Ticker trug ein Live-Label neben Zahlen aus einer taeglich aktualisierten Quelle' },
+      { type: 'fixed', text: 'Die Methodik begruendete die Preisgewichtung mit groesserer Marktbedeutung teurer Karten — dafuer gibt es in den Daten keinen Beleg' },
+      { type: 'new',   text: 'DOMAIN.md mit den Schritten fuer den Domainwechsel' },
+    ],
+  },
+  {
     version: '3.3.3',
     date: '30. Juli 2026',
     label: 'Keine Null aus einer gescheiterten Zaehlung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'In der neuen Datenabdeckung stand kurzzeitig eine 0 fuer die Set-Zahl, weil der Abruf fehlschlug - faellt die Zaehlung aus, entfaellt die Angabe' },
     ],

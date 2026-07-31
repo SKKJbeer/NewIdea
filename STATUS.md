@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v3.3.3` · **Stand:** 30. Juli 2026 · **Branch:** `main`
+**Version:** `v3.3.4` · **Stand:** 30. Juli 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v3.3.3)
+## Was gebaut ist (Stand v3.3.4)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v3.3.4 | Labels an die Berechnung angeglichen (Medianpreis, Marktbewegungen) · PMI-Begruendung ohne Behauptung ueber den Markt · DOMAIN.md |
 | v3.3.3 | Keine Null aus einer gescheiterten Zaehlung in der Datenabdeckung |
 | v3.3.2 | Index-Schnittstelle an die Stichprobe der Startseite angeglichen |
 | v3.3.1 | Nachtrag: Sprachpruefung nimmt den Verlauf aus |

@@ -143,8 +143,11 @@ export default function MethodikPage() {
           </p>
           <Formel>PMI = Σ(Trend × Preis) ÷ Σ(Preis)</Formel>
           <p>
-            Gewichtet nach Preis, weil eine 400-€-Karte den Markt stärker bewegt als eine 2-€-Karte.
-            Ohne Gewichtung würden viele billige Karten den Index bestimmen.
+            Der PMI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein größeres
+            Gewicht im Index, und eine große Anzahl sehr günstiger Karten dominiert die Kennzahl
+            nicht. Die Gewichtung ist eine Entscheidung über den Aufbau des Index — sie besagt
+            nicht, dass ein höherer Preis mit größerer Marktbedeutung oder häufigerem Handel
+            einhergeht.
           </p>
           <p>
             <strong className="text-slate-300">Mindestdatenlage:</strong> Unter{' '}

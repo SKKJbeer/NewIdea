@@ -275,7 +275,10 @@ export default async function Home() {
         <div className="border-b border-[#1e1e30] bg-[#0d0d18] py-2 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-6 px-4 min-w-max">
             <span className="shrink-0 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-slate-600 pr-2 border-r border-[#2a2a3a]">
-              <Activity size={10} /> Live
+              {/* Vorher „Live". Der Ticker zeigt Bewegungen aus einer täglich
+                  aktualisierten Quelle — nichts daran ist sekundengenau, und
+                  ein Label darf nichts versprechen, was die Daten nicht halten. */}
+              <Activity size={10} /> Marktbewegungen
             </span>
             {tickerCards.map((card) => {
               const trend = card.trendPercent ?? 0;
@@ -733,7 +736,9 @@ export default async function Home() {
               <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 border-b border-[#1e1e30] px-4 py-2">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700">Set</span>
                 <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700 text-right">Karten</span>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700 text-right">Ø Preis</span>
+                {/* Gerechnet wird der MEDIAN (siehe rankSets) — „Ø" hätte etwas anderes
+                    behauptet als die Zahl darunter zeigt. */}
+                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700 text-right">Medianpreis</span>
                 <span className="text-[9px] font-bold uppercase tracking-widest text-slate-700 text-right">Ø Trend</span>
               </div>
               <div className="divide-y divide-[#1a1a28]">
