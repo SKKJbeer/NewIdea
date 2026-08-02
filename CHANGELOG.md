@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.3.0] - 2. August 2026 · Generierte Beitraege wiederholen sich nicht mehr
+
+### Behoben
+- **Fuenf von acht veroeffentlichten Beitraegen behandelten dieselbe Karte.** Gezaehlt auf der Seite: KW 31, 30.07., 16.07. und KW 28 drehten sich um Pikachu ex / Surging Sparks, KW 29 und KW 30 um dasselbe zweite Motiv. Zwei strukturelle Ursachen:
+- **Derselbe Kandidatenpool.** Die Erzeugung bekam immer die sechs wertvollsten Karten der Stichprobe. Die aendern sich ueber Wochen kaum — und die auffaelligste Bewegung darin ist entsprechend oft dieselbe. Jetzt: breiterer Pool (30 statt 10) und eine Auswahl, die nach Datum deterministisch mischt statt nach Wert zu sortieren
+- **Die letzten Titel wurden dem Modell als ANKNUEPFUNG gereicht** — woertlich „nur bei thematischem Bezug natuerlich darauf anspielen — kein Zwang". Gemeint war ein roter Faden, herausgekommen ist eine Endlosschleife. Jetzt stehen sie als Sperre im Prompt
+
+### Neu
+- **`content-variety.ts`** — die eigentliche Absicherung liegt eine Ebene tiefer als der Prompt: Karten, deren Name oder Set in einem der letzten sechs Titel vorkommt, gehen gar nicht erst in die Kandidatenliste. Ein Modell, das man bittet, sich nicht zu wiederholen, tut es trotzdem; ueber ein Thema, das nicht in der Liste steht, kann es nicht schreiben
+- **Beide Richtungen im Kandidatenkreis** — staerkste Auf- UND Abwaertsbewegung. Ein Beitrag nur mit Steigerungen waere eine Auswahl zugunsten guter Nachrichten
+- **Deterministisch gemischt, nicht zufaellig:** derselbe Tag ergibt dieselbe Auswahl (sonst zeigte ein zweiter Seitenaufruf einen anderen Artikel), verschiedene Tage verschiedene
+- **Reicht die Auswahl nicht, wird die Sperre gelockert** — und das steht im Log. Lieber ein Beitrag ueber eine bekannte Karte als keiner
+
+### Unveraendert
+- **Der Marktbericht bleibt, wie er ist.** Er nennt die tatsaechlich staerksten Bewegungen der Woche; dort Abwechslung zu erzwingen waere eine Faelschung. Die Guides waren nie betroffen — sie ziehen aus einer kuratierten Themen-Warteschlange
+
+---
+
 ## [5.2.1] - 2. August 2026 · Monitoring zu Ende aufgeraeumt
 
 ### Behoben

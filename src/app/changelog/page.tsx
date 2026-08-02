@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.3.0',
+    date: '2. August 2026',
+    label: 'Generierte Beitraege wiederholen sich nicht mehr',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Fuenf von acht Beitraegen behandelten dieselbe Karte — der Kandidatenpool war immer derselbe' },
+      { type: 'fixed', text: 'Die letzten Titel wurden dem Modell als Anknuepfung gereicht statt als Sperre — das lud zur Wiederholung ein' },
+      { type: 'new', text: 'Karten, deren Name oder Set zuletzt Thema war, gehen gar nicht erst in die Kandidatenliste' },
+      { type: 'new', text: 'Beide Richtungen im Kandidatenkreis; deterministisch gemischt, damit derselbe Tag denselben Beitrag ergibt' },
+      { type: 'changed', text: 'Der Marktbericht bleibt unveraendert: Er nennt die tatsaechlich staerksten Bewegungen, dort waere erzwungene Abwechslung eine Faelschung' },
+    ],
+  },
+  {
     version: '5.2.1',
     date: '2. August 2026',
     label: 'Monitoring zu Ende aufgeraeumt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Das Monitoring meldete beide Cron-Jobs als inaktiv, waehrend sie liefen — „aktiv" haengte an einer Adresse, die nie verbunden wurde' },
       { type: 'fixed', text: 'Der Block „features" ist jetzt auch aus der API-Antwort raus, nicht nur aus der Anzeige' },

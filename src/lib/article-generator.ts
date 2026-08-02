@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
 import { loadArticle, saveArticle, listSavedArticleMeta } from './article-storage';
+import { waehleThemen, alsPromptText, SPERRFRIST } from './content-variety';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
 
@@ -441,8 +442,17 @@ function buildPrompt(type: ArticleType, cards: string, dateLabel: string, recent
     ? `Du bist erfahrener Content-Creator und Autor für eine deutschsprachige Pokémon-TCG-Plattform und schreibst den wöchentlichen Rückblick. Du lebst die Szene und weißt, was Sammler gerade bewegt. Stil: leicht lesbar und unterhaltsam, aber ohne persönliche Kaufempfehlungen — nur Beobachtungen, Fakten und Marktanalyse. Unbekannte Pokémon immer kurz in Klammern beschreiben. Klare sachliche Aussagen, alles jugendfrei ab 10 Jahren.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\n${CREATOR_RULES}\n\nAntworte NUR mit validem JSON:\n${RUECKBLICK_SCHEMA}`
     : `Du bist erfahrener Content-Creator und Autor für eine deutschsprachige Pokémon-TCG-Plattform — jemand, der die Szene lebt und weiß, was Sammler gerade bewegt. Du schreibst Artikel, die man WIRKLICH lesen will: starker Einstieg, roter Faden, konkrete Beispiele mit echten Karten. Du holst Einsteiger ab (Fachbegriffe beim ersten Auftreten kurz erklären, unbekannte Pokémon in Klammern beschreiben) UND Fortgeschrittene (Tiefe, Marktmechanik, Muster). Nutze ausschließlich Zahlen und Karten-Namen aus den gelieferten Daten. Keine persönlichen Kaufempfehlungen — nur Marktbeobachtungen und sachliche Einschätzungen.\n\n${CONTENT_RULES}\n\n${STYLE_RULES}\n\n${CREATOR_RULES}\n\nAntworte NUR mit validem JSON:\n${JSON_SCHEMA}`;
 
+  // ZULETZT ERSCHIENEN — ALS SPERRE, NICHT ALS ANKNUEPFUNG.
+  //
+  // Hier stand „nur bei thematischem Bezug natürlich darauf anspielen — kein
+  // Zwang". Gemeint war ein roter Faden. Herausgekommen ist, dass fünf von
+  // acht Beiträgen dieselbe Karte behandelten: Das Modell nahm die Liste als
+  // Themenvorschlag. Eine Bitte, sich nicht zu wiederholen, wirkt schwächer
+  // als eine Kandidatenliste ohne das Thema — deshalb greift die eigentliche
+  // Absicherung eine Ebene tiefer (`content-variety.ts`) und dieser Absatz
+  // ist nur die zweite Reihe.
   const continuity = recentTitles.length > 0
-    ? `\n\nZuletzt erschienen (nur bei thematischem Bezug natürlich darauf anspielen — kein Zwang):\n${recentTitles.map((t) => `- ${t}`).join('\n')}`
+    ? `\n\nBEREITS ERSCHIENEN — behandle NICHT dasselbe Thema, dieselbe Karte oder dasselbe Set erneut:\n${recentTitles.map((t) => `- ${t}`).join('\n')}\n\nWähle bewusst einen anderen Schwerpunkt aus den gelieferten Daten. Ein Rückverweis in einem Halbsatz ist erlaubt; ein zweiter Beitrag über dasselbe Motiv nicht.`
     : '';
 
   const contexts: Record<ArticleType, string> = {
@@ -622,12 +632,10 @@ export async function generateArticle(
   let trendingCards: PokemonCard[] = [];
   let cardSummary = 'Keine aktuellen Daten verfügbar';
   try {
-    trendingCards = await fetchTrendingCards(10);
-    cardSummary = trendingCards
-      .slice(0, 6)
-      // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
-      .map((c) => `${c.name} (${c.set}): ${(c.prices.market || c.prices.holofoil?.market || 0).toFixed(2)}€, Trend: ${(c.trendPercent || 0).toFixed(1)}%`)
-      .join('\n');
+    // BREITERER POOL ALS FRUEHER (30 statt 10). Aus zehn immer gleichen
+    // Karten laesst sich keine Abwechslung waehlen — die wertvollsten
+    // aendern sich ueber Wochen kaum.
+    trendingCards = await fetchTrendingCards(30);
   } catch (err) {
     // Nie stumm: Ohne Kartendaten wird der Artikel dünner, und genau das
     // muss im Log stehen (Stolperstelle 21).
@@ -636,8 +644,28 @@ export async function generateArticle(
 
   // Titel der letzten Artikel für optionale Anknüpfung (natürlicher roter Faden).
   const recentTitles = await listSavedArticleMeta()
-    .then((m) => m.filter((a) => a.date !== date).slice(0, 5).map((a) => a.title).filter(Boolean))
+    .then((m) => m.filter((a) => a.date !== date).slice(0, SPERRFRIST).map((a) => a.title).filter(Boolean))
     .catch(() => [] as string[]);
+
+  // THEMENWAHL — die eigentliche Absicherung gegen Wiederholung.
+  //
+  // Karten, deren Name oder Set in einem der letzten Titel vorkommt, gehen
+  // gar nicht erst in den Prompt. Was nicht in der Kandidatenliste steht,
+  // kann das Modell auch nicht zum wiederholten Mal behandeln.
+  if (trendingCards.length > 0) {
+    const wahl = waehleThemen(trendingCards, recentTitles, date);
+    cardSummary = alsPromptText(wahl.kandidaten);
+    // Die Auswahl gehoert ins Log: Ohne sie sieht ein wiederholtes Thema wie
+    // ein Zufall aus, statt wie eine zu kleine Kandidatenmenge.
+    console.log(
+      `[Artikel ${date}] ${wahl.kandidaten.length} Kandidaten` +
+        `${wahl.sperreGelockert ? ' — Sperre gelockert, zu wenig freie Themen' : ''}` +
+        `, gesperrt: ${wahl.gesperrteThemen.slice(0, 12).join(', ')}`,
+    );
+    // Die angezeigten Karten sind die gewaehlten, nicht der ganze Pool —
+    // sonst zeigt der Beitrag Karten, ueber die er nicht schreibt.
+    trendingCards = wahl.kandidaten;
+  }
 
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {

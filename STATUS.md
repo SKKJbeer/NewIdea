@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.2.1` · **Stand:** 2. August 2026 · **Branch:** `main`
+**Version:** `v5.3.0` · **Stand:** 2. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
