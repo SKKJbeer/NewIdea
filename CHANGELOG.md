@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.0.0] - 2. August 2026 · Der Hero ist die Identitaet, nicht ein Abschnitt
+
+### Neu
+- **Hero fuellt den ersten Bildschirm** (92 vh). Die Leere ist Teil der Gestaltung: Wer ankommt, soll ein paar Sekunden bleiben, bevor Zahlen kommen
+- **Hierarchie wie vorgegeben** — Auszeichnung, sehr grosse Ueberschrift (bis 72 px), Erzaehlung auf 620 px Textbreite, uebergrosse Knoepfe (58 px, Pille), kleine Marktfakten
+- **Hintergrund in sieben Ebenen**: tiefes Mitternachtsblau, grosse blaue Atmosphaere, grosse violette Atmosphaere, warmes goldenes Licht, feines holografisches Korn, zurueckhaltende diagonale Struktur, Drachen-Artwork. Licht statt Farbe — vier unsichtbare Quellen, kein Neon
+- **Abdeckung als Kreisfortschritt** statt Balken: Ein Balken misst eine Menge, ein Ring einen Anteil an einem Ganzen
+- **Stichprobe als Zeitstrahl**: Der Bestand ist nichts, was man vergleicht, sondern etwas, das ueber die Zeit entsteht
+
+### Geaendert
+- **Der Drache ist jetzt reine Kontur bei rund 3 Prozent**, ohne Fuellung und ohne Schatten, gross und teils ausserhalb des Bildausschnitts. Die Vorgaengerfassung war gefuellt und deutlich staerker — dadurch war sie Motiv statt Atmosphaere. Er soll beim ZWEITEN Hinsehen entdeckt werden
+- **CBI-Panel** mit 30 px Radius, weicherem Glas, groesserer Typografie und weiteren Abstaenden; das Achsenraster deutlich zurueckgenommen
+- **Mehr Weissraum ueberall** — Hero, Karten, Kennzahlen, Abschnitte, Listen. Drei Flaechenebenen, keine gestapelten dunklen Rechtecke
+
+### Behoben
+- **Die Fusszeile stand doppelt**: Das Grundgeruest rendert sie bereits fuer jede Seite, die Startseite setzte eine zweite darunter
+
+---
+
 ## [4.17.0] - 2. August 2026 · Startseite nach geliefertem Entwurf
 
 ### Neu

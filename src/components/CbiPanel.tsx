@@ -57,43 +57,43 @@ export function CbiPanel({ cbi, verlauf, zustand }: Props) {
           abheben, ohne dass ein Schatten sie auf den Grund drueckt. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-6 rounded-[32px] blur-2xl"
-        style={{ background: 'radial-gradient(closest-side, rgba(124,92,255,0.16), transparent)' }}
+        className="pointer-events-none absolute -inset-10 rounded-[42px] blur-3xl"
+        style={{ background: 'radial-gradient(closest-side, rgba(124,92,255,0.2), transparent)' }}
       />
 
-      <div className="card-frame relative overflow-hidden rounded-[22px] border border-white/[0.09] bg-white/[0.035] p-5 backdrop-blur-xl sm:p-6">
+      <div className="card-frame relative overflow-hidden rounded-[30px] border border-white/[0.075] bg-white/[0.028] p-7 backdrop-blur-2xl sm:p-9">
         {/* Lichtkante oben — der schmale helle Streifen, den die Vorlage an
             jeder Flaeche hat. */}
         <div
           aria-hidden
-          className="absolute inset-x-6 top-0 h-px"
+          className="absolute inset-x-10 top-0 h-px"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(190,180,255,0.5), transparent)' }}
         />
 
         <div className="flex items-start justify-between gap-4">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-violet-300/90">
+          <p className="text-[11.5px] font-medium uppercase tracking-[0.24em] text-violet-300/80">
             CardBeacon Index (CBI)
           </p>
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] text-slate-300">
+          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.04] px-3.5 py-1.5 text-[11.5px] text-slate-300">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-violet-400" />
             {zustand}
           </span>
         </div>
 
         {cbi.sufficient ? (
-          <p className={`mt-2 text-[54px] font-semibold leading-none tracking-tight sm:text-[64px] ${toneClass(cbi.value)}`}>
+          <p className={`mt-6 text-[62px] font-semibold leading-[0.95] tracking-[-0.03em] sm:text-[76px] ${toneClass(cbi.value)}`}>
             {formatPercent(cbi.value)}
           </p>
         ) : (
-          <p className="mt-2 text-[54px] font-semibold leading-none tracking-tight text-slate-700 sm:text-[64px]">—</p>
+          <p className="mt-6 text-[62px] font-semibold leading-[0.95] tracking-[-0.03em] text-slate-700 sm:text-[76px]">—</p>
         )}
 
-        <p className="mt-3 text-[12px] text-slate-400">
+        <p className="mt-5 text-[13px] text-slate-400/80">
           {cbi.windowDays}-Tage-Entwicklung des CardBeacon Index
         </p>
 
         {/* ── Verlauf ── */}
-        <div className="mt-4 flex gap-3">
+        <div className="mt-9 flex gap-4">
           <div className="relative min-w-0 flex-1">
             {genug ? (
               <svg viewBox={`0 0 ${B} ${H}`} className="h-[118px] w-full" preserveAspectRatio="none" role="img"
@@ -111,7 +111,7 @@ export function CbiPanel({ cbi, verlauf, zustand }: Props) {
                 </defs>
                 {/* Nulllinie — ohne sie ist nicht erkennbar, was oben und
                     was unten bedeutet. */}
-                <line x1="0" y1={H / 2} x2={B} y2={H / 2} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+                <line x1="0" y1={H / 2} x2={B} y2={H / 2} stroke="rgba(255,255,255,0.045)" strokeWidth="1" />
                 <path d={flaeche} fill="url(#cbi-fill)" />
                 <path d={linie} fill="none" stroke="url(#cbi-line)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
               </svg>

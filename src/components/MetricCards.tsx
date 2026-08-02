@@ -35,7 +35,7 @@ function Karte({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="card-frame group relative overflow-hidden rounded-[18px] border border-white/[0.07] bg-white/[0.025] p-4 backdrop-blur-md transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] sm:p-5">
+    <div className="card-frame group relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.11] hover:bg-white/[0.035] sm:p-7">
       {/* Lichtkante oben — dieselbe Behandlung wie am CBI-Panel, damit die
           Karten zu ihm gehoeren. */}
       <div
@@ -51,20 +51,20 @@ function Karte({
         style={{ background: 'linear-gradient(112deg, transparent 38%, rgba(255,255,255,0.05) 50%, transparent 62%)' }}
       />
 
-      <div className="relative flex items-start gap-3.5">
-        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] border border-white/[0.08] ${ton}`}>
+      <div className="relative flex items-start gap-4">
+        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] border border-white/[0.07] ${ton}`}>
           {icon}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] font-medium uppercase tracking-[0.11em] text-slate-400">{label}</p>
-          <p className="mt-1 text-[26px] font-semibold leading-none tracking-tight text-white sm:text-[30px]">
+          <p className="truncate text-[10.5px] font-medium uppercase tracking-[0.2em] text-slate-400/80">{label}</p>
+          <p className="mt-2.5 text-[30px] font-semibold leading-none tracking-[-0.02em] text-white sm:text-[34px]">
             {wert}
           </p>
-          <p className="mt-1.5 text-[12px] leading-snug text-slate-500">{unter}</p>
+          <p className="mt-2.5 text-[12.5px] leading-snug text-slate-500">{unter}</p>
         </div>
       </div>
 
-      {children && <div className="relative mt-4">{children}</div>}
+      {children && <div className="relative mt-7">{children}</div>}
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function MetricCards({
       : null;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
       {/* 1 — MARKTBREITE. Punktreihe: je ein Punkt fuer ein Fuenfzigstel,
              gefuellt bis zum Anteil im Plus. Ein Anteil, den man abzaehlen
              kann, statt eines Balkens, den man schaetzen muss. */}
@@ -165,14 +165,25 @@ export function MetricCards({
         }
       >
         {abdeckungPct !== null && (
-          <div className="h-[6px] overflow-hidden rounded-full bg-white/[0.07]" aria-hidden>
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${abdeckungPct}%`,
-                background: 'linear-gradient(90deg, rgb(167 139 250), rgb(232 121 249))',
-              }}
-            />
+          // KREISFORTSCHRITT statt Balken. Ein Balken misst eine Menge, ein
+          // Ring einen ANTEIL an einem Ganzen — und genau das ist die
+          // Abdeckung. Der Wert steht in der Mitte, damit man ihn nicht am
+          // Bogen schaetzen muss.
+          <div className="flex items-center gap-4" aria-hidden>
+            <svg viewBox="0 0 44 44" className="h-11 w-11 -rotate-90">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+              <circle
+                cx="22" cy="22" r="18" fill="none"
+                stroke="rgb(232 121 249)" strokeWidth="3.5" strokeLinecap="round"
+                strokeDasharray={`${(abdeckungPct / 100) * 2 * Math.PI * 18} ${2 * Math.PI * 18}`}
+              />
+            </svg>
+            <span className="text-[11px] leading-snug text-slate-500">
+              {cbi.cardCount.toLocaleString('de-DE')} von{' '}
+              {abdeckung!.cards.toLocaleString('de-DE')}
+              <br />
+              in der Auswertung
+            </span>
           </div>
         )}
       </Karte>
@@ -197,9 +208,33 @@ export function MetricCards({
           )
         }
       >
-        <div className="h-[6px] overflow-hidden rounded-full" aria-hidden
-          style={{ background: 'linear-gradient(90deg, rgba(16,185,129,0.35), rgba(56,189,248,0.25), rgba(167,139,250,0.3))' }}
-        />
+        {/* ZEITSTRAHL. Der Bestand ist keine Menge, die man vergleicht,
+            sondern etwas, das ueber die Zeit ENTSTEHT — der Preis-Durchlauf
+            traegt jeden Tag Punkte nach. Ein Strahl mit Marken sagt das; ein
+            Balken sagt es nicht. */}
+        <div className="relative h-[26px]" aria-hidden>
+          <div
+            className="absolute inset-x-0 top-[9px] h-px"
+            style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.05), rgba(16,185,129,0.45), rgba(255,255,255,0.05))' }}
+          />
+          {[8, 24, 40, 56, 72, 88].map((x, i) => (
+            <span
+              key={x}
+              className="absolute top-[5px] rounded-full bg-emerald-400"
+              style={{
+                left: `${x}%`,
+                height: `${i === 5 ? 9 : 5}px`,
+                width: `${i === 5 ? 9 : 5}px`,
+                top: i === 5 ? '5px' : '7px',
+                opacity: 0.3 + i * 0.14,
+              }}
+            />
+          ))}
+          <span className="absolute inset-x-0 top-[18px] flex justify-between text-[9px] uppercase tracking-wider text-slate-600">
+            <span>früher</span>
+            <span>heute</span>
+          </span>
+        </div>
       </Karte>
     </div>
   );

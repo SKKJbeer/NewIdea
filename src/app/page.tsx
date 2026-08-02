@@ -12,7 +12,6 @@ import { MetricCards } from '@/components/MetricCards';
 import { DistributionBands } from '@/components/DistributionBands';
 import { MoversPanel, SetMarketPanel, ReportPromo, QuickActions } from '@/components/HomePanels';
 import { MarketBriefBlock, SectionHead } from '@/components/MarketModules';
-import { SiteFooter } from '@/components/SiteFooter';
 
 import { getHomepageCards } from '@/lib/homepage-data';
 import { getDataCoverage } from '@/lib/data-coverage';
@@ -123,32 +122,43 @@ export default async function MarketPage() {
           : null
       }
     >
-      {/* ══ KOPF ══════════════════════════════════════════════════════════ */}
-      <section aria-labelledby="marktkopf" className="relative">
+      {/* ══ HERO ═══════════════════════════════════════════════════════════
+          Der Hero ist kein Abschnitt, sondern die Identitaet des Produkts.
+          Er fuellt fast den ersten Bildschirm (92 vh) — nicht, weil Platz
+          uebrig waere, sondern weil die Leere Teil der Gestaltung ist. Wer
+          hier ankommt, soll ein paar Sekunden bleiben, bevor Zahlen kommen.
+
+          Drei Bereiche, bewusst UNSYMMETRISCH: Navigation links (in der
+          Huelle), Erzaehlung in der Mitte, schwebende Auskunft rechts. */}
+      <section
+        aria-labelledby="marktkopf"
+        className="relative flex min-h-[92vh] flex-col justify-center"
+      >
         <HeroAtmosphere />
 
-        <div className="relative px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-12 lg:pt-6">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,520px)] xl:gap-10">
-            {/* Linke Spalte — Ueberschrift, Geschichte, zwei Wege */}
-            <div className="max-w-[620px] pt-2 lg:pt-6">
-              <p className="text-[11.5px] font-semibold uppercase tracking-[0.19em] text-slate-400">
+        <div className="relative w-full px-6 py-16 sm:px-10 lg:px-14 xl:px-16">
+          <div className="grid items-center gap-16 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-20">
+            {/* ── ERZAEHLUNG ────────────────────────────────────────────
+                Hierarchie wie vorgegeben: Auszeichnung, sehr grosse
+                Ueberschrift, Erzaehlung, Knoepfe, kleine Marktfakten.
+                Textbreite bei 620 px — darueber wird Fliesstext unlesbar,
+                darunter wirkt er gedraengt. */}
+            <div className="max-w-[620px]">
+              <p className="text-[12px] font-medium uppercase tracking-[0.32em] text-slate-400/80">
                 Marktübersicht · Pokémon TCG
               </p>
 
-              {/* DIE UEBERSCHRIFT. Zwei Zeilen, Verlauf von Bernstein nach
-                  Violett wie im Entwurf — ueber `.prismatic`, dieselbe
-                  Behandlung wie an den uebrigen Auszeichnungen. */}
               <h1
                 id="marktkopf"
-                className="mt-3.5 bg-clip-text text-[40px] font-semibold leading-[1.06] tracking-tight text-transparent sm:text-[52px] lg:text-[58px]"
+                className="mt-8 bg-clip-text text-[clamp(2.75rem,6.4vw,4.5rem)] font-semibold leading-[1.04] tracking-[-0.02em] text-transparent"
                 style={{
-                  // Der Verlauf des Entwurfs: Bernstein oben links, ueber Weiss
-                  // in die Markenfarbe. Nicht `.prismatic` — das ist der
-                  // Folienverlauf fuer kleine Auszeichnungen und laeuft ueber
-                  // drei kalte Toene. Eine Ueberschrift dieser Groesse braucht
-                  // den waermeren Anlauf, sonst wirkt sie kuehl statt kostbar.
+                  // Bernstein ueber Weiss in die Markenfarbe — der Verlauf des
+                  // Entwurfs. Nicht `.prismatic`: Das ist der Folienverlauf
+                  // fuer kleine Auszeichnungen und laeuft ueber drei kalte
+                  // Toene; eine Ueberschrift dieser Groesse wirkt damit kuehl
+                  // statt kostbar.
                   backgroundImage:
-                    'linear-gradient(103deg, rgb(252 211 130) 0%, rgb(250 232 214) 26%, rgb(255 255 255) 48%, rgb(226 214 255) 70%, rgb(167 139 250) 100%)',
+                    'linear-gradient(103deg, rgb(252 214 138) 0%, rgb(250 234 218) 24%, rgb(255 255 255) 46%, rgb(228 217 255) 70%, rgb(167 139 250) 100%)',
                 }}
               >
                 Heute im
@@ -156,42 +166,46 @@ export default async function MarketPage() {
                 Pokémon Markt
               </h1>
 
-              <p className="mt-5 max-w-[540px] text-[14.5px] leading-[1.75] text-slate-300/90 sm:text-[15.5px]">
+              <p className="mt-9 max-w-[560px] text-[16px] leading-[1.85] text-slate-300/85 sm:text-[17px]">
                 {story.absatz}
               </p>
 
-              <div className="mt-7 flex flex-wrap items-center gap-3">
+              {/* KNOEPFE bewusst uebergross: 58 px hoch, weite Innenabstaende,
+                  Pille. Ein Knopf in Standardgroesse wuerde neben einer
+                  72-px-Ueberschrift wie ein Bedienelement wirken — hier ist er
+                  Teil der Komposition. */}
+              <div className="mt-11 flex flex-wrap items-center gap-4">
                 <Link
                   href="/marktbericht"
-                  className="group inline-flex min-h-[46px] items-center gap-2 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 text-[14px] font-medium text-white shadow-[0_0_28px_-8px_rgba(139,92,246,0.7)] transition-all hover:-translate-y-[1px] hover:shadow-[0_0_34px_-6px_rgba(139,92,246,0.85)]"
+                  className="group inline-flex h-[58px] items-center gap-2.5 rounded-full border border-violet-300/25 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-9 text-[15px] font-medium text-white shadow-[0_10px_40px_-12px_rgba(139,92,246,0.75)] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_16px_52px_-12px_rgba(139,92,246,0.9)]"
                 >
                   Marktbericht lesen
-                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight size={17} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
                 <Link
                   href="/sets"
-                  className="inline-flex min-h-[46px] items-center rounded-full border border-white/[0.13] bg-white/[0.03] px-6 text-[14px] text-slate-100 backdrop-blur-md transition-colors hover:border-white/[0.24] hover:bg-white/[0.07]"
+                  className="inline-flex h-[58px] items-center rounded-full border border-white/[0.11] bg-white/[0.025] px-9 text-[15px] text-slate-100 backdrop-blur-xl transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.22] hover:bg-white/[0.06]"
                 >
                   Sets entdecken
                 </Link>
               </div>
 
-              {/* Die Belege der Geschichte — sie machen den Absatz darueber
-                  nachpruefbar. */}
+              {/* Kleine Marktfakten — sie machen die Erzaehlung darueber
+                  nachpruefbar, ohne sie zu unterbrechen. */}
               {story.belastbar && (
-                <dl className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[11.5px]">
+                <dl className="mt-12 flex flex-wrap gap-x-12 gap-y-3 text-[12px]">
                   {story.belege.map((b) => (
-                    <div key={b.label} className="flex items-baseline gap-2">
-                      <dt className="text-slate-500">{b.label}</dt>
-                      <dd className="tabular-nums text-slate-300">{b.wert}</dd>
+                    <div key={b.label} className="flex flex-col gap-1">
+                      <dt className="uppercase tracking-[0.16em] text-slate-600">{b.label}</dt>
+                      <dd className="text-[14px] tabular-nums text-slate-200">{b.wert}</dd>
                     </div>
                   ))}
                 </dl>
               )}
             </div>
 
-            {/* Rechte Spalte — das CBI-Panel */}
-            <div className="xl:pt-4">
+            {/* ── SCHWEBENDE AUSKUNFT ───────────────────────────────────── */}
+            <div>
               <CbiPanel
                 cbi={cbi}
                 verlauf={verlauf}
@@ -199,14 +213,18 @@ export default async function MarketPage() {
               />
             </div>
           </div>
+        </div>
+      </section>
 
+      {/* ══ KENNZAHLEN UND PANELS ═══════════════════════════════════════ */}
+      <div className="relative px-6 pb-14 sm:px-10 lg:px-14 xl:px-16">
           {/* ══ KENNZAHLEN ══════════════════════════════════════════════ */}
-          <div className="mt-6">
+          <div className="pt-4">
             <MetricCards breite={breite} stimmung={stimmung} abdeckung={abdeckung} cbi={cbi} />
           </div>
 
           {/* ══ DREI PANELS ═════════════════════════════════════════════ */}
-          <div className="mt-3 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
             <MoversPanel karten={gainers} cbi={cbi.sufficient ? cbi.value : null} />
             <SetMarketPanel sets={sets.slice(0, 4)} />
             <ReportPromo
@@ -218,20 +236,19 @@ export default async function MarketPage() {
           </div>
 
           {/* ══ SCHNELLZUGRIFF ══════════════════════════════════════════ */}
-          <div className="mt-3">
+          <div className="mt-5">
             <QuickActions />
           </div>
-        </div>
-      </section>
+      </div>
 
       {/* ══ WEITERFUEHREND ════════════════════════════════════════════════
           Der Entwurf zeigt den ersten Bildschirm. Was darunter bereits stand,
           bleibt: Einordnung, Verteilung und der Uebergang zum eigenen Bestand
           sind der inhaltliche Kern und nicht Teil des Bildausschnitts. */}
-      <main className="px-4 pb-4 sm:px-6 lg:px-8">
+      <main className="px-6 pb-6 sm:px-10 lg:px-14 xl:px-16">
         <section
           aria-labelledby="einordnung"
-          className="relative py-12 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
+          className="relative py-20 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
         >
           <SectionHead num="01" title="Einordnung" meta={`${cbi.windowDays} Tage`} />
           <h2 id="einordnung" className="sr-only">Einordnung des Marktstands</h2>
@@ -241,7 +258,7 @@ export default async function MarketPage() {
         {cbi.sufficient && trends.length > 0 && (
           <section
             aria-labelledby="verteilung"
-            className="relative py-12 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
+            className="relative py-20 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
           >
             <SectionHead num="02" title="Verteilung" meta={`${trends.length} gemessene Karten`} />
             <h2 id="verteilung" className="sr-only">Verteilung der Bewegungen</h2>
@@ -253,7 +270,7 @@ export default async function MarketPage() {
 
         <section
           aria-labelledby="verlierer"
-          className="relative py-12 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
+          className="relative py-20 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
         >
           <SectionHead
             num="03"
@@ -270,7 +287,7 @@ export default async function MarketPage() {
 
         <section
           aria-labelledby="bestand"
-          className="relative py-12 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
+          className="relative py-20 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]"
         >
           <SectionHead num="04" title="Eigener Bestand" />
           <h2 id="bestand" className="sr-only">Eigener Bestand</h2>
@@ -296,7 +313,6 @@ export default async function MarketPage() {
         </div>
       </main>
 
-      <SiteFooter />
     </AppShell>
   );
 }

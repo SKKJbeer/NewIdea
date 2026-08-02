@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.0.0',
+    date: '2. August 2026',
+    label: 'Der Hero ist die Identitaet, nicht ein Abschnitt',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Hero fuellt den ersten Bildschirm (92 vh) — Ueberschrift bis 72 px, Erzaehlung auf 620 px, uebergrosse Knoepfe' },
+      { type: 'new', text: 'Hintergrund in sieben Ebenen: Mitternachtsblau, blaue und violette Atmosphaere, warmes Gold, holografisches Korn, diagonale Struktur, Drache' },
+      { type: 'new', text: 'Abdeckung als Kreisfortschritt, Stichprobe als Zeitstrahl — jede Kennzahl mit eigener Darstellung' },
+      { type: 'changed', text: 'Der Drache ist reine Kontur bei rund 3 Prozent, ohne Fuellung — er soll beim zweiten Hinsehen entdeckt werden, nicht beim ersten' },
+      { type: 'changed', text: 'CBI-Panel mit 30 px Radius, weicherem Glas und groesserer Typografie; mehr Weissraum auf der ganzen Seite' },
+      { type: 'fixed', text: 'Die Fusszeile stand doppelt' },
+    ],
+  },
+  {
     version: '4.17.0',
     date: '2. August 2026',
     label: 'Startseite nach geliefertem Entwurf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Seitenleiste links mit Navigation, Datenstand und Bestand; Kopfzeile mit Suchfeld' },
       { type: 'new', text: 'Atmosphaere in sechs Ebenen und ein graviertes Fabelwesen als eigene Illustration — konstruiert, nicht nachgezeichnet' },
