@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.1.1] - 2. August 2026 · Ein Aussetzer der Quelle beendet nicht mehr die Runde
+
+### Behoben
+- **Ein einzelner HTTP 500 der Kartendatenbank beendete die ganze Runde.** Live gemessen nach dem Deploy von 5.1.0: Der Durchlauf lief bis Seite 59 von 82 und blieb dort haengen, `letzterFehler: Request failed with status code 500`, im Minutentakt wiederholt. Die Quelle beantwortet dokumentiert etwa jede dritte Anfrage mit 500 (Stolperstelle 28) — mit `break` endete damit fast jede Runde nach wenigen Seiten
+- **Dieselbe Seite wird jetzt bis zu dreimal in derselben Runde versucht**, mit wachsender Pause (2, 4, 6 Sekunden). Ein Aussetzer dauert Sekunden, nicht Minuten. Erst danach endet die Runde — der Zeiger bleibt auf der Seite stehen, die naechste Runde nimmt sie erneut
+
+---
+
 ## [5.1.0] - 2. August 2026 · Die Karten werden wieder vollstaendig erfasst
 
 ### Behoben

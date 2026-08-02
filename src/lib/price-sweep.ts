@@ -42,6 +42,15 @@ export const SWEEP_PAGE_SIZE = 250;
  */
 export const HEARTBEAT_DAYS = 7;
 
+/**
+ * Anläufe auf dieselbe Seite, bevor die Runde aufgibt.
+ *
+ * Die Kartendatenbank hat kurze Aussetzer (Stolperstelle 28). Drei Anläufe mit
+ * wachsender Pause überbrücken sie; mehr wären Beharren auf einem echten
+ * Ausfall, und der gehört ins Monitoring, nicht in eine Warteschleife.
+ */
+export const MAX_FEHLVERSUCHE = 3;
+
 export interface SweepState {
   /** Nächste abzurufende Seite (1-basiert). */
   nextPage: number;
@@ -267,6 +276,8 @@ export async function sweepChunk({
   let seenThisRun = 0;
   let savedThisRun = 0;
   let fehler: string | undefined;
+  /** Fehlschläge in Folge auf DERSELBEN Seite. */
+  let fehlversuche = 0;
 
   for (;;) {
     const totalPages = seitenGesamt(state.totalCards, pageSize);
@@ -278,6 +289,7 @@ export async function sweepChunk({
 
     try {
       const { cards, rawCount, totalCount } = await fetchCardPage(state.nextPage, pageSize);
+      fehlversuche = 0;
       if (totalCount > 0) state.totalCards = totalCount;
 
       // KARTENINDEX MITSCHREIBEN.
@@ -323,7 +335,26 @@ export async function sweepChunk({
       fehler = err instanceof Error ? err.message : String(err);
       state.lastError = fehler;
       console.error(`[Preis-Sweep] Seite ${state.nextPage} fehlgeschlagen:`, fehler);
-      break;
+      await saveSweepState(state);
+
+      // IN DERSELBEN RUNDE WIEDERHOLEN, statt die Runde zu beenden.
+      //
+      // BEFUND AUS DEM LAUFENDEN BETRIEB: Hier stand `break`. Die
+      // Kartendatenbank beantwortet dokumentiert etwa jede dritte Anfrage mit
+      // HTTP 500 (Stolperstelle 28) — eine Runde endete damit fast immer schon
+      // nach wenigen Seiten. Die nächste Runde traf dieselbe Seite und brach
+      // ebenso ab; der Durchlauf blieb bei Seite 59 von 82 stehen und
+      // wiederholte den Fehlschlag im Minutentakt.
+      //
+      // Ein Aussetzer dauert Sekunden, nicht Minuten. Zwei kurze Pausen im
+      // selben Aufruf kosten fast nichts und überbrücken ihn. Erst wenn auch
+      // die nicht reichen, ist es ein echter Ausfall — dann endet die Runde,
+      // der Zeiger steht weiterhin auf dieser Seite, und die nächste Runde
+      // versucht es erneut.
+      fehlversuche += 1;
+      if (fehlversuche >= MAX_FEHLVERSUCHE) break;
+      await new Promise((r) => setTimeout(r, 2_000 * fehlversuche));
+      continue;
     }
   }
 

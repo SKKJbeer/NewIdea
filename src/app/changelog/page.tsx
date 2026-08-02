@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.1.1',
+    date: '2. August 2026',
+    label: 'Ein Aussetzer der Quelle beendet nicht mehr die Runde',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Ein einzelner HTTP 500 der Kartendatenbank beendete die ganze Runde — der Durchlauf blieb bei Seite 59 von 82 haengen' },
+      { type: 'fixed', text: 'Dieselbe Seite wird jetzt bis zu dreimal in derselben Runde versucht, mit wachsender Pause' },
+    ],
+  },
+  {
     version: '5.1.0',
     date: '2. August 2026',
     label: 'Die Karten werden wieder vollstaendig erfasst',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Preiserfassung kam taeglich nur bis 27 Prozent — Seite 22 von 82, rund 15.000 Karten bekamen nie einen neuen Preis' },
       { type: 'fixed', text: 'Laengere Runden (240 statt 45 Sekunden): vier Uebergaben pro Tag statt sechzehn, also vier moegliche Abrisspunkte statt sechzehn' },

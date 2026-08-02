@@ -95,7 +95,15 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
   it('schiebt den Zeiger bei einem Fehler NICHT weiter', () => {
     // Sonst entstünde für die fehlgeschlagene Seite ein dauerhaftes Loch:
     // 250 Karten ohne Messpunkt für diesen Tag, ohne dass es auffällt.
-    expect(sweep).toMatch(/catch \(err\)[\s\S]{0,400}break;/);
+    // Der Zeiger darf im Fehlerfall NICHT weiterlaufen — sonst entstuende ein
+    // dauerhaftes Loch im Datensatz. Innerhalb der Runde wird dieselbe Seite
+    // aber wiederholt (`continue`), statt die Runde sofort zu beenden: Die
+    // Kartendatenbank beantwortet dokumentiert etwa jede dritte Anfrage mit
+    // HTTP 500, und mit `break` endete fast jede Runde nach wenigen Seiten.
+    expect(sweep).toMatch(/catch \(err\)[\s\S]{0,1400}continue;/);
+    expect(sweep).not.toMatch(/catch \(err\)[\s\S]{0,200}state\.nextPage \+= 1/);
+    // Aufgeben ist gedeckelt, nicht endlos.
+    expect(sweep).toMatch(/fehlversuche >= MAX_FEHLVERSUCHE\) break;/);
     expect(sweep).not.toMatch(/catch \(err\)[\s\S]{0,200}state\.nextPage \+= 1/);
   });
 
