@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.14.0',
+    date: '2. August 2026',
+    label: 'Sammler-Sichtebene — die Oberflaeche erkennt an, was hier gehandelt wird',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Umgebungs-Hintergrund in drei Ebenen: Lichthoefe, Hoehenlinien und eine eigene Linienkunst — alles unter 5 Prozent Deckkraft, reines SVG und CSS' },
+      { type: 'new', text: 'Fuenf Modi statt eines Hintergrunds (Markt, Karte, Set, Sammlung, Research); Research bleibt frei von Struktur, weil Lesbarkeit vorgeht' },
+      { type: 'new', text: 'Set-Seiten bekommen einen GEZAEHLTEN Farbton: haeufigster Energietyp der handelbaren Karten, mit Anteil und Anzahl daneben' },
+      { type: 'changed', text: 'Vier Kennzahlen im Marktkopf mit je eigener Signatur statt drei gleich aussehender Bloecke — jede zeigt ihren eigenen Wert' },
+      { type: 'changed', text: 'Sets ohne Logo zeigen ihren Namen als Wortmarke statt eines leeren Platzhalter-Kaestchens' },
+      { type: 'fixed', text: 'Waagerechtes Scrollen auf Telefon und Tablet beseitigt (Set-Logos sprengten ihr Rasterfeld, Mover-Listen die Zeilenbreite bei 768 px)' },
+    ],
+  },
+  {
     version: '4.13.0',
     date: '31. Juli 2026',
     label: 'Eigener Kartenindex — die Suche geht nicht mehr nach aussen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Eigener Kartenindex in der Datenbank: Die Suche antwortet aus Millisekunden statt aus einem Netzaufruf ueber Sekunden' },
       { type: 'new', text: 'Gefuellt vom taeglichen Preis-Durchlauf, der die Seiten ohnehin holt — kein einziger zusaetzlicher Abruf' },
@@ -1681,7 +1695,7 @@ const TYPE_STYLE = {
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">

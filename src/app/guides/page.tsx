@@ -22,7 +22,7 @@ export default async function GuidesPage() {
   const allGuides = [...GUIDES, ...generated.filter((g) => !staticSlugs.has(g.slug))];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,

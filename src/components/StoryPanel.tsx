@@ -124,7 +124,7 @@ export function StoryPanel() {
             {/* Der Rahmen hat das Seitenverhältnis des gewählten Formats —
                 sonst springt das Feld, sobald das Bild eintrifft. */}
             <div
-              className="mt-3 w-full overflow-hidden rounded-lg border border-[#2a2a3a] bg-[#0a0a0f]"
+              className="mt-3 w-full overflow-hidden rounded-lg border border-[#2a2a3a] bg-[#070810]"
               style={{
                 aspectRatio: `${STORY_FORMATE[format].width} / ${STORY_FORMATE[format].height}`,
               }}

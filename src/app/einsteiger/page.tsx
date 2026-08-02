@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function EinsteigerPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       {/* Hero */}

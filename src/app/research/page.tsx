@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
+import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { SectionHead } from '@/components/MarketModules';
 import { recentPublishDates } from '@/lib/publish-days';
 import { GUIDES } from '@/lib/guides';
@@ -65,10 +66,11 @@ export default function ResearchPage() {
   const letzteArtikel = recentPublishDates(6);
 
   return (
-    <div className="min-h-screen bg-[#08080b] text-slate-300">
+    <div className="min-h-screen bg-[#070810] text-slate-300">
       <NavBar />
 
-      <header className="border-b border-[#1c1c24]">
+      <header className="relative border-b border-[#1c1c24]">
+        <AmbientBackdrop mode="research" />
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
           <p className={SECTION_LABEL}>Research</p>
           <h1 className="mt-4 max-w-2xl text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">

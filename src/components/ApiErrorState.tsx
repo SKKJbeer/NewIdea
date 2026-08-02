@@ -9,7 +9,7 @@ import { CloudOff, RotateCw } from 'lucide-react';
  */
 export function ApiErrorState({ backHref = '/', backLabel = 'Zur Startseite' }: { backHref?: string; backLabel?: string }) {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
       <main className="max-w-md mx-auto px-4 py-24 text-center">
         <div className="w-16 h-16 bg-[#1a1a28] rounded-2xl flex items-center justify-center mx-auto mb-5">

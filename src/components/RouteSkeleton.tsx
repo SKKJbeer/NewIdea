@@ -54,7 +54,7 @@ function Zeilen({ anzahl = 8 }: { anzahl?: number }) {
 
 export function RouteSkeleton({ variant = 'list' }: Props) {
   return (
-    <div className="min-h-screen bg-[#08080b]">
+    <div className="min-h-screen bg-[#070810]">
       {/* DIE ECHTE NAVIGATION, kein Platzhalter.
           
           BEFUND AUS DEM ECHTEN GERÄT: Hier stand ein leerer Streifen in

@@ -113,7 +113,7 @@ export function AutoReelPanel() {
               />
             )}
 
-            <div className="rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-3">
+            <div className="rounded-xl border border-[#2a2a3a] bg-[#070810] p-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2">Karten im Reel</p>
               <ul className="space-y-1">
                 {result.cards.map((c) => (
@@ -135,7 +135,7 @@ export function AutoReelPanel() {
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 rows={7}
-                className="w-full rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] text-slate-300 text-xs p-3 leading-relaxed focus:outline-none focus:border-violet-500/50"
+                className="w-full rounded-xl border border-[#2a2a3a] bg-[#070810] text-slate-300 text-xs p-3 leading-relaxed focus:outline-none focus:border-violet-500/50"
               />
             </div>
 

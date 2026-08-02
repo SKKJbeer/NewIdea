@@ -34,7 +34,7 @@ export default async function MarktberichtArchivPage() {
   const years = Object.keys(byYear).sort((a, b) => Number(b) - Number(a));
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       <header className="border-b border-[#1c1c24]">

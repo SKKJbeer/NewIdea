@@ -153,7 +153,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
       {structuredData && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
@@ -261,7 +261,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                 <div className="pl-9">
                   <ArticleContent content={section.content} />
                   {section.highlight && (
-                    <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#0a0a0f] p-3">
+                    <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#070810] p-3">
                       {section.highlight.imageUrl && (
                         <Image
                           src={section.highlight.imageUrl}

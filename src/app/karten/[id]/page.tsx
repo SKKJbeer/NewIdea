@@ -8,6 +8,7 @@ import { PriceChartLazy } from '@/components/PriceChartLazy';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
 import { NavBar } from '@/components/NavBar';
+import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
 import { ambientFor } from '@/lib/collector';
@@ -159,7 +160,7 @@ export default async function CardDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
@@ -167,7 +168,15 @@ export default async function CardDetailPage({ params }: Props) {
 
       <NavBar />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* DIE KARTE FAERBT DEN RAUM.
+          Der Hof nimmt den Energietyp der Karte auf — dieselbe Quelle wie der
+          Schimmer hinter dem Bild, nur ueber die obere Seitenhaelfte. Damit
+          fuehlt sich eine Feuer-Karte anders an als eine Wasser-Karte, ohne
+          dass irgendein Bedienelement die Farbe wechselt. */}
+      <div className="relative">
+        <AmbientBackdrop mode="karte" akzent={ambient.ambient} className="h-[70vh]" />
+
+      <div className="relative max-w-4xl mx-auto px-4 py-8">
         <Link href="/" className="inline-flex min-h-[32px] items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-6 transition-colors">
           <ArrowLeft size={16} />Alle Karten
         </Link>
@@ -348,7 +357,7 @@ export default async function CardDetailPage({ params }: Props) {
                   <BoosterPackImage
                     setCode={card.setCode}
                     setName={card.set}
-                    className="h-48 w-auto object-contain drop-shadow-xl"
+                    className="h-48 w-auto max-w-full object-contain drop-shadow-xl"
                   />
                   <p className="text-sm font-semibold text-slate-400 mt-3 text-center leading-snug">{card.set}</p>
                 </div>
@@ -401,6 +410,7 @@ export default async function CardDetailPage({ params }: Props) {
         <p className="text-xs text-slate-700 text-center mt-6">
           Preise: Cardmarket (EUR), ohne Gewähr. Kein Anlageversprechen.
         </p>
+      </div>
       </div>
     </div>
   );

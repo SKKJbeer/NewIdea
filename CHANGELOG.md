@@ -7,6 +7,26 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.14.0] - 2. August 2026 · Sammler-Sichtebene: die Oberflaeche erkennt an, was hier gehandelt wird
+
+### Neu
+- **Umgebungs-Hintergrund in drei Ebenen** (`AmbientBackdrop`): radiale Lichthoefe, Hoehenlinien und eine eigene Linienkunst. Alles unter 5 Prozent Deckkraft, reines SVG und CSS — kein Bild, kein Video, keine dauerhafte Animation
+- **Die Linienkunst ist eigenstaendig gezeichnet**, nicht nachgezeichnet: Boegen, Kanten, Energiebahnen. Sie darf an ein Fluegelwesen erinnern, stellt aber keines dar — ein erkennbarer Charakter im Hintergrund macht aus einem Marktprodukt eine Fanseite
+- **Fuenf Modi statt eines Hintergrunds**: Markt, Karte, Set, Sammlung, Research. Research bekommt keine Linienkunst — hinter 1.500 Woertern ist jede Struktur eine Stoerung
+- **Set-Seiten bekommen einen gezaehlten Farbton**: der haeufigste Energietyp der handelbaren Karten, mit Anteil und Anzahl daneben. Reicht die Datenlage nicht, bleibt es beim Markenton und die Seite behauptet nichts
+- **Die Kartenseite faerbt den Raum** in der Farbe des Energietyps — eine Feuer-Karte fuehlt sich anders an als eine Wasser-Karte, ohne dass ein Bedienelement die Farbe wechselt
+
+### Geaendert
+- **Vier Kennzahlen im Marktkopf, vier eigene Signaturen** statt drei gleich aussehender Bloecke: Marktbreite als geteilter Balken, Temperatur als Position auf einer Skala, Stichprobe als abzaehlbare Punkte, Sets als gestapelte Ebenen. Jede zeigt ihren eigenen Wert, keine ist Schmuck
+- **Grundton mit einem Stich ins Blaue** (`#070810`) statt beinahe reinem Schwarz — neutralschwarz nimmt jedem Kartenbild das Licht
+- **„Marktuebersicht · Pokemon TCG"** statt „Erster Markt: Pokemon". Letzteres las sich wie eine Ankuendigung an Investoren; fuer jemanden, der sammelt, ist Pokemon nicht der erste Markt, sondern der Markt
+- **Sets ohne Logo zeigen ihren Namen als Wortmarke** statt eines Platzhalter-Kaestchens. Die vier juengsten Sets fuehrten die Galerie mit leeren Kaesten an, obwohl die Seite nur ehrlich war
+
+### Behoben
+- **Waagerechtes Scrollen auf Telefon und Tablet.** Die Set-Logos kommen mit 400 Pixeln aus der Quelle und sprengten ihr Rasterfeld (88 Pixel Ueberlauf bei 320 px); die Mover-Listen brachen bei genau 768 Pixeln zweispaltig um und schoben die letzte Zahlenspalte 39 Pixel ueber den Rand. Geprueft bei 320, 375, 390, 430, 768, 1024 und 1440 Pixeln
+
+---
+
 ## [4.13.0] - 31. Juli 2026 · Eigener Kartenindex — die Suche geht nicht mehr nach aussen
 
 ### Neu

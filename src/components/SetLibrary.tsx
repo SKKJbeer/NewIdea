@@ -142,12 +142,17 @@ export function SetLibrary({ sets }: { sets: SetEintrag[] }) {
         {sichtbar.length} Sets · {gemessene} mit gemessener Bewegung
       </p>
 
+      {/* `min-w-0` auf jedem Feld: Ein Rasterfeld hat von sich aus
+          `min-width: auto` und schrumpft damit nie unter die Eigenbreite seines
+          Inhalts. Das Set-Logo kommt mit 400 px aus der Quelle, und `max-w-full`
+          rechnete gegen genau dieses aufgeblähte Feld — die Seite ließ sich auf
+          dem Telefon 88 px waagerecht schieben. */}
       <div className="mt-6 grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
         {sichtbar.map((set) => (
           <Link
             key={set.id}
             href={`/sets/${set.id}`}
-            className={`group flex flex-col ${TABLE.row} py-5`}
+            className={`group flex min-w-0 flex-col ${TABLE.row} py-5`}
           >
             {/* Das Logo ist der Blickfang dieser Seite — größer als in der
                 Marktübersicht, weil hier das Set die Einheit ist, nicht die
@@ -157,6 +162,7 @@ export function SetLibrary({ sets }: { sets: SetEintrag[] }) {
                 setCode={set.id}
                 setName={set.name}
                 logoUrl={set.logoUrl}
+                platzhalter="wortmarke"
                 className="max-h-20 w-auto max-w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-[1.04]"
               />
             </div>

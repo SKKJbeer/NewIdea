@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { SetLibrary, type SetEintrag } from '@/components/SetLibrary';
 import { fetchRecentSets } from '@/lib/pokemon-api';
 import { getHomepageCards } from '@/lib/homepage-data';
@@ -69,13 +70,14 @@ export default async function SetsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#08080b] text-slate-300">
+    <div className="min-h-screen bg-[#070810] text-slate-300">
       <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster: linksbündig, Abschnittsmarke,
           keine Pille, kein Verlauf. Siehe DESIGN.md §2/§4. */}
-      <header className="border-b border-[#1c1c24]">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
+      <header className="relative border-b border-[#1c1c24]">
+        <AmbientBackdrop mode="set" />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
           <p className={SECTION_LABEL}>Sets · Pokémon</p>
           <h1 className="mt-4 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">
             Erweiterungen

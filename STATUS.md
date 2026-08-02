@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v4.13.0` · **Stand:** 31. Juli 2026 · **Branch:** `main`
+**Version:** `v4.14.0` · **Stand:** 2. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v4.13.0)
+## Was gebaut ist (Stand v4.14.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v4.14.0 | Sammler-Sichtebene: Umgebungs-Hintergrund in drei Ebenen, gezaehlter Set-Farbton, vier eigene Kennzahl-Signaturen, kein waagerechtes Scrollen mehr |
 | v4.13.0 | Eigener Kartenindex: Suche aus der eigenen Datenbank statt von aussen |
 | v4.12.1 | Studio stuerzt bei abgelaufener Sitzung nicht mehr ab; Vorschauen laden einzeln |
 | v4.12.0 | Marktbilder im Studio: Vorschau, Formatwahl, Herunterladen |

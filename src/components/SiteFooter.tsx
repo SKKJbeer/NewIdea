@@ -55,7 +55,7 @@ const GRUPPEN: Array<{ label: string; links: Array<{ href: string; label: string
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-[#1c1c24] bg-[#08080b]">
+    <footer className="mt-auto border-t border-[#1c1c24] bg-[#070810]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
@@ -67,7 +67,7 @@ export function SiteFooter() {
               <Wordmark />
             </Link>
             <p className="mt-3 max-w-[220px] text-[11px] leading-relaxed text-slate-600">
-              {DESCRIPTOR_DE}. Erster Markt: Pokémon.
+              {DESCRIPTOR_DE} für Pokémon TCG.
             </p>
           </div>
 

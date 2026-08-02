@@ -75,7 +75,7 @@ export default async function SearchPage({
       : null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       {structuredData && (
         <script
           type="application/ld+json"

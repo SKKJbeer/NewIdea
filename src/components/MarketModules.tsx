@@ -171,7 +171,13 @@ export function MarketMovers({
   );
 
   return (
-    <div className="mt-5 grid gap-x-10 gap-y-8 md:grid-cols-2">
+    /* ZWEISPALTIG ERST AB `lg`, NICHT AB `md`.
+       Bei genau 768 px greift `md`, und dann muss eine Zeile aus Rang, Bild,
+       Name, Preis, 30 T und „vs. Markt" in 340 px passen. Die drei Zahlenspalten
+       haben feste Breiten, also schob die letzte 39 px über den Rand hinaus —
+       die ganze Seite ließ sich waagerecht schieben. Ab 1024 px ist der Platz
+       da; darunter steht eine Liste unter der anderen. */
+    <div className="mt-5 grid gap-x-10 gap-y-8 lg:grid-cols-2">
       {[
         ['Gewinner', gainers, 'Keine gemessene Aufwärtsbewegung.'] as const,
         ['Verlierer', losers, 'Keine gemessene Abwärtsbewegung.'] as const,
@@ -182,7 +188,7 @@ export function MarketMovers({
           >
             <span className="w-4" />
             <span className="w-[26px]" />
-            <span>{titel}</span>
+            <span className="min-w-0 truncate">{titel}</span>
             {kopf}
           </div>
           {karten.length > 0 ? (

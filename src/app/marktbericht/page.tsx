@@ -49,7 +49,7 @@ export default async function MarktberichtPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       {/* Gemeinsames Kopf-Muster. Der Leuchtfleck, die zentrierte Zweizeilen-

@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[#070810]">
       {/* NavBar skeleton */}
       <div className="sticky top-0 z-50 h-[72px] bg-[#0d0d18] border-b border-[#1e1e30]" />
 

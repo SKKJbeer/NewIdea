@@ -26,7 +26,7 @@ function PositionsZeile({ p, rang }: { p: PositionPerformance; rang: number }) {
       className="group flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-[#1a1a28]"
     >
       <span className="w-3 shrink-0 text-[10px] font-black tabular-nums text-slate-700">{rang}</span>
-      <div className="h-[38px] w-7 shrink-0 overflow-hidden rounded-md border border-[#2a2a3a] bg-[#0a0a0f]">
+      <div className="h-[38px] w-7 shrink-0 overflow-hidden rounded-md border border-[#2a2a3a] bg-[#070810]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={cachedImg(p.holding.imageUrl)}

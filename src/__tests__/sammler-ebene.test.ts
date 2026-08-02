@@ -1,11 +1,23 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { ambientFor, AMBIENT_FALLBACK } from '@/lib/collector';
+import { ambientFor, dominantAmbient, AMBIENT_FALLBACK } from '@/lib/collector';
 import { findViolations, CAUSAL_CLAIM, HYPOTHESIS_MARKER } from '@/lib/content-rules';
 import { fearGreedLabel } from '@/lib/market-metrics';
 
 const lies = (p: string) => readFileSync(join(process.cwd(), p), 'utf-8');
+const existiert = (p: string) => existsSync(join(process.cwd(), p));
+
+/**
+ * Entfernt Kommentare vor der Pruefung.
+ *
+ * ZUM VIERTEN MAL noetig: Eine Waechter-Regel, die nach verbotenen Begriffen
+ * sucht, findet sie zuverlaessig in der Begruendung, warum sie verboten sind.
+ * Der Kommentar „kein WebGL, keine Leinwand" liess genau den Test scheitern,
+ * der WebGL und Leinwand verbietet.
+ */
+const ohneKommentare = (src: string) =>
+  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 // SAMMLER-EBENE — „Daten zuerst, Artwork respektiert".
 //
@@ -80,7 +92,8 @@ describe('Folienschimmer', () => {
 });
 
 describe('Hintergrund-Identitaet bleibt Hintergrund', () => {
-  const backdrop = lies('src/components/CollectorBackdrop.tsx');
+  const backdrop = lies('src/components/AmbientBackdrop.tsx');
+  const linienkunst = lies('src/lib/creature-art.ts');
 
   it('ist fuer Hilfsmittel unsichtbar und nicht anklickbar', () => {
     expect(backdrop).toContain('aria-hidden');
@@ -89,23 +102,80 @@ describe('Hintergrund-Identitaet bleibt Hintergrund', () => {
 
   it('bleibt weit unter der Lesbarkeitsgrenze', () => {
     // Vorgabe: Beim ersten Blick eine hochwertige dunkle Oberflaeche, erst beim
-    // genaueren Hinsehen die Struktur.
-    const deckkraefte = [...backdrop.matchAll(/opacity(?:=\{|: )([0-9.]+)/g)].map((m) => Number(m[1]));
-    for (const d of deckkraefte) expect(d).toBeLessThanOrEqual(0.9);
-    const flaechen = [...backdrop.matchAll(/fill-\w+-\d+\/\[0\.(\d+)\]/g)].map((m) => Number(m[1]));
-    for (const f of flaechen) expect(f).toBeLessThanOrEqual(6);
+    // genaueren Hinsehen die Struktur. Alles ueber 5 % waere Tapete.
+    const deckkraefte = [...backdrop.matchAll(/opacity-\[0\.(\d+)\]/g)]
+      .map((m) => Number(`0.${m[1]}`));
+    expect(deckkraefte.length).toBeGreaterThan(0);
+    for (const d of deckkraefte) expect(d).toBeLessThanOrEqual(0.05);
+
+    // Die Lichthoefe kommen als rgba aus collector.ts — auch die bleiben schwach.
+    const hoefe = [...lies('src/lib/collector.ts').matchAll(/rgba\([\d,\s]+,(0\.\d+)\)/g)]
+      .map((m) => Number(m[1]));
+    expect(hoefe.length).toBeGreaterThan(0);
+    for (const h of hoefe) expect(h).toBeLessThanOrEqual(0.1);
   });
 
   it('zeichnet keine Kreaturen nach', () => {
-    // Ein angedeuteter Kreatur-Umriss waere genau die Fan-Seiten-Anmutung, die
-    // dieses Produkt nicht haben soll — unabhaengig von der Rechtslage.
-    expect(backdrop).not.toMatch(/pokeball|pokéball|charizard|pikachu|creature-silhouette/i);
+    // Ein erkennbarer Charakter im Hintergrund waere genau die Fan-Seiten-
+    // Anmutung, die dieses Produkt nicht haben soll — unabhaengig von der
+    // Rechtslage. Die Linienkunst ist eigenstaendig gezeichnet.
+    const verboten = /pokeball|pokéball|charizard|glurak|pikachu|rayquaza|arceus|mewtwo|creature-silhouette/i;
+    expect(ohneKommentare(backdrop)).not.toMatch(verboten);
+    expect(ohneKommentare(linienkunst)).not.toMatch(verboten);
   });
 
-  it('liegt nur im Seitenkopf, nicht ueber der ganzen Seite', () => {
-    const seite = lies('src/app/page.tsx');
-    expect(seite).not.toContain('CollectorBackdrop');
-    expect(lies('src/components/MarketHeader.tsx')).toContain('CollectorBackdrop');
+  it('haelt Research frei von Kreaturen', () => {
+    // Hinter 1.500 Woertern ist jede Struktur eine Stoerung. Lesbarkeit zuerst.
+    const stufen = backdrop.slice(backdrop.indexOf('const STAERKE'), backdrop.indexOf('export function AmbientBackdrop'));
+    expect(stufen).toMatch(/research:\s*\{[^}]*kreatur: null/);
+    expect(stufen).toMatch(/markt:\s*\{[^}]*kreatur: '/);
+  });
+
+  it('nutzt keine Bilder, kein Video und keine Dauer-Animation', () => {
+    // Leistungsvorgabe: nur CSS-Verlaeufe und SVG. `url(#…)` ist erlaubt — das
+    // ist eine seiteninterne SVG-Referenz (Maske, Verlauf), kein geladenes Bild.
+    const code = ohneKommentare(backdrop);
+    expect(code).not.toMatch(/<img|background-image|<video|<canvas|requestAnimationFrame|WebGL/i);
+    expect(code).not.toMatch(/url\(['"]?(https?:|\/|\.)|\.(png|jpe?g|webp|gif)\b/i);
+    expect(code).not.toMatch(/animate-(pulse|spin|bounce|ping)/);
+  });
+
+  it('gibt es nur EINMAL — keine zweite Hintergrund-Umsetzung', () => {
+    // Code-Regel 10: eine Quelle pro UI-Baustein.
+    expect(existiert('src/components/CollectorBackdrop.tsx')).toBe(false);
+    expect(lies('src/components/MarketHeader.tsx')).toContain('AmbientBackdrop');
+  });
+});
+
+describe('Set-Ton ist gezaehlt, nicht gesetzt', () => {
+  const karte = (typ?: string) => ({ types: typ ? [typ] : undefined });
+
+  it('nimmt den haeufigsten Energietyp der Kartenmenge', () => {
+    const ton = dominantAmbient([karte('Fire'), karte('Fire'), karte('Water')]);
+    expect(ton.ambient.quelle).toBe('Feuer');
+    expect(ton.gezaehlt).toBe(3);
+    expect(ton.anteil).toBeCloseTo(2 / 3);
+  });
+
+  it('zaehlt Karten ohne Typ gar nicht mit', () => {
+    // Sonst waere der Anteil ein Anteil an etwas anderem, als er behauptet.
+    const ton = dominantAmbient([karte('Water'), karte(), karte()]);
+    expect(ton.gezaehlt).toBe(1);
+    expect(ton.anteil).toBe(1);
+  });
+
+  it('behauptet ohne Datenlage keinen Typ', () => {
+    const ton = dominantAmbient([karte(), karte()]);
+    expect(ton.gezaehlt).toBe(0);
+    expect(ton.ambient).toBe(AMBIENT_FALLBACK);
+  });
+
+  it('die Set-Seite verschweigt den Ton, wenn nichts gezaehlt wurde', () => {
+    // Eine Farbe ohne Erklaerung ist Dekoration; eine Erklaerung ohne Messung
+    // waere eine Behauptung. Beides ist hier ausgeschlossen.
+    const seite = lies('src/app/sets/[setCode]/page.tsx');
+    expect(seite).toMatch(/setTon\.gezaehlt > 0 && \(/);
+    expect(seite).toMatch(/setTon\.gezaehlt > 0 \? setTon\.ambient\.ambient : undefined/);
   });
 });
 

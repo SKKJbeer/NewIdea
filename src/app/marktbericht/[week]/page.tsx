@@ -40,7 +40,7 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
   const olderReport = idx >= 0 && idx < allMeta.length - 1 ? allMeta[idx + 1] : null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">

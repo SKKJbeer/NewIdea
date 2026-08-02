@@ -144,9 +144,15 @@ describe('Datenbestand und auswertbare Stichprobe sind zweierlei', () => {
   it('die Oberfläche trennt Datenbestand und Stichprobe sichtbar', () => {
     // Beide Zahlen stehen im Marktkopf, aber in getrennten Blöcken und mit
     // unterschiedlichen Begriffen — genau das war der Kern des Missverständnisses.
+    //
+    // Die Reihenfolge ist Teil der Aussage: erst die Kennzahlen (Stichprobe =
+    // was in die Zahlen EINGEHT), darunter der Streifen (Bestand = was wir
+    // HABEN). Stünde der Bestand oben, läse man die grosse Zahl darunter als
+    // seine Auswertung.
     const kopf = lies('src/components/MarketHeader.tsx');
     expect(kopf).toContain('Stichprobe');
-    expect(kopf).toContain('Datenbestand');
+    expect(kopf).toContain('im Bestand');
+    expect(kopf.indexOf('Stichprobe')).toBeLessThan(kopf.indexOf('im Bestand'));
   });
 });
 

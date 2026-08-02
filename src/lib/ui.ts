@@ -9,13 +9,26 @@
 // Komponente — ein Token-Verzeichnis, das jede Sonderform aufnimmt, ist wieder
 // nur eine zweite Stelle für dasselbe Problem.
 
-/** Flächen. Siehe DESIGN.md §5 — Kanten statt Radien. */
+/**
+ * Flächen. Siehe DESIGN.md §5 — Kanten statt Radien.
+ *
+ * GRUNDTON MIT EINEM STICH INS BLAUE (#070810 statt #08080b): Beinahe reines
+ * Schwarz ist der Grundton eines Terminals. Sammelkarten leben von Farbe, und
+ * ein neutralschwarzer Grund nimmt jedem Artwork das Licht. Der Blauanteil ist
+ * so gering, dass er als Farbe nicht auffällt — er verhindert nur, dass die
+ * Seite tot wirkt. Wer einen Wert davon ableitet, nimmt IMMER dieses Token,
+ * nie einen eigenen Hexwert.
+ *
+ * GENAU DREI EBENEN. Mehr Abstufungen erzeugen keine Tiefe, sondern Unschärfe:
+ * Bei vier Grautönen erkennt niemand mehr, was zusammengehört.
+ */
 export const SURFACE = {
-  page: 'bg-[#08080b]',
-  raised: 'bg-[#0e0e13]',
+  page: 'bg-[#070810]',
+  raised: 'bg-[#0d0e18]',
+  elevated: 'bg-[#12131f]',
   line: 'border-[#1c1c24]',
   lineStrong: 'border-[#2a2a35]',
-  hover: 'hover:bg-white/[0.02]',
+  hover: 'hover:bg-white/[0.025]',
 } as const;
 
 /** Abschnittsmarke — steht über jedem Block statt einer Überschrift in Kachel. */

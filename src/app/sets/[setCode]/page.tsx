@@ -2,12 +2,14 @@ import { notFound } from 'next/navigation';
 import { SECTION_LABEL } from '@/lib/ui';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { AmbientBackdrop } from '@/components/AmbientBackdrop';
+import { dominantAmbient } from '@/lib/collector';
 import { CardGrid } from '@/components/CardGrid';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
-import { formatEurRounded } from '@/lib/format';
+import { formatEurRounded, formatPercent } from '@/lib/format';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
 import { siteUrlOrLocal } from '@/lib/site';
@@ -65,6 +67,11 @@ export default async function SetDetailPage({ params }: Props) {
   const setName = cards[0].set;
   const topValue = cards.reduce((sum, c) => sum + displayPrice(c), 0);
 
+  // Der Ton dieser Seite ist GEZÄHLT, nicht gesetzt: vorherrschender Energietyp
+  // der handelbaren Karten. Bei zu dünner Datenlage bleibt es beim Markenton
+  // und die Seite behauptet nichts über einen Typ.
+  const setTon = dominantAmbient(cards);
+
   const amazonUrl =
     process.env.NEXT_PUBLIC_AMAZON_URL ||
     `https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${setName} Booster`)}`;
@@ -83,15 +90,16 @@ export default async function SetDetailPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
       <NavBar />
 
-      <header className="border-b border-[#1c1c24] ">
-        <div className="max-w-4xl mx-auto px-4 pt-8 pb-12 sm:py-14">
+      <header className="relative border-b border-[#1c1c24]">
+        <AmbientBackdrop mode="set" akzent={setTon.gezaehlt > 0 ? setTon.ambient.ambient : undefined} />
+        <div className="relative max-w-4xl mx-auto px-4 pt-8 pb-12 sm:py-14">
           <Link href="/sets" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-6 transition-colors">
             <ArrowLeft size={12} /> Alle Sets
           </Link>
@@ -107,6 +115,23 @@ export default async function SetDetailPage({ params }: Props) {
               <p className="text-slate-500 text-sm mt-2">
                 {cards.length} handelbare Karten · Gesamtwert der Einzelkarten ca. {formatEurRounded(topValue)}
               </p>
+              {/* Offenlegung des Seitentons: Die Farbe ist gezählt. Ohne diesen
+                  Satz wirkt sie wie Dekoration — mit ihm ist sie eine Angabe.
+
+                  `flex`, NICHT `inline-flex`: Ein Absatz mit `inline-flex` ist
+                  ein Inline-Element; der Kaufknopf darunter rutschte dadurch
+                  auf dieselbe Zeile und schnitt den Satz ab. */}
+              {setTon.gezaehlt > 0 && (
+                <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-[11px] text-slate-600 sm:justify-start">
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full bg-current ${setTon.ambient.text}`} />
+                  Häufigster Energietyp:{' '}
+                  <span className={setTon.ambient.text}>{setTon.ambient.quelle}</span>
+                  <span className="tabular-nums">
+                    {formatPercent(setTon.anteil * 100, { withSign: false, digits: 0 })}
+                  </span>
+                  der {setTon.gezaehlt} typisierten Karten
+                </p>
+              )}
               <a
                 href={amazonUrl}
                 target="_blank"

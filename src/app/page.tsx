@@ -91,7 +91,7 @@ export default async function MarketPage() {
 
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen bg-[#08080b] text-slate-300">
+      <div className="min-h-screen bg-[#070810] text-slate-300">
         <NavBar />
         <ApiErrorState backHref="/suche" backLabel="Zur Kartensuche" />
       </div>
@@ -148,7 +148,7 @@ export default async function MarketPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#08080b] text-slate-300">
+    <div className="min-h-screen bg-[#070810] text-slate-300">
       <NavBar />
 
       {/* 01 — MARKT */}

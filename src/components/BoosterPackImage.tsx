@@ -39,13 +39,27 @@ interface Props {
   className?: string;
   /** Echte Logo-URL aus der TCG-API (set.images.logo) — verlässlichste Quelle. */
   logoUrl?: string;
+  /**
+   * Ersatzdarstellung, wenn es kein Logo gibt.
+   *
+   * `icon` (Standard) ist der kleine Platzhalter — richtig überall dort, wo das
+   * Bild nur Beiwerk neben Text ist.
+   *
+   * `wortmarke` setzt stattdessen den Set-Namen. Gedacht für Flächen, auf denen
+   * das Set-Bild der Blickfang IST: In der Set-Galerie standen für die vier
+   * jüngsten Sets (deren Logos die Quelle noch nicht führt) vier winzige
+   * Platzhalter-Kästchen ganz oben — die Seite sah kaputt aus, obwohl sie nur
+   * ehrlich war. Ein gesetzter Name füllt denselben Platz und behauptet nichts
+   * über ein Bild, das es nicht gibt.
+   */
+  platzhalter?: 'icon' | 'wortmarke';
 }
 
 /**
  * Robuste Quellenkette: echtes API-Logo → aus dem Set-Code abgeleitetes Logo →
  * sauberer Platzhalter. Es erscheint NIE ein kaputtes Bild-Icon.
  */
-export function BoosterPackImage({ setCode, setName, className = '', logoUrl }: Props) {
+export function BoosterPackImage({ setCode, setName, className = '', logoUrl, platzhalter = 'icon' }: Props) {
   const sources = [
     logoUrl || '',
     setCode ? `https://images.pokemontcg.io/${setCode}/logo.png` : '',
@@ -54,6 +68,19 @@ export function BoosterPackImage({ setCode, setName, className = '', logoUrl }: 
   const [idx, setIdx] = useState(0);
 
   if (idx >= sources.length) {
+    if (platzhalter === 'wortmarke') {
+      return (
+        <span
+          className={`flex items-center ${className}`}
+          role="img"
+          aria-label={`${setName} — kein Set-Logo verfügbar`}
+        >
+          <span className="text-[15px] font-black uppercase leading-tight tracking-[0.12em] text-slate-500">
+            {setName}
+          </span>
+        </span>
+      );
+    }
     return (
       <div
         className={`flex items-center justify-center rounded-lg bg-[#1a1a28] text-slate-600 ${className}`}

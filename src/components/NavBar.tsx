@@ -54,7 +54,7 @@ export function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#1c1c24] bg-[#08080b]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-[#1c1c24] bg-[#070810]/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
         {/* Trefferflaeche 44 px hoch. Gemessen war die Wortmarke 25 px — als
             Verweis auf die Startseite ist sie damit auf einem Telefon schwerer

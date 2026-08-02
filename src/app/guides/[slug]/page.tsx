@@ -64,7 +64,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+    <div className="min-h-screen bg-[#070810] text-slate-200">
       <NavBar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
 
@@ -131,7 +131,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             {section.cards && section.cards.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
                 {section.cards.map((card) => (
-                  <div key={card.name} className="border border-[#2a2a3a] rounded-xl p-3 bg-[#0a0a0f] flex items-start gap-3">
+                  <div key={card.name} className="border border-[#2a2a3a] rounded-xl p-3 bg-[#070810] flex items-start gap-3">
                     {card.imageUrl ? (
                       <div className="flex-none text-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
