@@ -98,7 +98,11 @@ export default async function SetDetailPage({ params }: Props) {
       <NavBar />
 
       <header className="relative border-b border-[#1c1c24]">
-        <AmbientBackdrop mode="set" akzent={setTon.gezaehlt > 0 ? setTon.ambient.ambient : undefined} />
+        <AmbientBackdrop
+          mode="set"
+          akzent={setTon.gezaehlt > 0 ? setTon.ambient.ambient : undefined}
+          typ={setTon.typ ?? undefined}
+        />
         <div className="relative max-w-4xl mx-auto px-4 pt-8 pb-12 sm:py-14">
           <Link href="/sets" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-6 transition-colors">
             <ArrowLeft size={12} /> Alle Sets

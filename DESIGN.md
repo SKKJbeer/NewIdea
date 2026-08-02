@@ -227,15 +227,34 @@ laufenden Produkt nahm das niemand als Auskunft wahr — es sah nur aus, als
 flimmerten manche Zeilen und andere nicht. Eine Regel, die niemand als Regel
 wahrnimmt, ordnet nichts; sie erzeugt Ungleichmäßigkeit.
 
-### Hintergrund (`CollectorBackdrop`)
+### Hintergrund (`AmbientBackdrop`)
 
-Abstrakte Höhenlinien plus zwei weiche Lichthöfe, rund 3 % Deckkraft, nur im
-Seitenkopf. Über die ganze Seite gezogen wird daraus Tapete.
+Fünf Modi — `markt`, `karte`, `set`, `sammlung`, `research` — mit je eigener
+Stärke. Höhenlinien, zwei bis drei weiche Lichthöfe, aufgefächerte
+Kartenumrisse, eine abstrakte Linienkunst und das Elementzeichen des
+Energietyps. Alles unter 5 % Deckkraft. `research` bekennt sich zur Leere:
+Hinter 1.500 Wörtern ist jede Struktur eine Störung.
 
-**Kein nachgezeichnetes Pokémon-Artwork, keine Kreatur-Umrisse, keine Pokébälle
-als Dekoration.** Die Formensprache kommt von Energie und Folie. Das ist nicht
-nur eine Rechtsfrage: Ein angedeuteter Kreatur-Umriss im Hintergrund wäre genau
-die Fan-Seiten-Anmutung, die dieses Produkt nicht haben soll.
+#### Wo die Grenze bei fremdem Material liegt
+
+Die frühere Regel lautete pauschal „kein Pokémon-Material im Hintergrund". Sie
+war leicht zu prüfen und ließ das Produkt kühler wirken, als es muss. Sie ist
+ersetzt durch eine Unterscheidung, die schwerer zu prüfen, aber sachlich die
+richtige ist:
+
+| | |
+|---|---|
+| **Eigene Formen** — Kartenformat 63:88, Kartenfächer, Boosterumrisse, selbst gezeichnete Elementzeichen (`card-motifs.ts`) | Immer erlaubt. Ein Format ist kein Werk, und Feuer gehört niemandem. |
+| **Das Bild EINER Karte auf DEREN Seite**, stark unscharf als Raumfarbe | Erlaubt. Kein zusätzliches Material: Dasselbe Bild steht darüber in voller Größe und ist Gegenstand der Auskunft. |
+| **Fremdes Artwork als Tapete beliebiger Seiten**, losgelöst von der Karte | Verboten. Das ist Dekoration mit fremdem Eigentum. |
+| **Charaktere nachzeichnen** (auch als Silhouette), **Pokéball**, **offizielle Kartenrückseite**, **offizielle Energie-Symbole als unsere Markenzeichen** | Verboten, ohne Ausnahme. Kennzeichen und konkrete gestaltete Flächen — und ein erkennbarer Charakter macht aus einem Marktprodukt eine Fanseite. |
+
+Der Satz, an dem sich alles entscheidet: **Ein Bild zu einer Karte auf deren
+Seite ist Gegenstand der Auskunft. Dasselbe Bild als Hintergrund einer
+beliebigen anderen Seite ist Dekoration mit fremdem Eigentum.**
+
+Abgesichert in `sammler-ebene.test.ts` → „Sammler-Motive: was erlaubt ist und
+was nicht".
 
 ### Kartenformat
 

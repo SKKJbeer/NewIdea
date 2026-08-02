@@ -1,4 +1,5 @@
 import { CREATURE_LINES, ENERGY_ARC } from '@/lib/creature-art';
+import { CARD_FAN, CARD_W, CARD_H, glyphFor } from '@/lib/card-motifs';
 
 // HINTERGRUND-EBENEN — Atmosphäre ohne Tapete.
 //
@@ -37,26 +38,37 @@ interface Props {
   mode: BackdropMode;
   /** Akzentfarbe als rgba für den Lichthof — kommt aus `collector.ts`. */
   akzent?: string;
+  /**
+   * Energietyp der Karte bzw. des Sets. Setzt das Elementzeichen im Grund.
+   *
+   * Die Zeichen sind EIGENE Zeichnungen (`card-motifs.ts`), nicht die Symbole
+   * des Spiels: Eine Flamme ist eine Flamme. Ohne bekannten Typ erscheint
+   * keins — ein beliebiges Zeichen wäre eine Behauptung über die Karte.
+   */
+  typ?: string;
   className?: string;
 }
 
 /** Deckkraft der Linienkunst je Modus. Mobil greift zusätzlich `sm:`-Anhebung. */
-const STAERKE: Record<BackdropMode, { linien: string; kreatur: string | null }> = {
+const STAERKE: Record<BackdropMode, { linien: string; kreatur: string | null; karten: string | null }> = {
   // Der Marktkopf trägt die stärkste Signatur — dort entscheidet der erste Blick.
-  markt: { linien: 'opacity-[0.05]', kreatur: 'opacity-[0.028] sm:opacity-[0.038]' },
-  // Kartenseite: Die Karte ist der Blickfang, der Grund bleibt fast leer —
-  // die Farbe kommt hier ohnehin aus dem Energietyp der Karte (`akzent`),
-  // und zwei Motive nebeneinander wäre eines zu viel.
-  karte: { linien: 'opacity-[0.035]', kreatur: null },
-  set: { linien: 'opacity-[0.04]', kreatur: 'opacity-[0.02] sm:opacity-[0.028]' },
-  sammlung: { linien: 'opacity-[0.03]', kreatur: null },
-  // Research bekommt KEINE Kreaturen. Lesbarkeit zuerst — hinter 1.500 Wörtern
+  markt: { linien: 'opacity-[0.05]', kreatur: 'opacity-[0.028] sm:opacity-[0.038]', karten: 'opacity-[0.03] sm:opacity-[0.04]' },
+  // Kartenseite: Die Karte selbst ist der Blickfang und liefert über `akzent`
+  // schon die Farbe. Keine Kreatur, aber die Kartenumrisse — sie stellen die
+  // eine Karte in eine Sammlung.
+  karte: { linien: 'opacity-[0.035]', kreatur: null, karten: 'opacity-[0.022] sm:opacity-[0.03]' },
+  set: { linien: 'opacity-[0.04]', kreatur: 'opacity-[0.02] sm:opacity-[0.028]', karten: 'opacity-[0.03] sm:opacity-[0.042]' },
+  // Sammlung: hier liegen die echten Karten des Nutzers auf dem Bildschirm.
+  // Gezeichnete Umrisse daneben wären eine Verdopplung.
+  sammlung: { linien: 'opacity-[0.03]', kreatur: null, karten: null },
+  // Research bekommt KEINE Motive. Lesbarkeit zuerst — hinter 1.500 Wörtern
   // ist jede Struktur eine Störung.
-  research: { linien: 'opacity-[0.02]', kreatur: null },
+  research: { linien: 'opacity-[0.02]', kreatur: null, karten: null },
 };
 
-export function AmbientBackdrop({ mode, akzent, className = '' }: Props) {
+export function AmbientBackdrop({ mode, akzent, typ, className = '' }: Props) {
   const stufe = STAERKE[mode];
+  const glyph = glyphFor(typ);
 
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
@@ -137,6 +149,51 @@ export function AmbientBackdrop({ mode, akzent, className = '' }: Props) {
           strokeLinejoin="round"
         >
           {ENERGY_ARC.map((d) => (
+            <path key={d} d={d} />
+          ))}
+        </svg>
+      )}
+
+      {/* EBENE D — aufgefächerte Kartenumrisse.
+          Das direkteste Sammler-Zeichen, das ohne fremdes Material auskommt:
+          63:88 ist ein Format, kein Werk. Fünf Umrisse, ungleichmäßig gedreht
+          wie hingelegte Karten — gleichmäßige Winkel sähen aus wie ein
+          Diagramm. Unten links, wo auf keiner Seite eine Zahl steht. */}
+      {stufe.karten && (
+        <svg
+          className={`absolute -bottom-[22%] -left-[8%] h-[95%] w-[62%] text-slate-200 sm:w-[46%] ${stufe.karten}`}
+          viewBox="0 0 600 400"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        >
+          {CARD_FAN.map((k) => (
+            <g key={`${k.x}-${k.rot}`} transform={`rotate(${k.rot} ${k.x + CARD_W / 2} ${k.y + CARD_H / 2})`}>
+              <rect x={k.x} y={k.y} width={CARD_W} height={CARD_H} rx="9" />
+              {/* Die Bildfläche der Karte — der obere Ausschnitt, den jede
+                  Sammelkarte hat. Erst damit liest sich das Rechteck als Karte
+                  und nicht als Kachel. */}
+              <rect x={k.x + 11} y={k.y + 20} width={CARD_W - 22} height={CARD_H * 0.46} rx="3" />
+            </g>
+          ))}
+        </svg>
+      )}
+
+      {/* EBENE E — Elementzeichen des Energietyps.
+          Eigene Zeichnung, nicht das Symbol des Spiels (siehe card-motifs.ts).
+          Groß und stark angeschnitten: Ein vollständig sichtbares Zeichen wäre
+          ein Logo, ein angeschnittenes ist Struktur. */}
+      {glyph && (
+        <svg
+          className="absolute -right-[6%] bottom-[4%] h-[42%] w-auto text-slate-100 opacity-[0.035] sm:opacity-[0.05]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="0.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {glyph.map((d) => (
             <path key={d} d={d} />
           ))}
         </svg>

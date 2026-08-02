@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { ambientFor, dominantAmbient, AMBIENT_FALLBACK } from '@/lib/collector';
+import { glyphFor, ELEMENT_GLYPHS, CARD_W, CARD_H } from '@/lib/card-motifs';
 import { findViolations, CAUSAL_CLAIM, HYPOTHESIS_MARKER } from '@/lib/content-rules';
 import { fearGreedLabel } from '@/lib/market-metrics';
 
@@ -131,9 +132,13 @@ describe('Hintergrund-Identitaet bleibt Hintergrund', () => {
     expect(stufen).toMatch(/markt:\s*\{[^}]*kreatur: '/);
   });
 
-  it('nutzt keine Bilder, kein Video und keine Dauer-Animation', () => {
-    // Leistungsvorgabe: nur CSS-Verlaeufe und SVG. `url(#…)` ist erlaubt — das
-    // ist eine seiteninterne SVG-Referenz (Maske, Verlauf), kein geladenes Bild.
+  it('die Hintergrund-Ebene selbst laedt kein Bild und animiert nicht dauerhaft', () => {
+    // Leistungsvorgabe fuer diesen Baustein: nur CSS-Verlaeufe und SVG.
+    // `url(#…)` ist erlaubt — seiteninterne SVG-Referenz (Maske, Verlauf).
+    //
+    // Das Kartenbild als Raumfarbe steht bewusst NICHT hier, sondern auf der
+    // Kartenseite: Es gehoert zu EINER Karte und darf deshalb nicht in einen
+    // Baustein wandern, den jede Seite einsetzt (siehe eigener Test unten).
     const code = ohneKommentare(backdrop);
     expect(code).not.toMatch(/<img|background-image|<video|<canvas|requestAnimationFrame|WebGL/i);
     expect(code).not.toMatch(/url\(['"]?(https?:|\/|\.)|\.(png|jpe?g|webp|gif)\b/i);
@@ -176,6 +181,77 @@ describe('Set-Ton ist gezaehlt, nicht gesetzt', () => {
     const seite = lies('src/app/sets/[setCode]/page.tsx');
     expect(seite).toMatch(/setTon\.gezaehlt > 0 && \(/);
     expect(seite).toMatch(/setTon\.gezaehlt > 0 \? setTon\.ambient\.ambient : undefined/);
+  });
+});
+
+describe('Sammler-Motive: was erlaubt ist und was nicht', () => {
+  const motive = lies('src/lib/card-motifs.ts');
+  const kartenseite = lies('src/app/karten/[id]/page.tsx');
+
+  // DIE GRENZE WURDE BEWUSST VERSCHOBEN. Vorher galt pauschal „keine
+  // Pokemon-Bilder im Hintergrund"; das war einfach zu pruefen und liess das
+  // Produkt kuehler aussehen, als es muss. Jetzt gilt eine Unterscheidung, die
+  // schwerer zu pruefen, aber sachlich die richtige ist:
+  //
+  //   · EIGENE Formen (Kartenformat, Elementzeichen) — immer erlaubt.
+  //   · Das Bild EINER Karte auf DEREN Seite — erlaubt, weil es dort ohnehin
+  //     in voller Groesse steht und Gegenstand der Auskunft ist.
+  //   · Fremdes Artwork als Tapete beliebiger Seiten — weiterhin verboten.
+  //
+  // Diese Tests halten genau diese drei Zeilen fest.
+
+  it('das Kartenformat ist echt — 63:88, kein gerundetes Rechteck', () => {
+    // Ein Rechteck im falschen Verhaeltnis liest sich als Kachel. Erst das
+    // echte Format macht daraus eine Karte.
+    expect(CARD_W / CARD_H).toBeCloseTo(63 / 88, 2);
+  });
+
+  it('die Elementzeichen sind eigene Pfade, keine fremden Dateien', () => {
+    for (const [typ, pfade] of Object.entries(ELEMENT_GLYPHS)) {
+      expect(pfade.length, typ).toBeGreaterThan(0);
+      for (const d of pfade) expect(d, typ).toMatch(/^M[\s\d.-]/);
+    }
+    expect(ohneKommentare(motive)).not.toMatch(/<img|https?:|\.(png|svg|jpe?g|webp)\b/i);
+  });
+
+  it('erfindet kein Zeichen fuer einen unbekannten Typ', () => {
+    // Ein beliebiges Zeichen waere eine Behauptung ueber die Karte.
+    expect(glyphFor('Fire')).not.toBeNull();
+    expect(glyphFor('Gibtsnicht')).toBeNull();
+    expect(glyphFor(undefined)).toBeNull();
+  });
+
+  it('greift geschuetzte Kennzeichen NICHT auf', () => {
+    // Das bleibt ausgeschlossen, auch nach der Lockerung: Der Pokeball ist ein
+    // Kennzeichen, kein Symbol; die Kartenrueckseite ist eine konkrete
+    // gestaltete Flaeche; ein nachgezeichneter Charakter macht aus einem
+    // Marktprodukt eine Fanseite.
+    const verboten = /pokeball|poké?ball|monsterball|kartenrueckseite|card-?back|charizard|glurak|pikachu|rayquaza|mewtwo|arceus|eevee|evoli/i;
+    for (const datei of [
+      'src/lib/card-motifs.ts',
+      'src/lib/creature-art.ts',
+      'src/components/AmbientBackdrop.tsx',
+    ]) {
+      expect(ohneKommentare(lies(datei)), datei).not.toMatch(verboten);
+    }
+  });
+
+  it('das Kartenbild als Raumfarbe steht NUR auf der Seite dieser Karte', () => {
+    // Der entscheidende Unterschied: `card.imageUrl` ist auf DIESER Seite die
+    // Karte, um die es geht. Derselbe Griff in einem seitenweiten Baustein
+    // waere fremdes Artwork als Tapete.
+    expect(kartenseite).toMatch(/card\.imageUrl && \(/);
+    expect(kartenseite).toMatch(/blur-\[\d+px\]/);
+
+    // Unkenntlich UND schwach. Beides zusammen, nicht eins von beidem.
+    const deckkraft = Number(kartenseite.match(/opacity-\[0\.(\d+)\][^>]*blur/)?.[1] ?? '99');
+    expect(deckkraft).toBeLessThanOrEqual(12);
+
+    // Und nirgendwo sonst: Kein seitenweiter Baustein darf ein Kartenbild als
+    // Hintergrund einsetzen.
+    for (const datei of ['src/components/AmbientBackdrop.tsx', 'src/components/NavBar.tsx', 'src/components/SiteFooter.tsx']) {
+      expect(ohneKommentare(lies(datei)), datei).not.toMatch(/imageUrl/);
+    }
   });
 });
 

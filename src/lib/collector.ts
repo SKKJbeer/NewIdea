@@ -103,7 +103,7 @@ export function ambientFor(types: string[] | undefined): Ambient {
  */
 export function dominantAmbient(
   cards: Array<{ types?: string[] }>,
-): { ambient: Ambient; anteil: number; gezaehlt: number } {
+): { ambient: Ambient; anteil: number; gezaehlt: number; typ: string | null } {
   const zaehler = new Map<string, number>();
   let gezaehlt = 0;
   for (const c of cards) {
@@ -112,14 +112,14 @@ export function dominantAmbient(
     zaehler.set(t, (zaehler.get(t) ?? 0) + 1);
     gezaehlt++;
   }
-  if (gezaehlt === 0) return { ambient: AMBIENT_FALLBACK, anteil: 0, gezaehlt: 0 };
+  if (gezaehlt === 0) return { ambient: AMBIENT_FALLBACK, anteil: 0, gezaehlt: 0, typ: null };
 
   let bester = '';
   let beste = 0;
   for (const [typ, n] of zaehler) {
     if (n > beste) { bester = typ; beste = n; }
   }
-  return { ambient: TOENE[bester], anteil: beste / gezaehlt, gezaehlt };
+  return { ambient: TOENE[bester], anteil: beste / gezaehlt, gezaehlt, typ: bester };
 }
 
 // FRÜHER STAND HIER `hatFolie(rarity)`.

@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.15.0',
+    date: '2. August 2026',
+    label: 'Sammler-Motive — die Grenze zu fremdem Material neu gezogen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Aufgefaecherte Kartenumrisse im Grund, im echten Format 63:88 — ein Format ist kein Werk' },
+      { type: 'new', text: 'Eigene Elementzeichen je Energietyp: Flamme, Tropfen, Blatt, Blitz. Selbst gezeichnet, nicht die Symbole des Spiels' },
+      { type: 'new', text: 'Das Artwork einer Karte faerbt ihre eigene Seite — stark unscharf, nicht mehr als Bild erkennbar. Jede Karte fuehlt sich dadurch anders an' },
+      { type: 'changed', text: 'Neue Grenze zu fremdem Material: eigene Formen immer, das Bild EINER Karte auf DEREN Seite ja, fremdes Artwork als Tapete beliebiger Seiten weiterhin nein' },
+      { type: 'changed', text: 'Unveraendert ausgeschlossen: nachgezeichnete Charaktere, Pokeball, offizielle Kartenrueckseite, offizielle Energie-Symbole als Markenzeichen' },
+      { type: 'fixed', text: 'Die neue Farbflaeche kostete 160 KB und wurde auf 2,6 KB gebracht — Bildlast der Kartenseite 75 KB statt 234 KB' },
+    ],
+  },
+  {
     version: '4.14.0',
     date: '2. August 2026',
     label: 'Sammler-Sichtebene — die Oberflaeche erkennt an, was hier gehandelt wird',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Umgebungs-Hintergrund in drei Ebenen: Lichthoefe, Hoehenlinien und eine eigene Linienkunst — alles unter 5 Prozent Deckkraft, reines SVG und CSS' },
       { type: 'new', text: 'Fuenf Modi statt eines Hintergrunds (Markt, Karte, Set, Sammlung, Research); Research bleibt frei von Struktur, weil Lesbarkeit vorgeht' },

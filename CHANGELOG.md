@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.15.0] - 2. August 2026 · Sammler-Motive: die Grenze zu fremdem Material neu gezogen
+
+### Neu
+- **Aufgefaecherte Kartenumrisse im Grund** — fuenf Umrisse im echten Format 63:88, ungleichmaessig gedreht wie hingelegte Karten. Das direkteste Sammler-Zeichen, das ohne fremdes Material auskommt: Ein Format ist kein Werk
+- **Eigene Elementzeichen je Energietyp** (`card-motifs.ts`): Flamme, Tropfen, Blatt, Blitz, Spirale, Mond, Zahnrad, Kristall, Stern, Ring. Selbst gezeichnet, NICHT die Symbole des Spiels — eine Flamme ist eine Flamme. Ohne bekannten Typ erscheint keins
+- **Das Artwork einer Karte faerbt ihre eigene Seite.** Bisher kam die Raumfarbe aus dem Energietyp; damit sah jede Feuer-Karte gleich aus, obwohl ein Vulkan-Artwork und eine helle Illustration nichts gemeinsam haben. Jetzt liefert das Bild selbst die Farbe — stark unscharf, sehr gering deckend, nicht mehr als Bild erkennbar
+
+### Geaendert
+- **Die Regel „kein Pokemon-Material im Hintergrund" ist ersetzt.** Sie war leicht zu pruefen und liess das Produkt kuehler wirken, als es muss. An ihre Stelle tritt eine Unterscheidung: eigene Formen immer erlaubt; das Bild EINER Karte auf DEREN Seite erlaubt, weil es dort ohnehin in voller Groesse steht und Gegenstand der Auskunft ist; fremdes Artwork als Tapete beliebiger Seiten weiterhin verboten
+- **Unveraendert ausgeschlossen bleiben** nachgezeichnete Charaktere, der Pokeball, die offizielle Kartenrueckseite und die offiziellen Energie-Symbole als Markenzeichen von CardBeacon. Sechs neue Tests halten genau diese Zeilen fest
+
+### Behoben
+- **Die neue Farbflaeche kostete 160 KB** und war damit das groesste Element der Kartenseite — fuer eine Flaeche, auf der bei 90 Pixel Unschaerfe nichts mehr zu erkennen ist. Ueber den Bildoptimierer winzig angefordert: 2,6 KB, optisch identisch. Die Bildlast der Kartenseite liegt damit bei 75 KB statt 234 KB
+
+---
+
 ## [4.14.0] - 2. August 2026 · Sammler-Sichtebene: die Oberflaeche erkennt an, was hier gehandelt wird
 
 ### Neu

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
 import { fetchCardById } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@/lib/price-history';
@@ -174,7 +175,44 @@ export default async function CardDetailPage({ params }: Props) {
           fuehlt sich eine Feuer-Karte anders an als eine Wasser-Karte, ohne
           dass irgendein Bedienelement die Farbe wechselt. */}
       <div className="relative">
-        <AmbientBackdrop mode="karte" akzent={ambient.ambient} className="h-[70vh]" />
+        <AmbientBackdrop mode="karte" akzent={ambient.ambient} typ={card.types?.[0]} className="h-[70vh]" />
+
+        {/* DAS ARTWORK DIESER KARTE ALS RAUMFARBE.
+            Bis hierher kam die Farbe aus dem Energietyp — richtig, aber grob:
+            Jede Feuer-Karte faerbte den Raum gleich, obwohl ein Vulkan-Artwork
+            und eine helle Illustration nichts gemeinsam haben. Das Bild selbst
+            ist die genauere Quelle, und es kostet nichts: Es steht zwanzig
+            Zentimeter weiter oben ohnehin in voller Groesse, der Browser hat
+            es also schon.
+
+            ZUR RECHTSLAGE, weil das die Frage ist, an der es haengt: Das ist
+            KEIN zusaetzliches Material. Es ist das Bild DIESER Karte auf DEREN
+            Seite — derselbe informierende Zusammenhang wie die Preisangabe
+            darunter. Was ausgeschlossen bleibt, ist dasselbe Bild als Tapete
+            einer beliebigen anderen Seite, losgeloest von der Karte, zu der es
+            gehoert.
+
+            WINZIG ANGEFORDERT, NICHT GROSS UND DANN WEICHGEZEICHNET. Der erste
+            Entwurf holte das Bild ueber den Zwischenspeicher-Proxy: 160 KB,
+            das groesste Asset der ganzen Seite — fuer eine Flaeche, auf der bei
+            90 px Unschaerfe nichts mehr zu erkennen ist. Ueber den
+            Bildoptimierer mit `sizes="64px"` sind es wenige Kilobyte, und das
+            Ergebnis sieht identisch aus. Die ROHE Adresse, nicht die des
+            Zwischenspeicher-Proxys: Der Optimierer lehnt Proxy-Adressen mit
+            HTTP 400 ab (Stolperstelle 18). */}
+        {card.imageUrl && (
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[70vh] overflow-hidden">
+            <Image
+              src={card.imageUrl}
+              alt=""
+              fill
+              sizes="64px"
+              quality={40}
+              className="scale-125 object-cover opacity-[0.10] blur-[90px] saturate-150"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#070810]/30 via-[#070810]/70 to-[#070810]" />
+          </div>
+        )}
 
       <div className="relative max-w-4xl mx-auto px-4 py-8">
         <Link href="/" className="inline-flex min-h-[32px] items-center gap-2 text-violet-400 hover:text-violet-300 text-sm mb-6 transition-colors">
