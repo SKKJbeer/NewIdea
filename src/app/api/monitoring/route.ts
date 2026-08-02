@@ -34,42 +34,71 @@ function getSkills() {
 
 // Describe automation workflows — derived from vercel.json + known API routes
 function getWorkflows(cronActive: boolean) {
+  // WAS HIER STEHEN MUSS, ist der TATSAECHLICHE Ablauf — nicht der von damals.
+  //
+  // BEFUND BEIM AUFRAEUMEN: Der taegliche Cron war mit „Speichert aktuelle
+  // Preise in Supabase, waermt Blog- und Karten-Cache auf" beschrieben. Er
+  // stoesst inzwischen ausserdem die flaechendeckende Erfassung an, schreibt
+  // den Indexstand fort, waermt die Suche vor, erzeugt sonntags und
+  // donnerstags einen Artikel und dienstags und freitags einen Guide. Eine
+  // Beschreibung, die das Wichtigste verschweigt, ist schlimmer als keine.
   return [
     {
       name: 'Wöchentliche Marktanalyse',
       endpoint: '/api/cron',
       schedule: '0 7 * * 1',
       scheduleLabel: 'Montags 07:00 UTC',
-      description: 'Generiert KI-Marktbericht, bereitet Newsletter vor, speichert Preis-Snapshots',
+      description: 'Erzeugt den Wochenbericht, bereitet den Newsletter vor und speichert Preis-Schnappschüsse',
       active: cronActive,
       trigger: 'Vercel Cron',
     },
     {
-      name: 'Täglicher Preis-Cron',
+      name: 'Täglicher Cron',
       endpoint: '/api/cron/daily',
       schedule: '0 8 * * *',
       scheduleLabel: 'Täglich 08:00 UTC',
-      description: 'Speichert aktuelle Preise in Supabase, wärmt Blog- und Karten-Cache auf',
+      description:
+        'Schnappschüsse der Top-Karten, Indexstand, Vorwärmen der Suche — und der Anstoß für die flächendeckende Preiserfassung',
       active: cronActive,
       trigger: 'Vercel Cron',
     },
     {
-      name: 'KI-Blog-Generierung',
-      endpoint: '/api/generate',
-      schedule: 'On Demand',
-      scheduleLabel: 'Manuell (Studio)',
-      description: 'Generiert Marktberichte, Newsletter-Texte, Video-Skripte via Claude API',
-      active: env('ANTHROPIC_API_KEY'),
-      trigger: 'Manuell',
+      name: 'Flächendeckende Preiserfassung',
+      endpoint: '/api/cron/price-sweep',
+      schedule: 'Kette',
+      scheduleLabel: 'Reicht sich selbst weiter, bis der Tag fertig ist',
+      description:
+        'Holt alle ~20.500 Karten seitenweise, schreibt Messpunkte und den Kartenindex fort. Der Fortschritt steht im Betriebszustand',
+      active: cronActive,
+      trigger: 'Täglicher Cron',
+    },
+    {
+      name: 'Artikel (Sonntag + Donnerstag)',
+      endpoint: '/api/cron/daily',
+      schedule: '0 8 * * 0,4',
+      scheduleLabel: 'Sonntags + donnerstags',
+      description: 'Erzeugt den Wochenrückblick bzw. das Marktthema — nur an diesen beiden Tagen',
+      active: cronActive,
+      trigger: 'Täglicher Cron',
+    },
+    {
+      name: 'Guides (Dienstag + Freitag)',
+      endpoint: '/api/cron/daily',
+      schedule: '0 8 * * 2,5',
+      scheduleLabel: 'Dienstags + freitags',
+      description:
+        'Nimmt das nächste Thema aus der Warteschlange. Verletzt die Ausgabe eine Inhaltsregel, wird sie NICHT gespeichert',
+      active: cronActive,
+      trigger: 'Täglicher Cron',
     },
     {
       name: 'Newsletter-Versand',
       endpoint: '/api/newsletter',
       schedule: 'On Demand',
       scheduleLabel: 'Bei Anmeldung / Manuell',
-      description: 'Sendet Newsletter über Beehiiv; sammelt Anmeldungen auch ohne Key',
-      active: env('BEEHIIV_API_KEY') && env('BEEHIIV_PUBLICATION_ID'),
-      trigger: 'Webhook',
+      description: 'Versendet über Beehiiv; Anmeldungen werden auch ohne Key gesammelt',
+      active: !!process.env.BEEHIIV_API_KEY && !!process.env.BEEHIIV_PUBLICATION_ID,
+      trigger: 'Formular / Studio',
     },
   ];
 }
@@ -208,25 +237,31 @@ export async function GET(request: Request) {
       },
     },
 
-    // Feature / Content status
-    features: {
-      supabaseConnected,
-      priceSnapshots: { working: supabaseConnected, label: 'Preis-Snapshots (Supabase)', effect: 'Echte tägl. Preis-Historie' },
-      tcgPrices: { working: tcgApiWorking, label: 'Cardmarket-Preise (EUR)', effect: 'via TCG-API-Key' },
-      aiBlog: { working: env('ANTHROPIC_API_KEY'), label: 'KI-Blog-Artikel', effect: 'Ohne Key: Evergreen-Fallback-Inhalte' },
-      cronDaily: { working: env('CRON_SECRET') && !!siteUrl, label: 'Täglicher Cron (08:00)', effect: 'Speichert Preise & wärmt Cache' },
-      portfolioKonto: { working: process.env.NEXT_PUBLIC_PORTFOLIO_LOGIN === 'on' && env('NEXT_PUBLIC_SUPABASE_URL') && env('NEXT_PUBLIC_SUPABASE_ANON_KEY'), label: 'Portfolio-Konto (Google/Apple)', effect: 'Ohne: Portfolio liegt nur im Browser des Besuchers' },
-      newsletter: { working: env('BEEHIIV_API_KEY') && env('BEEHIIV_PUBLICATION_ID'), label: 'Newsletter-Versand', effect: 'Anmeldungen werden gesammelt, aber nicht versendet' },
-      video: { working: env('ELEVENLABS_API_KEY'), label: 'Video-Pipeline (ElevenLabs)', effect: 'Skript-Generator funktioniert, Stimme fehlt' },
-      socialMedia: { working: env('BUFFER_ACCESS_TOKEN'), label: 'Social-Media-Auto-Post', effect: 'Posts werden generiert, aber nicht geplant' },
-    },
+    // FRUEHER STAND HIER „features".
+    //
+    // Der Block zaehlte auf, welche Funktionen konfiguriert sind — und sagte
+    // damit zum DRITTEN Mal dasselbe: `apiKeys` nennt die Konfiguration,
+    // `health` nennt die Ergebnisse. Jeder einzelne Eintrag war anderswo
+    // bereits beantwortet. Die Anzeige war schon entfernt; das Feld hier
+    // stehen zu lassen waere genau die Drift, gegen die der Umbau war.
+
 
     // Betriebszustand: echte Ergebnisse statt nur Konfiguration
     health,
 
     // Skills & Workflows
     skills: getSkills(),
-    workflows: getWorkflows(env('CRON_SECRET') && !!siteUrl),
+    // „AKTIV" HAENGT NUR NOCH AM SECRET.
+    //
+    // BEFUND: Hier stand `env('CRON_SECRET') && !!siteUrl`. `siteUrl` ist
+    // NEXT_PUBLIC_SITE_URL — und die zeigt auf eine Domain, die nie verbunden
+    // wurde, ist also nicht gesetzt. Das Monitoring meldete beide Crons damit
+    // als INAKTIV, waehrend sie nachweislich jeden Tag liefen.
+    //
+    // Die Cron-Routen brauchen die Variable auch gar nicht: Sie verwenden
+    // `url.origin`, also die Adresse, unter der sie gerade laufen — genau
+    // deshalb, weil NEXT_PUBLIC_SITE_URL ins Leere zeigte.
+    workflows: getWorkflows(env('CRON_SECRET')),
 
     checkedAt: new Date().toISOString(),
   };

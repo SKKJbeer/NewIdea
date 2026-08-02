@@ -7,6 +7,22 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.2.1] - 2. August 2026 · Monitoring zu Ende aufgeraeumt
+
+### Behoben
+- **Das Monitoring meldete beide Cron-Jobs als INAKTIV, waehrend sie liefen.** „aktiv" haengte an `NEXT_PUBLIC_SITE_URL` — und die zeigt auf eine nie verbundene Domain, ist also nicht gesetzt. Die Cron-Routen brauchen sie gar nicht: Sie nutzen `url.origin`, genau weil die Variable ins Leere zeigte. Eine Falschmeldung ist schlimmer als eine fehlende
+- **Der Block „features" ist jetzt auch aus der API-Antwort raus**, nicht nur aus der Anzeige. Ein totes Feld stehen zu lassen waere genau die Drift gewesen, gegen die der Umbau war
+
+### Geaendert
+- **Die Workflow-Beschreibungen entsprechen wieder dem tatsaechlichen Ablauf.** Der taegliche Cron war mit „Speichert aktuelle Preise, waermt Cache auf" beschrieben — er stoesst inzwischen die flaechendeckende Erfassung an, schreibt den Indexstand fort, waermt die Suche vor und erzeugt Artikel und Guides
+- **Drei Ablaeufe fehlten ganz** und stehen jetzt drin: die flaechendeckende Preiserfassung (der wichtigste ueberhaupt), die Artikel-Tage (So + Do) und die Guide-Tage (Di + Fr)
+- **Der Gesamtwert oben zaehlt nur noch drei Bereiche** — Keys, Affiliate-Links, Rechtstexte
+
+### Neu
+- **`monitoring.test.ts`** haelt beides fest: kein dritter Aufzaehlblock, „aktiv" nicht an einer ungenutzten Adresse, jeder Cron aus `vercel.json` kommt vor, und der Betriebszustand zeigt die Erfassung als Arbeit statt als Zeitstempel
+
+---
+
 ## [5.2.0] - 2. August 2026 · Das Portfolio zeigt immer einen Stand
 
 ### Behoben

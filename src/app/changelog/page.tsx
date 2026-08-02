@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.2.1',
+    date: '2. August 2026',
+    label: 'Monitoring zu Ende aufgeraeumt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Das Monitoring meldete beide Cron-Jobs als inaktiv, waehrend sie liefen — „aktiv" haengte an einer Adresse, die nie verbunden wurde' },
+      { type: 'fixed', text: 'Der Block „features" ist jetzt auch aus der API-Antwort raus, nicht nur aus der Anzeige' },
+      { type: 'changed', text: 'Workflow-Beschreibungen entsprechen wieder dem tatsaechlichen Ablauf; Preiserfassung, Artikel- und Guide-Tage fehlten ganz' },
+      { type: 'new', text: 'Ein Waechter-Test haelt fest, dass keine dritte Aufzaehlung derselben Sache zurueckkommt' },
+    ],
+  },
+  {
     version: '5.2.0',
     date: '2. August 2026',
     label: 'Das Portfolio zeigt immer einen Stand',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Von sechs Positionen standen drei auf „Kein Marktpreis geladen" — ein fehlgeschlagener Abruf liess die Position komplett ausfallen' },
       { type: 'fixed', text: 'Rueckfall auf den eigenen Kartenindex: dieselben Karten samt Preis, aus unserer Datenbank, in einer einzigen Abfrage' },

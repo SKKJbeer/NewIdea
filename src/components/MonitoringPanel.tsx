@@ -35,12 +35,6 @@ interface LegalStatus {
   hint: string;
 }
 
-interface FeatureStatus {
-  working: boolean;
-  label: string;
-  effect: string;
-}
-
 interface SkillInfo {
   name: string;
   title: string;
@@ -103,7 +97,6 @@ interface MonitoringData {
   apiKeys: Record<string, ApiKeyStatus>;
   affiliates: Record<string, AffiliateStatus>;
   legal: Record<string, LegalStatus>;
-  features: { supabaseConnected: boolean } & Record<string, FeatureStatus>;
   health: SystemHealth | null;
   skills: SkillInfo[];
   workflows: WorkflowInfo[];
@@ -595,11 +588,11 @@ export function MonitoringPanel() {
   const legalEntries = Object.entries(data.legal);
   const legalOk = legalEntries.filter(([, v]) => !v.hasPlaceholders).length;
 
-  const featureEntries = Object.entries(data.features).filter(([k]) => k !== 'supabaseConnected') as [string, FeatureStatus][];
-  const featuresWorking = featureEntries.filter(([, v]) => v.working).length;
-
-  const totalScore = keysSet + affiliatesReal + legalOk + featuresWorking;
-  const totalMax = apiKeyEntries.length + affiliateEntries.length + legalEntries.length + featureEntries.length;
+  // `features` ist entfallen — der Block sagte zum dritten Mal, was „API-Keys"
+  // (Konfiguration) und „Betriebszustand" (Ergebnisse) bereits sagen. Der
+  // Gesamtwert zaehlt entsprechend nur noch die drei verbliebenen Bereiche.
+  const totalScore = keysSet + affiliatesReal + legalOk;
+  const totalMax = apiKeyEntries.length + affiliateEntries.length + legalEntries.length;
 
   return (
     <div className="space-y-5">
@@ -627,7 +620,6 @@ export function MonitoringPanel() {
           <span className="inline-flex items-center gap-1"><KeyRound size={11} /> {keysSet}/{apiKeyEntries.length} Keys</span>
           <span className="inline-flex items-center gap-1"><Link2 size={11} /> {affiliatesReal}/{affiliateEntries.length} Affiliate</span>
           <span className="inline-flex items-center gap-1"><FileText size={11} /> {legalOk}/{legalEntries.length} Rechtstexte</span>
-          <span className="inline-flex items-center gap-1"><Zap size={11} /> {featuresWorking}/{featureEntries.length} Features</span>
         </div>
         {data.build.siteUrlMissing && (
           <p className="mt-2 text-[11px] text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
@@ -820,7 +812,7 @@ export function MonitoringPanel() {
             ['Site-URL', data.build.siteUrl
               ? <a key="u" href={data.build.siteUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-violet-600 hover:underline font-mono">{data.build.siteUrl}</a>
               : <span key="u" className="text-xs text-rose-600">Nicht gesetzt</span>],
-            ['Supabase', <span key="s" className={`text-xs font-semibold px-2 py-0.5 rounded-full ${data.features.supabaseConnected ? 'bg-emerald-50 text-emerald-700' : 'bg-[#1a1a28] text-slate-500'}`}>{data.features.supabaseConnected ? '✓ Verbunden' : 'Nicht verbunden'}</span>],
+            ['Supabase', <span key="s" className={`text-xs font-semibold px-2 py-0.5 rounded-full ${data.health?.configured ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[#1a1a28] text-slate-500'}`}>{data.health?.configured ? 'Verbunden' : 'Nicht verbunden'}</span>],
             ['Geprüft', <span key="t" className="text-xs text-slate-500">{new Date(data.checkedAt).toLocaleTimeString('de-DE')}</span>],
           ].map(([label, value]) => (
             <div key={String(label)} className="flex items-center justify-between py-2 border-b border-[#1e1e30] last:border-0">
