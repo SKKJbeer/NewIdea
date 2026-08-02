@@ -238,7 +238,7 @@ describe('Die Marktübersicht zeigt Daten, keinen Katalog', () => {
 
   it('zeigt jede Karte nur EINMAL', () => {
     // Genau ein Modul beantwortet die Frage „was hat sich bewegt".
-    expect(seite).toContain('<MarketMovers');
+    expect(seite).toContain('<MoversPanel');
     expect(seite).not.toContain('tickerCards');
     expect(seite).not.toContain('trendingTable');
   });

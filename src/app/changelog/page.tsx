@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.17.0',
+    date: '2. August 2026',
+    label: 'Startseite nach geliefertem Entwurf',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Seitenleiste links mit Navigation, Datenstand und Bestand; Kopfzeile mit Suchfeld' },
+      { type: 'new', text: 'Atmosphaere in sechs Ebenen und ein graviertes Fabelwesen als eigene Illustration — konstruiert, nicht nachgezeichnet' },
+      { type: 'new', text: 'CBI-Panel als Glasflaeche mit Verlaufskurve; ohne gespeicherte Tagesstaende steht dort der Grund statt einer Linie' },
+      { type: 'new', text: 'Vier Kennzahl-Karten mit je eigener Mikro-Darstellung, Drei-Panel-Reihe und Schnellzugriff' },
+      { type: 'changed', text: 'Ueberschrift „Heute im Pokémon Markt" mit dem Verlauf des Entwurfs; Materialien statt Flaechen' },
+      { type: 'fixed', text: 'Acht Pixel waagerechter Ueberlauf auf dem Telefon durch den Lichthof des CBI-Panels' },
+    ],
+  },
+  {
     version: '4.16.0',
     date: '2. August 2026',
     label: 'Die Startseite erzaehlt, bevor sie misst',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Markt-Story als Einstieg: Schlagzeile, Absatz und drei Belege vor jeder Kennzahl — regelbasiert aus gemessenen Werten, ohne Prognose und ohne Ursachenbehauptung' },
       { type: 'new', text: 'Verteilung in fuenf benannten Baendern statt acht namenloser Balken, mit Anzahl, Anteil, Grenzen und einem Satz, der die Form deutet' },

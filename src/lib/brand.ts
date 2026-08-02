@@ -23,6 +23,9 @@ export const PROMISE = 'Understand the market behind the cards.';
 /** Kurzfassung für Stellen, an denen wenig Platz ist. */
 export const PROMISE_SHORT = 'See where the market is moving.';
 
+/** Englische Kurzbeschreibung — steht in der Seitenleiste unter der Wortmarke. */
+export const DESCRIPTOR_EN = 'Market Intelligence for Collectors';
+
 /** Deutsche Entsprechungen — die Oberfläche ist deutschsprachig. */
 export const DESCRIPTOR_DE = 'Marktanalyse für Sammelkarten';
 export const PROMISE_DE = 'Den Markt hinter den Karten verstehen.';

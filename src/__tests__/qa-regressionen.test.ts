@@ -118,20 +118,26 @@ describe('Die Startseite führt durch die Produktlogik', () => {
 
   // Neue Reihenfolge: Markt → Einordnung → Bewegungen → Set-Markt → Bestand →
   // Research. Erst der Markt, dann seine Teile, dann der eigene Bestand.
+  // Reihenfolge nach dem gelieferten Entwurf: erst der Kopf mit Geschichte und
+  // Index, danach die vertiefenden Abschnitte. Set-Markt und Bewegungen stehen
+  // jetzt IM Kopf (drei Panels nebeneinander) statt als eigene Abschnitte —
+  // deshalb tauchen sie hier nicht mehr als `aria-labelledby` auf.
   const REIHENFOLGE = [
-    '<MarketHeader',
+    'aria-labelledby="marktkopf"',
     'aria-labelledby="einordnung"',
-    'aria-labelledby="bewegungen"',
-    'aria-labelledby="setmarkt"',
+    'aria-labelledby="verteilung"',
+    'aria-labelledby="verlierer"',
     'aria-labelledby="bestand"',
-    'aria-labelledby="research"',
   ];
 
   it('beginnt mit dem Marktstand, nicht mit einem Suchfeld', () => {
     // Der Blickfang war ein leeres Eingabefeld. Die erste Aussage der Seite
-    // ist jetzt der Marktstand; die Suche steht in der Kopfzeile.
-    expect(seite.indexOf('<MarketHeader')).toBeGreaterThan(0);
+    // ist jetzt die Marktgeschichte; die Suche steht in der Kopfleiste
+    // (`AppShell`), nicht im Inhalt.
+    expect(seite.indexOf('aria-labelledby="marktkopf"')).toBeGreaterThan(0);
     expect(seite).not.toContain('<SearchBox');
+    // Die Geschichte steht vor jeder Kennzahl.
+    expect(seite.indexOf('story.absatz')).toBeLessThan(seite.indexOf('<MetricCards'));
   });
 
   it('hält die Abschnitte in der Produktreihenfolge', () => {
@@ -142,7 +148,7 @@ describe('Die Startseite führt durch die Produktlogik', () => {
 
   it('bleibt bei sechs Abschnitten', () => {
     // Zehn Abschnitte waren der Grund, warum keiner wichtig aussah.
-    const abschnitte = (seite.match(/<section aria-labelledby=/g) ?? []).length;
+    const abschnitte = (seite.match(/<section\s+aria-labelledby=/g) ?? []).length;
     expect(abschnitte).toBeLessThanOrEqual(6);
   });
 });

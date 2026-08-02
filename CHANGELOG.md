@@ -7,6 +7,32 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.17.0] - 2. August 2026 · Startseite nach geliefertem Entwurf
+
+### Neu
+- **Seitenleiste links** ab 1024 px (`AppSidebar`): Wortmarke, sieben Navigationspunkte, Datenstand-Karte und Bestandskarte. Darunter bleibt es bei der Kopfleiste — eine 236-px-Leiste neben 390 px Inhalt waere keine Navigation, sondern ein Rand
+- **Kopfzeile mit Suchfeld** und runden Schaltflaechen zu Merkliste und Portfolio
+- **Atmosphaere in sechs Ebenen** (`HeroAtmosphere`): Mitternachtsbasis, vier weit auseinander gesetzte Lichthoefe, diagonale Folienschlieren, die Gravur, Bloom und ruhig gesetzte Partikel — reines SVG und CSS
+- **Graviertes Fabelwesen** (`mythic-art.ts`) als eigene Illustration: Schaedel, geoeffneter Rachen mit Zaehnen, Auge, vierteiliger Kamm, Hals, Energiefilamente und konzentrische Ringe. Konstruiert aus gesetzten Punkten, nicht nachgezeichnet
+- **CBI-Panel als Glasflaeche** mit Verlaufskurve, Zustandsmarke und Achsenbeschriftung. Liegen weniger als zwei gespeicherte Tagesstaende vor, steht dort der Grund statt einer Linie
+- **Vier Kennzahl-Karten** mit je eigener Mikro-Darstellung: Punktreihe, Temperaturskala mit Marke, Fortschritt, Materialstreifen
+- **Drei-Panel-Reihe**: staerkste Bewegungen, Set-Markt mit Logos und tragender Karte, Marktbericht-Hinweis mit dem Bild der staerksten Karte
+- **Schnellzugriff** mit fuenf Kacheln
+
+### Geaendert
+- **Ueberschrift „Heute im Pokémon Markt"** mit dem Verlauf des Entwurfs — Bernstein ueber Weiss in die Markenfarbe
+- **Materialien statt Flaechen**: Lichtkante oben an jedem Panel, halbdurchlaessige Fuellung, weicher Hof ueber den Rand hinaus. Keine grossen Schatten — die stapeln Flaechen sichtbar
+
+### Bewusst abweichend vom Entwurf
+- **Keine Glocke mit Zaehler** („3" ungelesene Meldungen): Es gibt kein Benachrichtigungssystem, die Zahl waere erfunden
+- **Kein Benutzerbild „JD"**: Es gibt keine angemeldete Person
+- An ihrer Stelle stehen zwei Wege, die es wirklich gibt — Merkliste und Portfolio
+
+### Behoben
+- **Acht Pixel waagerechter Ueberlauf** auf dem Telefon: Der Lichthof des CBI-Panels reicht bewusst ueber dessen Rand hinaus und schob am Seitenrand die Seite. Jetzt `overflow-x-clip` auf dem Inhaltsbereich
+
+---
+
 ## [4.16.0] - 2. August 2026 · Die Startseite erzaehlt, bevor sie misst
 
 ### Neu

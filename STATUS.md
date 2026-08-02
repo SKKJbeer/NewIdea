@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v4.16.0` · **Stand:** 2. August 2026 · **Branch:** `main`
+**Version:** `v4.17.0` · **Stand:** 2. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v4.16.0)
+## Was gebaut ist (Stand v4.17.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v4.17.0 | Startseite nach geliefertem Entwurf: Seitenleiste, Kopfzeile, Glas-Panels, gravierte Eigenillustration, Kennzahl-Karten, Drei-Panel-Reihe, Schnellzugriff |
 | v4.16.0 | Startseite erzaehlt zuerst: Markt-Story ueber den Zahlen, Verteilung in fuenf benannten Baendern mit Deutung, Sammler-Materialien (Prisma, Folie, Energie-Trenner) |
 | v4.15.0 | Sammler-Motive: Kartenfaecher und eigene Elementzeichen im Grund, Kartenbild als Raumfarbe auf der eigenen Seite; Grenze zu fremdem Material neu gezogen |
 | v4.14.0 | Sammler-Sichtebene: Umgebungs-Hintergrund in drei Ebenen, gezaehlter Set-Farbton, vier eigene Kennzahl-Signaturen, kein waagerechtes Scrollen mehr |
