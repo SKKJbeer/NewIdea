@@ -1,6 +1,11 @@
 import { INDEX_SHORT, INDEX_LONG } from '@/lib/brand';
 import { AmbientBackdrop } from './AmbientBackdrop';
-import { NUM, SECTION_LABEL, toneClass, barClass } from '@/lib/ui';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+import { NUM, SECTION_LABEL, toneClass } from '@/lib/ui';
+import { MarketStoryBlock } from './MarketStoryBlock';
+import { DistributionBands } from './DistributionBands';
+import type { MarketStory } from '@/lib/market-story';
 import { formatPercent } from '@/lib/format';
 import type { PmiResult, Breadth, FearGreedResult } from '@/lib/market-metrics';
 import type { DataCoverage } from '@/lib/data-coverage';
@@ -60,11 +65,11 @@ interface Props {
   /** Gemessene 30-Tage-Bewegungen der auswertbaren Karten. */
   trends: number[];
   datenstand: string;
+  /** Die Story steht VOR den Zahlen — sie ist der Einstieg, nicht die Fußnote. */
+  story: MarketStory;
 }
 
-export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenstand }: Props) {
-  const klassen = verteilung(trends);
-  const maxKlasse = Math.max(...klassen.map((k) => k.anzahl), 1);
+export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenstand, story }: Props) {
 
   return (
     <section aria-labelledby="marktkopf" className="relative border-b border-[#1c1c24]">
@@ -74,17 +79,24 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
       <AmbientBackdrop mode="markt" />
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">
-        {/* „Marktübersicht · Pokémon TCG", NICHT „Erster Markt: Pokémon".
-            Letzteres las sich wie eine Ankündigung an Investoren — als sei
-            Pokémon ein Testlauf. Für jemanden, der Karten sammelt, ist Pokémon
-            aber nicht der erste Markt, sondern DER Markt. */}
-        <h1 id="marktkopf" className={`${SECTION_LABEL} flex items-center gap-2`}>
-          Marktübersicht · Pokémon TCG
-          <span aria-hidden className="h-1 w-1 rounded-full bg-violet-400/70" />
-        </h1>
+        {/* 1. DIE GESCHICHTE. Sie steht vor jeder Zahl.
 
-        {/* Der Indexwert ist die größte Zahl der Seite. Genau eine. */}
-        <div className="mt-6 flex flex-wrap items-end gap-x-8 gap-y-4">
+            Der Grund ist keine Geschmacksfrage: Wer neu ist, kann mit „−0,2 %"
+            nichts anfangen, mit „Ruhig an der Oberfläche, schwach darunter"
+            sofort. Die Zahl beantwortet eine Frage, die man erst stellen kann,
+            wenn man den Satz gelesen hat. */}
+        <h1 id="marktkopf" className="sr-only">
+          Marktübersicht Pokémon TCG — {story.schlagzeile}
+        </h1>
+        <MarketStoryBlock story={story} datenstand={datenstand} />
+
+        {/* 2. DER INDEX UND SEINE VERTEILUNG.
+            Nebeneinander, weil sie zusammengehören: Der Index sagt, WOHIN sich
+            der Markt bewegt hat, die Verteilung, WIE EINHEITLICH. Ein Index
+            nahe null kann aus lauter unbewegten Karten entstehen oder aus
+            starken Gegenbewegungen, die sich aufheben — erst zusammen ergeben
+            die beiden eine Auskunft. */}
+        <div className="mt-10 grid gap-x-12 gap-y-8 border-t border-[#1c1c24] pt-8 lg:grid-cols-[minmax(0,260px)_1fr]">
           <div>
             <div className="flex items-baseline gap-3">
               <span className="text-[13px] font-semibold tracking-tight text-slate-300">
@@ -99,43 +111,29 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             ) : (
               <p className={`${NUM.hero} mt-2 text-slate-700`}>—</p>
             )}
-            <p className="mt-3 text-[11px] text-slate-600">
+            {/* Was der Index IST, in einem Satz. Ohne ihn ist „CBI" ein Kürzel,
+                das man nachschlagen müsste — und niemand schlägt nach. */}
+            <p className="mt-3 max-w-[260px] text-[12px] leading-relaxed text-slate-500">
               {cbi.sufficient
-                ? `Gemessene Bewegung über ${cbi.windowDays} Tage`
-                : `Noch nicht genügend Daten (${cbi.cardCount}/${cbi.minCards} Karten)`}
+                ? `Durchschnittliche Preisbewegung über ${cbi.windowDays} Tage, nach Kartenwert gewichtet: Teure Karten zählen stärker.`
+                : `Noch nicht genügend Daten (${cbi.cardCount} von ${cbi.minCards} Karten).`}
             </p>
+            <Link
+              href="/methodik"
+              className="mt-3 inline-flex items-center gap-1 text-[11px] text-slate-600 transition-colors hover:text-violet-400"
+            >
+              Wie das gerechnet wird <ArrowUpRight size={11} />
+            </Link>
           </div>
 
-          {/* Verteilung statt Kurve — siehe Kommentar oben.
-              `basis-full` bis zum sm-Bereich: Auf 390 px quetschte sich die
-              Verteilung neben den Indexwert, die Überschrift brach mitten im
-              Wort um und die Achsenbeschriftung lag auf den Balken. Auf dem
-              Telefon gehört sie unter die Zahl, nicht daneben. */}
           {cbi.sufficient && trends.length > 0 && (
-            <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
-              <p className={SECTION_LABEL}>Verteilung der 30-Tage-Bewegung</p>
-              <div className="mt-3 flex h-24 items-end gap-1" role="img"
-                aria-label={klassen.map((k) => `${k.label} Prozent: ${k.anzahl} Karten`).join(', ')}>
-                {klassen.map((k) => (
-                  <div key={k.label} className="group flex min-w-0 flex-1 flex-col justify-end gap-1">
-                    <span className="text-center text-[10px] tabular-nums text-slate-600">
-                      {k.anzahl > 0 ? k.anzahl : ''}
-                    </span>
-                    <div
-                      className={`${barClass(k.richtung)} w-full`}
-                      style={{ height: `${Math.max((k.anzahl / maxKlasse) * 64, k.anzahl > 0 ? 2 : 0)}px` }}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-1.5 flex justify-between text-[10px] tabular-nums text-slate-700">
-                <span>−20 %</span>
-                <span>0</span>
-                <span>+20 %</span>
-              </div>
+            <div className="min-w-0">
+              <DistributionBands trends={trends} />
             </div>
           )}
         </div>
+
+        <p className={`${SECTION_LABEL} mt-12`}>Die Zahlen dahinter</p>
 
         {/* VIER KENNZAHLEN, VIER SIGNATUREN.
             Vorher standen hier drei typografisch identische Blöcke — dieselbe
@@ -146,7 +144,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             Balken, die Temperatur als Position auf einer Skala, die Stichprobe
             als abzählbare Punkte, die Sets als gestapelte Ebenen. Keine davon
             steht da, wenn der zugehörige Wert nicht gemessen ist. */}
-        <dl className="mt-10 grid grid-cols-2 divide-y divide-[#1c1c24] border-y border-[#1c1c24] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+        <dl className="mt-4 grid grid-cols-2 divide-y divide-[#1c1c24] border-y border-[#1c1c24] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
           <div className="py-4 pr-4 sm:py-5 sm:pr-5">
             <dt className={SECTION_LABEL}>Marktbreite</dt>
             <dd className={`${NUM.large} mt-2 ${breite.total > 0 ? 'text-slate-200' : 'text-slate-700'}`}>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowRight } from 'lucide-react';
 import type { PokemonCard } from '@/types';
 import type { SetRank } from '@/lib/market-metrics';
@@ -262,7 +263,16 @@ export function SetMarket({ sets, cbi = null }: { sets: SetRank[]; cbi?: number 
             className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-1 sm:grid-cols-[1fr_auto_auto_auto] ${TABLE.row} ${TABLE.cell}`}
           >
             <span className="min-w-0">
-              <span className="flex items-baseline gap-2">
+              <span className="flex items-center gap-2">
+                {/* DAS SET-LOGO GEHOERT IN DIE ZEILE.
+                    Ein Set-Name ist eine Zeichenkette; das Logo ist das, was
+                    jemand im Laden in der Hand hatte. Klein (h-4) und ohne
+                    Rahmen — es ordnet zu, ohne die Zahlen zu verdraengen. */}
+                <BoosterPackImage
+                  setCode={s.code}
+                  setName={s.name}
+                  className="h-4 w-auto max-w-[52px] shrink-0 object-contain opacity-80"
+                />
                 <span className="truncate text-[13px] text-slate-200">{s.name}</span>
                 <span className="shrink-0 text-[11px] tabular-nums text-slate-600">
                   {s.count} Karten

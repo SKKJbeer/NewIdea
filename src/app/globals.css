@@ -118,3 +118,113 @@ body {
   .lift { transition: transform 180ms ease-out; }
   .group:hover .lift, .lift:hover { transform: translateY(-2px); }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SAMMLER-MATERIALIEN — die Bildsprache hochwertiger Sammelkarten.
+   ══════════════════════════════════════════════════════════════════════
+   WOZU: Die Oberfläche war zuletzt „hochwertiges dunkles Dashboard" — und
+   damit von einem Finanzprodukt nicht zu unterscheiden. Was eine Sammelkarte
+   ausmacht, ist aber kein Farbschema, sondern MATERIAL: Folie, die das Licht
+   bricht; Prismenlack, der die Farbe mit dem Winkel wechselt; der leichte
+   Raster einer guten Druckveredelung.
+
+   Genau das steht hier — und zwar als eigene Sprache, nicht als Zitat einer
+   Marke. Keine offiziellen Motive, keine fremden Farben.
+
+   REGEL FÜR ALLES HIER: Die Wirkung muss unterhalb der Schwelle bleiben, ab
+   der man sie BEMERKT. Was auffällt, konkurriert mit den Zahlen — und die
+   sind der Zweck der Seite. Wo es eine Bewegung gibt, liegt sie vollständig
+   in einem `prefers-reduced-motion`-Block. */
+
+/* PRISMENVERLAUF für Text.
+   Der Farbwechsel von Regenbogenfolie, aber gedeckt: Violett über Fuchsia
+   nach Cyan, ohne Gelb und Grün. Ein voller Regenbogen sieht nach Jahrmarkt
+   aus; drei benachbarte Töne sehen nach Lack aus. */
+.prismatic {
+  background-image: linear-gradient(
+    100deg,
+    rgb(196 181 253) 0%,
+    rgb(240 171 252) 34%,
+    rgb(125 211 252) 68%,
+    rgb(196 181 253) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* FOLIENRASTER als Fläche.
+   Zwei sehr feine, gegenläufige Linienraster — die Struktur, die auf einer
+   Holo-Karte im Streiflicht sichtbar wird. 0,015 Deckkraft: auf einem Foto
+   nicht nachweisbar, auf einem Bildschirm spürbar. */
+.foil-surface {
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.015) 0 1px,
+      transparent 1px 7px
+    ),
+    repeating-linear-gradient(
+      -115deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 11px
+    );
+}
+
+/* ENERGIETRENNER.
+   Statt einer grauen Linie zwischen Abschnitten ein Strich, der zur Mitte hin
+   heller wird und an den Enden ins Nichts läuft — wie eine Lichtkante. Ersetzt
+   `border-t` NUR dort, wo ein Abschnitt beginnt; in Tabellen bleibt die
+   nüchterne Linie, sonst wird aus einer Ordnung eine Girlande. */
+.energy-rule {
+  height: 1px;
+  border: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.18) 18%,
+    rgba(217, 70, 239, 0.28) 50%,
+    rgba(56, 189, 248, 0.18) 82%,
+    transparent 100%
+  );
+}
+
+/* KARTENRAHMEN mit Lichtkante.
+   Ein heller Innenrand oben, ein dunkler unten — der Eindruck, dass Licht von
+   oben auf eine leicht erhabene Fläche fällt. Das ist der Unterschied zwischen
+   „Kasten mit Rahmen" und „Objekt, das auf dem Tisch liegt", und er kostet
+   keinen Schatten. Grosse Schatten wurden bewusst nicht genommen: Sie stapeln
+   Flächen sichtbar übereinander, und genau dieser Dashboard-Eindruck soll weg. */
+.card-frame {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* SELTENHEITS-SCHEIN.
+   Ein sehr weicher farbiger Hof um eine besondere Karte. Nur dort einsetzen,
+   wo die Besonderheit auch GEMESSEN ist (Seltenheitsstufe, Höchstwert der
+   Reihe) — ein Schein ohne Anlass ist Dekoration und wertet nichts auf. */
+.rare-glow {
+  box-shadow:
+    0 0 0 1px rgba(196, 181, 253, 0.12),
+    0 0 28px -6px rgba(167, 139, 250, 0.28);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* PRISMENWANDERUNG.
+     Der Verlauf wandert langsam durch — der Effekt, den eine gekippte
+     Folienkarte zeigt. 9 Sekunden pro Durchlauf: schnell genug, dass man es
+     bemerkt, wenn man hinsieht, langsam genug, dass es beim Lesen nicht
+     stört. Läuft nur auf sehr kleinen Textflächen (Auszeichnungen,
+     Abschnittsmarken), nie auf Fließtext. */
+  .prismatic-shift {
+    background-size: 220% 100%;
+    animation: prism-drift 9s ease-in-out infinite;
+  }
+
+  @keyframes prism-drift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+}

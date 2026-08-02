@@ -32,6 +32,23 @@ import { CARD_FAN, CARD_W, CARD_H, glyphFor } from '@/lib/card-motifs';
 // kein WebGL, keine dauerhafte Animation. `aria-hidden`, damit Hilfsmittel
 // nichts davon vorlesen.
 
+/**
+ * Sternfeld fuer den Markt-Modus — von Hand gesetzt.
+ *
+ * Je Eintrag: x, y, Radius. Die groesseren Punkte stehen bewusst vereinzelt;
+ * gleich grosse Punkte ergeben ein Raster, und ein Raster ist kein Himmel.
+ */
+const STERNE: Array<[number, number, number]> = [
+  [88, 74, 1.3], [212, 42, 0.7], [316, 118, 0.8], [402, 58, 1.4], [498, 146, 0.7],
+  [566, 36, 0.8], [648, 104, 1.2], [742, 52, 0.7], [826, 132, 0.9], [914, 66, 1.3],
+  [1002, 118, 0.7], [1086, 44, 0.8], [1154, 126, 1.1],
+  [56, 236, 0.8], [164, 296, 1.2], [268, 214, 0.7], [372, 268, 0.9], [468, 322, 0.7],
+  [578, 244, 1.3], [672, 306, 0.7], [768, 228, 0.8], [864, 288, 1.1], [968, 232, 0.7],
+  [1064, 302, 0.9], [1142, 246, 0.8],
+  [124, 428, 0.7], [246, 486, 1.1], [358, 412, 0.8], [462, 468, 0.7], [594, 434, 0.9],
+  [706, 492, 0.7], [818, 418, 1.2], [926, 476, 0.7], [1038, 424, 0.8], [1128, 482, 0.7],
+];
+
 export type BackdropMode = 'markt' | 'karte' | 'set' | 'sammlung' | 'research';
 
 interface Props {
@@ -50,20 +67,31 @@ interface Props {
 }
 
 /** Deckkraft der Linienkunst je Modus. Mobil greift zusätzlich `sm:`-Anhebung. */
-const STAERKE: Record<BackdropMode, { linien: string; kreatur: string | null; karten: string | null }> = {
+const STAERKE: Record<
+  BackdropMode,
+  {
+    linien: string;
+    kreatur: string | null;
+    karten: string | null;
+    /** Sternfeld — nur im Markt-Modus. Gibt der Uebersicht Tiefe statt Flaeche. */
+    kosmos: boolean;
+    /** Folienraster ueber der ganzen Flaeche — nur in der Sammlung. */
+    folie: boolean;
+  }
+> = {
   // Der Marktkopf trägt die stärkste Signatur — dort entscheidet der erste Blick.
-  markt: { linien: 'opacity-[0.05]', kreatur: 'opacity-[0.028] sm:opacity-[0.038]', karten: 'opacity-[0.03] sm:opacity-[0.04]' },
+  markt: { linien: 'opacity-[0.05]', kreatur: 'opacity-[0.028] sm:opacity-[0.038]', karten: 'opacity-[0.03] sm:opacity-[0.04]', kosmos: true, folie: false },
   // Kartenseite: Die Karte selbst ist der Blickfang und liefert über `akzent`
   // schon die Farbe. Keine Kreatur, aber die Kartenumrisse — sie stellen die
   // eine Karte in eine Sammlung.
-  karte: { linien: 'opacity-[0.035]', kreatur: null, karten: 'opacity-[0.022] sm:opacity-[0.03]' },
-  set: { linien: 'opacity-[0.04]', kreatur: 'opacity-[0.02] sm:opacity-[0.028]', karten: 'opacity-[0.03] sm:opacity-[0.042]' },
+  karte: { linien: 'opacity-[0.035]', kreatur: null, karten: 'opacity-[0.022] sm:opacity-[0.03]', kosmos: false, folie: false },
+  set: { linien: 'opacity-[0.04]', kreatur: 'opacity-[0.02] sm:opacity-[0.028]', karten: 'opacity-[0.03] sm:opacity-[0.042]', kosmos: false, folie: false },
   // Sammlung: hier liegen die echten Karten des Nutzers auf dem Bildschirm.
   // Gezeichnete Umrisse daneben wären eine Verdopplung.
-  sammlung: { linien: 'opacity-[0.03]', kreatur: null, karten: null },
+  sammlung: { linien: 'opacity-[0.03]', kreatur: null, karten: null, kosmos: false, folie: true },
   // Research bekommt KEINE Motive. Lesbarkeit zuerst — hinter 1.500 Wörtern
   // ist jede Struktur eine Störung.
-  research: { linien: 'opacity-[0.02]', kreatur: null, karten: null },
+  research: { linien: 'opacity-[0.02]', kreatur: null, karten: null, kosmos: false, folie: false },
 };
 
 export function AmbientBackdrop({ mode, akzent, typ, className = '' }: Props) {
@@ -101,6 +129,36 @@ export function AmbientBackdrop({ mode, akzent, typ, className = '' }: Props) {
           style={{ background: `radial-gradient(closest-side, ${akzent}, transparent)` }}
         />
       )}
+
+      {/* EBENE A2 — Sternfeld, nur in der Marktuebersicht.
+          Der Markt ist die einzige Flaeche, die als RAUM gelesen werden soll:
+          Alles andere zeigt ein Objekt (eine Karte, ein Set, einen Text). Ein
+          sehr duenn gesaetes Punktfeld gibt dem Grund Tiefe, ohne dass etwas
+          darauf liegt.
+
+          Fest gesetzte Koordinaten, kein Zufall: Ein zufaellig erzeugtes Feld
+          saehe bei jedem Aufbau anders aus, und ein Hintergrund, der sich
+          zwischen zwei Seitenaufrufen aendert, wirkt wie ein Fehler. Ausserdem
+          verteilen Zufallszahlen sichtbar ungleich — von Hand gesetzt liegen
+          die Punkte ruhiger. */}
+      {stufe.kosmos && (
+        <svg
+          className="absolute inset-0 h-full w-full text-slate-100 opacity-[0.05]"
+          preserveAspectRatio="xMidYMid slice"
+          viewBox="0 0 1200 600"
+          fill="currentColor"
+        >
+          {STERNE.map(([cx, cy, r]) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} opacity={r > 1 ? 1 : 0.55} />
+          ))}
+        </svg>
+      )}
+
+      {/* EBENE A3 — Folienraster, nur in der Sammlung.
+          Dort liegen die Karten des Nutzers. Der Grund darf sich anfuehlen wie
+          das Material, in dem sie stecken — zwei gegenlaeufige Feinraster bei
+          1,5 % Deckkraft (`.foil-surface` in globals.css). */}
+      {stufe.folie && <div className="foil-surface absolute inset-0" />}
 
       {/* EBENE B — Höhenlinien. Ungleichmäßig gesetzt: Berechnete Abstände
           ergeben ein Raster, und ein Raster ist kein Gelände. */}

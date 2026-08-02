@@ -11,10 +11,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '4.16.0',
+    date: '2. August 2026',
+    label: 'Die Startseite erzaehlt, bevor sie misst',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Markt-Story als Einstieg: Schlagzeile, Absatz und drei Belege vor jeder Kennzahl — regelbasiert aus gemessenen Werten, ohne Prognose und ohne Ursachenbehauptung' },
+      { type: 'new', text: 'Verteilung in fuenf benannten Baendern statt acht namenloser Balken, mit Anzahl, Anteil, Grenzen und einem Satz, der die Form deutet' },
+      { type: 'new', text: 'Sammler-Materialien: Prismenverlauf, Folienraster, Energie-Trenner, Lichtkante am Rahmen — eigene Bildsprache, keine fremden Motive' },
+      { type: 'new', text: 'Set-Logos in den Set-Markt-Zeilen; Sternfeld im Markt-Hintergrund, Folienraster in der Sammlung' },
+      { type: 'changed', text: 'Der Index erklaert sich selbst, statt sein Kuerzel vorauszusetzen — mit Verweis auf die Methodik' },
+      { type: 'fixed', text: 'Die Deutung unter der Verteilung widersprach der Schlagzeile: 115 Karten im Minus gegen 52 im Plus galten als „ungefaehr die Waage"' },
+    ],
+  },
+  {
     version: '4.15.0',
     date: '2. August 2026',
     label: 'Sammler-Motive — die Grenze zu fremdem Material neu gezogen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Aufgefaecherte Kartenumrisse im Grund, im echten Format 63:88 — ein Format ist kein Werk' },
       { type: 'new', text: 'Eigene Elementzeichen je Energietyp: Flamme, Tropfen, Blatt, Blitz. Selbst gezeichnet, nicht die Symbole des Spiels' },

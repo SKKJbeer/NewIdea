@@ -49,7 +49,7 @@ describe('Kein Versprechen von Echtzeit-Daten', () => {
     // Statt eines Versprechens („in Echtzeit") steht dort, worauf die Zahlen
     // beruhen: Zeitraum, Stichprobengröße, Datenstand.
     const kopf = lies('src/components/MarketHeader.tsx');
-    expect(kopf).toContain('Gemessene Bewegung über');
+    expect(kopf).toContain('Preisbewegung über');
     expect(kopf).toContain('Stichprobe');
     expect(kopf).toContain('Stand');
   });

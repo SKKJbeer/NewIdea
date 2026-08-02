@@ -17,6 +17,7 @@ import { getHomepageCards } from '@/lib/homepage-data';
 import { getDataCoverage } from '@/lib/data-coverage';
 import { saveMarketIndex } from '@/lib/market-index-store';
 import { marketBrief } from '@/lib/market-brief';
+import { marketStory } from '@/lib/market-story';
 import {
   splitMovers,
   marketBreadth,
@@ -117,6 +118,13 @@ export default async function MarketPage() {
 
   const brief = marketBrief(cbi, breite, stimmung, sets);
 
+  // DIE STORY steht auf dem ersten Bildschirm, der Brief unter den Zahlen.
+  // Beide ziehen aus denselben geprueften Kennzahlen — der Unterschied ist die
+  // Adressierung: Die Story erklaert jemandem, der die Zahlen noch nicht
+  // gesehen hat, was passiert ist; der Brief ordnet fuer jemanden ein, der sie
+  // gerade gelesen hat.
+  const story = marketStory(cbi, breite, sets);
+
   // INDEXSTAND FESTHALTEN.
   //
   // Diese Seite berechnet den Index ohnehin — ihn dabei zu speichern kostet
@@ -159,6 +167,7 @@ export default async function MarketPage() {
         abdeckung={abdeckung}
         trends={trends}
         datenstand={datenstand}
+        story={story}
       />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -172,7 +181,7 @@ export default async function MarketPage() {
         </section>
 
         {/* 03 — BEWEGUNGEN */}
-        <section aria-labelledby="bewegungen" className="border-t border-[#1c1c24] py-12 sm:py-16">
+        <section aria-labelledby="bewegungen" className="relative py-12 sm:py-16 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]">
           <SectionHead
             num="03"
             title="Bewegungen"
@@ -191,7 +200,7 @@ export default async function MarketPage() {
         </section>
 
         {/* 04 — SET-MARKT */}
-        <section aria-labelledby="setmarkt" className="border-t border-[#1c1c24] py-12 sm:py-16">
+        <section aria-labelledby="setmarkt" className="relative py-12 sm:py-16 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]">
           <SectionHead
             num="04"
             title="Set-Markt"
@@ -209,7 +218,7 @@ export default async function MarketPage() {
             Der Übergang vom Markt zum eigenen Bestand ist die Produktidee:
             derselbe Maßstab für beides. Deshalb steht hier keine Werbekachel,
             sondern die Frage, die das Portfolio beantwortet. */}
-        <section aria-labelledby="bestand" className="border-t border-[#1c1c24] py-12 sm:py-16">
+        <section aria-labelledby="bestand" className="relative py-12 sm:py-16 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]">
           <SectionHead num="05" title="Eigener Bestand" />
           <h2 id="bestand" className="sr-only">
             Eigener Bestand
@@ -232,7 +241,7 @@ export default async function MarketPage() {
         </section>
 
         {/* 06 — RESEARCH */}
-        <section aria-labelledby="research" className="border-t border-[#1c1c24] py-12 sm:py-16">
+        <section aria-labelledby="research" className="relative py-12 sm:py-16 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.16)_18%,rgba(217,70,239,0.24)_50%,rgba(56,189,248,0.16)_82%,transparent)]">
           <SectionHead num="06" title="Research" href="/research" hrefLabel="Alle Inhalte" />
           <h2 id="research" className="sr-only">
             Research

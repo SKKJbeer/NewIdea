@@ -229,7 +229,7 @@ describe('Die Guides-Liste hat keine durchscheinende Kachel mehr', () => {
 describe('Die Marktübersicht zeigt Daten, keinen Katalog', () => {
   const seite = lies('src/app/page.tsx');
   const module = lies('src/components/MarketModules.tsx');
-  const kopf = lies('src/components/MarketHeader.tsx');
+  const kopf = lies('src/components/MarketHeader.tsx') + lies('src/components/DistributionBands.tsx');
 
   // ANLASS DES UMBAUS: Die frühere Startseite bestand aus zehn Abschnitten, die
   // alle gleich aussahen — Kachel, Symbol, Titel, Zahl. Dieselbe Karte erschien
@@ -258,8 +258,29 @@ describe('Die Marktübersicht zeigt Daten, keinen Katalog', () => {
   it('zeigt die Verteilung der Messwerte statt einer erfundenen Kurve', () => {
     // Für eine Indexkurve fehlen gespeicherte Tagesstände. Statt sie
     // zurückzurechnen, zeigt der Kopf die tatsächliche Streuung der Messwerte.
-    expect(kopf).toContain('Verteilung der 30-Tage-Bewegung');
-    expect(kopf).toContain('verteilung(trends)');
+    expect(kopf).toContain('Wie sich die ');
+    expect(kopf).toContain('verteileBaender(trends)');
+  });
+
+  it('die Verteilung ist ohne Vorwissen lesbar', () => {
+    // FÜNF-SEKUNDEN-PRÜFUNG: Wer die Grafik kurz ansieht, muss sagen können,
+    // WAS er sieht und WARUM es ihn angeht. Die Vorgängerfassung bestand
+    // keine der beiden Fragen — acht namenlose Balken über einer Achse mit
+    // drei Zahlen.
+    const baender = lies('src/components/DistributionBands.tsx');
+
+    // 1. Namen in Worten, nicht Klassengrenzen.
+    for (const wort of ['Starker Rückgang', 'Unverändert', 'Starker Anstieg']) {
+      expect(lies('src/lib/market-distribution.ts')).toContain(wort);
+    }
+    // 2. Anzahl UND Anteil an jedem Band — eine Balkenlänge allein muss man
+    //    gegen eine unsichtbare Skala schätzen.
+    expect(baender).toContain('b.anzahl');
+    expect(baender).toContain('b.anteil');
+    // 3. Ein Satz, der die Form deutet.
+    expect(baender).toContain('deuteVerteilung');
+    // 4. Die Grenzen stehen dabei — sonst ist „moderat" eine Behauptung.
+    expect(baender).toMatch(/Grenzen:/);
   });
 
   it('leitet keine Kennzahl ohne Datengrundlage ab', () => {

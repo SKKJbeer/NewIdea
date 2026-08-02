@@ -7,6 +7,26 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [4.16.0] - 2. August 2026 · Die Startseite erzaehlt, bevor sie misst
+
+### Neu
+- **Markt-Story als Einstieg** (`market-story.ts` + `MarketStoryBlock`): Schlagzeile, ein zusammenhaengender Absatz und drei Belege — vor jeder Kennzahl. Beispiel aus dem laufenden Betrieb: „Ruhig an der Oberflaeche, schwach darunter — Der Gesamtmarkt hat sich ueber 30 Tage kaum bewegt (−0,2 %, preisgewichtet). Getragen wird das von einer Minderheit: Nur 32 % der 204 gemessenen Karten notieren ueber ihrem Vergleichswert, 138 darunter."
+- **Regelbasiert, nicht per Sprachmodell.** Jeder Halbsatz haengt an einer Zahl, die daneben steht. Prognosen, Ursachenbehauptungen und Empfehlungen sind ausgeschlossen und per Test abgesichert
+- **Verteilung in fuenf benannten Baendern** statt acht namenloser Balken: Starker Rueckgang, Moderater Rueckgang, Unveraendert, Moderater Anstieg, Starker Anstieg — je mit Anzahl, Anteil, den geltenden Grenzen und einem Satz darunter, der die Form deutet
+- **Sammler-Materialien in CSS**: Prismenverlauf, Folienraster, Energie-Trenner, Kartenrahmen mit Lichtkante, Seltenheits-Schein. Eigene Bildsprache, keine fremden Motive; jede Bewegung liegt im `prefers-reduced-motion`-Block
+- **Sternfeld im Markt-Hintergrund** und **Folienraster in der Sammlung** — die Hintergrund-Modi unterscheiden sich jetzt im Material, nicht nur in der Deckkraft
+- **Set-Logos in den Set-Markt-Zeilen** — ein Set-Name ist eine Zeichenkette, das Logo ist das, was jemand im Laden in der Hand hatte
+
+### Geaendert
+- **Der Index erklaert sich selbst.** Statt „Gemessene Bewegung ueber 30 Tage" steht dort, was gerechnet wird: „Durchschnittliche Preisbewegung ueber 30 Tage, nach Kartenwert gewichtet: Teure Karten zaehlen staerker" — mit Verweis auf die Methodik
+- **Die Kennzahlen sind als Stuetze ausgewiesen** („Die Zahlen dahinter") statt als Einstieg
+- **Abschnittsgrenzen als Energie-Trenner** statt grauer Linien
+
+### Behoben
+- **Die Deutung unter der Verteilung widersprach der Schlagzeile.** Bei 115 Karten im Minus gegen 52 im Plus stand dort „Gewinner und Verlierer halten sich ungefaehr die Waage". Ursache war eine feste 60-%-Marke, gemessen an der Gesamtzahl inklusive der unbewegten Karten — bei vielen unbewegten Karten kann keine Seite 60 % erreichen, obwohl eine doppelt so schwer wiegt. Verglichen werden jetzt die beiden Seiten miteinander
+
+---
+
 ## [4.15.0] - 2. August 2026 · Sammler-Motive: die Grenze zu fremdem Material neu gezogen
 
 ### Neu

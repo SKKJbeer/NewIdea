@@ -15,4 +15,4 @@
 // baut. Der Preis ist, dass sie zur Version in package.json passen muss — genau
 // das prüft `qa-regressionen.test.ts` und bricht den Build, wenn beim
 // Versionssprung eine der beiden Stellen vergessen wird.
-export const APP_VERSION = '4.15.0';
+export const APP_VERSION = '4.16.0';
