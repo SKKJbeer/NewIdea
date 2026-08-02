@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.1.0] - 2. August 2026 · Die Karten werden wieder vollstaendig erfasst
+
+### Behoben
+- **Die flaechendeckende Preiserfassung kam taeglich nur bis 27 Prozent.** Gemessen am laufenden Betrieb: Seite 22 von 82, 5.242 von 20.479 Karten, seit neun Stunden ohne Bewegung, kein Fehler im Log. Von Hand angestossen lief sie anstandslos weiter (22 → 46 in drei Minuten) — der Mechanismus stimmte, es fehlte die Robustheit gegen EINE verlorene Uebergabe. Da der Durchlauf am naechsten Tag wieder bei Seite 1 beginnt, bekamen immer dieselben ersten ~5.000 Karten einen neuen Preis und rund 15.000 nie
+- **Laengere Runden statt mehr Uebergaben:** 240 statt 45 Sekunden je Runde. Ein Tag braucht damit vier Uebergaben statt sechzehn — jede Uebergabe ist ein moeglicher Abrisspunkt, die kuerzeste Kette ist die zuverlaessigste
+- **Die Uebergabe wird nachgeprueft:** acht Sekunden warten, Stand erneut lesen, und wenn der Seitenzeiger stillsteht, ein zweites Mal anstossen. Das Absenden allein beweist nicht, dass die naechste Runde laeuft — der Anstoss wird nach drei Sekunden abgebrochen, und ein abgebrochener Aufruf kann die gerade gestartete Funktion mitnehmen
+
+### Geaendert
+- **Das Monitoring zeigt die Erfassung als eigenen Punkt ganz oben** — mit Fortschrittsbalken, Seite von Seiten, Karten von Karten und der Zeit seit der letzten Bewegung. Bisher stand dort nur, dass die Zustandstabelle frisch sei; sie war das auch, waehrend der Durchlauf feststeckte. „Die Tabelle wurde heute angefasst" und „die Arbeit ist fertig" sind zwei verschiedene Aussagen
+- **Drei verschiedene Stoerungen, drei verschiedene Saetze:** heute nicht gestartet · seit N Minuten stehengeblieben · laeuft gerade. Sie in einen Satz zu fassen waere bequem und wuerde die Ursache verschleiern
+- **Der Abschnitt „Features" ist entfernt.** Er zaehlte auf, welche Funktionen konfiguriert sind — und sagte damit zum DRITTEN Mal dasselbe: „API-Keys" nennt die Konfiguration, „Betriebszustand" nennt die Ergebnisse. Jeder einzelne Eintrag war anderswo bereits beantwortet. Drei Darstellungen derselben Sache sind schlimmer als eine, weil sie auseinanderlaufen koennen
+
+---
+
 ## [5.0.0] - 2. August 2026 · Der Hero ist die Identitaet, nicht ein Abschnitt
 
 ### Neu

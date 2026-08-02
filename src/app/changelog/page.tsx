@@ -11,10 +11,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.1.0',
+    date: '2. August 2026',
+    label: 'Die Karten werden wieder vollstaendig erfasst',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Preiserfassung kam taeglich nur bis 27 Prozent — Seite 22 von 82, rund 15.000 Karten bekamen nie einen neuen Preis' },
+      { type: 'fixed', text: 'Laengere Runden (240 statt 45 Sekunden): vier Uebergaben pro Tag statt sechzehn, also vier moegliche Abrisspunkte statt sechzehn' },
+      { type: 'fixed', text: 'Die Uebergabe wird nachgeprueft und notfalls ein zweites Mal angestossen' },
+      { type: 'changed', text: 'Das Monitoring zeigt den Fortschritt der Erfassung ganz oben — mit Balken, Seitenzahl und Zeit seit der letzten Bewegung' },
+      { type: 'changed', text: 'Der Abschnitt „Features" ist entfernt: Er sagte zum dritten Mal, was „API-Keys" und „Betriebszustand" bereits sagen' },
+    ],
+  },
+  {
     version: '5.0.0',
     date: '2. August 2026',
     label: 'Der Hero ist die Identitaet, nicht ein Abschnitt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Hero fuellt den ersten Bildschirm (92 vh) — Ueberschrift bis 72 px, Erzaehlung auf 620 px, uebergrosse Knoepfe' },
       { type: 'new', text: 'Hintergrund in sieben Ebenen: Mitternachtsblau, blaue und violette Atmosphaere, warmes Gold, holografisches Korn, diagonale Struktur, Drache' },

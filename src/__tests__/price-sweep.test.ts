@@ -174,12 +174,35 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     expect(sweep).toMatch(/pagesThisRun \+= 1;[\s\S]{0,900}await saveSweepState\(state\);/);
   });
 
-  it('bleibt mit dem Budget unter der kleinsten Laufzeitgrenze', () => {
-    // Ob die längere Laufzeit auf dem gebuchten Tarif gewährt wird, ist von
-    // außen nicht erkennbar. Wird eine Runde abgeschnitten, stößt sie die
-    // nächste nicht mehr an — und die Kette ist tot.
+  it('lässt der Runde genug Luft, ihre Fortsetzung noch anzustoßen', () => {
+    // FRÜHER STAND HIER `< 60_000`, mit der Begründung, eine kurze Runde halte
+    // auch die kleinste Laufzeitgrenze ein. Der laufende Betrieb hat das
+    // widerlegt: Mit 45 Sekunden braucht ein Tag rund 16 Übergaben, und der
+    // Durchlauf blieb Tag für Tag bei Seite 22 von 82 stehen — nicht weil eine
+    // Runde abgeschnitten wurde, sondern weil irgendeine der vielen Übergaben
+    // verlorenging. Jede Übergabe ist ein Abrisspunkt; die kürzeste Kette ist
+    // die zuverlässigste.
+    //
+    // Die neue Regel ist enger, nicht weiter: Das Budget muss unter
+    // `maxDuration` bleiben, und zwar mit genug Abstand, dass die Runde ihre
+    // Fortsetzung samt Nachprüfung (8 s Warten + zweiter Anstoß) noch
+    // unterbringt.
     const budget = Number(/BUDGET_MS = ([\d_]+)/.exec(route)?.[1].replace(/_/g, ''));
-    expect(budget).toBeLessThan(60_000);
+    const maxDuration = Number(/maxDuration = (\d+)/.exec(route)?.[1]) * 1000;
+    expect(budget).toBeGreaterThan(0);
+    expect(maxDuration).toBeGreaterThan(0);
+    expect(budget + 20_000).toBeLessThanOrEqual(maxDuration);
+  });
+
+  it('prüft die Übergabe nach und stößt notfalls ein zweites Mal an', () => {
+    // Das Absenden allein beweist nicht, dass die nächste Runde LÄUFT: Der
+    // Anstoß wird nach drei Sekunden abgebrochen, und ein abgebrochener Aufruf
+    // kann die gerade gestartete Funktion mitnehmen. Genau so starb die Kette
+    // bisher — lautlos, weil der Absender das nicht merkt.
+    expect(route).toMatch(/loadSweepState\(\)/);
+    expect(route).toMatch(/zweiter Anstoß/);
+    // Der zweite Anstoß darf NUR fallen, wenn sich der Zeiger nicht bewegt hat.
+    expect(route).toMatch(/danach\.nextPage <= progress\.page/);
   });
 
   it('lässt den Anstoß nicht zwischenspeichern', () => {

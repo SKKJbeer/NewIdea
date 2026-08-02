@@ -81,6 +81,19 @@ interface SystemHealth {
     nextTopic: string | null;
     stalled: boolean;
   };
+  /** Fortschritt der flaechendeckenden Preiserfassung. `null` ohne Datenbank. */
+  sweep: {
+    laufTag: string;
+    heute: string;
+    seite: number;
+    seitenGesamt: number;
+    gesehen: number;
+    kartenGesamt: number;
+    anteil: number;
+    fertig: boolean;
+    stillstandMinuten: number | null;
+    letzterFehler: string | null;
+  } | null;
   problems: string[];
   checkedAt: string;
 }
@@ -263,6 +276,47 @@ function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh:
         </p>
       ) : (
         <>
+          {/* DIE PREISERFASSUNG ZUERST.
+              Sie beantwortet die wichtigste Frage der ganzen Seite: Sind die
+              Karten heute aktualisiert worden? Bisher stand dazu nur, dass die
+              Zustandstabelle frisch sei — sie war das auch, waehrend der
+              Durchlauf Tag fuer Tag bei 27 Prozent haengenblieb. */}
+          {health.sweep && (
+            <div className="mb-3 rounded-xl border border-[#2a2a3a] bg-[#0e0e18] px-3.5 py-3">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[11px] font-semibold text-slate-200">Preiserfassung heute</p>
+                <p className={`text-[11px] font-semibold tabular-nums ${
+                  health.sweep.fertig ? 'text-emerald-400'
+                    : health.sweep.laufTag !== health.sweep.heute ? 'text-rose-400'
+                    : 'text-amber-400'
+                }`}>
+                  {health.sweep.fertig ? 'vollständig' : `${health.sweep.anteil} %`}
+                </p>
+              </div>
+
+              <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-white/[0.07]">
+                <div
+                  className={`h-full rounded-full ${health.sweep.fertig ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                  style={{ width: `${health.sweep.anteil}%` }}
+                />
+              </div>
+
+              <p className="mt-2 text-[10px] tabular-nums text-slate-500">
+                Seite {health.sweep.seite} von {health.sweep.seitenGesamt} ·{' '}
+                {health.sweep.gesehen.toLocaleString('de-DE')} von{' '}
+                {health.sweep.kartenGesamt.toLocaleString('de-DE')} Karten
+                {health.sweep.stillstandMinuten !== null && !health.sweep.fertig && (
+                  <> · seit {health.sweep.stillstandMinuten} Min ohne Bewegung</>
+                )}
+              </p>
+              {health.sweep.laufTag !== health.sweep.heute && (
+                <p className="mt-1 text-[10px] text-rose-400">
+                  Letzter Durchlauf vom {health.sweep.laufTag} — heute noch nicht gestartet.
+                </p>
+              )}
+            </div>
+          )}
+
           {health.problems.length > 0 ? (
             <ul className="mb-3 space-y-1">
               {health.problems.map((p, i) => (
@@ -668,23 +722,23 @@ export function MonitoringPanel() {
         </div>
       </div>
 
-      {/* Features */}
-      <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
-        <SectionTitle icon={Zap} title="Features" score={featuresWorking} total={featureEntries.length} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-          {featureEntries.map(([key, info]) => (
-            <div key={key} className={`flex items-start gap-2.5 rounded-xl border px-3 py-2 ${
-              info.working ? 'border-emerald-100 bg-emerald-50/40' : 'border-[#2a2a3a]'
-            }`}>
-              <StatusIcon ok={info.working} />
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold text-slate-200 leading-tight">{info.label}</p>
-                <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{info.effect}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* FRUEHER STAND HIER „FEATURES".
+          Der Abschnitt zaehlte auf, welche Funktionen konfiguriert sind —
+          und sagte damit zum DRITTEN Mal dasselbe: „API-Keys" nennt die
+          Konfiguration, „Betriebszustand" nennt die Ergebnisse. Jeder
+          einzelne Eintrag war anderswo schon beantwortet:
+
+            supabaseConnected → API-Keys (SUPABASE_URL, SERVICE_ROLE_KEY)
+            priceSnapshots    → Betriebszustand (Zeilen, Datenstand)
+            aiBlog            → Betriebszustand (Artikel) + Workflows
+            cronDaily         → Workflows (Taeglicher Preis-Cron)
+            portfolioKonto    → API-Keys + Betriebszustand (Konto-Portfolios)
+            newsletter        → API-Keys + Workflows
+            video, social     → API-Keys
+            tcgPrices         → API-Keys (Pokémon TCG API, `working`)
+
+          Drei Darstellungen derselben Sache sind schlimmer als eine: Sie
+          koennen auseinanderlaufen, und dann glaubt man der falschen. */}
 
       {/* Skills */}
       {data.skills.length > 0 && (

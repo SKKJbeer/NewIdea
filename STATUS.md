@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.0.0` · **Stand:** 2. August 2026 · **Branch:** `main`
+**Version:** `v5.1.0` · **Stand:** 2. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -8,7 +8,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v5.0.0)
+## Was gebaut ist (Stand v5.1.0)
 
 | Bereich | Status | Details |
 |---|---|---|
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.1.0 | Preiserfassung lief taeglich nur bis 27 % — laengere Runden, nachgeprueft Uebergabe, Fortschritt im Monitoring sichtbar; dreifach erzaehlte „Features" entfernt |
 | v5.0.0 | Hero fuellt den ersten Bildschirm (92 vh), Hintergrund in sieben Ebenen, Drache nur als Kontur bei 3 %, Kennzahlen mit eigener Persoenlichkeit, mehr Weissraum ueberall |
 | v4.17.0 | Startseite nach geliefertem Entwurf: Seitenleiste, Kopfzeile, Glas-Panels, gravierte Eigenillustration, Kennzahl-Karten, Drei-Panel-Reihe, Schnellzugriff |
 | v4.16.0 | Startseite erzaehlt zuerst: Markt-Story ueber den Zahlen, Verteilung in fuenf benannten Baendern mit Deutung, Sammler-Materialien (Prisma, Folie, Energie-Trenner) |

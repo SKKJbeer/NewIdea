@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sweepChunk, markChainError } from '@/lib/price-sweep';
+import { sweepChunk, markChainError, loadSweepState } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 // FLÄCHENDECKENDE PREISERFASSUNG — Antrieb
@@ -44,15 +44,22 @@ const MAX_CHAIN = 150;
 /**
  * Arbeitszeit je Runde.
  *
- * BEWUSST WEIT UNTER `maxDuration`: Ob die längere Laufzeit auf dem
- * gebuchten Tarif tatsächlich gewährt wird, ist von außen nicht erkennbar —
- * wird eine Runde vorher abgeschnitten, stößt sie die nächste nicht mehr an
- * und die Kette ist tot. 45 Sekunden halten auch die kleinste Grenze ein.
- * Dass das mehr Übergaben bedeutet, ist verkraftbar, seit der Stand nach
- * JEDER Seite gesichert wird — eine abgebrochene Runde kostet dann höchstens
- * eine Seite, nicht ihre gesamte Arbeit.
+ * VON 45 AUF 240 SEKUNDEN ANGEHOBEN — BEFUND AUS DEM LAUFENDEN BETRIEB:
+ * Der Durchlauf blieb Tag für Tag bei Seite 22 von 82 stehen, ohne Fehler
+ * und ohne Log. Von Hand angestoßen lief er anstandslos weiter (22 → 46 in
+ * drei Minuten). Der Mechanismus stimmt also; was fehlte, war Robustheit
+ * gegen EINE verlorene Übergabe.
+ *
+ * Mit 45 Sekunden schafft eine Runde etwa fünf Seiten — für 82 Seiten also
+ * rund 16 Übergaben, und jede davon ist ein möglicher Abrisspunkt. Mit 240
+ * Sekunden sind es vier. Die kürzeste Kette ist die zuverlässigste.
+ *
+ * Der Wert bleibt unter `maxDuration` (300), damit eine Runde ihre
+ * Fortsetzung noch anstoßen kann, bevor die Plattform sie beendet. Und weil
+ * der Stand nach JEDER Seite gesichert wird, kostet eine abgeschnittene
+ * Runde höchstens eine Seite, nicht ihre gesamte Arbeit.
  */
-const BUDGET_MS = 45_000;
+const BUDGET_MS = 240_000;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -107,6 +114,34 @@ export async function GET(request: Request) {
           const grund = err instanceof Error ? err.message : String(err);
           console.warn('[Preis-Sweep] Fortsetzung nicht angestoßen:', grund);
           await markChainError(grund);
+        }
+      }
+
+      // ÜBERGABE NACHPRÜFEN UND EINMAL WIEDERHOLEN.
+      //
+      // Das Absenden allein beweist nicht, dass die nächste Runde LÄUFT: Der
+      // Anstoß wird nach drei Sekunden abgebrochen, und ein abgebrochener
+      // Aufruf kann die gerade gestartete Funktion mitnehmen. Genau so starb
+      // die Kette bisher — lautlos, weil der Absender das nicht merkt.
+      //
+      // Deshalb: kurz warten, den Stand erneut lesen, und wenn der Zeiger
+      // sich nicht bewegt hat, ein zweites Mal anstoßen. Kostet acht
+      // Sekunden je Runde und rettet den Tag.
+      await new Promise((r) => setTimeout(r, 8_000));
+      const danach = await loadSweepState();
+      const steht = danach !== null && danach.nextPage <= progress.page;
+      if (steht) {
+        console.warn(`[Preis-Sweep] Übergabe verloren bei Seite ${progress.page} — zweiter Anstoß`);
+        try {
+          await fetch(`${basis}/api/cron/price-sweep?chain=${chain + 1}`, {
+            headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+            cache: 'no-store',
+            signal: AbortSignal.timeout(3_000),
+          });
+        } catch {
+          // catch erlaubt: Der zweite Anstoß ist die Rettungsleine. Scheitert
+          // auch er, greift der Wächter im Monitoring — ein Vermerk hier
+          // brächte nichts, was dort nicht sichtbar wäre.
         }
       }
     }

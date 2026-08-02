@@ -12,6 +12,7 @@
 // überhaupt erst eingebrockt hat.
 
 import { getSupabase, isSupabaseConfigured } from './supabase';
+import { loadSweepState, heute, seitenGesamt as seitenTotal } from '@/lib/price-sweep';
 import { GUIDE_TOPICS } from './guide-topics';
 import { GUIDES } from './guides';
 
@@ -50,8 +51,40 @@ export interface SystemHealth {
   configured: boolean;
   tables: TableHealth[];
   guidePipeline: GuidePipelineHealth;
+  /** Fortschritt der flächendeckenden Preiserfassung — siehe `SweepHealth`. */
+  sweep: SweepHealth | null;
   problems: string[];
   checkedAt: string;
+}
+
+/**
+ * Zustand der Preiserfassung — die WICHTIGSTE Angabe im Monitoring.
+ *
+ * WARUM EIGENS: Bisher stand dort nur, dass die Tabelle `price_sweep_state`
+ * frisch ist. Sie war das auch — und der Durchlauf hing trotzdem Tag für Tag
+ * bei Seite 22 von 82 fest. „Die Tabelle wurde heute angefasst" und „die
+ * Arbeit ist fertig" sind zwei verschiedene Aussagen, und nur die zweite
+ * beantwortet die Frage, ob die Karten aktuell sind.
+ *
+ * Das ist Stolperstelle 21 in einer neuen Verkleidung: Monitoring muss
+ * ERGEBNISSE zeigen, nicht Konfiguration — und ein Zeitstempel ist hier
+ * Konfiguration.
+ */
+export interface SweepHealth {
+  /** Tag, für den der aktuelle Durchlauf zählt. */
+  laufTag: string;
+  /** Heutiges Datum — weicht es ab, ist der Durchlauf heute nie gestartet. */
+  heute: string;
+  seite: number;
+  seitenGesamt: number;
+  gesehen: number;
+  kartenGesamt: number;
+  /** Anteil der heute erfassten Karten, 0–100. */
+  anteil: number;
+  fertig: boolean;
+  /** Minuten seit der letzten Bewegung. `null`, wenn unbekannt. */
+  stillstandMinuten: number | null;
+  letzterFehler: string | null;
 }
 
 /** Erkennt „Tabelle existiert nicht" robust über Code UND Meldung. */
@@ -360,6 +393,7 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
         nextTopic: GUIDE_TOPICS[0]?.slug ?? null,
         stalled: false,
       },
+      sweep: null,
       problems: ['Supabase ist nicht konfiguriert — es werden keine Daten gespeichert'],
       checkedAt,
     };
@@ -417,5 +451,64 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
     );
   }
 
-  return { configured: true, tables, guidePipeline, problems, checkedAt };
+  // ── PREISERFASSUNG ──────────────────────────────────────────────────────
+  //
+  // Die wichtigste Frage der ganzen Seite: Sind die Karten heute aktualisiert
+  // worden? Sie wird hier beantwortet, und zwar an der ARBEIT, nicht am
+  // Zeitstempel der Tabelle.
+  let sweep: SweepHealth | null = null;
+  const stand = await loadSweepState();
+  if (stand) {
+    const heuteStr = heute();
+    const seitenGesamt = seitenTotal(stand.totalCards);
+    const fertig = seitenGesamt > 0 && stand.nextPage > seitenGesamt;
+    const anteil =
+      stand.totalCards > 0 ? Math.min(Math.round((stand.seen / stand.totalCards) * 100), 100) : 0;
+
+    // Stillstand messen: Die Tabelle traegt einen Zeitstempel der letzten
+    // Bewegung. Steht er lange still und ist der Durchlauf nicht fertig, ist
+    // die Kette abgerissen.
+    const sweepTabelle = tables.find((t) => t.table === 'price_sweep_state');
+    let stillstandMinuten: number | null = null;
+    if (sweepTabelle?.latest) {
+      const zeit = new Date(sweepTabelle.latest).getTime();
+      if (!Number.isNaN(zeit)) stillstandMinuten = Math.round((Date.now() - zeit) / 60_000);
+    }
+
+    sweep = {
+      laufTag: stand.runDate,
+      heute: heuteStr,
+      seite: stand.nextPage,
+      seitenGesamt,
+      gesehen: stand.seen,
+      kartenGesamt: stand.totalCards,
+      anteil,
+      fertig,
+      stillstandMinuten,
+      letzterFehler: stand.lastError,
+    };
+
+    // DREI VERSCHIEDENE STOERUNGEN, drei verschiedene Saetze. Sie in einen zu
+    // fassen waere bequem und wuerde die Ursache verschleiern.
+    if (stand.runDate !== heuteStr) {
+      problems.push(
+        `Preiserfassung ist heute nicht gestartet — letzter Durchlauf vom ${stand.runDate}. ` +
+          `Die Kartenpreise stammen von diesem Tag.`,
+      );
+    } else if (!fertig && stillstandMinuten !== null && stillstandMinuten > 20) {
+      problems.push(
+        `Preiserfassung steht seit ${stillstandMinuten} Minuten bei Seite ${stand.nextPage} von ${seitenGesamt} ` +
+          `(${anteil} % der Karten). Die Kette ist abgerissen — die restlichen Karten bekommen heute keinen neuen Preis.`,
+      );
+    } else if (!fertig) {
+      problems.push(
+        `Preiserfassung läuft: Seite ${stand.nextPage} von ${seitenGesamt} (${anteil} % der Karten).`,
+      );
+    }
+    if (stand.lastError) {
+      problems.push(`Preiserfassung meldet: ${stand.lastError}`);
+    }
+  }
+
+  return { configured: true, tables, guidePipeline, sweep, problems, checkedAt };
 }
