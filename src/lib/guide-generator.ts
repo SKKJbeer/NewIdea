@@ -14,6 +14,15 @@ import { recordAiUsage } from './ai-usage';
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 
 const GUIDE_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Guide):
+ZUBEHÖR BEIM NAMEN NENNEN, wo es sachlich hingehört:
+Geht es um Lagerung, Schutz, Zustand, Grading-Vorbereitung oder Sammlung
+ordnen, dann nenne das passende Zubehör mit dem gängigen Wort — Sleeves,
+Toploader, Sammelalbum, Aufbewahrungsbox. Die Anzeige verlinkt die ERSTE
+Erwähnung je Art automatisch; du selbst schreibst KEINE Links und KEIN Markup.
+Nenne Zubehör nur, wenn es zum Thema gehört, und höchstens beiläufig — ein
+Absatz, der Produkte aufzählt, ist Werbung und keine Analyse. Keine Marken,
+keine Preise, keine Kaufaufforderung.
+
 1. WAHRHEIT: Nur dokumentierte, verifizierbare Fakten (Bulbapedia, Cardmarket-Systematik, offizielle Anbieter-Websites). NIEMALS erfinden: Preise, Prozentwerte, Druckraten, Auktionsergebnisse, Illustratoren, Jahreszahlen ohne Beleg. Wo Zahlen schwanken (Preise, Gebühren): qualitativ formulieren und auf die Quelle verweisen ("aktuelle Gebühren auf cardmarket.com prüfen").
 2. KEINE PREISZAHLEN im Text: kein "€", "EUR", "$" mit Zahl — Preise veralten sofort. Stattdessen: "ein Vielfaches", "deutlich höher", "auf Cardmarket prüfen".
 3. KEINE ANLAGEBERATUNG: keine Kaufempfehlungen, keine Renditeversprechen, keine Kauf-/Verkaufszeitpunkte. Kriterien liefern, Entscheidung beim Leser lassen.

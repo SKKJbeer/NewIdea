@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AffiliateNote } from '@/components/AffiliateNote';
 import { SECTION_LABEL } from '@/lib/ui';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
@@ -164,6 +165,8 @@ export default async function MarktberichtPage() {
           <p className="text-xs text-slate-700 mb-2 flex items-center gap-1"><Shield size={10} />Partner & Affiliate-Links</p>
           <AffiliateBar />
         </section>
+
+        <AffiliateNote texte={[report?.reportText ?? '']} />
 
         <footer className="space-y-4 border-t border-[#1e1e30] pt-6">
           <div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">

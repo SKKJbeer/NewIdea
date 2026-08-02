@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { getGuide, GUIDES, type Guide } from '@/lib/guides';
@@ -206,6 +207,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </Link>
           <Link href="/artikel" className="text-sm text-violet-400 hover:text-violet-300 font-semibold">Blog →</Link>
         </div>
+        <AffiliateNote texte={[guide.intro, ...guide.sections.map((s) => s.content)]} />
       </main>
     </div>
   );

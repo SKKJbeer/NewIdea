@@ -418,6 +418,15 @@ export const CONTENT_RULES = `ABSOLUTE REGELN (Verstoß = unbrauchbarer Artikel)
 // Schreibstil-Regeln gegen KI-Klang — Kurzform von .claude/commands/schreibstil.md.
 // Werden jedem Generierungs-Prompt vorangestellt.
 export const STYLE_RULES = `SCHREIBSTIL (Texte müssen menschlich und nüchtern klingen, NICHT nach KI):
+ZUBEHÖR BEIM NAMEN NENNEN, wo es sachlich hingehört:
+Geht es um Lagerung, Schutz, Zustand, Grading-Vorbereitung oder Sammlung
+ordnen, dann nenne das passende Zubehör mit dem gängigen Wort — Sleeves,
+Toploader, Sammelalbum, Aufbewahrungsbox. Die Anzeige verlinkt die ERSTE
+Erwähnung je Art automatisch; du selbst schreibst KEINE Links und KEIN Markup.
+Nenne Zubehör nur, wenn es zum Thema gehört, und höchstens beiläufig — ein
+Absatz, der Produkte aufzählt, ist Werbung und keine Analyse. Keine Marken,
+keine Preise, keine Kaufaufforderung.
+
 1. Direkt mit einem Fakt, einer Beobachtung oder einem Kontrast einsteigen. VERBOTEN: "Hier ein Überblick", "In der heutigen Zeit", "Tauchen wir ein", Panorama-Sätze.
 2. VERBOTENE Wörter: atemberaubend, revolutionär, bahnbrechend, faszinierend, episch, spektakulär, unglaublich. Stattdessen das konkrete Detail nennen, das den Eindruck erzeugt.
 3. Keine Meta-Kommentare ("In diesem Artikel...", "Zusammenfassend...", "Fazit:"). Kein Absatz endet mit einer Zusammenfassung seiner selbst — er endet mit dem letzten Fakt.

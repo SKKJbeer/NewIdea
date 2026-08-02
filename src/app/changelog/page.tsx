@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.4.0',
+    date: '2. August 2026',
+    label: 'Zubehoer im Text wird verlinkt — sparsam',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Sleeves, Toploader, Sammelalben und Aufbewahrungsboxen im Fliesstext werden zu Kauflinks — rueckwirkend fuer alle bestehenden Beitraege' },
+      { type: 'new', text: 'Hoechstens ein Link je Zubehoerart und Beitrag, hoechstens vier insgesamt, nur im Fliesstext' },
+      { type: 'new', text: 'Kennzeichnung nach Recht — und nur dort, wo auch wirklich ein Link steht' },
+      { type: 'changed', text: 'Beide Generatoren nennen Zubehoer beim Namen, wo es hingehoert; Links und Markup schreiben sie nicht selbst' },
+    ],
+  },
+  {
     version: '5.3.0',
     date: '2. August 2026',
     label: 'Generierte Beitraege wiederholen sich nicht mehr',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Fuenf von acht Beitraegen behandelten dieselbe Karte — der Kandidatenpool war immer derselbe' },
       { type: 'fixed', text: 'Die letzten Titel wurden dem Modell als Anknuepfung gereicht statt als Sperre — das lud zur Wiederholung ein' },

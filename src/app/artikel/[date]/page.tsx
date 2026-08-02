@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NavBar } from '@/components/NavBar';
@@ -361,6 +362,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           </Link>
           <Link href="/marktbericht" className="text-sm text-violet-400 hover:text-violet-300 font-semibold">Marktbericht →</Link>
         </div>
+
+        <AffiliateNote texte={article ? [article.intro, ...article.sections.map((s) => s.content)] : []} />
 
         <footer className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center space-y-1">
           <p className="text-[11px] font-semibold text-amber-400/80">Inoffizielle Fan-Seite · Keine Anlageberatung</p>

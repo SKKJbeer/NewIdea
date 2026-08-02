@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.4.0] - 2. August 2026 · Zubehoer im Text wird verlinkt — sparsam
+
+### Neu
+- **Erwaehnungen von Sleeves, Toploadern, Sammelalben und Aufbewahrungsboxen werden zu Kauflinks.** Umgesetzt als RENDER-Ebene, nicht im gespeicherten Text: Damit gilt die Regel rueckwirkend fuer alle bestehenden Guides, Artikel und Marktberichte und automatisch fuer jeden neuen — ohne dass ein einziger Beitrag umgeschrieben werden muss
+- **„Nicht dominant" ist eine Zahl, keine Haltung:** hoechstens EIN Link je Zubehoerart und Beitrag (die erste Erwaehnung), hoechstens vier insgesamt, nur im Fliesstext. Ohne die erste Regel bekaeme ein Lagerungs-Guide, der zwoelfmal „Toploader" schreibt, zwoelf Links — und laese sich wie eine Anzeige
+- **Kennzeichnung nach Recht** (`AffiliateNote`) auf Guides, Artikeln und Marktbericht — und NUR dort, wo auch wirklich ein Link steht. Ein Hinweis unter einem Text ohne Links waere eine Behauptung ueber etwas, das gar nicht da ist
+- **Beide Generatoren wissen davon:** Sie sollen Zubehoer beim gaengigen Namen nennen, wo es sachlich hingehoert — aber KEIN Markup und keine Links schreiben, keine Marken, keine Preise, keine Kaufaufforderung. Ein Absatz, der Produkte aufzaehlt, ist Werbung und keine Analyse
+
+### Hinweis
+- Die Links zeigen weiterhin auf die generischen Fallbacks (Amazon-Suche, Dragon Shield). Sobald `NEXT_PUBLIC_TOPLOADER_AFFILIATE_URL` und die drei uebrigen in Vercel stehen, nutzt `AccessoryLink` sie automatisch — kein Code-Update noetig
+
+---
+
 ## [5.3.0] - 2. August 2026 · Generierte Beitraege wiederholen sich nicht mehr
 
 ### Behoben
