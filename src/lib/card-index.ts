@@ -134,6 +134,39 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   return (data as unknown as IndexZeile[]).map(zuKarte);
 }
 
+/**
+ * Karten anhand ihrer IDs aus dem eigenen Index holen.
+ *
+ * WOZU: Das Portfolio fragte jede Position einzeln bei der Kartendatenbank an.
+ * Schlug ein Abruf fehl — und die Quelle antwortet dokumentiert auf etwa jede
+ * dritte Anfrage mit einem Fehler (Stolperstelle 28) —, fiel die Position
+ * komplett aus und die Oberfläche zeigte „Kein Marktpreis geladen". Bei sechs
+ * Positionen traf es regelmäßig zwei bis drei.
+ *
+ * Der Index enthält dieselben Karten samt Preis, liegt in unserer eigenen
+ * Datenbank und kann nicht aussetzen. Er ist damit der richtige Rückfall —
+ * KEIN Ersatz: Sein Preis ist so aktuell wie der letzte Durchlauf, und genau
+ * das muss die Oberfläche auch sagen.
+ *
+ * EINE Abfrage für alle IDs, nicht eine je Karte — sonst wäre der Rückfall
+ * langsamer als das, was er ersetzt.
+ */
+export async function cardsFromIndex(ids: string[]): Promise<Map<string, IndexTreffer>> {
+  const sb = getSupabase();
+  const treffer = new Map<string, IndexTreffer>();
+  if (!sb || ids.length === 0) return treffer;
+
+  const { data, error } = await sb.from('cards_index').select('*').in('id', ids.slice(0, 200));
+  if (error) {
+    console.warn('[Kartenindex] Abruf nach IDs fehlgeschlagen:', error.message);
+    return treffer;
+  }
+  for (const zeile of (data as unknown as IndexZeile[]) ?? []) {
+    treffer.set(zeile.id, zuKarte(zeile));
+  }
+  return treffer;
+}
+
 /** Zeilenzahl und Datenstand — für das Monitoring. */
 export async function cardIndexStand(): Promise<{ zeilen: number; stand: string | null }> {
   const sb = getSupabase();

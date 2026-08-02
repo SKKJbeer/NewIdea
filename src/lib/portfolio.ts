@@ -31,6 +31,14 @@ export interface LiveCardData {
   priceHistory: Array<{ date: string; price: number }>;
   /** Wie viele davon echte Tages-Snapshots sind (Rest: Cardmarket-Ankerpunkte). */
   dailyPoints?: number;
+  /**
+   * Woher der Preis stammt: direkt von der Kartendatenbank (`live`) oder aus
+   * dem eigenen Index (`index`), weil der Abruf ausfiel. Ein Preis vom Vortag
+   * ist brauchbar, darf aber nicht aussehen wie einer von jetzt.
+   */
+  quelle?: 'live' | 'index';
+  /** Datenstand des Index — nur bei `quelle: 'index'`. */
+  indexStand?: string | null;
 }
 
 export interface ChartPoint {

@@ -11,10 +11,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.2.0',
+    date: '2. August 2026',
+    label: 'Das Portfolio zeigt immer einen Stand',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Von sechs Positionen standen drei auf „Kein Marktpreis geladen" — ein fehlgeschlagener Abruf liess die Position komplett ausfallen' },
+      { type: 'fixed', text: 'Rueckfall auf den eigenen Kartenindex: dieselben Karten samt Preis, aus unserer Datenbank, in einer einzigen Abfrage' },
+      { type: 'changed', text: 'Die Herkunft des Preises steht in der Zeile — kommt er aus dem Index, mit Datenstand' },
+      { type: 'changed', text: '„Abruf gescheitert" und „Karte hat keinen Preis" sind zwei verschiedene Saetze: das eine behebt sich von selbst, das andere nie' },
+    ],
+  },
+  {
     version: '5.1.1',
     date: '2. August 2026',
     label: 'Ein Aussetzer der Quelle beendet nicht mehr die Runde',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Ein einzelner HTTP 500 der Kartendatenbank beendete die ganze Runde — der Durchlauf blieb bei Seite 59 von 82 haengen' },
       { type: 'fixed', text: 'Dieselbe Seite wird jetzt bis zu dreimal in derselben Runde versucht, mit wachsender Pause' },

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchCardById } from '@/lib/pokemon-api';
+import { cardsFromIndex, cardIndexStand } from '@/lib/card-index';
 import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
 import { PriceDataPoint, PokemonCard } from '@/types';
 import { getStoredPriceHistories, mergePriceHistory, recordPriceSnapshots } from '@/lib/price-history';
@@ -30,6 +31,19 @@ interface LiveCardData {
   setCode: string;
   imageUrl: string;
   priceLanguage: CardLanguage;
+  /**
+   * Woher der Preis stammt.
+   *
+   * `live`  — direkt von der Kartendatenbank, so aktuell wie sie selbst.
+   * `index` — aus dem eigenen Kartenindex, weil der Abruf ausfiel. So aktuell
+   *           wie der letzte Preis-Durchlauf.
+   *
+   * Die Unterscheidung MUSS nach aussen: Ein Preis vom Vortag ist brauchbar,
+   * aber er darf nicht aussehen wie einer von jetzt.
+   */
+  quelle: 'live' | 'index';
+  /** Datenstand des Index — nur bei `quelle: 'index'` gesetzt. */
+  indexStand?: string | null;
 }
 
 export async function POST(request: Request) {
@@ -76,10 +90,28 @@ export async function POST(request: Request) {
   // je Karte) — die vorhandene Tages-Historie blieb ungenutzt.
   const storedByCard = await getStoredPriceHistories(cards.map((c) => c.id), 365);
 
+  // Den Rueckfall VORAB in EINER Abfrage holen, nicht je gescheiterter Karte.
+  // Er kostet nichts, wenn er nicht gebraucht wird, und verzoegert nichts,
+  // wenn doch.
+  const [ausIndex, indexInfo] = await Promise.all([
+    cardsFromIndex(cards.map((c) => c.id)).catch(() => new Map()),
+    cardIndexStand().catch(() => ({ zeilen: 0, stand: null })),
+  ]);
+  const indexStand = indexInfo.stand;
+
   const results = await Promise.allSettled(
     cards.map(async (c) => {
-      const card = await withTimeout(fetchCardById(c.id));
+      // RUECKFALL AUF DEN EIGENEN INDEX, wenn der Abruf ausfaellt.
+      //
+      // Vorher stand hier `return null` — die Position verschwand dann
+      // vollstaendig aus der Antwort, und die Oberflaeche zeigte „Kein
+      // Marktpreis geladen". Bei einer Quelle, die auf etwa jede dritte
+      // Anfrage mit einem Fehler antwortet, traf das regelmaessig die Haelfte
+      // eines Portfolios.
+      const live = await withTimeout(fetchCardById(c.id));
+      const card = live ?? ausIndex.get(c.id) ?? null;
       if (!card) return null;
+      const quelle: 'live' | 'index' = live ? 'live' : 'index';
 
       let price = card.prices.market || card.prices.holofoil?.market || 0;
       let priceLanguage: CardLanguage = 'EN';
@@ -111,6 +143,8 @@ export async function POST(request: Request) {
           setCode: card.setCode,
           imageUrl: card.imageUrl,
           priceLanguage,
+          quelle,
+          indexStand: quelle === 'index' ? indexStand : undefined,
         } satisfies LiveCardData,
       };
     }),
@@ -121,7 +155,10 @@ export async function POST(request: Request) {
   results.forEach((result) => {
     if (result.status === 'fulfilled' && result.value) {
       data[result.value.id] = result.value.data;
-      abgerufen.push(result.value.card);
+      // NUR live abgerufene Karten als Messpunkt zurueckschreiben. Ein Preis
+      // aus dem Index ist eine Kopie von gestern — ihn als heutigen Snapshot
+      // zu speichern waere eine erfundene Messung.
+      if (result.value.data.quelle === 'live') abgerufen.push(result.value.card);
     }
   });
 

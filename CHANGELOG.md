@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.2.0] - 2. August 2026 · Das Portfolio zeigt immer einen Stand
+
+### Behoben
+- **Von sechs Positionen standen drei auf „Kein Marktpreis geladen".** Ursache: Der Abruf holte jede Karte einzeln bei der Kartendatenbank, und bei einem Fehlschlag fiel die Position komplett aus der Antwort. Die Quelle antwortet dokumentiert auf etwa jede dritte Anfrage mit einem Fehler (Stolperstelle 28) — bei sechs Karten traf es damit regelmaessig die Haelfte
+- **Rueckfall auf den eigenen Kartenindex.** Er enthaelt dieselben 19.690 Karten samt Preis, liegt in unserer Datenbank und kann nicht aussetzen. In EINER Abfrage vorab geholt, nicht je gescheiterter Karte — sonst waere der Rueckfall langsamer als das, was er ersetzt
+
+### Geaendert
+- **Die Herkunft des Preises steht in der Zeile.** Kommt er aus dem Index, steht sein Datenstand daneben. Ein Preis vom Vortag ist brauchbar — er darf nur nicht aussehen wie einer von jetzt
+- **„Abruf gescheitert" und „Karte hat keinen Preis" sind jetzt zwei verschiedene Saetze.** Vorher stand fuer beide „Kein Marktpreis geladen". Das eine behebt sich von selbst, das andere nie; wer das nicht unterscheiden kann, wartet auf etwas, das nicht kommt
+- **Ein Index-Preis wird NICHT als heutiger Messpunkt zurueckgeschrieben** — er ist eine Kopie von gestern, und ihn als heutige Messung zu speichern waere eine erfundene Messung
+
+---
+
 ## [5.1.1] - 2. August 2026 · Ein Aussetzer der Quelle beendet nicht mehr die Runde
 
 ### Behoben

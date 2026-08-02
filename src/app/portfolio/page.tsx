@@ -596,10 +596,32 @@ export default function PortfolioPage() {
                         <p className={`text-[10px] tabular-nums ${pos ? 'text-emerald-400' : 'text-rose-400'}`}>
                           {formatPercent(pct)}
                         </p>
+                        {/* HERKUNFT AUSWEISEN, wenn der Preis aus dem eigenen
+                            Index kommt. Er ist so aktuell wie der letzte
+                            Durchlauf — brauchbar, aber nicht von jetzt, und
+                            genau das muss dranstehen. */}
+                        {liveData[h.cardId]?.quelle === 'index' && (
+                          <p className="text-[9px] leading-tight text-slate-600">
+                            Stand{' '}
+                            {liveData[h.cardId]?.indexStand
+                              ? new Date(liveData[h.cardId]!.indexStand!).toLocaleDateString('de-DE', {
+                                  day: '2-digit', month: '2-digit',
+                                })
+                              : 'aus Index'}
+                          </p>
+                        )}
                       </>
                     ) : (
-                      <p className="text-[10px] leading-tight text-amber-400/70 max-w-[92px]">
-                        Kein Marktpreis geladen — Kaufpreis
+                      /* ZWEI VERSCHIEDENE ZUSTAENDE, zwei verschiedene Saetze.
+                         Vorher stand hier fuer beide „Kein Marktpreis geladen":
+                         fuer eine Karte, deren Abruf ausfiel, UND fuer eine, die
+                         in der Quelle gar keinen Preis hat. Das erste behebt
+                         sich von selbst, das zweite nie — wer das nicht
+                         unterscheiden kann, wartet auf etwas, das nicht kommt. */
+                      <p className="text-[10px] leading-tight text-amber-400/70 max-w-[104px]">
+                        {liveData[h.cardId]
+                          ? 'Für diese Karte liegt kein Marktpreis vor — angezeigt: Kaufpreis'
+                          : 'Preis gerade nicht abrufbar — angezeigt: Kaufpreis'}
                       </p>
                     )}
                   </div>
