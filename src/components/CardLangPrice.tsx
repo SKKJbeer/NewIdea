@@ -82,8 +82,11 @@ export function CardLangPrice({
         {language !== 'EN' && (
           <p className="mt-1.5 text-[10px] text-slate-600">
             {status === 'ok' && `✓ Cardmarket-Preis für ${LANG_LABEL[language]}-Ausgaben`}
+            {/* Den GRUND nennen, nicht nur den Zustand. „Nicht verfuegbar"
+                liest sich wie eine voruebergehende Stoerung; tatsaechlich
+                vergibt Cardmarket derzeit keine API-Zugaenge. */}
             {status === 'fallback' &&
-              'Sprachspezifischer Preis nicht verfügbar — EN-Fallback'}
+              'Preis aus der englischen Notierung — sprachspezifische Preise brauchen einen Cardmarket-API-Zugang, der derzeit nicht vergeben wird'}
           </p>
         )}
       </div>

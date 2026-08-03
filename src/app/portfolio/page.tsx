@@ -69,9 +69,20 @@ function LangPicker({ value, onChange }: { value: CardLanguage; onChange: (l: Ca
           </button>
         ))}
       </div>
-      <p className="text-[10px] text-slate-600 mt-1.5">
+      {/* KEIN VERSPRECHEN, DAS NICHT EINGELOEST WIRD.
+          Hier stand „Preis wird von Cardmarket für diese Sprache abgerufen".
+          Das war schon vorher nur wahr, wenn die vier CARDMARKET_*-Zugaenge
+          gesetzt waren — und Cardmarket nimmt seit dem 2.8.2026 gar keine
+          API-Antraege mehr an („we are not accepting applications for API
+          access at this time"). Der Satz war damit eine Zusage, die niemand
+          einloesen kann.
+
+          Die Sprachwahl bleibt: Sie gehoert zur Position und ist fuer den
+          eigenen Bestand eine Information. Nur der PREIS kommt bis auf
+          Weiteres aus der englischen Notierung, und genau das steht jetzt da. */}
+      <p className="text-[10px] leading-relaxed text-slate-600 mt-1.5">
         {value !== 'EN'
-          ? 'Preis wird von Cardmarket für diese Sprache abgerufen'
+          ? 'Sprache wird gespeichert. Der Preis stammt weiterhin aus der englischen Cardmarket-Notierung — sprachspezifische Preise brauchen einen API-Zugang, den Cardmarket derzeit nicht vergibt.'
           : 'Cardmarket EUR (englische Ausgabe)'}
       </p>
     </div>

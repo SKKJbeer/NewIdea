@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.4.1] - 2. August 2026 · Kein Versprechen auf sprachspezifische Preise
+
+### Behoben
+- **Die Sprachwahl im Portfolio sagte „Preis wird von Cardmarket für diese Sprache abgerufen".** Das war eine Zusage, die niemand einlösen kann: Cardmarket vergibt derzeit gar keine API-Zugänge mehr („we are not accepting applications for API access at this time"). Jetzt steht dort, was tatsächlich passiert — die Sprache wird gespeichert, der Preis kommt aus der englischen Notierung, und der Grund steht dabei
+- **Die Kartenseite sagte „Sprachspezifischer Preis nicht verfügbar — EN-Fallback".** Das liest sich wie eine vorübergehende Störung. Der Grund steht jetzt dabei
+
+### Unverändert
+- **Die Sprachwahl bleibt.** Sie gehört zur Position und ist für den eigenen Bestand eine Information — nur der Preis kommt bis auf Weiteres aus der englischen Notierung
+- **Die Cardmarket-Anbindung bleibt im Code.** Sie ist fertig und wartet nur auf die vier `CARDMARKET_*`-Werte. Öffnet Cardmarket die Anträge wieder, genügt es, sie in Vercel einzutragen
+
+---
+
 ## [5.4.0] - 2. August 2026 · Zubehoer im Text wird verlinkt — sparsam
 
 ### Neu

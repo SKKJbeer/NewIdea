@@ -11,10 +11,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.4.1',
+    date: '2. August 2026',
+    label: 'Kein Versprechen auf sprachspezifische Preise',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Sprachwahl versprach einen Cardmarket-Preis je Sprache — Cardmarket vergibt derzeit keine API-Zugaenge, die Zusage konnte niemand einloesen' },
+      { type: 'changed', text: 'Beide Stellen nennen jetzt den Grund statt nur den Zustand; die Sprachwahl selbst bleibt' },
+    ],
+  },
+  {
     version: '5.4.0',
     date: '2. August 2026',
     label: 'Zubehoer im Text wird verlinkt — sparsam',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Sleeves, Toploader, Sammelalben und Aufbewahrungsboxen im Fliesstext werden zu Kauflinks — rueckwirkend fuer alle bestehenden Beitraege' },
       { type: 'new', text: 'Hoechstens ein Link je Zubehoerart und Beitrag, hoechstens vier insgesamt, nur im Fliesstext' },
