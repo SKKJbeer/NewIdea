@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, globSync } from 'fs';
 import { join } from 'path';
 
 // BEFUNDE AUS DEM SUCH-DURCHLAUF (04.08.2026, gemessen auf 1536×900).
@@ -130,6 +130,24 @@ describe('Breite bestimmt die aufrufende Seite', () => {
     // Der Seiteninhalt darunter nutzt px-6 sm:px-10 lg:px-14 xl:px-16.
     // Weicht die Leiste davon ab, hängt das Suchfeld neben allem anderen.
     expect(shell).toMatch(/px-6[^"]*sm:px-10[^"]*lg:px-14[^"]*xl:px-16/);
+  });
+});
+
+describe('Kopfleiste steht genau einmal', () => {
+  // GEFUNDEN beim Nachmessen der Suche auf 390 Pixel: Die Seite trug ZWEI
+  // identische Kopfleisten uebereinander. Die Huelle bringt seit v5.5.0 eine
+  // mit (`lg:hidden`), jede der achtzehn Seiten brachte weiterhin ihre eigene.
+  // Auf dem Telefon kostete das rund sechzig Pixel Hoehe an der wertvollsten
+  // Stelle der Seite — und es sah aus wie ein Fehler, weil es einer war.
+  it('wird von keiner Seite selbst gerendert', () => {
+    const seiten = globSync('src/app/**/page.tsx', { cwd: WURZEL });
+    expect(seiten.length).toBeGreaterThan(10);
+    const doppelt = seiten.filter((d) => /<NavBar\s*\/>/.test(lies(d)));
+    expect(doppelt).toEqual([]);
+  });
+
+  it('steht in der Huelle und nur dort', () => {
+    expect(lies('src/components/AppShell.tsx')).toContain('<NavBar />');
   });
 });
 

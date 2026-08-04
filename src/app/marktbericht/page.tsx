@@ -3,7 +3,6 @@ import { AffiliateNote } from '@/components/AffiliateNote';
 import { SECTION_LABEL } from '@/lib/ui';
 import { CardGrid } from '@/components/CardGrid';
 import { AffiliateBar } from '@/components/AffiliateBar';
-import { NavBar } from '@/components/NavBar';
 import { Calendar, CalendarDays, Zap, Shield, TrendingUp, BarChart3, ChevronLeft, Archive } from 'lucide-react';
 import { loadLatestMarketReport, listMarketReportMeta } from '@/lib/market-report-storage';
 import { Reveal } from '@/components/Reveal';
@@ -51,7 +50,6 @@ export default async function MarktberichtPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Gemeinsames Kopf-Muster. Der Leuchtfleck, die zentrierte Zweizeilen-
           Überschrift mit Farbhervorhebung und die drei Merkmal-Zeilen darunter

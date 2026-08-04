@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { ContentIcon } from '@/components/ContentIcon';
 import { GUIDES } from '@/lib/guides';
 import { listGeneratedGuides } from '@/lib/guide-storage';
@@ -23,7 +22,6 @@ export default async function GuidesPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
           Abschnittsmarke statt Pille, keine Verlaufsfläche, keine

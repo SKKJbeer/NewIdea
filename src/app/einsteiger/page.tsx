@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { SECTION_LABEL } from '@/lib/ui';
 import type { Metadata } from 'next';
-import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
 import { ContentIcon } from '@/components/ContentIcon';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
@@ -22,7 +21,6 @@ export const metadata: Metadata = {
 export default function EinsteigerPage() {
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Hero */}
       <header className="border-b border-[#1c1c24]">

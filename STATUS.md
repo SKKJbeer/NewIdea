@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.6.0` · **Stand:** 4. August 2026 · **Branch:** `main`
+**Version:** `v5.6.1` · **Stand:** 4. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -13,7 +13,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Bereich | Status | Details |
 |---|---|---|
 | Startseite `/` | ✅ Fertig | Bloomberg/TradingView Dark Mode, PMI, Fear & Greed, Sparklines, Ticker · ISR 1h |
-| Suche `/suche` | ✅ Fertig | Autocomplete (debounce 320ms), zentrale Filterung leerer Preview-Karten, Dark Dropdown |
+| Suche `/suche` | ✅ Fertig | Autocomplete (140 ms Wartezeit, laufende Abfragen abgebrochen, hoechstens 8 Zeilen mit Deckel, Tastaturbedienung), zentrale Filterung leerer Preview-Karten |
 | Marktbericht `/marktbericht` | ⚠️ Nachziehen | v2.23.0 behebt Erzeugung + entfernt Platzhalter. Seit KW 26 kein echter Bericht — per `POST /api/market-report/generate` sofort erzeugen |
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
 | Artikel-Erzeugung | ⚠️ Nachziehen | v2.22.0 behebt die Ursache (Token-Limit). Bestehende 8 Beiträge sind noch Fallbacks — per `POST /api/articles/generate` neu erzeugen |
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.6.1 | Auf dem Telefon standen zwei identische Kopfleisten uebereinander — die Huelle brachte seit v5.5.0 eine mit, die achtzehn Seiten weiterhin ihre eigene |
 | v5.6.0 | Suche: Vorschlagsfeld gedeckelt (war 1015 px hoch), Feld an den Seiteninhalt ausgerichtet und auf 640 px verbreitert, Wartezeit 320 → 140 ms, laufende Abfragen werden abgebrochen, Tastaturbedienung, Verlaengerungen bekannter Begriffe ohne Netzweg |
 | v5.5.0 | Seitenleiste auf allen siebzehn Seiten statt nur auf der Startseite; „Abdeckung 1 %" verglich zwei interne Zahlen — jetzt erfasste Karten gegen alle Karten |
 | v5.4.1 | Sprachwahl im Portfolio versprach Cardmarket-Preise je Sprache — Cardmarket vergibt derzeit keine API-Zugaenge; jetzt steht dort der Grund |

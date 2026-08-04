@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { ContentIcon } from '@/components/ContentIcon';
 import { ARTICLE_META, ARTICLE_PREVIEW_TITLES, ARTICLE_PREVIEW_SUBTITLES, recentPublishDates, getArticleType, ARTICLE_LEVEL, LEVEL_LABEL } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
@@ -32,7 +31,6 @@ export default async function ArtikelListPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
           Abschnittsmarke statt Pille, keine Verlaufsfläche, keine

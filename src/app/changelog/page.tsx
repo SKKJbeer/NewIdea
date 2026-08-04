@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { ArrowLeft, GitMerge, Plus, RefreshCw, Wrench } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -11,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.6.1',
+    date: '4. August 2026',
+    label: 'Eine Kopfleiste statt zwei',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auf dem Telefon standen zwei identische Kopfleisten uebereinander — auf jeder der achtzehn Seiten. Die Huelle bringt seit v5.5.0 eine mit, die Seiten brachten weiterhin ihre eigene' },
+      { type: 'changed', text: 'Ein Test bricht den Build, sobald eine Seite wieder ihre eigene Kopfleiste rendert' },
+    ],
+  },
+  {
     version: '5.6.0',
     date: '4. August 2026',
     label: 'Suche: sauber dargestellt und spuerbar schneller',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Das Vorschlagsfeld war 1015 Pixel hoch (16 Treffer, kein Deckel) und lief unten aus dem Bild — jetzt hoechstens acht Zeilen mit eigenem Rollbereich' },
       { type: 'fixed', text: 'Das Suchfeld stand bei 24 Pixeln Innenabstand, der Seiteninhalt bei 64 — beide nutzen jetzt dieselbe Staffel, Feld und Ueberschrift beginnen an derselben Kante' },
@@ -1862,7 +1871,6 @@ const TYPE_STYLE = {
 export default function ChangelogPage() {
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">

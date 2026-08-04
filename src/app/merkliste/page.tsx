@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Star, Trash2, Loader2, Search } from 'lucide-react';
-import { NavBar } from '@/components/NavBar';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { formatEur } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
@@ -69,7 +68,6 @@ export default function MerklistePage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
           Abschnittsmarke statt Pille, keine Verlaufsfläche, keine

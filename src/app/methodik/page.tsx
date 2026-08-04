@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { NavBar } from '@/components/NavBar';
 import { Reveal } from '@/components/Reveal';
 import { ScrollText, ExternalLink } from 'lucide-react';
 import {
@@ -66,7 +65,6 @@ export default function MethodikPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster (DESIGN.md §2/§4): linksbündig,
           Abschnittsmarke statt Pille, keine Verlaufsfläche, keine

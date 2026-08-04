@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.6.1] - 4. August 2026 · Eine Kopfleiste statt zwei
+
+### Behoben
+- **Auf dem Telefon standen ZWEI identische Kopfleisten uebereinander** — auf jeder der achtzehn Seiten. Seit v5.5.0 bringt die Anwendungshuelle eine mit (unterhalb von 1024 px, wo die Seitenleiste weicht), jede Seite brachte weiterhin ihre eigene. Das kostete rund sechzig Pixel an der wertvollsten Stelle der Seite und sah aus wie ein Fehler, weil es einer war. Gefunden beim Nachmessen der Suche auf 390 Pixel, nicht durch einen Test — deshalb gibt es jetzt einen: `suche-oberflaeche.test.ts` bricht den Build, sobald eine Seite wieder ihre eigene Kopfleiste rendert
+
+---
+
 ## [5.6.0] - 4. August 2026 · Suche: sauber dargestellt und spuerbar schneller
 
 ### Behoben

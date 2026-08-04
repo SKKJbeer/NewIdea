@@ -1,4 +1,3 @@
-import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
 import type { searchCards } from '@/lib/pokemon-api';
@@ -82,8 +81,6 @@ export default async function SearchPage({
           dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
         />
       )}
-
-      <NavBar />
 
       {/* KOPF NACH DEM GEMEINSAMEN MUSTER.
           Hier standen drei Dinge, die DESIGN.md ausdrücklich ausschliesst: ein

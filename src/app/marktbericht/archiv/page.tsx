@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { SECTION_LABEL } from '@/lib/ui';
-import { NavBar } from '@/components/NavBar';
 import { Calendar, ChevronRight, TrendingUp } from 'lucide-react';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
@@ -35,7 +34,6 @@ export default async function MarktberichtArchivPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       <header className="border-b border-[#1c1c24]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-14">

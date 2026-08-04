@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 
 import { ApiErrorState } from '@/components/ApiErrorState';
-import { NavBar } from '@/components/NavBar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { CbiPanel } from '@/components/CbiPanel';
 import { MetricCards } from '@/components/MetricCards';
@@ -65,7 +64,6 @@ export default async function MarketPage() {
   if (cards.length === 0) {
     return (
       <div className="min-h-screen bg-[#070810] text-slate-300">
-        <NavBar />
         <ApiErrorState backHref="/suche" backLabel="Zur Kartensuche" />
       </div>
     );

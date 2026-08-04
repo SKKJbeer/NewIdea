@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { CardGrid } from '@/components/CardGrid';
 import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap } from 'lucide-react';
 import { loadMarketReportByWeek, listMarketReportMeta } from '@/lib/market-report-storage';
@@ -41,7 +40,6 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       <header className="border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-14 sm:py-16">

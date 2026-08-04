@@ -8,7 +8,6 @@ import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@
 import { PriceChartLazy } from '@/components/PriceChartLazy';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
-import { NavBar } from '@/components/NavBar';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
@@ -166,8 +165,6 @@ export default async function CardDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
-
-      <NavBar />
 
       {/* DIE KARTE FAERBT DEN RAUM.
           Der Hof nimmt den Energietyp der Karte auf — dieselbe Quelle wie der

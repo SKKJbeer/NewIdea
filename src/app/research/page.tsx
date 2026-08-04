@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { NavBar } from '@/components/NavBar';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { SectionHead } from '@/components/MarketModules';
 import { recentPublishDates } from '@/lib/publish-days';
@@ -67,7 +66,6 @@ export default function ResearchPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-300">
-      <NavBar />
 
       <header className="relative border-b border-[#1c1c24]">
         <AmbientBackdrop mode="research" />

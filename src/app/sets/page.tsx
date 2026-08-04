@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { SetLibrary, type SetEintrag } from '@/components/SetLibrary';
 import { fetchRecentSets } from '@/lib/pokemon-api';
@@ -71,7 +70,6 @@ export default async function SetsPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-300">
-      <NavBar />
 
       {/* Kopf nach dem gemeinsamen Muster: linksbündig, Abschnittsmarke,
           keine Pille, kein Verlauf. Siehe DESIGN.md §2/§4. */}

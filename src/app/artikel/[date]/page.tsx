@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
 import Image from 'next/image';
-import { NavBar } from '@/components/NavBar';
 import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
@@ -155,7 +154,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
       {structuredData && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       )}

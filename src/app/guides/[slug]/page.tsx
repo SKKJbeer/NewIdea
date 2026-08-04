@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { getGuide, GUIDES, type Guide } from '@/lib/guides';
 import { loadGeneratedGuide, listGeneratedGuides } from '@/lib/guide-storage';
 import { ArrowLeft, Clock, Tag, ChevronRight, Lightbulb } from 'lucide-react';
@@ -66,7 +65,6 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
 
       <header className="relative overflow-hidden border-b border-[#1e1e30] bg-gradient-to-b from-[#0f0f1c] to-[#0a0a0f]">

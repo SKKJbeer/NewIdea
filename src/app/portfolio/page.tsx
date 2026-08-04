@@ -4,7 +4,6 @@ import { APP_VERSION } from '@/lib/app-version';
 import { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, Loader2, BarChart3, Search, X, Check, TrendingUp, Coins, Globe, Lock } from 'lucide-react';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
-import { NavBar } from '@/components/NavBar';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { PortfolioChart, type ChartPoint } from '@/components/PortfolioChart';
 import {
@@ -335,7 +334,6 @@ export default function PortfolioPage() {
   if (holdings.length === 0 && !showAdd) {
     return (
       <div className="min-h-screen bg-[#070810] text-slate-200">
-        <NavBar />
         <div className="max-w-2xl mx-auto px-5 pt-5">
           <AccountBar
           signedIn={signedIn}
@@ -355,7 +353,6 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-[#070810] text-slate-200">
-      <NavBar />
 
       {/* ── Hero ── */}
       <div className="relative border-b border-[#1e1e30]">

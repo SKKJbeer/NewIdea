@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { SECTION_LABEL } from '@/lib/ui';
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { dominantAmbient } from '@/lib/collector';
 import { CardGrid } from '@/components/CardGrid';
@@ -95,7 +94,6 @@ export default async function SetDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
       />
-      <NavBar />
 
       <header className="relative border-b border-[#1c1c24]">
         <AmbientBackdrop
