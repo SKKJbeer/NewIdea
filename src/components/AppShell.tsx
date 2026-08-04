@@ -3,6 +3,8 @@ import { Star, Briefcase } from 'lucide-react';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NavBar } from '@/components/NavBar';
 import { SearchBox } from '@/components/SearchBox';
+import { SiteFooter } from '@/components/SiteFooter';
+import { getDataCoverage } from '@/lib/data-coverage';
 
 // DIE ANWENDUNGSHUELLE — Seitenleiste plus Kopfzeile, nach der Vorlage.
 //
@@ -22,13 +24,25 @@ import { SearchBox } from '@/components/SearchBox';
 // Portfolio. Die Anordnung der Vorlage bleibt damit erhalten — Suchfeld
 // links, runde Schaltflaechen rechts.
 
-interface Props {
-  datenstand: string;
-  bestand: { karten: number; sets: number | null; punkte: number } | null;
-  children: React.ReactNode;
-}
+/**
+ * Die Huelle holt ihre eigenen Daten.
+ *
+ * Frueher reichte die Startseite `datenstand` und `bestand` herein — und damit
+ * gab es die Seitenleiste nur dort. Siebzehn Seiten dieselben zwei Werte
+ * durchreichen zu lassen waere siebzehn Gelegenheiten, es zu vergessen. Der
+ * Abruf ist eine einzige Datenbankabfrage und faellt bei einem Fehler
+ * lautlos auf „keine Angabe" zurueck: Eine Seitenleiste ohne Bestandskarte ist
+ * brauchbar, eine Seite ohne Navigation nicht.
+ */
+export async function AppShell({ children }: { children: React.ReactNode }) {
+  const abdeckung = await getDataCoverage().catch(() => null);
+  const bestand = abdeckung
+    ? { karten: abdeckung.cards, sets: abdeckung.sets, punkte: abdeckung.pricePoints }
+    : null;
+  const datenstand = new Date().toLocaleString('de-DE', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
 
-export function AppShell({ datenstand, bestand, children }: Props) {
   return (
     <div className="min-h-screen bg-[#070810] text-slate-300">
       <AppSidebar datenstand={datenstand} bestand={bestand} />
@@ -73,6 +87,7 @@ export function AppShell({ datenstand, bestand, children }: Props) {
         </div>
 
         {children}
+        <SiteFooter />
       </div>
     </div>
   );

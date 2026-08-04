@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { SiteFooter } from "@/components/SiteFooter";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 import { siteUrlOrLocal } from '@/lib/site';
 
@@ -67,8 +67,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#070810]">
-        {children}
-        <SiteFooter />
+        {/* DIE NAVIGATION GEHOERT INS GRUNDGERUEST, NICHT AUF EINE SEITE.
+            Sie stand zuerst nur auf der Startseite — und verschwand damit,
+            sobald jemand einen Reiter oeffnete. Navigation, die beim Navigieren
+            weg ist, ist keine.
+
+            Hier steht sie einmal und gilt fuer alle siebzehn Seiten. Unterhalb
+            von `lg` bleibt es bei der Kopfleiste (`NavBar`, dort `lg:hidden`) —
+            eine 236-px-Leiste neben 390 px Inhalt waere kein Menue, sondern
+            ein Rand. */}
+        <AppShell>{children}</AppShell>
         <Analytics />
       </body>
     </html>

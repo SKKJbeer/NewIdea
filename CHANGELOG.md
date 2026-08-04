@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.5.0] - 4. August 2026 · Navigation ueberall, Abdeckung richtig gerechnet
+
+### Behoben
+- **„Abdeckung 1 %" verglich die falschen Groessen.** Dort stand die Index-Stichprobe (249) gegen den erfassten Bestand (19.690) — zwei INTERNE Zahlen, von denen die kleinere eine bewusste methodische Wahl ist: Der Index rechnet auf einer Stichprobe, nicht auf allem. Beide Zahlen waren richtig, die Aussage war falsch: Es las sich als „dieser Dienst kennt ein Prozent des Marktes". Jetzt steht dort der erfasste Bestand gegen die Gesamtzahl der Karten — die Frage, die jemand tatsaechlich hat, lautet „kennt ihr meine Karten?"
+- **Die Seitenleiste gab es nur auf der Startseite** und verschwand, sobald man einen Reiter oeffnete. Navigation, die beim Navigieren weg ist, ist keine. Sie steht jetzt im Grundgeruest und gilt fuer alle siebzehn Seiten; die Kopfleiste uebernimmt weiterhin unterhalb von 1024 px
+
+### Geaendert
+- **Die Huelle holt ihre Daten selbst.** Vorher reichte die Startseite Datenstand und Bestand herein — siebzehn Seiten dieselben zwei Werte durchreichen zu lassen waeren siebzehn Gelegenheiten, es zu vergessen
+- **Die `lg:hidden`-Regel fuer die Kopfleiste steht in der Kopfleiste**, nicht in jeder Seite
+
+---
+
 ## [5.4.1] - 2. August 2026 · Kein Versprechen auf sprachspezifische Preise
 
 ### Behoben

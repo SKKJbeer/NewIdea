@@ -53,8 +53,12 @@ export function NavBar() {
     return pfad === href || pfad.startsWith(`${href}/`);
   };
 
+  // NUR UNTERHALB VON `lg`. Ab dort uebernimmt die Seitenleiste im
+  // Grundgeruest — beides gleichzeitig waere doppelte Navigation. Die Regel
+  // steht HIER und nicht in siebzehn Seiten: So kann sie nicht auf einer
+  // Seite vergessen werden.
   return (
-    <header className="sticky top-0 z-50 border-b border-[#1c1c24] bg-[#070810]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-[#1c1c24] bg-[#070810]/95 backdrop-blur lg:hidden">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
         {/* Trefferflaeche 44 px hoch. Gemessen war die Wortmarke 25 px — als
             Verweis auf die Startseite ist sie damit auf einem Telefon schwerer

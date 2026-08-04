@@ -3,7 +3,6 @@ import { after } from 'next/server';
 import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 
-import { AppShell } from '@/components/AppShell';
 import { ApiErrorState } from '@/components/ApiErrorState';
 import { NavBar } from '@/components/NavBar';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
@@ -114,14 +113,7 @@ export default async function MarketPage() {
     )[0] ?? null;
 
   return (
-    <AppShell
-      datenstand={datenstand}
-      bestand={
-        abdeckung
-          ? { karten: abdeckung.cards, sets: abdeckung.sets, punkte: abdeckung.pricePoints }
-          : null
-      }
-    >
+    <>
       {/* ══ HERO ═══════════════════════════════════════════════════════════
           Der Hero ist kein Abschnitt, sondern die Identitaet des Produkts.
           Er fuellt fast den ersten Bildschirm (92 vh) — nicht, weil Platz
@@ -313,6 +305,6 @@ export default async function MarketPage() {
         </div>
       </main>
 
-    </AppShell>
+    </>
   );
 }

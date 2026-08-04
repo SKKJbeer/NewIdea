@@ -80,11 +80,20 @@ export function MetricCards({
   abdeckung: DataCoverage | null;
   cbi: PmiResult;
 }) {
-  // Abdeckung: Anteil der Stichprobe am erfassten Bestand. Ohne Bestandszahl
-  // gibt es keinen Anteil — dann steht dort ein Strich, kein geschaetzter Wert.
+  // ABDECKUNG = WIE VIEL DES MARKTES WIR KENNEN.
+  //
+  // Vorher stand hier `cbi.cardCount / abdeckung.cards` — die Index-Stichprobe
+  // gegen den erfassten Bestand. Auf der Seite ergab das „1 %, 249 von 19.690",
+  // und das las sich als „dieser Dienst kennt ein Prozent des Marktes". Beide
+  // Zahlen waren richtig, die Aussage war falsch: Verglichen wurden zwei
+  // INTERNE Groessen, von denen die kleinere eine bewusste methodische Wahl
+  // ist — der Index rechnet auf einer Stichprobe, nicht auf allem.
+  //
+  // Die Frage, die jemand tatsaechlich hat, lautet: Kennt ihr meine Karten?
+  // Darauf antwortet der erfasste Bestand gegen die Gesamtzahl.
   const abdeckungPct =
-    abdeckung && abdeckung.cards > 0
-      ? Math.min(Math.round((cbi.cardCount / abdeckung.cards) * 100), 100)
+    abdeckung && abdeckung.totalCards > 0
+      ? Math.min(Math.round((abdeckung.cards / abdeckung.totalCards) * 100), 100)
       : null;
 
   return (
@@ -161,7 +170,7 @@ export function MetricCards({
         label="Abdeckung"
         wert={abdeckungPct !== null ? `${abdeckungPct} %` : '—'}
         unter={
-          abdeckungPct !== null ? 'des erfassten Bestands ausgewertet' : 'Bestand noch nicht ermittelt'
+          abdeckungPct !== null ? 'aller Pokémon-Karten mit Preis erfasst' : 'Bestand noch nicht ermittelt'
         }
       >
         {abdeckungPct !== null && (
@@ -179,10 +188,10 @@ export function MetricCards({
               />
             </svg>
             <span className="text-[11px] leading-snug text-slate-500">
-              {cbi.cardCount.toLocaleString('de-DE')} von{' '}
-              {abdeckung!.cards.toLocaleString('de-DE')}
+              {abdeckung!.cards.toLocaleString('de-DE')} von{' '}
+              {abdeckung!.totalCards.toLocaleString('de-DE')}
               <br />
-              in der Auswertung
+              Karten erfasst
             </span>
           </div>
         )}

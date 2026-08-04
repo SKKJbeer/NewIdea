@@ -22,6 +22,20 @@ export interface DataCoverage {
   /** Karten, die die Erfassung abdeckt. */
   cards: number;
   /**
+   * Karten, die es in der Datenbank überhaupt gibt.
+   *
+   * OHNE DIESE ZAHL LÄSST SICH ABDECKUNG NICHT AUSDRÜCKEN. Vorher stand auf
+   * der Startseite „1 % — 249 von 19.690 in der Auswertung": Das verglich die
+   * Index-Stichprobe mit dem erfassten Bestand, also zwei INTERNE Größen. Für
+   * jemanden, der die Seite zum ersten Mal sieht, las es sich als „dieser
+   * Dienst kennt ein Prozent des Marktes" — das Gegenteil der Wahrheit.
+   *
+   * Die ehrliche Abdeckung ist `cards` gegen `totalCards`. `0`, solange kein
+   * Durchlauf die Gesamtzahl gemeldet hat — dann entfällt die Angabe, statt
+   * geschätzt zu werden.
+   */
+  totalCards: number;
+  /**
    * Sets in der Kartendatenbank — `null`, wenn die Zahl gerade nicht
    * ermittelbar war.
    *
@@ -66,6 +80,7 @@ export async function getDataCoverage(): Promise<DataCoverage | null> {
 
   return {
     cards,
+    totalCards: stand?.totalCards ?? 0,
     sets: sets && sets > 0 ? sets : null,
     pricePoints: punkte,
     lastSweep: stand?.runDate ?? null,

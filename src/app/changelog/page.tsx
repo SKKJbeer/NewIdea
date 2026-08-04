@@ -11,10 +11,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.5.0',
+    date: '4. August 2026',
+    label: 'Navigation ueberall, Abdeckung richtig gerechnet',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„Abdeckung 1 %" verglich Index-Stichprobe gegen erfassten Bestand — zwei interne Zahlen. Jetzt: erfasste Karten gegen alle Karten' },
+      { type: 'fixed', text: 'Die Seitenleiste gab es nur auf der Startseite und verschwand beim Navigieren — sie steht jetzt im Grundgeruest' },
+      { type: 'changed', text: 'Die Huelle holt Datenstand und Bestand selbst, statt sie von jeder Seite durchreichen zu lassen' },
+    ],
+  },
+  {
     version: '5.4.1',
     date: '2. August 2026',
     label: 'Kein Versprechen auf sprachspezifische Preise',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Sprachwahl versprach einen Cardmarket-Preis je Sprache — Cardmarket vergibt derzeit keine API-Zugaenge, die Zusage konnte niemand einloesen' },
       { type: 'changed', text: 'Beide Stellen nennen jetzt den Grund statt nur den Zustand; die Sprachwahl selbst bleibt' },
