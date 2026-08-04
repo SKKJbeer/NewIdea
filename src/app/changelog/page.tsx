@@ -11,10 +11,27 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.6.0',
+    date: '4. August 2026',
+    label: 'Suche: sauber dargestellt und spuerbar schneller',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Das Vorschlagsfeld war 1015 Pixel hoch (16 Treffer, kein Deckel) und lief unten aus dem Bild — jetzt hoechstens acht Zeilen mit eigenem Rollbereich' },
+      { type: 'fixed', text: 'Das Suchfeld stand bei 24 Pixeln Innenabstand, der Seiteninhalt bei 64 — beide nutzen jetzt dieselbe Staffel, Feld und Ueberschrift beginnen an derselben Kante' },
+      { type: 'fixed', text: 'Feldbreite von 460 auf 640 — 460 in einer 1300 Pixel breiten Flaeche lasen sich als zwei Inseln mit Leere dazwischen' },
+      { type: 'fixed', text: 'Das eingebaute Leeren-Kreuz von type="search" sah in jedem Browser anders aus — ersetzt durch ein eigenes' },
+      { type: 'fixed', text: 'Eine langsame fruehere Abfrage konnte eine neuere ueberschreiben — laufende Abfragen werden jetzt abgebrochen' },
+      { type: 'new', text: 'Tastaturbedienung: Pfeiltasten durch die Vorschlaege, Eingabetaste oeffnet die ausgewaehlte Karte' },
+      { type: 'new', text: 'Verlaengerungen eines bekannten Begriffs („char" → „chari") kommen ohne Netzweg aus der bereits geholten Liste' },
+      { type: 'changed', text: 'Wartezeit nach dem letzten Anschlag von 320 auf 140 ms' },
+      { type: 'changed', text: 'Der Browser-Speicher der Suchtreffer hat eine Frist von fuenf Minuten — in der Liste stehen Preise' },
+    ],
+  },
+  {
     version: '5.5.0',
     date: '4. August 2026',
     label: 'Navigation ueberall, Abdeckung richtig gerechnet',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '„Abdeckung 1 %" verglich Index-Stichprobe gegen erfassten Bestand — zwei interne Zahlen. Jetzt: erfasste Karten gegen alle Karten' },
       { type: 'fixed', text: 'Die Seitenleiste gab es nur auf der Startseite und verschwand beim Navigieren — sie steht jetzt im Grundgeruest' },

@@ -7,6 +7,27 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.6.0] - 4. August 2026 · Suche: sauber dargestellt und spuerbar schneller
+
+### Behoben
+- **Das Vorschlagsfeld war 1015 Pixel hoch.** Gemessen auf 1536×900: 16 Treffer, jede Zeile gerendert, kein Deckel — die Liste lief unten aus dem Bild, und was darunter stand, sah niemand. Jetzt hoechstens acht Zeilen, gedeckelt auf `min(58vh, 22rem)` mit eigenem Rollbereich; die Trefferzahl darueber hinaus wird als „N weitere" benannt statt verschwiegen
+- **Das Suchfeld hing sichtbar links neben allem anderen.** Die Kopfleiste stand bei 24 Pixeln Innenabstand, der Seiteninhalt darunter auf einem breiten Bildschirm bei 64. Beide nutzen jetzt dieselbe Staffel — Suchfeld und Ueberschrift beginnen nachgemessen bei exakt derselben Kante
+- **460 Pixel Feldbreite in einer 1300 Pixel breiten Flaeche** liessen die Leiste als zwei Inseln mit Leere dazwischen lesen. Jetzt 640 — dieselbe Breite wie der Text der Startseite
+- **Das eingebaute Leeren-Kreuz von `type="search"`** zeichnet Safari und Chrome als grauen Kreis, Firefox gar nicht — auf dem Mac sass es als fremder heller Fleck neben der violetten Schaltflaeche. Ersetzt durch ein eigenes, das ueberall gleich aussieht
+- **Eine langsame frueher gestartete Abfrage konnte eine neuere ueberschreiben** — man tippt „charizard" und sieht die Treffer zu „chari". Laufende Abfragen werden jetzt abgebrochen, und eine Antwort, die den Abbruch ueberholt, wird verworfen
+
+### Neu
+- **Tastaturbedienung.** Pfeiltasten fuehren durch die Vorschlaege, die Eingabetaste oeffnet die ausgewaehlte Karte, danach faellt die Auswahl zurueck auf das Feld. Die ausgewaehlte Zeile bekommt einen violetten Balken — der reine Zeiger-Ton reicht nicht, wenn es keinen Zeiger gibt. `role="combobox"`, `aria-activedescendant` und `aria-selected` melden dasselbe an Hilfstechnik
+- **Verlaengerungen eines bekannten Begriffs kommen ohne Netzweg.** Wer „char" getippt hat und „chari" ergaenzt, bekommt die Verfeinerung aus der bereits geholten Liste — gemessen 8 Zeilen sofort statt nach einer Netzrunde. Der echte Abruf laeuft parallel weiter; die Sofort-Antwort kann nur zu wenig zeigen, nie etwas Falsches
+- **Die Vorschlagsroute deckelt, was sie herausgibt** (5 bis 20). Ohne Deckel waere `?n=5000` ein Weg, ueber sie die halbe Datenbank abzuziehen
+
+### Geaendert
+- **Wartezeit nach dem letzten Anschlag von 320 auf 140 ms.** Die ersten Vorschlaege standen gemessen nach 1876 ms, ein knappes Fuenftel davon war reines Warten. 140 ms liegen unter der Wahrnehmungsschwelle und buendeln trotzdem die Anschlaege innerhalb eines Wortes
+- **Der Browser-Speicher der Suchtreffer hat eine Frist von fuenf Minuten.** In der Liste stehen Preise; der serverseitige Speicher ist bewusst an die Kartenseite gekoppelt, damit beide Seiten derselben Karte nie widersprechen. Ein unbefristeter Speicher im Browser haette genau diesen Widerspruch wieder eingefuehrt
+- **Das Suchfeld bringt keine eigene Maximalbreite mehr mit** — sie stand im Widerspruch zu jedem Aufrufer, der eine andere vorgibt
+
+---
+
 ## [5.5.0] - 4. August 2026 · Navigation ueberall, Abdeckung richtig gerechnet
 
 ### Behoben

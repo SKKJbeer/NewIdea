@@ -62,8 +62,18 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <div className="overflow-x-clip lg:pl-[236px]">
         {/* OBERE LEISTE. In der Vorlage schwebt sie ueber dem Hintergrund,
             ohne eigene Flaeche — deshalb kein Balken, nur die Bedienelemente. */}
-        <div className="relative z-30 hidden items-center gap-3 px-6 pt-5 lg:flex">
-          <div className="max-w-[460px] flex-1">
+        {/* WAAGERECHTE AUSRICHTUNG: dieselben Innenabstaende wie der
+            Seiteninhalt darunter (`px-6 sm:px-10 lg:px-14 xl:px-16`). Vorher
+            stand die Leiste bei festen 24 Pixeln, der Inhalt auf einem breiten
+            Bildschirm aber bei 56 bis 64 — das Suchfeld hing dadurch sichtbar
+            links neben allem anderen.
+
+            BREITE: 460 Pixel in einer 1300 Pixel breiten Flaeche lassen das
+            Feld gestrandet wirken. 640 entsprechen der Textbreite der
+            Startseite; die Leiste liest sich damit als eine Zeile, nicht als
+            zwei Inseln mit Leere dazwischen. */}
+        <div className="relative z-30 hidden items-center gap-3 px-6 pt-5 sm:px-10 lg:flex lg:px-14 xl:px-16">
+          <div className="max-w-[640px] flex-1">
             <SearchBox placeholder="Suche Karten, Sets, …" searchBtn="Suchen" />
           </div>
           <div className="ml-auto flex items-center gap-2">

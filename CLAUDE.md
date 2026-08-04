@@ -675,7 +675,7 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 | Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`) |
 | Preis-Historie | NUR echte Daten: Supabase-Tages-Snapshots (record-on-view + Daily-Cron) gemerged mit echten Cardmarket-Ankern (Ø 30/7/1 + Trend). KEINE Interpolation, KEINE synthetische Kurve. Zu wenig Punkte → kein Chart, nur aktueller Preis (v2.19.1) |
 | Übersetzungen | `src/lib/i18n.ts` + `getLang()` aus Cookie (`next/headers`) |
-| Autocomplete | `/api/search/suggestions?q=` — debounce 320 ms im SearchBox-Client |
+| Autocomplete | `/api/search/suggestions?q=&n=` — 140 ms Wartezeit im SearchBox-Client, laufende Abfragen per `AbortController` abgebrochen, höchstens 8 sichtbare Zeilen, Browser-Speicher mit 5-Minuten-Frist (Preise!), Verlängerungen bekannter Begriffe ohne Netzweg. Abgesichert durch `suche-oberflaeche.test.ts` |
 | SEO | JSON-LD auf Karten-Detailseiten (Product+Offer), ItemList auf Suchergebnissen |
 | Supabase | Graceful: App läuft auch ohne Konfiguration (client gibt `null` zurück) |
 | Boosterpack-Bild | Überall wo Karten erscheinen → `<BoosterPackImage>` Pflicht (siehe UI-Design-Regeln) |

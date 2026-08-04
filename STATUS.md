@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.5.0` · **Stand:** 2. August 2026 · **Branch:** `main`
+**Version:** `v5.6.0` · **Stand:** 4. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,12 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.6.0 | Suche: Vorschlagsfeld gedeckelt (war 1015 px hoch), Feld an den Seiteninhalt ausgerichtet und auf 640 px verbreitert, Wartezeit 320 → 140 ms, laufende Abfragen werden abgebrochen, Tastaturbedienung, Verlaengerungen bekannter Begriffe ohne Netzweg |
+| v5.5.0 | Seitenleiste auf allen siebzehn Seiten statt nur auf der Startseite; „Abdeckung 1 %" verglich zwei interne Zahlen — jetzt erfasste Karten gegen alle Karten |
+| v5.4.1 | Sprachwahl im Portfolio versprach Cardmarket-Preise je Sprache — Cardmarket vergibt derzeit keine API-Zugaenge; jetzt steht dort der Grund |
+| v5.4.0 | Zubehoer im Fliesstext (Sleeves, Toploader, Sammelalben, Boxen) wird zu Kauflinks — auf der Render-Ebene, damit auch bestehende Beitraege erfasst sind; hoechstens vier je Beitrag |
+| v5.3.0 | Inhalte wiederholen sich nicht mehr: Sperrfrist ueber die letzten sechs Veroeffentlichungen, Themenwahl deterministisch aus dem Datum statt zufaellig |
+| v5.2.1 | Monitoring vollstaendig aufgeraeumt: Ergebnisse statt Konfiguration, keine dreifach erzaehlten Zustaende |
 | v5.2.0 | Portfolio zeigt immer einen Stand: Rueckfall auf den eigenen Kartenindex statt leerer Positionen |
 | v5.1.0 | Preiserfassung lief taeglich nur bis 27 % — laengere Runden, nachgeprueft Uebergabe, Fortschritt im Monitoring sichtbar; dreifach erzaehlte „Features" entfernt |
 | v5.0.0 | Hero fuellt den ersten Bildschirm (92 vh), Hintergrund in sieben Ebenen, Drache nur als Kontur bei 3 %, Kennzahlen mit eigener Persoenlichkeit, mehr Weissraum ueberall |

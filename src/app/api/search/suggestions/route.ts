@@ -18,13 +18,26 @@ import { NextResponse } from 'next/server';
 // Beides bleibt: Der Datenspeicher spart den Weg zur Quelle, die Kopfzeile
 // spart zusätzlich den Weg zum Server.
 
+// Der Client bestimmt, wieviele er braucht — aber nur innerhalb einer Grenze.
+// Ohne Deckel wäre `?n=5000` ein Weg, über die Vorschlagsroute die halbe
+// Datenbank abzuziehen; ohne Untergrenze käme eine leere Liste zurück, die wie
+// „keine Treffer" aussieht.
+const N_MIN = 5;
+const N_MAX = 20;
+
+function grenze(roh: string | null): number {
+  const n = Number.parseInt(roh ?? '', 10);
+  if (!Number.isFinite(n)) return N_MAX;
+  return Math.min(Math.max(n, N_MIN), N_MAX);
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get('q') || '').trim();
   if (q.length < 2) return NextResponse.json([]);
 
   try {
-    const cards = await cachedSearchCards(q, 20);
+    const cards = await cachedSearchCards(q, grenze(searchParams.get('n')));
     const suggestions = cards.map((c) => ({
       id: c.id,
       name: c.name,
