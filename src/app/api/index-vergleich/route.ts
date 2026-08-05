@@ -26,6 +26,7 @@ const SEITE = 1000;
 const MAX_SEITEN = 30;
 
 interface IndexZeile {
+  id: string;
   set_code: string;
   price: number;
   trend: number | null;
@@ -42,7 +43,7 @@ async function ganzenIndexLesen(): Promise<{ zeilen: IndexZeile[]; vollstaendig:
     const von = seite * SEITE;
     const { data, error } = await sb
       .from('cards_index')
-      .select('set_code,price,trend,real_data')
+      .select('id,set_code,price,trend,real_data')
       .order('price', { ascending: false })
       .range(von, von + SEITE - 1);
     if (error) throw new Error(error.message);
@@ -189,6 +190,36 @@ export async function GET(request: Request) {
 
     const gewichtSumme = gemessen.reduce((s, k) => s + (k.prices.market || 1), 0);
 
+    // DER ENTSCHEIDENDE TEST: DIESELBEN KARTEN AUF BEIDEN SEITEN.
+    //
+    // Stichprobe und Gesamtbestand unterscheiden sich um rund 29 Prozentpunkte.
+    // Dafür gibt es genau zwei mögliche Erklärungen, und sie führen zu
+    // gegensätzlichen Schlüssen:
+    //
+    //   a) VERSCHIEDENE KARTEN. Der Bestand enthält alte und selten gehandelte
+    //      Karten, bei denen der Cardmarket-Trendpreis strukturell über dem
+    //      30-Tage-Schnitt liegt. Dann ist die Zahl echt, misst aber etwas
+    //      anderes als „der Markt".
+    //   b) VERSCHIEDENE WERTE FÜR DIESELBE KARTE. Dann ist der gespeicherte
+    //      Trend veraltet oder anders gerechnet — und dann darf er überhaupt
+    //      nichts tragen, egal mit welcher Formel.
+    //
+    // Nur der direkte Abgleich derselben Karten-IDs unterscheidet die beiden.
+    const ausIndexNachId = new Map<string, number>();
+    for (const z of zeilen as unknown as (IndexZeile & { id?: string })[]) {
+      if (z.id && z.trend !== null) ausIndexNachId.set(z.id, Number(z.trend));
+    }
+    const paare: { id: string; live: number; index: number }[] = [];
+    for (const k of stichprobe) {
+      const idx = ausIndexNachId.get(k.id);
+      if (idx === undefined || typeof k.trendPercent !== 'number') continue;
+      paare.push({ id: k.id, live: k.trendPercent, index: idx });
+    }
+    const abweichungen = paare.map((p) => p.index - p.live).sort((a, b) => a - b);
+    const mittel = (xs: number[]) => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : null);
+    // toFixed erlaubt: JSON-Diagnose, kein Seitentext.
+    const rr = (x: number | null) => (x === null ? null : Number(x.toFixed(2)));
+
     return NextResponse.json({
       stand: new Date().toISOString(),
       verteilung: {
@@ -203,6 +234,16 @@ export async function GET(request: Request) {
         ueber100Prozent: trends.filter((t) => t > 100).length,
         ueber1000Prozent: trends.filter((t) => t > 1000).length,
         unterMinus50: trends.filter((t) => t < -50).length,
+      },
+      dieselbenKarten: {
+        gefunden: paare.length,
+        mittelLive: rr(mittel(paare.map((p) => p.live))),
+        mittelIndex: rr(mittel(paare.map((p) => p.index))),
+        medianAbweichung: abweichungen.length
+          ? rr(abweichungen[Math.floor((abweichungen.length - 1) * 0.5)])
+          : null,
+        mittlereAbweichung: rr(mittel(abweichungen)),
+        identisch: paare.filter((p) => Math.abs(p.index - p.live) < 0.01).length,
       },
       groessteBeitraege: beitraege.map((b) => ({
         ...b,

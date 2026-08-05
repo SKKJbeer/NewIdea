@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.9.3] - 5. August 2026 · Derselbe Kartenbestand auf beiden Seiten
+
+### Neu
+- Der Index-Vergleich stellt jetzt **dieselben Karten-IDs** gegenueber: den Live-Trend aus der Kartendatenbank gegen den im Index gespeicherten Wert derselben Karte
+
+### Warum das der entscheidende Test ist
+- Stichprobe und Gesamtbestand unterscheiden sich um rund 29 Prozentpunkte. Dafuer gibt es genau zwei moegliche Erklaerungen, und sie fuehren zu gegensaetzlichen Schluessen: **verschiedene Karten** (dann ist die Zahl echt, misst aber etwas anderes als „der Markt") oder **verschiedene Werte fuer dieselbe Karte** (dann ist der gespeicherte Trend veraltet oder anders gerechnet — und darf ueberhaupt nichts tragen, egal mit welcher Formel)
+- Trimmen und Deckeln hatten die Frage nicht beantwortet: +28,69 % roh, +26,15 % gestutzt, +23,71 % gedeckelt. Es sind also keine zehn Ausreisser, sondern die ganze Verteilung
+
+---
+
 ## [5.9.2] - 5. August 2026 · Drei belastbare Alternativen zum heutigen Indexwert
 
 ### Neu

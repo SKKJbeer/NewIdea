@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.9.3',
+    date: '5. August 2026',
+    label: 'Derselbe Kartenbestand auf beiden Seiten',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Live-Trend gegen gespeicherten Index-Trend fuer dieselben Karten-IDs — unterscheidet „andere Karten" von „andere Werte fuer dieselbe Karte"' },
+      { type: 'changed', text: 'Trimmen und Deckeln beantworteten die Frage nicht: +28,69 % roh, +26,15 % gestutzt, +23,71 % gedeckelt — keine zehn Ausreisser, sondern die ganze Verteilung' },
+    ],
+  },
+  {
     version: '5.9.2',
     date: '5. August 2026',
     label: 'Drei belastbare Alternativen zum heutigen Indexwert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Median, gestutzte Raender (P1/P99) und Gewichtsdeckel (max. 0,5 % je Karte) — fuer Stichprobe und Gesamtbestand' },
       { type: 'changed', text: 'Anlass: zehn Karten von 19.063 tragen rund 12 der 28,7 Prozentpunkte; der Median aller Trends liegt bei 0 %' },

@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.9.2` · **Stand:** 5. August 2026 · **Branch:** `main`
+**Version:** `v5.9.3` · **Stand:** 5. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.9.3 | Index-Vergleich stellt dieselben Karten-IDs gegenueber (live vs. gespeichert) — der entscheidende Test fuer die 29-Prozentpunkte-Luecke |
 | v5.9.2 | Drei ausreisserfeste Index-Varianten zum Vergleich (Median, gestutzt, Gewichtsdeckel) — zehn Karten trugen 12 von 28,7 Prozentpunkten |
 | v5.9.1 | Index-Vergleich zeigt auch Trend-Verteilung und groesste Einzelbeitraege — Anlass: +28,69 % Gesamtbestand gegen −0,19 % Stichprobe |
 | v5.9.0 | Passwortgeschuetzter Index-Vergleich: CBI und Marktbreite auf Stichprobe vs. Gesamtbestand, je Preisschwelle — Entscheidungsgrundlage, keine Aenderung am Angezeigten |
