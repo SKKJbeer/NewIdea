@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.2.1] - 5. August 2026 · Die Preiserfassung stand drei Tage still
+
+### Behoben
+- **`price_sweep_state` stand seit dem 02.08. still** — 4.369 Minuten, waehrend DERSELBE Cron am 04.08. um 08:19 UTC einen Guide erzeugt hat. Der Cron lief also; nur der Anstoss der Erfassung kam nie an. Der Kartenindex war dadurch drei Tage alt — und er traegt seit v6.0.0 den Marktindex
+- **Ursache 1: Dem Tages-Cron fehlte jede Laufzeitgrenze.** Die Route, die er aufruft, hat laengst 300 Sekunden; die Stelle, die sie aufruft, hatte gar nichts
+- **Ursache 2: Der Anstoss stand hinter zwei Netzabrufen** ueber eine Quelle mit dokumentierten Aussetzern (Stolperstelle 28). Reisst die die Zeit auf, wird die Funktion beendet, bevor die Zeile erreicht ist — und dann wird an dem Tag gar nichts erfasst. Der Anstoss ist jetzt die ERSTE Handlung des Crons
+- **Ein echter Abriss wird gemeldet** statt als Normalfall verbucht. Bisher landete jeder Fehlschlag in derselben Notiz wie das gewollte kurze Zeitlimit
+
+### Anmerkung
+- Manuell angestossen lief der Durchlauf sofort an (Seite 3 von 82 nach 33 Sekunden). Am Mechanismus lag es nicht — nur daran, dass ihn niemand erreicht hat
+
+---
+
 ## [6.2.0] - 5. August 2026 · Die Startseite laedt nicht mehr die halbe Site vorab
 
 ### Behoben

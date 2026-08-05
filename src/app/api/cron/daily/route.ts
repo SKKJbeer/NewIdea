@@ -15,6 +15,18 @@ import { warmSearchCache } from '@/lib/search-cache';
 // damit über die Woche verteilt frischer Content erscheint.
 const GUIDE_DAYS = new Set([2, 5]);
 
+// LAUFZEITGRENZE — sie fehlte hier komplett, und das war der Grund fuer einen
+// dreitaegigen Stillstand der Preiserfassung.
+//
+// BEFUND am 05.08.2026: `price_sweep_state` stand seit dem 02.08. still
+// (4.369 Minuten), waehrend DERSELBE Cron am 04.08. um 08:19 UTC einen Guide
+// erzeugt hat. Der Cron LIEF also — nur der Anstoss der Erfassung kam nie an.
+//
+// Ohne diesen Wert gilt die Standard-Laufzeit der Plattform. Die Route, die
+// hier aufgerufen wird, hat laengst 300 Sekunden; die Stelle, die sie aufruft,
+// hatte gar nichts.
+export const maxDuration = 300;
+
 // Called daily at 08:00 to pre-warm today's article so first visitors don't wait
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -25,6 +37,42 @@ export async function GET(request: Request) {
   const today = new Date().toISOString().split('T')[0];
 
   const results: Record<string, unknown> = { date: today };
+
+  // FLÄCHENDECKENDE ERFASSUNG ANSTOSSEN — ALS ERSTES.
+  //
+  // Sie stand frueher HINTER dem Schnappschuss-Block. Das war die zweite
+  // Ursache des Stillstands: Zwei Netzabrufe ueber eine Quelle mit
+  // dokumentierten Aussetzern (Stolperstelle 28) koennen die Laufzeit
+  // aufbrauchen, bevor diese Zeile ueberhaupt erreicht ist — und dann wird an
+  // dem Tag gar nichts erfasst.
+  //
+  // Der Anstoss kostet fast nichts: ein Abruf, dessen Antwort nicht abgewartet
+  // wird. Er gehoert deshalb an den Anfang. Die Route reicht sich danach selbst
+  // weiter, bis der Tag fertig ist.
+  //
+  // Eigene Adresse statt NEXT_PUBLIC_SITE_URL — dort steht die kuenftige
+  // Domain, die noch nicht verbunden ist (siehe price-sweep/route.ts).
+  if (isSupabaseConfigured()) {
+    const basis = new URL(request.url).origin;
+    try {
+      const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        signal: AbortSignal.timeout(3000),
+      });
+      results.priceSweepStarted = antwort.ok;
+      if (!antwort.ok) results.priceSweepError = `HTTP ${antwort.status}`;
+    } catch (err) {
+      // Das eigene kurze Zeitlimit ist der Normalfall: Die Anfrage ist raus,
+      // der Durchlauf arbeitet. Alles andere ist ein echter Abriss und muss in
+      // der Antwort stehen — sonst sieht ein Stillstand aus wie ein Erfolg.
+      const abgebrochen = err instanceof Error && err.name === 'TimeoutError';
+      results.priceSweepStarted = abgebrochen ? 'angestoßen (Antwort nicht abgewartet)' : false;
+      if (!abgebrochen) {
+        results.priceSweepError = err instanceof Error ? err.message : 'unbekannt';
+        console.error('Preis-Durchlauf: Anstoß fehlgeschlagen:', err);
+      }
+    }
+  }
 
   // Echte Tagespreise erfassen, damit über die Zeit ein echter Verlauf entsteht.
   if (isSupabaseConfigured()) {
@@ -93,29 +141,6 @@ export async function GET(request: Request) {
       results.suchVorwaermungFehler = err instanceof Error ? err.message : 'unbekannt';
     }
 
-    // FLÄCHENDECKENDE ERFASSUNG ANSTOSSEN.
-    //
-    // Die Zeilen darüber decken rund 80 Karten ab — die wichtigsten, sofort.
-    // Sie bleiben als schnelle Absicherung stehen. Den Rest der ~20.500 Karten
-    // übernimmt der Durchlauf, der sich selbst weiterreicht, bis der Tag fertig
-    // ist. Er läuft absichtlich NEBENHER: Ein Fehler dort darf den Artikel
-    // dieses Crons nicht mitreißen.
-    // Eigene Adresse statt NEXT_PUBLIC_SITE_URL — dort steht die künftige
-    // Domain, die noch nicht verbunden ist (siehe price-sweep/route.ts).
-    const basis = new URL(request.url).origin;
-    try {
-      const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
-        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-        signal: AbortSignal.timeout(3000),
-      });
-      results.priceSweepStarted = antwort.ok;
-      if (!antwort.ok) results.priceSweepError = `HTTP ${antwort.status}`;
-    } catch (err) {
-      // Der Anstoß kann in ein Zeitlimit laufen, während der Durchlauf längst
-      // arbeitet — deshalb ist das eine Notiz, kein Fehlschlag.
-      results.priceSweepStarted = 'angestoßen (Antwort nicht abgewartet)';
-      console.warn('Preis-Durchlauf: Anstoß ohne Bestätigung:', err);
-    }
   } else {
     results.priceSnapshots = 'skipped (Supabase nicht konfiguriert)';
   }

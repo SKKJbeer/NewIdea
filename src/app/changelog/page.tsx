@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.2.1',
+    date: '5. August 2026',
+    label: 'Die Preiserfassung stand drei Tage still',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Erfassung stand seit dem 02.08. still, waehrend derselbe Cron am 04.08. einen Guide erzeugte — der Anstoss kam nie an' },
+      { type: 'fixed', text: 'Dem Tages-Cron fehlte jede Laufzeitgrenze; die Route, die er aufruft, hat 300 Sekunden' },
+      { type: 'changed', text: 'Der Anstoss ist jetzt die erste Handlung des Crons statt hinter zwei Netzabrufen zu stehen' },
+    ],
+  },
+  {
     version: '6.2.0',
     date: '5. August 2026',
     label: 'Die Startseite laedt nicht mehr die halbe Site vorab',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '37 Vorabrufe bei einem Aufruf der Startseite — jede Route vier- bis fuenfmal, auf Vercel je ein echter Serveraufruf. Jetzt 0' },
       { type: 'fixed', text: 'Anfragen nach dem Laden von 49 auf 1, Hover-Reaktion von 65 ms auf 9 bis 30 ms' },

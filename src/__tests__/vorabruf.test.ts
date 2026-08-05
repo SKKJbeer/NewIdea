@@ -55,3 +55,39 @@ describe('Dauernavigation ruft keine Seiten vorab ab', () => {
     }
   });
 });
+
+describe('Der Tages-Cron stoesst die Erfassung zuverlaessig an', () => {
+  // BEFUND am 05.08.2026: `price_sweep_state` stand seit dem 02.08. still
+  // (4.369 Minuten Stillstand), waehrend DERSELBE Cron am 04.08. um 08:19 UTC
+  // einen Guide erzeugt hat. Der Cron lief also — nur der Anstoss kam nie an.
+  //
+  // Zwei Ursachen, beide hier festgehalten:
+  //   1. Dem Cron fehlte jede Laufzeitgrenze, waehrend die Route, die er
+  //      aufruft, laengst 300 Sekunden hatte.
+  //   2. Der Anstoss stand HINTER zwei Netzabrufen ueber eine Quelle mit
+  //      dokumentierten Aussetzern. Reisst die die Zeit auf, wird die Funktion
+  //      beendet, bevor die Zeile erreicht ist.
+  const cron = lies('src/app/api/cron/daily/route.ts');
+
+  it('hat eine eigene Laufzeitgrenze', () => {
+    expect(cron).toMatch(/export const maxDuration = \d+/);
+  });
+
+  it('gibt sich mindestens so viel Zeit wie die Route, die er aufruft', () => {
+    const sweep = lies('src/app/api/cron/price-sweep/route.ts');
+    const zahl = (s: string) => Number(/export const maxDuration = (\d+)/.exec(s)?.[1] ?? 0);
+    expect(zahl(cron)).toBeGreaterThanOrEqual(zahl(sweep));
+  });
+
+  it('stoesst die Erfassung VOR den langsamen Netzabrufen an', () => {
+    const anstoss = cron.indexOf('/api/cron/price-sweep');
+    const schnappschuesse = cron.indexOf('fetchTopValueCards(');
+    expect(anstoss).toBeGreaterThan(0);
+    expect(anstoss).toBeLessThan(schnappschuesse);
+  });
+
+  it('meldet einen echten Abriss, statt ihn als Normalfall zu verbuchen', () => {
+    expect(cron).toContain("err.name === 'TimeoutError'");
+    expect(cron).toContain('results.priceSweepError');
+  });
+});
