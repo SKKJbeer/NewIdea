@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import {
   splitMovers,
   marketBreadth,
@@ -352,5 +354,64 @@ describe('validateMarketData', () => {
   it('meldet den Anteil verwertbarer Karten', () => {
     const r = validateMarketData([card('a', 5), card('b', 5, 0)]);
     expect(r.usablePct).toBe(50);
+  });
+});
+
+describe('Index-Zeilen überleben die Qualitätsprüfung', () => {
+  // BEFUND, LIVE SICHTBAR: Nach der Umstellung auf den Gesamtbestand stand auf
+  // der Startseite „Keine Messung" und ein Gedankenstrich statt einer Zahl.
+  //
+  // URSACHE: Die Zeilen aus dem Kartenindex trugen weder `id` noch `imageUrl`
+  // — sie waren ja nur fuer Kennzahlen gedacht. `validateMarketData` verwirft
+  // aber Zeilen ohne Bild UND behandelt jede weitere Zeile mit derselben ID als
+  // Dublette. Von 19.690 Karten blieb damit genau EINE uebrig, und eine Karte
+  // reicht nicht fuer eine Aussage.
+  //
+  // Die Lehre ist allgemeiner als der Fehler: Wer Daten fuer eine Kennzahl
+  // erzeugt, muss sie durch DIESELBE Pruefung schicken, die sie spaeter
+  // durchlaufen — sonst prueft man etwas anderes, als man ausliefert.
+  function indexZeile(i: number, trend: number, preis = 5) {
+    return {
+      id: `idx-${i}`,
+      name: '',
+      set: '',
+      setCode: 'sv1',
+      rarity: '',
+      imageUrl: 'https://images.pokemontcg.io/sv1/1.png',
+      prices: { market: preis },
+      trendPercent: trend,
+      realData: true,
+    } as PokemonCard;
+  }
+
+  it('kommen vollzaehlig durch die Pruefung', () => {
+    const zeilen = Array.from({ length: 50 }, (_, i) => indexZeile(i, 2));
+    expect(validateMarketData(zeilen).clean).toHaveLength(50);
+  });
+
+  it('ergeben danach eine belastbare Kennzahl', () => {
+    const zeilen = Array.from({ length: 50 }, (_, i) => indexZeile(i, i - 25));
+    const pmi = computePmi(validateMarketData(zeilen).clean);
+    expect(pmi.sufficient).toBe(true);
+    expect(pmi.cardCount).toBe(50);
+  });
+
+  it('ohne ID bleibt genau eine Zeile uebrig — der Fehler von v6.0.0', () => {
+    // Diese Pruefung haelt die URSACHE fest, nicht nur die Behebung.
+    const ohneId = Array.from({ length: 50 }, (_, i) => ({ ...indexZeile(i, 2), id: '' }));
+    expect(validateMarketData(ohneId).clean).toHaveLength(1);
+  });
+
+  it('ohne Bild bleibt nichts uebrig', () => {
+    const ohneBild = Array.from({ length: 50 }, (_, i) => ({ ...indexZeile(i, 2), imageUrl: '' }));
+    expect(validateMarketData(ohneBild).clean).toHaveLength(0);
+  });
+
+  it('der Bestandslader liefert beide Felder mit', () => {
+    const quelle = readFileSync(join(process.cwd(), 'src/lib/card-index.ts'), 'utf8');
+    const abschnitt = quelle.slice(quelle.indexOf('indexKartenFuerIndex'));
+    expect(abschnitt).toContain('id,set_code,price,trend,real_data,image_url');
+    expect(abschnitt).toContain('id: z.id');
+    expect(abschnitt).toContain('imageUrl: z.image_url');
   });
 });

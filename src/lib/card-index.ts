@@ -165,9 +165,14 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
  *
  * Die Daten lagen längst hier. Der tägliche Durchlauf schreibt sie ohnehin.
  *
- * NUR FÜR KENNZAHLEN: Die Zeilen tragen absichtlich keine Namen und Bilder —
- * es geht um Preis, Trend und Set. Wer Karten ANZEIGEN will, nimmt
- * `searchCardIndex` oder den Live-Abruf.
+ * WARUM ID UND BILD-URL MITKOMMEN, obwohl hier niemand etwas anzeigt:
+ * `validateMarketData` — die Qualitätsprüfung, durch die JEDE Kennzahl läuft —
+ * verwirft Zeilen ohne Bild und behandelt eine zweite Zeile mit derselben ID
+ * als Dublette. Ohne diese beiden Felder blieb von 19.690 Karten genau EINE
+ * übrig, und die Startseite zeigte „Keine Messung". Das war live zu sehen.
+ *
+ * Der Name bleibt weg: Ihn prüft niemand, und er ist das mit Abstand größte
+ * Feld.
  */
 export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
   const sb = getSupabase();
@@ -181,7 +186,7 @@ export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
     const von = seite * SEITE;
     const { data, error } = await sb
       .from('cards_index')
-      .select('set_code,price,trend,real_data')
+      .select('id,set_code,price,trend,real_data,image_url')
       .range(von, von + SEITE - 1);
     if (error) {
       console.warn('[Kartenindex] Bestand für Index nicht lesbar:', error.message);
@@ -189,15 +194,18 @@ export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
       // eine Aussage reicht, entscheidet `computePmi` selbst.
       return karten;
     }
-    const stapel = (data ?? []) as Pick<IndexZeile, 'set_code' | 'price' | 'trend' | 'real_data'>[];
+    const stapel = (data ?? []) as Pick<
+      IndexZeile,
+      'id' | 'set_code' | 'price' | 'trend' | 'real_data' | 'image_url'
+    >[];
     for (const z of stapel) {
       karten.push({
-        id: '',
+        id: z.id,
         name: '',
         set: '',
         setCode: z.set_code,
         rarity: '',
-        imageUrl: '',
+        imageUrl: z.image_url,
         prices: { market: Number(z.price) },
         trendPercent: z.trend === null ? undefined : Number(z.trend),
         realData: z.real_data,
