@@ -201,12 +201,32 @@ describe('Gewinner und Verlierer bleiben vorzeichenrein', () => {
     expect(api).toMatch(/tcgList\(\{ q, pageSize: limit \}, \{ retries: 2, timeout \}\)/);
   });
 
-  it('Startseite, PMI-Schnittstelle und Marktbericht ziehen dieselbe Menge', () => {
+  it('alle Index-Schreiber rechnen auf derselben Grundlage', () => {
     // Sonst nennt die Seite eine andere Kartenzahl als die Schnittstelle, die
     // denselben Index ausliefert — live standen dort 204 gegen 50.
-    const groessen = [
+    //
+    // Seit August 2026 ist diese Grundlage der gesamte erfasste Bestand
+    // (`getMarketBasis`), nicht mehr eine Stichprobe von 250 Karten aus den
+    // obersten Seltenheitsstufen. Fuenf Stellen schreiben den Index; fuenf
+    // Stellen sind fuenf Gelegenheiten, dieselbe Frage verschieden zu
+    // beantworten.
+    const schreiber = [
       'src/app/page.tsx',
       'src/app/api/market/pmi/route.ts',
+      'src/app/api/cron/daily/route.ts',
+      'src/app/api/studio/market-index/route.ts',
+      'src/lib/market-context.ts',
+    ];
+    const ohneBasis = schreiber.filter((d) => !lies(d).includes('getMarketBasis'));
+    expect(ohneBasis, `Ohne gemeinsame Grundlage: ${ohneBasis.join(', ')}`).toEqual([]);
+  });
+
+  it('die ANZEIGE-Listen ziehen weiterhin dieselbe Menge', () => {
+    // Bewegungslisten und Set-Rangliste brauchen Karten MIT Namen und Bild —
+    // dafuer bleibt die geholte Auswahl. Nur muessen es ueberall gleich viele
+    // sein, sonst zeigt eine Seite mehr Bewegungen als die andere.
+    const groessen = [
+      'src/app/page.tsx',
       'src/lib/market-report-generator.ts',
     ].map((d) => /getHomepageCards\((\d+)\)/.exec(lies(d))?.[1]);
     expect(new Set(groessen).size, `Stichproben: ${groessen.join(' / ')}`).toBe(1);

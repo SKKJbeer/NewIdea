@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.0.0',
+    date: '5. August 2026',
+    label: 'Der Index rechnet auf dem ganzen Markt — als Median',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Grundlage: 19.690 erfasste Karten aus 155 Sets statt 204 aus 15 — die alte Stichprobe bestand nur aus den obersten Seltenheitsstufen' },
+      { type: 'changed', text: 'Kennzahl: Median statt preisgewichtetem Mittel. Auf dem Gesamtbestand: Mittel +28,69 %, gestutzt +26,15 %, gedeckelt +23,71 %, Median +3,50 %' },
+      { type: 'changed', text: 'Karten unter zehn Cent gehen nicht in den Index — dort sind zwei auf drei Cent fuenfzig Prozent, ohne dass etwas geschehen ist' },
+      { type: 'changed', text: 'Eine Grundlage statt vier: getMarketBasis() ersetzt vier getrennte Stichproben-Aufrufe, der Rueckfall ist am Feld quelle erkennbar' },
+      { type: 'fixed', text: 'Die Methodik-Seite erklaert die Umstellung samt Zahlen statt weiterhin eine Preisgewichtung zu beschreiben' },
+    ],
+  },
+  {
     version: '5.9.3',
     date: '5. August 2026',
     label: 'Derselbe Kartenbestand auf beiden Seiten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Live-Trend gegen gespeicherten Index-Trend fuer dieselben Karten-IDs — unterscheidet „andere Karten" von „andere Werte fuer dieselbe Karte"' },
       { type: 'changed', text: 'Trimmen und Deckeln beantworteten die Frage nicht: +28,69 % roh, +26,15 % gestutzt, +23,71 % gedeckelt — keine zehn Ausreisser, sondern die ganze Verteilung' },

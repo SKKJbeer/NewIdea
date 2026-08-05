@@ -121,8 +121,8 @@ export function marketStory(
 
   teile.push(
     flach
-      ? `Der Gesamtmarkt hat sich über ${cbi.windowDays} Tage kaum bewegt (${prozent(cbi.value)}, preisgewichtet).`
-      : `Der Gesamtmarkt liegt über ${cbi.windowDays} Tage bei ${prozent(cbi.value)} (preisgewichtet).`,
+      ? `Der Gesamtmarkt hat sich über ${cbi.windowDays} Tage kaum bewegt (${prozent(cbi.value)} für die typische Karte).`
+      : `Die typische Karte liegt über ${cbi.windowDays} Tage bei ${prozent(cbi.value)}.`,
   );
 
   if (schmal) {

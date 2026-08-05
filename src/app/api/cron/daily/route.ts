@@ -8,6 +8,7 @@ import { generateNextGuide } from '@/lib/guide-generator';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
 import { saveMarketIndex } from '@/lib/market-index-store';
+import { getMarketBasis } from '@/lib/market-basis';
 import { warmSearchCache } from '@/lib/search-cache';
 
 // Guide-Generierung: dienstags + freitags — versetzt zu den Artikel-Tagen (So/Do),
@@ -49,8 +50,9 @@ export async function GET(request: Request) {
     // Zwischenspeicher ausgelieferte Seiten schreiben nichts. Dieser Cron läuft
     // garantiert einmal am Tag und ist damit die verlässliche Untergrenze.
     try {
-      const cards = await getHomepageCards(250);
-      const index = computePmi(validateMarketData(cards).clean);
+      const basis = await getMarketBasis();
+      const index = computePmi(validateMarketData(basis.karten).clean);
+      results.marketIndexQuelle = basis.quelle;
       if (index.sufficient) {
         const fehler = await saveMarketIndex({
           value: index.value,

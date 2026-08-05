@@ -135,16 +135,32 @@ export default function MethodikPage() {
 
         <Abschnitt nummer={4} titel="CardBeacon Index (CBI)">
           <p>
-            Der CBI ist der <strong className="text-slate-300">preisgewichtete</strong>{' '}
-            Durchschnittstrend aller ausgewerteten Karten über 30 Tage.
+            Der CBI ist der <strong className="text-slate-300">Median</strong> der gemessenen
+            30-Tage-Bewegungen aller ausgewerteten Karten. Er beantwortet die Frage: Wie hat sich
+            eine <em>typische</em> Karte bewegt?
           </p>
-          <Formel>CBI = Σ(Trend × Preis) ÷ Σ(Preis)</Formel>
+          <Formel>CBI = Median(Trend aller gemessenen Karten)</Formel>
           <p>
-            Der CBI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein größeres
-            Gewicht im Index, und eine große Anzahl sehr günstiger Karten dominiert die Kennzahl
-            nicht. Die Gewichtung ist eine Entscheidung über den Aufbau des Index — sie besagt
-            nicht, dass ein höherer Preis mit größerer Marktbedeutung oder häufigerem Handel
-            einhergeht.
+            <strong className="text-slate-300">Warum der Median und kein Durchschnitt.</strong>{' '}
+            Die Verteilung der Kartenbewegungen ist stark rechtsschief: Über den gesamten
+            erfassten Bestand liegt das 90. Perzentil bei +40 %, das 99. bei +100 %, der höchste
+            gemessene Wert bei +1191 %. Ein Durchschnitt daraus ergäbe über 30 Tage einen Wert im
+            zweistelligen Prozentbereich — rechnerisch richtig und als Aussage über den Markt
+            unbrauchbar. Der Median ist gegen diese Schiefe unempfindlich, ohne dass ein einziger
+            Messwert verworfen oder gekappt werden muss.
+          </p>
+          <p>
+            <strong className="text-slate-300">Grundlage:</strong> der gesamte erfasste
+            Kartenbestand, nicht eine Auswahl. Karten unter zehn Cent bleiben außen vor — dort
+            steht der Preis auf der untersten Stufe, und eine Bewegung von zwei auf drei Cent
+            wären fünfzig Prozent, ohne dass am Markt etwas geschehen ist. Diese Karten sind auf
+            der Seite normal auffindbar; sie tragen nur keine Marktaussage.
+          </p>
+          <p>
+            <strong className="text-slate-300">Keine Preisgewichtung.</strong> Bis August 2026 war
+            der CBI preisgewichtet. Diese Gewichtung war eine Entscheidung über den Aufbau des
+            Index und nie eine Erkenntnis über den Markt — ein höherer Preis besagt nicht, dass
+            eine Karte häufiger gehandelt wird.
           </p>
           <p>
             <strong className="text-slate-300">Mindestdatenlage:</strong> Unter{' '}

@@ -2,6 +2,7 @@ import { NextResponse, after } from 'next/server';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
 import { saveMarketIndex } from '@/lib/market-index-store';
+import { getMarketBasis } from '@/lib/market-basis';
 
 // Liefert den CardBeacon Index als Zahl — Grundlage für den Vergleich
 // „mein Bestand gegen den Markt" auf der Portfolio-Seite.
@@ -20,7 +21,7 @@ export async function GET() {
   try {
     // Dieselbe Stichprobengröße wie die Startseite — sonst nennt die Seite eine
     // andere Kartenzahl als die Schnittstelle, die denselben Index ausliefert.
-    const cards = await getHomepageCards(250);
+    const cards = (await getMarketBasis()).karten;
     // Dieselbe Prüfung wie auf der Startseite — sonst könnten hier andere
     // Zahlen stehen als dort.
     const pmi = computePmi(validateMarketData(cards).clean);

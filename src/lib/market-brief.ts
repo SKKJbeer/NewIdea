@@ -56,7 +56,7 @@ export function marketBrief(
     text: flach
       ? `Der Gesamtmarkt bewegt sich über ${cbi.windowDays} Tage kaum.`
       : `Der Gesamtmarkt steht über ${cbi.windowDays} Tage ${richtung}.`,
-    beleg: `${INDEX_ZAHL(cbi.value)} preisgewichtet`,
+    beleg: `${INDEX_ZAHL(cbi.value)} — Median aus ${cbi.cardCount} gemessenen Karten`,
   });
 
   // 2. Marktbreite gegen Indexrichtung — der eigentliche Erkenntnisgewinn.

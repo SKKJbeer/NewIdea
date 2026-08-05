@@ -75,13 +75,19 @@ describe('Labels sagen, was die Zahl darunter ist', () => {
     expect(lies('src/lib/market-metrics.ts')).toContain('medianPrice: median(');
   });
 
-  it('die Methodik erklärt die Gewichtung ohne Behauptung über den Markt', () => {
-    // Vorher: „weil eine 400-€-Karte den Markt stärker bewegt“ — eine Aussage
-    // über Marktbedeutung und Liquidität, für die es keinen Beleg gibt.
+  it('die Methodik erklärt, warum der Index ein Median ist', () => {
+    // ZWEI STUFEN DERSELBEN REGEL. Zuerst musste die Begruendung der
+    // Preisgewichtung raus („weil eine 400-€-Karte den Markt stärker bewegt“ —
+    // eine Aussage über Marktbedeutung, für die es keinen Beleg gibt). Seit
+    // August 2026 ist die Gewichtung selbst weg: Auf dem Gesamtbestand ergab
+    // sie +28,7 %, der Median derselben Daten +3,5 %.
     const methodik = lies('src/app/methodik/page.tsx');
-    expect(methodik).toContain('preisgewichtet');
     expect(methodik).not.toMatch(/bewegt den Markt|Markt stärker bewegt/);
-    expect(methodik).toMatch(/dominiert die Kennzahl\s*\n?\s*nicht/);
+    expect(methodik).toContain('Median');
+    // Die Entscheidung muss BEGRUENDET dastehen, nicht nur behauptet.
+    expect(methodik).toMatch(/rechtsschief|Perzentil/);
+    // Und die frueheren Saetze duerfen nicht daneben stehenbleiben.
+    expect(methodik).not.toMatch(/dominiert die Kennzahl\s*\n?\s*nicht/);
   });
 });
 

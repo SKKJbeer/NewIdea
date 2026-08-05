@@ -154,6 +154,60 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   );
 }
 
+/**
+ * Der GESAMTE erfasste Bestand als Kartenliste — Grundlage des Marktindex.
+ *
+ * WARUM ES DAS GIBT: Der Index rechnete auf einer Stichprobe von rund 250
+ * Karten aus drei Seltenheits-Abfragen. Das waren 204 auswertbare Karten aus
+ * 15 Sets — bei 19.690 erfassten Karten aus 155 Sets. Eine Marktaussage aus
+ * einem Prozent des Bestands, und ausgerechnet aus dem obersten
+ * Seltenheitsband.
+ *
+ * Die Daten lagen längst hier. Der tägliche Durchlauf schreibt sie ohnehin.
+ *
+ * NUR FÜR KENNZAHLEN: Die Zeilen tragen absichtlich keine Namen und Bilder —
+ * es geht um Preis, Trend und Set. Wer Karten ANZEIGEN will, nimmt
+ * `searchCardIndex` oder den Live-Abruf.
+ */
+export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const SEITE = 1000;
+  const MAX_SEITEN = 40;
+  const karten: PokemonCard[] = [];
+
+  for (let seite = 0; seite < MAX_SEITEN; seite++) {
+    const von = seite * SEITE;
+    const { data, error } = await sb
+      .from('cards_index')
+      .select('set_code,price,trend,real_data')
+      .range(von, von + SEITE - 1);
+    if (error) {
+      console.warn('[Kartenindex] Bestand für Index nicht lesbar:', error.message);
+      // Was schon gelesen wurde, ist echt und darf gezählt werden — ob es für
+      // eine Aussage reicht, entscheidet `computePmi` selbst.
+      return karten;
+    }
+    const stapel = (data ?? []) as Pick<IndexZeile, 'set_code' | 'price' | 'trend' | 'real_data'>[];
+    for (const z of stapel) {
+      karten.push({
+        id: '',
+        name: '',
+        set: '',
+        setCode: z.set_code,
+        rarity: '',
+        imageUrl: '',
+        prices: { market: Number(z.price) },
+        trendPercent: z.trend === null ? undefined : Number(z.trend),
+        realData: z.real_data,
+      } as PokemonCard);
+    }
+    if (stapel.length < SEITE) break;
+  }
+  return karten;
+}
+
 export interface SetTreffer {
   setCode: string;
   setName: string;

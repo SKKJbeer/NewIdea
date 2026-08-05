@@ -86,7 +86,10 @@ describe('Der Index heißt sichtbar CBI', () => {
   it('die Methodik erklärt ihn unter dem neuen Namen', () => {
     const m = lies('src/app/methodik/page.tsx');
     expect(m).toContain('CardBeacon Index');
-    expect(m).toContain('CBI = Σ');
+    // Seit August 2026 ist der CBI der Median, kein gewichtetes Mittel —
+    // die Formel auf der Methodik-Seite muss das sagen.
+    expect(m).toContain('CBI = Median(');
+    expect(m).not.toContain('CBI = Σ');
   });
 });
 
@@ -336,16 +339,21 @@ describe('Der Indexstand wird gespeichert statt nachgerechnet', () => {
   it('liest den gespeicherten Stand VOR einer Neuberechnung', () => {
     // Vorher holte jede kalt gestartete Instanz 250 Karten aus dem Netz — fuer
     // EINE Zahl, die sich einmal am Tag aendert.
-    const vorLaden = ctx.indexOf('loadLatestMarketIndex');
-    const vorRechnen = ctx.indexOf('getHomepageCards(250)');
+    // OHNE die Import-Zeilen vergleichen: Sie stehen nach Herkunft sortiert
+    // ganz oben und sagen nichts ueber die Reihenfolge im Ablauf. (Genau daran
+    // ist diese Pruefung beim Umbau auf die gemeinsame Grundlage einmal falsch
+    // angeschlagen.)
+    const rumpf = ctx.split('\n').filter((z) => !z.startsWith('import ')).join('\n');
+    const vorLaden = rumpf.indexOf('loadLatestMarketIndex');
+    const vorRechnen = rumpf.indexOf('getMarketBasis');
     expect(vorLaden).toBeGreaterThan(0);
     expect(vorLaden).toBeLessThan(vorRechnen);
   });
 
   it('rechnet weiterhin selbst, wenn nichts gespeichert ist', () => {
     // Der Speicher ist eine Abkuerzung, kein Ersatz. Ohne Eintrag muss die
-    // Zahl trotzdem entstehen.
-    expect(ctx).toContain('getHomepageCards(250)');
+    // Zahl trotzdem entstehen — jetzt auf der gemeinsamen Grundlage.
+    expect(ctx).toContain('getMarketBasis');
   });
 
   it('haelt kein Fehlergebnis eine Stunde lang fest', () => {

@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.0.0] - 5. August 2026 · Der Index rechnet auf dem ganzen Markt — als Median
+
+Der CardBeacon Index steht ab sofort auf dem **gesamten erfassten Kartenbestand** statt auf einer Stichprobe, und er ist der **Median** statt eines preisgewichteten Mittels. Das ist die groesste Aenderung an der Kernaussage der Seite seit ihrem Bestehen — deshalb eine neue Hauptversion.
+
+### Geaendert
+- **Grundlage: 19.690 erfasste Karten aus 155 Sets statt 204 aus 15.** Die alte Stichprobe kam aus drei Seltenheits-Abfragen und bestand ausschliesslich aus den obersten Seltenheitsstufen („Special Illustration Rare", „Hyper Rare") — eine Marktaussage aus einem Prozent des Bestands, und aus dem unrepraesentativsten Prozent
+- **Kennzahl: Median statt preisgewichtetem Mittel.** Gemessen auf dem Gesamtbestand: preisgewichtetes Mittel **+28,69 %**, Raender gestutzt **+26,15 %**, Gewichtsdeckel **+23,71 %**, **Median +3,50 %**. Die Verteilung ist stark rechtsschief (P90 +40 %, P99 +100 %, Maximum +1191 %); ein Mittelwert daraus ist rechnerisch richtig und als Satz ueber den Markt unbrauchbar
+- **Karten unter zehn Cent gehen nicht in den Index.** Dort steht der Preis auf der untersten Cardmarket-Stufe — zwei auf drei Cent sind fuenfzig Prozent, ohne dass etwas geschehen ist. Ueber ALLE Karten war der Median deshalb exakt 0,00 %, ab zehn Cent +3,50 %. Die Karten bleiben such- und auffindbar wie alle anderen; sie tragen nur keine Marktaussage
+- **Eine Grundlage statt vier.** `getMarketBasis()` ersetzt vier getrennte `getHomepageCards(250)`-Aufrufe (Tages-Cron, Studio-Route, `/api/market/pmi`, Marktkontext). Faellt der Bestand aus, greift die alte Stichprobe — aber sichtbar, ueber das Feld `quelle`
+- **Anzeige und Kennzahl bleiben getrennt.** Bewegungslisten und Set-Rangliste brauchen Karten mit Namen und Bild und ziehen weiterhin die geholte Auswahl; Index und Marktbreite brauchen Messpunkte
+- **Die Methodik-Seite erklaert die Umstellung** samt Zahlen und nennt die Preisgewichtung als das, was sie war: eine Entscheidung ueber den Aufbau des Index, nie eine Erkenntnis ueber den Markt
+
+### Was ausdruecklich ausgeschlossen wurde
+- **Veraltete oder anders gerechnete Werte im Bestand.** Fuer dieselben 250 Karten stimmen Live-Abruf und gespeicherter Wert in **250 von 250 Faellen exakt** ueberein (Abweichung 0,00 Prozentpunkte). Die hohen Werte kommen von ANDEREN Karten — alten und selten gehandelten, bei denen der Cardmarket-Trendpreis strukturell ueber dem 30-Tage-Schnitt liegt
+- **Ausreisser als Erklaerung.** Stutzen und Deckeln aendern das Ergebnis kaum (+28,7 → +26,2 → +23,7). Es sind keine zehn Karten, sondern die ganze Verteilung
+
+---
+
 ## [5.9.3] - 5. August 2026 · Derselbe Kartenbestand auf beiden Seiten
 
 ### Neu

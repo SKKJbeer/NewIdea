@@ -673,6 +673,8 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 | Entscheidung | Details |
 |---|---|
 | Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`) |
+| CardBeacon Index (CBI) | **MEDIAN** der gemessenen 30-Tage-Bewegungen, KEINE Preisgewichtung mehr (v6.0.0). Grundlage: der GANZE erfasste Bestand über `getMarketBasis()` (`market-basis.ts`), nicht mehr `getHomepageCards(250)`. Karten unter `INDEX_MIN_PREIS` (0,10 €) zählen nicht mit. Gemessen am 05.08.2026 auf 19.063 Karten: gewichtetes Mittel +28,69 %, gestutzt +26,15 %, gedeckelt +23,71 %, **Median +3,50 %** — die Verteilung ist stark rechtsschief (P90 +40 %, P99 +100 %, Max +1191 %). Ausgeschlossen als Ursache: veraltete Indexwerte (250 von 250 Karten stimmen exakt mit dem Live-Abruf überein) |
+| Anzeige vs. Kennzahl | ZWEI Grundlagen, bewusst getrennt: Listen (Mover, Set-Rangliste) brauchen Karten mit Namen/Bild → `getHomepageCards(250)`. Index und Marktbreite brauchen Messpunkte → `getMarketBasis()`. Nie vermischen |
 | Preis-Historie | NUR echte Daten: Supabase-Tages-Snapshots (record-on-view + Daily-Cron) gemerged mit echten Cardmarket-Ankern (Ø 30/7/1 + Trend). KEINE Interpolation, KEINE synthetische Kurve. Zu wenig Punkte → kein Chart, nur aktueller Preis (v2.19.1) |
 | Übersetzungen | `src/lib/i18n.ts` + `getLang()` aus Cookie (`next/headers`) |
 | Autocomplete | `/api/search/suggestions?q=&n=` liefert `{ cards, sets }` — 140 ms Wartezeit im SearchBox-Client, laufende Abfragen per `AbortController` abgebrochen, höchstens 8 sichtbare Zeilen, Browser-Speicher mit 5-Minuten-Frist (Preise!), Verlängerungen bekannter Begriffe ohne Netzweg. Abgesichert durch `suche-oberflaeche.test.ts` |

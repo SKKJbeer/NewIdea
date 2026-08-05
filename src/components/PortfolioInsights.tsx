@@ -227,7 +227,7 @@ export function MarketComparison({
         </div>
       </div>
       <p className="mt-2.5 text-[10px] leading-snug text-slate-600">
-        Der Vergleich stellt die Entwicklung deines Bestands dem preisgewichteten Markttrend
+        Der Vergleich stellt die Entwicklung deines Bestands dem Markttrend der typischen Karte
         gegenüber. „Pp." steht für Prozentpunkte.
       </p>
     </div>

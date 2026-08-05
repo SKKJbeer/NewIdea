@@ -1,4 +1,4 @@
-import { getHomepageCards } from './homepage-data';
+import { getMarketBasis } from './market-basis';
 import { fetchCardsBySet } from './pokemon-api';
 import { computePmi, rankSets, hasRealTrend, MIN_SET_SAMPLE } from './market-metrics';
 import { loadLatestMarketIndex } from './market-index-store';
@@ -100,7 +100,7 @@ export async function getMarketBenchmark(): Promise<MarketBenchmark | null> {
 
   // Stufe 3: selbst rechnen. Nur, wenn noch nichts gespeichert ist.
   try {
-    const cards = await mitZeitgrenze(getHomepageCards(250), BUDGET_MS);
+    const cards = await mitZeitgrenze(getMarketBasis().then((b) => b.karten), BUDGET_MS);
     if (cards === null) {
       console.warn('[Marktkontext] Index nicht rechtzeitig verfügbar');
       return null;

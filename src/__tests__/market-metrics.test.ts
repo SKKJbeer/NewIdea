@@ -173,11 +173,25 @@ describe('computePmi', () => {
     expect(computePmi(viele(2)).sufficient).toBe(true);
   });
 
-  it('gewichtet teure Karten stärker', () => {
-    // Eine teure Karte mit −10 % gegen eine billige mit +10 %: Der Index muss
-    // der teuren folgen, sonst bestimmen Cent-Karten den Markt.
-    const pmi = computePmi([card('teuer', -10, 1000), card('billig', 10, 1)]);
-    expect(pmi.value).toBeLessThan(0);
+  it('laesst sich von einer einzelnen teuren Karte nicht bestimmen', () => {
+    // FRUEHER forderte diese Pruefung das GEGENTEIL: Der preisgewichtete Index
+    // MUSSTE der teuren Karte folgen. Gemessen am Gesamtbestand war genau das
+    // der Fehler — zehn Karten von 19.063 trugen 12 von 28,7 Prozentpunkten.
+    // Der Median folgt der Mehrheit, nicht dem Preisschild.
+    const guenstig = Array.from({ length: 24 }, (_, i) => card(`g${i}`, 2, 5));
+    const pmi = computePmi([...guenstig, card('teuer', -400, 9000)]);
+    expect(pmi.value).toBeCloseTo(2, 5);
+  });
+
+  it('nimmt Karten unter zehn Cent nicht in die Marktaussage', () => {
+    // Am Cardmarket-Boden sind zwei auf drei Cent fuenfzig Prozent, ohne dass
+    // etwas passiert ist. Ueber ALLE Karten war der Median deshalb exakt
+    // 0,00 %, ab zehn Cent +3,50 %.
+    const boden = Array.from({ length: 30 }, (_, i) => card(`b${i}`, 50, 0.02));
+    const echte = Array.from({ length: 25 }, (_, i) => card(`e${i}`, 3, 4));
+    const pmi = computePmi([...boden, ...echte]);
+    expect(pmi.cardCount).toBe(25);
+    expect(pmi.value).toBeCloseTo(3, 5);
   });
 
   it('zählt die vertretenen Sets', () => {
@@ -325,10 +339,14 @@ describe('validateMarketData', () => {
   it('ein Ausreißer verzerrt den Index nach der Prüfung nicht mehr', () => {
     const echte = Array.from({ length: 25 }, (_, i) => card(`c${i}`, -2, 10));
     const kaputt = card('boese', 5000, 90_000);
+    // Der Median haelt den Ausreisser schon von sich aus draussen — die
+    // Pruefung bleibt trotzdem noetig, weil sie ihn AUCH aus Marktbreite,
+    // Set-Rangliste und Bewegungslisten entfernt.
     const ohnePruefung = computePmi([...echte, kaputt]).value;
     const mitPruefung = computePmi(validateMarketData([...echte, kaputt]).clean).value;
-    expect(ohnePruefung).toBeGreaterThan(100);
+    expect(ohnePruefung).toBeCloseTo(-2, 5);
     expect(mitPruefung).toBeCloseTo(-2, 5);
+    expect(validateMarketData([...echte, kaputt]).clean).toHaveLength(25);
   });
 
   it('meldet den Anteil verwertbarer Karten', () => {

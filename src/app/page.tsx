@@ -12,6 +12,7 @@ import { MoversPanel, SetMarketPanel, ReportPromo, QuickActions } from '@/compon
 import { MarketBriefBlock, SectionHead } from '@/components/MarketModules';
 
 import { getHomepageCards } from '@/lib/homepage-data';
+import { getMarketBasis } from '@/lib/market-basis';
 import { getDataCoverage } from '@/lib/data-coverage';
 import { saveMarketIndex, loadMarketIndexHistory } from '@/lib/market-index-store';
 import { marketBrief } from '@/lib/market-brief';
@@ -73,9 +74,23 @@ export default async function MarketPage() {
   logDataIssues(qualitaet, 'markt');
   const geprueft = qualitaet.clean;
 
-  const cbi = computePmi(geprueft);
-  const breite = marketBreadth(geprueft);
-  const stimmung = computeFearGreed(geprueft);
+  // ZWEI VERSCHIEDENE FRAGEN, ZWEI VERSCHIEDENE GRUNDLAGEN.
+  //
+  // Die LISTEN brauchen Karten mit Namen und Bild — dafuer bleibt die Auswahl,
+  // die schon geholt ist. Der INDEX braucht keine Namen, sondern moeglichst
+  // viele Messpunkte: 19.690 erfasste Karten aus 155 Sets statt 204 aus 15,
+  // und ohne die Verzerrung, dass die Stichprobe nur aus den obersten
+  // Seltenheitsstufen bestand.
+  //
+  // Faellt der Bestand aus, liefert `getMarketBasis` die alte Stichprobe —
+  // dann steht die Zahl auf derselben Grundlage wie bisher, nicht auf gar
+  // keiner.
+  const basis = await getMarketBasis();
+  const marktKarten = validateMarketData(basis.karten).clean;
+
+  const cbi = computePmi(marktKarten);
+  const breite = marketBreadth(marktKarten);
+  const stimmung = computeFearGreed(marktKarten);
   const sets = rankSets(geprueft, 8);
   const { gainers, losers } = splitMovers(geprueft, 6);
   const [abdeckung, verlauf] = await Promise.all([
@@ -85,7 +100,7 @@ export default async function MarketPage() {
     loadMarketIndexHistory(30).catch(() => []),
   ]);
 
-  const trends = geprueft.filter(hasRealTrend).map((c) => c.trendPercent as number);
+  const trends = marktKarten.filter(hasRealTrend).map((c) => c.trendPercent as number);
   const brief = marketBrief(cbi, breite, stimmung, sets);
   const story = marketStory(cbi, breite, sets);
 

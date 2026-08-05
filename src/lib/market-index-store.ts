@@ -21,7 +21,7 @@ import { getSupabase } from './supabase';
 export interface MarketIndexPoint {
   /** Tag der Messung (ISO). */
   date: string;
-  /** Preisgewichteter Trend in Prozent über `windowDays`. */
+  /** Median der gemessenen Bewegungen in Prozent über `windowDays`. */
   value: number;
   cardCount: number;
   setCount: number;

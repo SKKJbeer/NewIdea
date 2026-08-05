@@ -3,6 +3,7 @@ import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
 import { saveMarketIndex, loadLatestMarketIndex } from '@/lib/market-index-store';
+import { getMarketBasis } from '@/lib/market-basis';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 // INDEXSTAND VON HAND SCHREIBEN UND NACHSEHEN
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
 
   // Dieselbe Stichprobe und dieselbe Prüfung wie überall sonst — sonst stünde
   // hier ein anderer Index als auf der Startseite.
-  const cards = await getHomepageCards(250);
+  const cards = (await getMarketBasis()).karten;
   const index = computePmi(validateMarketData(cards).clean);
 
   if (!index.sufficient) {

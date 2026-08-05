@@ -231,7 +231,7 @@ export function rankSets(cards: PokemonCard[], limit = 5): SetRank[] {
 export const PMI_MIN_CARDS = 20;
 
 export interface PmiResult {
-  /** Preisgewichteter Durchschnittstrend in Prozent. Nur gültig, wenn `sufficient`. */
+  /** MEDIAN der gemessenen Bewegungen in Prozent. Nur gültig, wenn `sufficient`. */
   value: number;
   /** Liegen genügend Datenpunkte für eine Aussage vor? */
   sufficient: boolean;
@@ -243,33 +243,63 @@ export interface PmiResult {
 }
 
 /**
- * Preisgewichteter Markttrend.
+ * Untergrenze für Karten, die in den Index eingehen.
  *
- * Der CBI ist preisgewichtet. Dadurch erhalten höherpreisige Karten ein
- * größeres Gewicht im Index, und eine große Anzahl sehr günstiger Karten
- * dominiert die Kennzahl nicht.
+ * Unterhalb von zehn Cent steht der Preis auf dem Cardmarket-Boden. Eine
+ * Bewegung von 0,02 auf 0,03 € sind fünfzig Prozent, ohne dass irgendetwas
+ * geschehen ist — und weil sehr viele Karten dort liegen, ziehen sie jeden
+ * Kennwert an sich. GEMESSEN: Über ALLE 19.063 gemessenen Karten ist der Median
+ * exakt 0,00 %; ab zehn Cent sind es +3,50 %. Die erste Zahl beschreibt nicht
+ * den Markt, sondern die Preisstufung an seinem unteren Rand.
  *
- * BEWUSST NICHT BEHAUPTET: Ein höherer Preis heißt nicht, dass eine Karte den
- * Markt stärker bewegt oder häufiger gehandelt wird. Genau das stand hier
- * vorher („eine 400-€-Karte bewegt den Markt stärker als eine 2-€-Karte") —
- * eine Aussage über Marktbedeutung und Liquidität, für die es in den Daten
- * keinen Beleg gibt. Die Gewichtung ist eine Entscheidung über die Konstruktion
- * des Index, keine Erkenntnis über den Markt.
+ * Das schließt diese Karten NICHT von der Seite aus — sie sind such- und
+ * auffindbar wie alle anderen. Sie tragen nur keine Marktaussage.
+ */
+export const INDEX_MIN_PREIS = 0.1;
+
+/**
+ * Markttrend als MEDIAN der gemessenen Bewegungen.
+ *
+ * WAS SICH GEÄNDERT HAT UND WARUM — gemessen am 05.08.2026 auf dem gesamten
+ * erfassten Bestand (19.063 auswertbare Karten):
+ *
+ *   heutige Formel, preisgewichtetes Mittel   +28,69 %
+ *   dieselbe Formel, Ränder gestutzt (P1/P99) +26,15 %
+ *   dieselbe Formel, Gewichtsdeckel 0,5 %     +23,71 %
+ *   MEDIAN                                     +3,50 %
+ *
+ * Auf der früheren Stichprobe von 250 gleichartigen Karten fiel der Unterschied
+ * nie auf — dort lagen Mittel und Median dicht beieinander. Über den ganzen
+ * Bestand ist die Verteilung stark rechtsschief: P90 bei +40 %, P99 bei +100 %,
+ * Maximum bei +1191 %. Ein Mittelwert daraus ist rechnerisch richtig und als
+ * Satz falsch — „der Markt ist in 30 Tagen um 28 % gestiegen" würde niemand
+ * wiedererkennen.
+ *
+ * AUSGESCHLOSSEN als Erklärung: veraltete oder anders gerechnete Werte im
+ * Bestand. Für dieselben 250 Karten stimmen Live-Abruf und gespeicherter Wert
+ * in 250 von 250 Fällen exakt überein (Abweichung 0,00 Prozentpunkte). Die
+ * hohen Werte kommen von ANDEREN Karten — alten und selten gehandelten, bei
+ * denen der Cardmarket-Trendpreis strukturell über dem 30-Tage-Schnitt liegt.
+ *
+ * Der Median beantwortet die Frage, die jemand tatsächlich hat: Wie hat sich
+ * eine typische Karte bewegt? Er ist gegen diese Schiefe unempfindlich, ohne
+ * dass ein einziger Messwert verworfen oder gekappt werden muss.
+ *
+ * KEINE PREISGEWICHTUNG MEHR. Sie war eine Entscheidung über die Konstruktion
+ * des Index, nie eine Erkenntnis über den Markt — ein höherer Preis heißt
+ * nicht, dass eine Karte häufiger gehandelt wird.
  */
 export function computePmi(cards: PokemonCard[]): PmiResult {
-  const mitTrend = cards.filter(hasRealTrend);
+  const mitTrend = cards.filter((c) => hasRealTrend(c) && displayPrice(c) >= INDEX_MIN_PREIS);
   const setCount = new Set(mitTrend.map((c) => c.setCode).filter(Boolean)).size;
 
-  let gewichtSumme = 0;
-  let trendSumme = 0;
-  for (const c of mitTrend) {
-    const gewicht = displayPrice(c) || 1;
-    trendSumme += (c.trendPercent as number) * gewicht;
-    gewichtSumme += gewicht;
-  }
+  // `median` gibt bei leerer Liste `null` — hier wird daraus 0, weil
+  // `sufficient: false` in dem Fall ohnehin verhindert, dass der Wert
+  // irgendwo als Aussage erscheint.
+  const value = median(mitTrend.map((c) => c.trendPercent as number)) ?? 0;
 
   return {
-    value: gewichtSumme > 0 ? trendSumme / gewichtSumme : 0,
+    value,
     sufficient: mitTrend.length >= PMI_MIN_CARDS,
     cardCount: mitTrend.length,
     setCount,
@@ -315,7 +345,7 @@ function skalieren(wert: number, min: number, max: number): number {
  * Oberfläche erklärt.
  *
  * - Marktbreite (50 %): Anteil der Karten über ihrem 30-Tage-Schnitt.
- * - Momentum (30 %): preisgewichteter Trend, abgebildet von −15 % bis +15 %.
+ * - Momentum (30 %): Median-Trend, abgebildet von −15 % bis +15 %.
  * - Verhältnis (20 %): Gewinner gegen Verlierer.
  */
 export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
@@ -342,7 +372,7 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
       label: 'Momentum',
       score: skalieren(pmi, -15, 15),
       weight: FEAR_GREED_WEIGHTS.momentum,
-      detail: `Preisgewichteter Trend ${pmi >= 0 ? '+' : ''}${pmi.toFixed(1)} %, abgebildet von −15 % bis +15 %`, // toFixed erlaubt: Erklärtext, keine Preisangabe
+      detail: `Median-Trend ${pmi >= 0 ? '+' : ''}${pmi.toFixed(1)} %, abgebildet von −15 % bis +15 %`, // toFixed erlaubt: Erklärtext, keine Preisangabe
     },
     {
       label: 'Gewinner zu Verlierer',
