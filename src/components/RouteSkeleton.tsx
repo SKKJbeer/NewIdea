@@ -1,5 +1,4 @@
 import { SKELETON } from '@/lib/ui';
-import { NavBar } from './NavBar';
 
 // LADEZUSTÄNDE
 //
@@ -55,18 +54,20 @@ function Zeilen({ anzahl = 8 }: { anzahl?: number }) {
 export function RouteSkeleton({ variant = 'list' }: Props) {
   return (
     <div className="min-h-screen bg-[#070810]">
-      {/* DIE ECHTE NAVIGATION, kein Platzhalter.
-          
-          BEFUND AUS DEM ECHTEN GERÄT: Hier stand ein leerer Streifen in
-          Kopfzeilenhöhe. Wer während des Ladens zurückwollte, hatte dafür kein
-          einziges Bedienelement — kein Logo, kein Menü, keinen Zurück-Weg. Bei
-          einer langsamen Seite ist das der Moment, in dem man weg will, und
-          genau dann war die Seite eine Sackgasse.
-          
-          Die Navigation braucht keine Daten. Sie gehört von der ersten
-          Millisekunde an dorthin. */}
-      <NavBar />
+      {/* HIER STEHT KEINE NAVIGATION — und das ist inzwischen die richtige
+          Antwort auf denselben Befund wie vorher.
 
+          URSPRÜNGLICH stand hier ein leerer Streifen in Kopfzeilenhöhe: Wer
+          während des Ladens zurückwollte, hatte kein einziges Bedienelement.
+          Die Antwort darauf war, die echte Navigation ins Skelett zu holen.
+
+          Seit v5.5.0 liegt die Navigation in der Anwendungshülle — also
+          AUSSERHALB dieser Ladegrenze. Sie verschwindet beim Navigieren gar
+          nicht mehr, sie steht die ganze Zeit da. Das Skelett bräuchte sie
+          nicht nur nicht, es zeichnete sie ein zweites Mal unter die erste.
+
+          Merke: Was die Hülle liefert, darf ein Ladezustand weder wiederholen
+          noch andeuten. */}
       <Kopf />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12">

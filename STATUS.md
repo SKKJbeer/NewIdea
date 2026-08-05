@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.6.1` · **Stand:** 4. August 2026 · **Branch:** `main`
+**Version:** `v5.6.2` · **Stand:** 4. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.6.2 | Auch die Ladezustaende zeigten die Kopfleiste doppelt — Skelett und Such-Umriss bereinigt; der Umriss der Suche war mittig statt linksbuendig |
 | v5.6.1 | Auf dem Telefon standen zwei identische Kopfleisten uebereinander — die Huelle brachte seit v5.5.0 eine mit, die achtzehn Seiten weiterhin ihre eigene |
 | v5.6.0 | Suche: Vorschlagsfeld gedeckelt (war 1015 px hoch), Feld an den Seiteninhalt ausgerichtet und auf 640 px verbreitert, Wartezeit 320 → 140 ms, laufende Abfragen werden abgebrochen, Tastaturbedienung, Verlaengerungen bekannter Begriffe ohne Netzweg |
 | v5.5.0 | Seitenleiste auf allen siebzehn Seiten statt nur auf der Startseite; „Abdeckung 1 %" verglich zwei interne Zahlen — jetzt erfasste Karten gegen alle Karten |

@@ -149,6 +149,24 @@ describe('Kopfleiste steht genau einmal', () => {
   it('steht in der Huelle und nur dort', () => {
     expect(lies('src/components/AppShell.tsx')).toContain('<NavBar />');
   });
+
+  it('wird von keinem Ladezustand wiederholt oder angedeutet', () => {
+    // Eine Ebene tiefer derselbe Fehler. Die Lade-Umrisse liegen INNERHALB der
+    // Ladegrenze, die Navigation liegt ausserhalb davon — sie verschwindet
+    // beim Navigieren gar nicht. Ein Umriss, der sie nachzeichnet (grauer
+    // Streifen) oder sie sogar echt rendert, legt sie ein zweites Mal unter
+    // die erste.
+    const umrisse = [
+      ...globSync('src/app/**/loading.tsx', { cwd: WURZEL }),
+      'src/components/RouteSkeleton.tsx',
+    ];
+    expect(umrisse.length).toBeGreaterThan(2);
+    for (const datei of umrisse) {
+      const src = ohneKommentare(lies(datei));
+      expect(src, `${datei} rendert die Navigation erneut`).not.toContain('<NavBar');
+      expect(src, `${datei} deutet eine Kopfleiste an`).not.toMatch(/sticky top-0/);
+    }
+  });
 });
 
 describe('Vorschlagsroute begrenzt, was sie herausgibt', () => {

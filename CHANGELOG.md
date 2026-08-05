@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.6.2] - 4. August 2026 · Auch die Ladezustaende zeigen die Kopfleiste nur einmal
+
+### Behoben
+- **Derselbe Fehler wie v5.6.1, eine Ebene tiefer.** Die Lade-Umrisse liegen INNERHALB der Ladegrenze, die Navigation liegt seit v5.5.0 ausserhalb davon — sie verschwindet beim Navigieren gar nicht mehr. Das allgemeine Lade-Skelett rendert die Kopfleiste trotzdem ein zweites Mal, der Ladezustand der Suche zeichnete ein graues Band an ihrer Stelle. Beides entfernt
+- **Der Lade-Umriss der Suche war mittig, die Suchseite ist linksbuendig.** Beim Erscheinen der Treffer sprang deshalb der ganze Seitenkopf nach links. Der Umriss bildet jetzt nach, was wirklich kommt: linksbuendig in `max-w-6xl`, danach Trefferzeilen in derselben Aufteilung wie die fertige Liste
+
+### Geaendert
+- Die Pruefung „das Lade-Skelett traegt die echte Navigation" (aus der Zeit, als es sie tragen MUSSTE) prueft jetzt das Gegenteil und nennt den Grund fuer die Umkehr. Der Befund dahinter — waehrend des Ladens muss die Seite bedienbar bleiben — gilt unveraendert, nur erfuellt ihn jetzt die Anwendungshuelle
+
+---
+
 ## [5.6.1] - 4. August 2026 · Eine Kopfleiste statt zwei
 
 ### Behoben

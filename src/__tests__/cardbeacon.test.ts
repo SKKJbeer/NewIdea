@@ -284,14 +284,22 @@ describe('Suche und Kartenbilder funktionieren verlässlich', () => {
 });
 
 describe('Die Seite ist bedienbar, bevor sie fertig ist', () => {
-  it('das Lade-Skelett trägt die echte Navigation', () => {
+  it('die Navigation steht ausserhalb der Ladegrenze', () => {
     // BEFUND VOM ECHTEN GERÄT: Waehrend des Ladens stand oben ein leerer
     // Streifen. Kein Logo, kein Menue, kein Zurueck — wer weg wollte, konnte
     // nicht. Bei einer langsamen Seite ist das genau der Moment, in dem man
     // weg will, und dann war sie eine Sackgasse.
+    //
+    // DIE ANTWORT DARAUF HAT SICH GEAENDERT, der Befund nicht: Erst trug das
+    // Skelett die echte Navigation. Seit v5.5.0 liegt sie in der
+    // Anwendungshuelle — also ausserhalb dieser Ladegrenze — und verschwindet
+    // beim Navigieren gar nicht erst. Traegt das Skelett sie zusaetzlich,
+    // steht sie doppelt (siehe `suche-oberflaeche.test.ts`).
+    const huelle = lies('src/components/AppShell.tsx');
     const skelett = lies('src/components/RouteSkeleton.tsx');
-    expect(skelett).toContain('<NavBar />');
-    expect(skelett).not.toMatch(/sticky top-0 z-50 h-14 border-b[^"]*"\s*\/>/);
+    expect(huelle).toContain('<NavBar />');
+    expect(huelle.indexOf('<NavBar />')).toBeLessThan(huelle.indexOf('{children}'));
+    expect(skelett).not.toContain('<NavBar');
   });
 
   it('der Marktkontext blockiert die Kartenseite nicht', () => {

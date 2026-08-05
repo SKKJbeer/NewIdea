@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.6.2',
+    date: '4. August 2026',
+    label: 'Auch die Ladezustaende zeigen die Kopfleiste nur einmal',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Derselbe Fehler wie v5.6.1, eine Ebene tiefer: Das Lade-Skelett rendert die Kopfleiste ein zweites Mal, der Ladezustand der Suche zeichnete ein graues Band an ihrer Stelle' },
+      { type: 'fixed', text: 'Der Lade-Umriss der Suche war mittig, die Suchseite ist linksbuendig — beim Erscheinen der Treffer sprang der Seitenkopf nach links' },
+      { type: 'changed', text: 'Die Pruefung „das Lade-Skelett traegt die echte Navigation" prueft jetzt das Gegenteil und nennt den Grund fuer die Umkehr' },
+    ],
+  },
+  {
     version: '5.6.1',
     date: '4. August 2026',
     label: 'Eine Kopfleiste statt zwei',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auf dem Telefon standen zwei identische Kopfleisten uebereinander — auf jeder der achtzehn Seiten. Die Huelle bringt seit v5.5.0 eine mit, die Seiten brachten weiterhin ihre eigene' },
       { type: 'changed', text: 'Ein Test bricht den Build, sobald eine Seite wieder ihre eigene Kopfleiste rendert' },
