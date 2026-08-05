@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.9.1',
+    date: '5. August 2026',
+    label: 'Der Vergleich sagt auch, WOHER die Zahl kommt',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Trend-Verteilung (Perzentile, Ausreisserzahlen) und die zehn groessten Beitraege zum gewichteten Mittel' },
+      { type: 'changed', text: 'Anlass: Gesamtbestand ergab +28,69 % gegen −0,19 % der Stichprobe — 29 Prozentpunkte Unterschied sind eine Frage, kein Messergebnis' },
+    ],
+  },
+  {
     version: '5.9.0',
     date: '5. August 2026',
     label: 'Entscheidungsgrundlage fuer die Index-Breite',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'GET /api/index-vergleich (passwortgeschuetzt) rechnet CBI und Marktbreite auf der heutigen Stichprobe UND auf dem gesamten Bestand, je Preisschwelle' },
       { type: 'changed', text: 'Aendert keine oeffentliche Kennzahl — erst messen, wie stark sich eine Marktaussage aendern wuerde, dann entscheiden' },

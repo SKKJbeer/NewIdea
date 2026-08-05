@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.9.1] - 5. August 2026 · Der Vergleich sagt auch, WOHER die Zahl kommt
+
+### Neu
+- Der Index-Vergleich liefert zusaetzlich die Verteilung der gemessenen Trends (Minimum, 1./10./50./90./99. Perzentil, Maximum, Anzahl ueber +100 %, ueber +1000 %, unter −50 %) und die zehn Karten mit dem groessten Beitrag zum gewichteten Mittel
+
+### Warum
+- Der erste Durchlauf ergab auf dem Gesamtbestand **+28,69 %** gegen **−0,19 %** auf der heutigen Stichprobe. Ein Unterschied von 29 Prozentpunkten ist kein Messergebnis, sondern eine Frage. Ohne die Aufschluesselung waere der Vergleich nur ein zweiter Wert gewesen, kein Argument
+
+---
+
 ## [5.9.0] - 5. August 2026 · Entscheidungsgrundlage fuer die Index-Breite
 
 ### Neu

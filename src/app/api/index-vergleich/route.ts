@@ -106,8 +106,50 @@ export async function GET(request: Request) {
     // gemeint ist, entscheidet sich an diesen Zahlen.
     const schwellen = [0, 0.1, 0.5, 1, 5, 20];
 
+    // WOHER KOMMT DIE ZAHL? Ohne diese Aufschlüsselung wäre der Vergleich oben
+    // nur ein zweiter Wert, kein Argument. Der CBI ist preisgewichtet und hat
+    // keinerlei Ausreißerschutz — auf einer gleichartigen Stichprobe fällt das
+    // nie auf, auf dem Gesamtbestand entscheidet es alles.
+    const gemessen = alle.filter(
+      (k) => typeof k.trendPercent === 'number' && !(k.trendPercent === 0 && k.realData !== true),
+    );
+    const trends = gemessen.map((k) => k.trendPercent as number).sort((a, b) => a - b);
+    const p = (q: number) => (trends.length ? trends[Math.floor((trends.length - 1) * q)] : null);
+
+    // Die zehn Karten mit dem größten Beitrag zum gewichteten Mittel:
+    // Preis × Trend. Genau sie machen den Unterschied zwischen −0,2 und +28.
+    const beitraege = gemessen
+      .map((k) => ({
+        preis: k.prices.market ?? 0,
+        trend: k.trendPercent as number,
+        beitrag: (k.prices.market ?? 0) * (k.trendPercent as number),
+        set: k.setCode,
+      }))
+      .sort((a, b) => Math.abs(b.beitrag) - Math.abs(a.beitrag))
+      .slice(0, 10);
+
+    const gewichtSumme = gemessen.reduce((s, k) => s + (k.prices.market || 1), 0);
+
     return NextResponse.json({
       stand: new Date().toISOString(),
+      verteilung: {
+        n: trends.length,
+        min: p(0),
+        p01: p(0.01),
+        p10: p(0.1),
+        median: p(0.5),
+        p90: p(0.9),
+        p99: p(0.99),
+        max: p(1),
+        ueber100Prozent: trends.filter((t) => t > 100).length,
+        ueber1000Prozent: trends.filter((t) => t > 1000).length,
+        unterMinus50: trends.filter((t) => t < -50).length,
+      },
+      groessteBeitraege: beitraege.map((b) => ({
+        ...b,
+        // Wieviel Prozentpunkte des Gesamtindex geht auf DIESE eine Karte?
+        anteilAmIndex: gewichtSumme > 0 ? b.beitrag / gewichtSumme : 0,
+      })),
       indexVollstaendigGelesen: vollstaendig,
       zeilenImIndex: zeilen.length,
       heute: {
