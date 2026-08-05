@@ -1,7 +1,10 @@
+import Link from 'next/link';
 import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
+import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { searchCards } from '@/lib/pokemon-api';
 import { cachedSearchCards } from '@/lib/search-cache';
+import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { getMarketBenchmark } from '@/lib/market-context';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -29,6 +32,44 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Gefundene Sets über den Kartentreffern.
+ *
+ * Mit Set-Logo, nicht nur als Text: Die Projektregel „wo ein Set erscheint,
+ * erscheint sein Bild" gilt hier besonders — der ganze Zweck dieses Blocks ist,
+ * dass jemand sein Set WIEDERERKENNT.
+ */
+function SetTrefferListe({ sets }: { sets: SetTreffer[] }) {
+  if (sets.length === 0) return null;
+  return (
+    <section>
+      <div className="mb-4 flex items-center gap-3">
+        <p className={SECTION_LABEL}>{sets.length === 1 ? 'Passendes Set' : 'Passende Sets'}</p>
+        <div className="h-px flex-1 bg-[#1c1c24]" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {sets.map((s) => (
+          <Link
+            key={s.setCode}
+            href={`/sets/${s.setCode}`}
+            className="flex min-w-0 items-center gap-4 border border-[#1c1c24] px-4 py-3 transition-colors hover:border-violet-500/30 hover:bg-white/[0.02]"
+          >
+            <BoosterPackImage
+              setCode={s.setCode}
+              setName={s.setName}
+              className="h-10 w-auto max-w-[64px] shrink-0 object-contain"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-200">{s.setName}</p>
+              <p className="truncate text-xs text-slate-500">Alle Karten dieses Sets ansehen</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function SearchPage({
   searchParams,
 }: {
@@ -38,10 +79,19 @@ export default async function SearchPage({
   const query = (q || '').trim();
 
   let results = [] as Awaited<ReturnType<typeof searchCards>>;
+  // SETS MITSUCHEN. Das Suchfeld verspricht „Suche Karten, Sets, …", und die
+  // Startseite nennt Sets beim Namen. Wer „Black Bolt" eintippte, bekam bis
+  // v5.6.2 „Keine Karten gefunden" — plus den Hinweis, es doch mit dem
+  // englischen Namen zu versuchen. Der Name WAR englisch; er gehört nur zu
+  // einem Set.
+  let sets: SetTreffer[] = [];
   let error = false;
   if (query.length >= 2) {
     try {
-      results = await cachedSearchCards(query, 40);
+      [results, sets] = await Promise.all([
+        cachedSearchCards(query, 40),
+        searchSetIndex(query, 4).catch(() => [] as SetTreffer[]),
+      ]);
     } catch {
       error = true;
     }
@@ -120,14 +170,24 @@ export default async function SearchPage({
             <p className="font-semibold flex items-center justify-center gap-1.5"><TriangleAlert size={14} /> Suche momentan nicht verfügbar</p>
             <p className="text-sm mt-1 text-amber-400/60">Bitte versuche es später erneut.</p>
           </div>
-        ) : results.length === 0 ? (
+        ) : results.length === 0 && sets.length === 0 ? (
           <div className="text-center text-slate-600 py-16">
             <SearchX size={40} className="mx-auto mb-4 opacity-40" />
             <p className="text-sm">Keine Karten für „<span className="font-semibold text-slate-400">{query}</span>" gefunden.</p>
             <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
           </div>
         ) : (
-          <SearchResultsLang cards={results} query={query} cbi={markt?.value ?? null} />
+          <div className="space-y-10">
+            <SetTrefferListe sets={sets} />
+            {results.length > 0 ? (
+              <SearchResultsLang cards={results} query={query} cbi={markt?.value ?? null} />
+            ) : (
+              <p className="text-center text-sm text-slate-600">
+                Keine einzelne Karte trägt diesen Namen — er gehört zu{' '}
+                {sets.length === 1 ? 'einem Set' : `${sets.length} Sets`}.
+              </p>
+            )}
+          </div>
         )}
       </main>
 

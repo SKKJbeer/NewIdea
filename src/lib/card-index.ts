@@ -134,6 +134,78 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   return (data as unknown as IndexZeile[]).map(zuKarte);
 }
 
+export interface SetTreffer {
+  setCode: string;
+  setName: string;
+  hoechsterPreis: number;
+}
+
+/**
+ * Sets im eigenen Index suchen.
+ *
+ * WARUM ES DAS BRAUCHT: Das Suchfeld verspricht „Suche Karten, Sets, …", und
+ * die Startseite nennt Sets beim Namen („Black Bolt +6,7 %"). Wer das las und
+ * „black bolt" eintippte, bekam „Keine Karten gefunden" und darunter den
+ * Hinweis, es doch mit dem englischen Namen zu versuchen — der Name WAR
+ * englisch, er gehört nur zu einem Set und nicht zu einer Karte. Eine Suche,
+ * die etwas verspricht und dann in eine Sackgasse führt, ist schlimmer als
+ * eine, die nichts verspricht.
+ *
+ * KEINE eigene Tabelle: Die Set-Namen stehen bereits in jeder Zeile des
+ * Kartenindex. Eine zweite Tabelle wäre eine zweite Stelle, an der etwas
+ * veralten kann — dieselbe Falle wie bei den ableitbaren Diagnosen
+ * (Stolperstelle 21).
+ *
+ * Die Gruppierung passiert hier und nicht in der Datenbank: `distinct` gibt es
+ * über den Supabase-Client nicht, und die Menge ist gedeckelt. Sortiert wird
+ * nach dem höchsten Kartenpreis des Sets — wer einen Set-Namen tippt, meint
+ * fast immer das bekanntere Set, und Bekanntheit schlägt sich im Preis nieder.
+ */
+export async function searchSetIndex(query: string, limit = 3): Promise<SetTreffer[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const begriff = query.trim().replace(/[%_\\]/g, '');
+  if (begriff.length < 2) return [];
+
+  // 400 Zeilen reichen: Ein Set hat höchstens ein paar hundert Karten, und die
+  // teuersten stehen vorn. Ohne Deckel wäre das eine Volltabellen-Abfrage bei
+  // jedem Tastendruck.
+  const { data, error } = await sb
+    .from('cards_index')
+    .select('set_name,set_code,price')
+    .ilike('set_name', `%${begriff}%`)
+    .order('price', { ascending: false })
+    .limit(400);
+
+  if (error) {
+    console.warn('[Kartenindex] Set-Suche fehlgeschlagen:', error.message);
+    return [];
+  }
+
+  // BEWUSST OHNE KARTENZAHL. Sie liesse sich aus diesen Zeilen zaehlen — aber
+  // nur die, die innerhalb der 400er-Grenze liegen. Bei einem grossen Set oder
+  // zwei gleichzeitigen Treffern waere die Zahl zu niedrig, ohne dass man ihr
+  // das ansieht. Eine stille Untertreibung ist genau die Sorte Zahl, die diese
+  // Seite nicht anzeigt (siehe Preis-Wahrheitspflicht). Die genaue Zahl steht
+  // auf der Set-Seite, die einen Klick entfernt ist.
+  const proSet = new Map<string, SetTreffer>();
+  for (const z of (data ?? []) as { set_name: string; set_code: string; price: number }[]) {
+    if (proSet.has(z.set_code)) continue;
+    proSet.set(z.set_code, {
+      setCode: z.set_code,
+      setName: z.set_name,
+      // Die Zeilen kommen absteigend sortiert — die erste je Set ist die
+      // teuerste.
+      hoechsterPreis: Number(z.price),
+    });
+  }
+
+  return [...proSet.values()]
+    .sort((a, b) => b.hoechsterPreis - a.hoechsterPreis)
+    .slice(0, limit);
+}
+
 /**
  * Karten anhand ihrer IDs aus dem eigenen Index holen.
  *

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Loader2, ImageOff, X } from 'lucide-react';
+import { Search, Loader2, ImageOff, X, Layers } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatEur } from '@/lib/format';
@@ -14,6 +14,12 @@ interface Suggestion {
   imageUrl?: string;
   price: number;
   set: string;
+}
+
+interface SetVorschlag {
+  setCode: string;
+  setName: string;
+  hoechsterPreis: number;
 }
 
 interface SearchBoxProps {
@@ -54,7 +60,7 @@ const WARTE_MS = 140;
 // Seitenwechsel neu aufgebaut (Kopfleiste, Suchseite, Einstiegsseite sind drei
 // Instanzen). Läge der Speicher in der Komponente, wäre er nach jedem Klick
 // leer — also genau dann, wenn er gebraucht wird.
-const SPEICHER = new Map<string, { treffer: Suggestion[]; zeit: number }>();
+const SPEICHER = new Map<string, { treffer: Suggestion[]; sets: SetVorschlag[]; zeit: number }>();
 const SPEICHER_MAX = 40;
 
 // FRIST — und zwar nicht, um Speicher zu sparen.
@@ -68,19 +74,19 @@ const SPEICHER_MAX = 40;
 // und lang genug, um eine Suchsitzung abzudecken.
 const FRIST_MS = 5 * 60 * 1000;
 
-function ausSpeicherRoh(q: string): Suggestion[] | undefined {
+function ausSpeicherRoh(q: string): { treffer: Suggestion[]; sets: SetVorschlag[] } | undefined {
   const e = SPEICHER.get(q);
   if (!e) return undefined;
   if (Date.now() - e.zeit > FRIST_MS) {
     SPEICHER.delete(q);
     return undefined;
   }
-  return e.treffer;
+  return e;
 }
 
-function merken(q: string, treffer: Suggestion[]) {
+function merken(q: string, treffer: Suggestion[], sets: SetVorschlag[]) {
   SPEICHER.delete(q);
-  SPEICHER.set(q, { treffer, zeit: Date.now() });
+  SPEICHER.set(q, { treffer, sets, zeit: Date.now() });
   // Ältester Eintrag zuerst raus — `Map` merkt sich die Einfügereihenfolge.
   while (SPEICHER.size > SPEICHER_MAX) {
     const aeltester = SPEICHER.keys().next().value;
@@ -106,17 +112,23 @@ function passt(s: Suggestion, q: string): boolean {
  * ersetzt die Liste, sobald er da ist — die Speicher-Antwort kann nur zu
  * WENIG zeigen (die kurze Liste war abgeschnitten), nie etwas Falsches.
  */
-function ausSpeicher(q: string): Suggestion[] | null {
+function ausSpeicher(q: string): { treffer: Suggestion[]; sets: SetVorschlag[] } | null {
   const genau = ausSpeicherRoh(q);
   if (genau) return genau;
 
   for (let i = q.length - 1; i >= 2; i--) {
     const kurz = ausSpeicherRoh(q.slice(0, i));
     if (!kurz) continue;
-    const passend = kurz.filter((s) => passt(s, q));
+    const passend = kurz.treffer.filter((s) => passt(s, q));
+    // Set-Namen aus dem kürzeren Begriff gelten nur weiter, wenn sie den
+    // längeren auch enthalten — sonst stünde „Black Bolt" noch über
+    // „black boltx".
+    const passendeSets = kurz.sets.filter((s) => s.setName.toLowerCase().includes(q));
     // Kein Treffer im Präfix heißt NICHT „es gibt keine" — die kurze Liste war
     // bei zwanzig Einträgen abgeschnitten. Also weitersuchen statt behaupten.
-    if (passend.length > 0) return passend;
+    if (passend.length > 0 || passendeSets.length > 0) {
+      return { treffer: passend, sets: passendeSets };
+    }
   }
   return null;
 }
@@ -130,6 +142,7 @@ export function SearchBox({
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [sets, setSets] = useState<SetVorschlag[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [open, setOpen] = useState(false);
   const [aktiv, setAktiv] = useState(-1);
@@ -166,6 +179,7 @@ export function SearchBox({
     if (q.length < 2) {
       abbruchRef.current?.abort();
       setSuggestions([]);
+      setSets([]);
       setLoadingSuggestions(false);
       setOpen(false);
       setAktiv(-1);
@@ -176,8 +190,9 @@ export function SearchBox({
     // „nach einer Sekunde".
     const sofort = ausSpeicher(q);
     if (sofort) {
-      setSuggestions(sofort);
-      setOpen(sofort.length > 0);
+      setSuggestions(sofort.treffer);
+      setSets(sofort.sets);
+      setOpen(sofort.treffer.length > 0 || sofort.sets.length > 0);
       setAktiv(-1);
     }
     // Ein exakter, noch gültiger Treffer im Speicher ist die vollständige
@@ -198,11 +213,19 @@ export function SearchBox({
           { signal: controller.signal },
         );
         if (!res.ok) throw new Error(String(res.status));
-        const data: Suggestion[] = await res.json();
+        const roh = await res.json();
         if (controller.signal.aborted) return;
-        merken(q, data);
+        // BEIDE FORMEN VERTRAGEN. Die Route gab bis v5.6.2 eine nackte Liste
+        // zurück und liefert jetzt `{ cards, sets }`. Zwischen Auslieferung und
+        // Ablauf des Zwischenspeichers (fünf Minuten) beantwortet das Netz
+        // beide Formen — ein Client, der nur die neue kennt, zeigt in dieser
+        // Zeit gar nichts.
+        const data: Suggestion[] = Array.isArray(roh) ? roh : (roh?.cards ?? []);
+        const gefundeneSets: SetVorschlag[] = Array.isArray(roh) ? [] : (roh?.sets ?? []);
+        merken(q, data, gefundeneSets);
         setSuggestions(data);
-        setOpen(data.length > 0);
+        setSets(gefundeneSets);
+        setOpen(data.length > 0 || gefundeneSets.length > 0);
         setAktiv(-1);
       } catch (err) {
         // catch erlaubt: Ein abgebrochener Abruf ist der Normalfall beim
@@ -272,7 +295,7 @@ export function SearchBox({
           type="search"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onFocus={() => suggestions.length > 0 && setOpen(true)}
+          onFocus={() => (suggestions.length > 0 || sets.length > 0) && setOpen(true)}
           onKeyDown={onKeyDown}
           autoFocus={autoFocus}
           placeholder={placeholder}
@@ -313,8 +336,41 @@ export function SearchBox({
         </button>
       </form>
 
-      {open && sichtbar.length > 0 && (
+      {open && (sichtbar.length > 0 || sets.length > 0) && (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] shadow-xl">
+          {/* SETS ZUERST, und ausserhalb des Rollbereichs.
+
+              Wer einen Set-Namen tippt, meint das Set — nicht die dreissig
+              Karten daraus, die zufaellig denselben Namen im Set-Feld tragen.
+              Stuende es unten in der Liste, muesste man dafuer scrollen.
+
+              Es ist bewusst NICHT Teil der Pfeiltasten-Auswahl: Die fuehrt
+              durch Karten, und ein Eintrag anderer Art mittendrin macht die
+              Reihenfolge unvorhersehbar. Ein Klick genuegt hier. */}
+          {sets.length > 0 && (
+            <div className="border-b border-[#1e1e30] bg-white/[0.02]">
+              {sets.map((s) => (
+                <Link
+                  key={s.setCode}
+                  href={`/sets/${s.setCode}`}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[#1a1a28]"
+                >
+                  <div className="flex h-10 w-8 shrink-0 items-center justify-center rounded bg-violet-500/10 text-violet-400">
+                    <Layers size={15} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-slate-200">{s.setName}</p>
+                    <p className="truncate text-xs text-slate-500">Alle Karten dieses Sets</p>
+                  </div>
+                  <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-violet-400">
+                    Set
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Die Höhe ist gedeckelt, NICHT die Liste allein: Der Weg zur
               vollständigen Suche steht unter dem Rollbereich und bleibt damit
               immer sichtbar — auch wenn oben gescrollt wird. */}

@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.7.0',
+    date: '5. August 2026',
+    label: 'Die Suche findet auch Sets',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Ein Set-Name lief in eine Sackgasse: „black bolt" ergab 0 Vorschlaege und „Keine Karten gefunden" — dabei verspricht das Feld „Suche Karten, Sets, …" und die Startseite nennt Sets beim Namen' },
+      { type: 'new', text: 'Set-Treffer im Vorschlagsfeld, ueber den Karten und ausserhalb des Rollbereichs' },
+      { type: 'new', text: 'Set-Treffer auf der Suchseite mit Set-Bild; findet die Suche nur Sets, steht das ausdruecklich da statt eines Leerzustands' },
+      { type: 'changed', text: 'Die Set-Suche geht in den eigenen Kartenindex statt in eine neue Tabelle — die Set-Namen stehen dort bereits in jeder Zeile' },
+      { type: 'changed', text: 'Bewusst ohne Kartenzahl am Set: Sie waere innerhalb der Abfragegrenze gezaehlt und damit still zu niedrig' },
+    ],
+  },
+  {
     version: '5.6.2',
     date: '4. August 2026',
     label: 'Auch die Ladezustaende zeigen die Kopfleiste nur einmal',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Derselbe Fehler wie v5.6.1, eine Ebene tiefer: Das Lade-Skelett rendert die Kopfleiste ein zweites Mal, der Ladezustand der Suche zeichnete ein graues Band an ihrer Stelle' },
       { type: 'fixed', text: 'Der Lade-Umriss der Suche war mittig, die Suchseite ist linksbuendig — beim Erscheinen der Treffer sprang der Seitenkopf nach links' },

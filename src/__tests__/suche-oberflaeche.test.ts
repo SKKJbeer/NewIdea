@@ -169,6 +169,61 @@ describe('Kopfleiste steht genau einmal', () => {
   });
 });
 
+describe('Die Suche haelt, was das Feld verspricht', () => {
+  // BEFUND: Das Suchfeld heisst „Suche Karten, Sets, …", und die Startseite
+  // nennt Sets beim Namen („Black Bolt +6,7 %"). Wer das las und „black bolt"
+  // eintippte, bekam „Keine Karten gefunden" und darunter den Rat, es mit dem
+  // englischen Namen zu versuchen — der Name WAR englisch, er gehoert nur zu
+  // einem Set. Gemessen an der Produktion: 0 Vorschlaege, 3,7 s Ladezeit, und
+  // am Ende eine Sackgasse.
+  const index = ohneKommentare(lies('src/lib/card-index.ts'));
+  const seite = ohneKommentare(lies('src/app/suche/page.tsx'));
+
+  it('sucht Sets im eigenen Index, nicht in einer zweiten Tabelle', () => {
+    // Eine eigene Set-Tabelle waere eine zweite Stelle, an der etwas veralten
+    // kann — die Set-Namen stehen bereits in jeder Zeile des Kartenindex.
+    expect(index).toContain('export async function searchSetIndex');
+    expect(index).toContain("ilike('set_name'");
+  });
+
+  it('nennt keine Kartenzahl, die sie nicht kennt', () => {
+    // Aus den gedeckelten Zeilen liesse sich eine Zahl zaehlen — bei einem
+    // grossen Set oder zwei Treffern waere sie zu niedrig, ohne dass man ihr
+    // das ansieht. Eine stille Untertreibung ist genau die Sorte Zahl, die
+    // diese Seite nicht anzeigt.
+    expect(index).not.toMatch(/karten:\s*\d/);
+    expect(index).not.toContain('vorhanden.karten++');
+    expect(ohneKommentare(box)).not.toMatch(/\{s\.karten\}/);
+    expect(seite).not.toMatch(/\{s\.karten\}/);
+  });
+
+  it('laesst einen Set-Namen nicht mehr in die Sackgasse laufen', () => {
+    // Der Leerzustand darf nur greifen, wenn WEDER Karten NOCH Sets gefunden
+    // wurden.
+    expect(seite).toContain('results.length === 0 && sets.length === 0');
+  });
+
+  it('holt Karten und Sets nebeneinander, nicht nacheinander', () => {
+    // Beide gehen in dieselbe Datenbank; nacheinander verdoppelt sich die
+    // Antwortzeit fuer nichts.
+    expect(seite).toContain('await Promise.all([');
+    expect(ohneKommentare(route)).toContain('await Promise.all([');
+  });
+
+  it('laesst einen Ausfall der Set-Suche die Kartensuche nicht mitreissen', () => {
+    // Die Kartenvorschlaege sind der Hauptzweck. Ein `Promise.all` ohne
+    // eigenen Auffang wuerde beide zusammen scheitern lassen.
+    expect(seite).toMatch(/searchSetIndex\([^)]*\)\.catch/);
+    expect(ohneKommentare(route)).toMatch(/searchSetIndex\([^)]*\)\.catch/);
+  });
+
+  it('zeigt das Set mit seinem Bild, nicht nur als Text', () => {
+    // Projektregel: Wo ein Set erscheint, erscheint sein Bild. Hier besonders —
+    // der ganze Zweck des Blocks ist, dass jemand sein Set wiedererkennt.
+    expect(seite).toContain('<BoosterPackImage');
+  });
+});
+
 describe('Vorschlagsroute begrenzt, was sie herausgibt', () => {
   it('deckelt die angeforderte Menge', () => {
     // Ohne Deckel wäre `?n=5000` ein Weg, über die Vorschlagsroute die halbe

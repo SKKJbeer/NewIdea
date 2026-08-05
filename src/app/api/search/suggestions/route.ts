@@ -1,5 +1,6 @@
 import { displayPrice } from '@/lib/pokemon-api';
 import { cachedSearchCards } from '@/lib/search-cache';
+import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { NextResponse } from 'next/server';
 
 // VORSCHLÄGE BEIM TIPPEN
@@ -25,6 +26,11 @@ import { NextResponse } from 'next/server';
 const N_MIN = 5;
 const N_MAX = 20;
 
+// EINE Form der Antwort, auch im Fehlerfall. Zwei verschiedene Formen (mal
+// Liste, mal Objekt) waeren eine Fallunterscheidung im Client, die niemand
+// mitpflegt.
+const LEER = { cards: [], sets: [] };
+
 function grenze(roh: string | null): number {
   const n = Number.parseInt(roh ?? '', 10);
   if (!Number.isFinite(n)) return N_MAX;
@@ -34,10 +40,17 @@ function grenze(roh: string | null): number {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get('q') || '').trim();
-  if (q.length < 2) return NextResponse.json([]);
+  if (q.length < 2) return NextResponse.json(LEER);
 
   try {
-    const cards = await cachedSearchCards(q, grenze(searchParams.get('n')));
+    // Karten und Sets NEBENEINANDER, nicht nacheinander: Die Set-Suche geht in
+    // dieselbe Datenbank und würde sonst die Antwortzeit verdoppeln.
+    const [cards, sets] = await Promise.all([
+      cachedSearchCards(q, grenze(searchParams.get('n'))),
+      // Ein Ausfall der Set-Suche darf die Kartenvorschläge nicht mitreißen —
+      // sie sind der Hauptzweck dieser Route.
+      searchSetIndex(q, 2).catch(() => [] as SetTreffer[]),
+    ]);
     const suggestions = cards.map((c) => ({
       id: c.id,
       name: c.name,
@@ -46,12 +59,13 @@ export async function GET(request: Request) {
       price: displayPrice(c),
       set: c.set,
     }));
-    return NextResponse.json(suggestions, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
-    });
+    return NextResponse.json(
+      { cards: suggestions, sets },
+      { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } },
+    );
   } catch {
     // catch erlaubt: Vorschläge sind eine Zugabe — ohne sie funktioniert die
     // Suche weiterhin über die Eingabetaste.
-    return NextResponse.json([]);
+    return NextResponse.json(LEER);
   }
 }

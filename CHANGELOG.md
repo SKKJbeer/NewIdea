@@ -7,6 +7,23 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.7.0] - 5. August 2026 · Die Suche findet auch Sets
+
+### Behoben
+- **Ein Set-Name lief in eine Sackgasse.** Das Suchfeld heisst „Suche Karten, Sets, …", und die Startseite nennt Sets beim Namen („Black Bolt +6,7 %"). Wer das las und „black bolt" eintippte, bekam an der Produktion gemessen: 0 Vorschlaege, 3,7 s Ladezeit, dann „Keine Karten gefunden" — und darunter den Rat, es doch mit dem englischen Namen zu versuchen. Der Name WAR englisch; er gehoert nur zu einem Set und nicht zu einer Karte. Eine Suche, die etwas verspricht und dann ins Leere fuehrt, ist schlechter als eine, die nichts verspricht
+
+### Neu
+- **Set-Treffer im Vorschlagsfeld** — ueber den Karten, ausserhalb des Rollbereichs. Wer einen Set-Namen tippt, meint das Set, nicht die dreissig Karten daraus, die zufaellig denselben Namen im Set-Feld tragen
+- **Set-Treffer auf der Suchseite**, mit Set-Bild statt nur als Text: Der Zweck des Blocks ist, dass jemand sein Set wiedererkennt. Findet die Suche nur Sets und keine Karte, steht das ausdruecklich da statt eines Leerzustands
+
+### Geaendert
+- **Die Set-Suche geht in den eigenen Kartenindex, nicht in eine neue Tabelle.** Die Set-Namen stehen bereits in jeder Zeile — eine zweite Tabelle waere eine zweite Stelle, an der etwas veralten kann
+- **Karten und Sets werden nebeneinander gesucht**, nicht nacheinander; ein Ausfall der Set-Suche reisst die Kartenvorschlaege nicht mit
+- **Bewusst ohne Kartenzahl am Set.** Sie liesse sich aus den geholten Zeilen zaehlen — aber nur innerhalb der Abfragegrenze. Bei einem grossen Set oder zwei gleichzeitigen Treffern waere sie zu niedrig, ohne dass man ihr das ansieht; die genaue Zahl steht einen Klick entfernt auf der Set-Seite
+- Die Vorschlagsroute antwortet jetzt mit `{ cards, sets }` statt einer nackten Liste. Der Client vertraegt beide Formen — waehrend der ersten fuenf Minuten nach einer Auslieferung beantwortet der Zwischenspeicher noch die alte
+
+---
+
 ## [5.6.2] - 4. August 2026 · Auch die Ladezustaende zeigen die Kopfleiste nur einmal
 
 ### Behoben
