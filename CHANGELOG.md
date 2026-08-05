@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.9.2] - 5. August 2026 · Drei belastbare Alternativen zum heutigen Indexwert
+
+### Neu
+- Der Index-Vergleich rechnet zusaetzlich drei ausreisserfeste Varianten: **Median** (ungewichtet), **preisgewichtet mit gestutzten Raendern** (P1/P99) und **preisgewichtet mit Gewichtsdeckel** (keine Karte ueber 0,5 % des Gesamtgewichts) — fuer Stichprobe und Gesamtbestand gleichermassen
+
+### Warum
+- Der heutige Indexwert ist preisgewichtet und hat **keinerlei Ausreisserschutz**. Auf der gleichartigen Stichprobe faellt das nie auf, auf dem Gesamtbestand entscheidet es alles: **zehn Karten von 19.063 tragen rund 12 der 28,7 Prozentpunkte** — alle aus alten Sets (pop5, base1, ex7, ecard3), wo ein 30-Tage-Schnitt aus wenigen Verkaeufen entsteht und dreistellige Prozentwerte zeigen kann
+- Der Median aller 19.063 gemessenen Trends liegt bei **0 %**. Die Spanne des Mittelwerts gegen den Median ist kein Detail, sondern die eigentliche Frage
+
+---
+
 ## [5.9.1] - 5. August 2026 · Der Vergleich sagt auch, WOHER die Zahl kommt
 
 ### Neu

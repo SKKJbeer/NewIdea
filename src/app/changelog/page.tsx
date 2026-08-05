@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.9.2',
+    date: '5. August 2026',
+    label: 'Drei belastbare Alternativen zum heutigen Indexwert',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Median, gestutzte Raender (P1/P99) und Gewichtsdeckel (max. 0,5 % je Karte) — fuer Stichprobe und Gesamtbestand' },
+      { type: 'changed', text: 'Anlass: zehn Karten von 19.063 tragen rund 12 der 28,7 Prozentpunkte; der Median aller Trends liegt bei 0 %' },
+    ],
+  },
+  {
     version: '5.9.1',
     date: '5. August 2026',
     label: 'Der Vergleich sagt auch, WOHER die Zahl kommt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Trend-Verteilung (Perzentile, Ausreisserzahlen) und die zehn groessten Beitraege zum gewichteten Mittel' },
       { type: 'changed', text: 'Anlass: Gesamtbestand ergab +28,69 % gegen −0,19 % der Stichprobe — 29 Prozentpunkte Unterschied sind eine Frage, kein Messergebnis' },

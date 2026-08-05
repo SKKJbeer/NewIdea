@@ -69,6 +69,64 @@ function alsKarte(z: IndexZeile): PokemonCard {
   } as PokemonCard;
 }
 
+/**
+ * Kandidaten für einen belastbaren Indexwert — zum Vergleich, nicht zum Einbau.
+ *
+ * BEFUND, der sie nötig macht: Auf dem Gesamtbestand ergibt der heutige,
+ * preisgewichtete Mittelwert +28,7 %, während der MEDIAN aller 19.063
+ * gemessenen Trends bei 0 % liegt. Zehn Karten von 19.063 tragen zusammen rund
+ * 12 der 28,7 Prozentpunkte — alles Karten aus alten Sets (pop5, base1, ex7),
+ * bei denen ein Cardmarket-30-Tage-Schnitt aus wenigen Verkäufen entsteht und
+ * dadurch dreistellige Prozentwerte zeigen kann.
+ *
+ * Der Mittelwert ohne Ausreißerschutz war auf einer gleichartigen Stichprobe
+ * unauffällig. Auf dem ganzen Markt ist er es nicht.
+ */
+function robusteVarianten(karten: PokemonCard[]) {
+  const mit = karten.filter(
+    (k) => typeof k.trendPercent === 'number' && !(k.trendPercent === 0 && k.realData !== true),
+  );
+  if (mit.length === 0) return null;
+
+  const trends = mit.map((k) => k.trendPercent as number).sort((a, b) => a - b);
+  const perzentil = (q: number) => trends[Math.floor((trends.length - 1) * q)];
+
+  // 1. Median, ungewichtet — die typische Karte.
+  const median = perzentil(0.5);
+
+  // 2. Preisgewichtet, aber die äußersten Prozent gestutzt (nicht entfernt):
+  //    Ein Ausreißer zählt mit dem Wert der Grenze, nicht mit seinem eigenen.
+  const unten = perzentil(0.01);
+  const oben = perzentil(0.99);
+  let gs = 0;
+  let ts = 0;
+  for (const k of mit) {
+    const g = k.prices.market || 1;
+    const t = Math.min(Math.max(k.trendPercent as number, unten), oben);
+    ts += t * g;
+    gs += g;
+  }
+  const gestutzt = gs > 0 ? ts / gs : 0;
+
+  // 3. Preisgewichtet mit Gewichtsdeckel: Keine Karte darf mehr als ein halbes
+  //    Prozent des Gesamtgewichts stellen. Das begrenzt genau den Effekt, den
+  //    die Liste `groessteBeitraege` sichtbar macht.
+  const gesamtGewicht = mit.reduce((s, k) => s + (k.prices.market || 1), 0);
+  const deckel = gesamtGewicht * 0.005;
+  let gs2 = 0;
+  let ts2 = 0;
+  for (const k of mit) {
+    const g = Math.min(k.prices.market || 1, deckel);
+    ts2 += (k.trendPercent as number) * g;
+    gs2 += g;
+  }
+  const gedeckelt = gs2 > 0 ? ts2 / gs2 : 0;
+
+  // toFixed erlaubt: JSON-Diagnose, kein Seitentext.
+  const r = (x: number) => Number(x.toFixed(2));
+  return { median: r(median), gestutztP1P99: r(gestutzt), gewichtsdeckel: r(gedeckelt) };
+}
+
 // Diese Route liefert JSON zur internen Entscheidung, keinen Seitentext. Die
 // Zahlen werden nur gekuerzt, nicht fuer die Anzeige formatiert — deutsche
 // Schreibweise waere in JSON sogar falsch.
@@ -86,6 +144,7 @@ function kennzahlen(karten: PokemonCard[]) {
     marktbreite: breite.total > 0 ? Number(breite.pct.toFixed(1)) : null,
     hoch: breite.up,
     runter: breite.down,
+    robust: robusteVarianten(karten),
   };
 }
 
