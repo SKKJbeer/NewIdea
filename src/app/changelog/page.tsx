@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.9.0',
+    date: '5. August 2026',
+    label: 'Entscheidungsgrundlage fuer die Index-Breite',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'GET /api/index-vergleich (passwortgeschuetzt) rechnet CBI und Marktbreite auf der heutigen Stichprobe UND auf dem gesamten Bestand, je Preisschwelle' },
+      { type: 'changed', text: 'Aendert keine oeffentliche Kennzahl — erst messen, wie stark sich eine Marktaussage aendern wuerde, dann entscheiden' },
+    ],
+  },
+  {
     version: '5.8.1',
     date: '5. August 2026',
     label: 'Gleichnamige Treffer sind unterscheidbar',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Seit die Liste nach Passgenauigkeit sortiert, stehen gleichnamige Karten untereinander — die zweite Zeile zeigte aber entweder den deutschen Namen oder das Set. Das Set steht jetzt immer da' },
     ],

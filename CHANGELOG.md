@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.9.0] - 5. August 2026 · Entscheidungsgrundlage fuer die Index-Breite
+
+### Neu
+- **`GET /api/index-vergleich`** (passwortgeschuetzt wie `/monitoring`) rechnet CBI und Marktbreite doppelt: einmal auf der heutigen Stichprobe von rund 250 Karten, einmal auf dem gesamten erfassten Bestand — und zusaetzlich je Preisschwelle (alle · ab 0,10 € · 0,50 € · 1 € · 5 € · 20 €)
+
+### Warum getrennt vom Angezeigten
+- Die Route **aendert keine einzige oeffentliche Kennzahl.** Eine Marktaussage umzustellen, ohne vorher zu wissen, wie stark sie sich dadurch aendert, waere das Falscheste ueberhaupt — man wuerde eine andere Zahl ausliefern und sie fuer dieselbe halten
+- Wird der Bestand nicht vollstaendig gelesen (Seitengrenze), steht das ausdruecklich in der Antwort. Eine Vergleichszahl, die selbst eine Behauptung ist, waere wertlos
+
+---
+
 ## [5.8.1] - 5. August 2026 · Gleichnamige Treffer sind unterscheidbar
 
 ### Behoben
