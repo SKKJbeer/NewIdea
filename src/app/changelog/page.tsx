@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.0.2',
+    date: '5. August 2026',
+    label: 'Groessere Zahlen brauchen deutsche Schreibweise',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„14985 Karten“ stand ohne Tausenderpunkt — bei 204 Karten unsichtbar, mit dem Gesamtbestand an sechs Stellen gleichzeitig' },
+      { type: 'fixed', text: '„Stichprobe“ als Beschriftung stimmte nicht mehr: Der Index rechnet auf dem gesamten erfassten Bestand, nicht auf einer Auswahl' },
+    ],
+  },
+  {
     version: '6.0.1',
     date: '5. August 2026',
     label: 'Der neue Index kam nicht durch die eigene Qualitaetspruefung',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Startseite zeigte „Keine Messung“ statt einer Zahl: Die Index-Zeilen trugen weder ID noch Bild-URL, und validateMarketData verwirft Zeilen ohne Bild bzw. mit doppelter ID — von 19.690 Karten blieb eine uebrig' },
       { type: 'fixed', text: 'Der Index-Vergleich hatte das nicht gezeigt, weil er die Qualitaetspruefung ueberspringt — gemessen wurde ein anderer Weg als der ausgelieferte' },

@@ -1,4 +1,5 @@
 import type { PmiResult, Breadth, FearGreedResult, SetRank } from './market-metrics';
+import { formatAmount } from './format';
 
 // MARKTKOMMENTAR — Kennzahlen in Sätzen.
 //
@@ -42,7 +43,7 @@ export function marketBrief(
     return [
       {
         text: 'Für eine Einordnung liegen derzeit nicht genügend gemessene Karten vor.',
-        beleg: `${cbi.cardCount} von ${cbi.minCards} nötigen Karten`,
+        beleg: `${formatAmount(cbi.cardCount)} von ${cbi.minCards} nötigen Karten`,
       },
     ];
   }
@@ -56,7 +57,7 @@ export function marketBrief(
     text: flach
       ? `Der Gesamtmarkt bewegt sich über ${cbi.windowDays} Tage kaum.`
       : `Der Gesamtmarkt steht über ${cbi.windowDays} Tage ${richtung}.`,
-    beleg: `${INDEX_ZAHL(cbi.value)} — Median aus ${cbi.cardCount} gemessenen Karten`,
+    beleg: `${INDEX_ZAHL(cbi.value)} — Median aus ${formatAmount(cbi.cardCount)} gemessenen Karten`,
   });
 
   // 2. Marktbreite gegen Indexrichtung — der eigentliche Erkenntnisgewinn.

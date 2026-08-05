@@ -86,8 +86,11 @@ export function MetricCards({
   // gegen den erfassten Bestand. Auf der Seite ergab das „1 %, 249 von 19.690",
   // und das las sich als „dieser Dienst kennt ein Prozent des Marktes". Beide
   // Zahlen waren richtig, die Aussage war falsch: Verglichen wurden zwei
-  // INTERNE Groessen, von denen die kleinere eine bewusste methodische Wahl
-  // ist — der Index rechnet auf einer Stichprobe, nicht auf allem.
+  // INTERNE Groessen.
+  //
+  // Seit v6.0.0 rechnet der Index ohnehin auf dem ganzen erfassten Bestand;
+  // der Bruch waere heute nahe eins und damit nichtssagend. Die Frage bleibt
+  // dieselbe.
   //
   // Die Frage, die jemand tatsaechlich hat, lautet: Kennt ihr meine Karten?
   // Darauf antwortet der erfasste Bestand gegen die Gesamtzahl.
@@ -213,7 +216,7 @@ export function MetricCards({
               {abdeckung.sets !== null && ` · ${abdeckung.sets.toLocaleString('de-DE')} Sets`}
             </>
           ) : (
-            'in der laufenden Stichprobe'
+            'im laufenden Bestand'
           )
         }
       >

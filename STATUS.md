@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.0.1` · **Stand:** 5. August 2026 · **Branch:** `main`
+**Version:** `v6.0.2` · **Stand:** 5. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.0.2 | Kartenzahlen deutsch formatiert („14985“ ohne Tausenderpunkt) und „Stichprobe“ als Beschriftung ersetzt |
 | v6.0.1 | Index-Zeilen fielen durch die eigene Qualitaetspruefung (keine ID, kein Bild) — die Startseite zeigte „Keine Messung“ |
 | v6.0.0 | Der Index rechnet auf dem ganzen Bestand (19.690 statt 204 Karten) und ist der Median statt eines preisgewichteten Mittels — auf dem Gesamtbestand ergab das Mittel +28,7 %, der Median +3,5 % |
 | v5.9.3 | Index-Vergleich stellt dieselben Karten-IDs gegenueber (live vs. gespeichert) — der entscheidende Test fuer die 29-Prozentpunkte-Luecke |

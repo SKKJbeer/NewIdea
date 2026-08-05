@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.0.2] - 5. August 2026 · Groessere Zahlen brauchen deutsche Schreibweise
+
+### Behoben
+- **„14985 Karten“** stand ohne Tausenderpunkt auf der Startseite. Bei 204 Karten war der Fehler nicht zu sehen — mit dem Gesamtbestand ist er es an sechs Stellen gleichzeitig. Alle laufen jetzt ueber `formatAmount` (Projektregel: jede sichtbare Zahl deutsch)
+- **„Stichprobe“** als Beschriftung stimmte nicht mehr. Der Index rechnet seit v6.0.0 auf dem gesamten erfassten Bestand, nicht auf einer Auswahl — die Kachel heisst jetzt „Gemessene Karten“, der Bestandshinweis „im laufenden Bestand“
+- Der Kommentar zur Abdeckungs-Kachel behauptete weiterhin, der Index rechne auf einer Stichprobe. Ein Kommentar, der die Gegenwart falsch beschreibt, ist schlimmer als keiner
+
+---
+
 ## [6.0.1] - 5. August 2026 · Der neue Index kam nicht durch die eigene Qualitaetspruefung
 
 ### Behoben

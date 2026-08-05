@@ -3,6 +3,7 @@ import { fetchCardsBySet } from './pokemon-api';
 import { computePmi, rankSets, hasRealTrend, MIN_SET_SAMPLE } from './market-metrics';
 import { loadLatestMarketIndex } from './market-index-store';
 import type { PokemonCard } from '@/types';
+import { formatAmount } from './format';
 
 // MARKTKONTEXT — der Gedanke, der das Produkt trägt.
 //
@@ -221,7 +222,7 @@ export function buildMarketContext(
     rows.push({
       label: 'CardBeacon Index',
       value: markt.value,
-      meta: `${markt.cardCount} Karten · ${markt.setCount} Sets`,
+      meta: `${formatAmount(markt.cardCount)} Karten · ${formatAmount(markt.setCount)} Sets`,
     });
   }
 

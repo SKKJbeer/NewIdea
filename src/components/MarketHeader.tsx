@@ -9,6 +9,7 @@ import type { MarketStory } from '@/lib/market-story';
 import { formatPercent } from '@/lib/format';
 import type { PmiResult, Breadth, FearGreedResult } from '@/lib/market-metrics';
 import type { DataCoverage } from '@/lib/data-coverage';
+import { formatAmount } from '@/lib/format';
 
 // MARKTKOPF — die visuelle Signatur des Produkts.
 //
@@ -116,7 +117,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             <p className="mt-3 max-w-[260px] text-[12px] leading-relaxed text-slate-500">
               {cbi.sufficient
                 ? `Durchschnittliche Preisbewegung über ${cbi.windowDays} Tage, nach Kartenwert gewichtet: Teure Karten zählen stärker.`
-                : `Noch nicht genügend Daten (${cbi.cardCount} von ${cbi.minCards} Karten).`}
+                : `Noch nicht genügend Daten (${formatAmount(cbi.cardCount)} von ${cbi.minCards} Karten).`}
             </p>
             <Link
               href="/methodik"
@@ -141,7 +142,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             sich keine davon, weil nichts sie unterscheidet. Jede bekommt jetzt
             eine eigene kleine Darstellung, und zwar eine, die ihren Wert
             WIEDERHOLT statt ihn zu schmücken: der Anteil im Plus als geteilter
-            Balken, die Temperatur als Position auf einer Skala, die Stichprobe
+            Balken, die Temperatur als Position auf einer Skala, die Kartenzahl
             als abzählbare Punkte, die Sets als gestapelte Ebenen. Keine davon
             steht da, wenn der zugehörige Wert nicht gemessen ist. */}
         <dl className="mt-4 grid grid-cols-2 divide-y divide-[#1c1c24] border-y border-[#1c1c24] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
@@ -184,8 +185,8 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
           </div>
 
           <div className="py-4 pr-4 sm:px-5 sm:py-5">
-            <dt className={SECTION_LABEL}>Stichprobe</dt>
-            <dd className={`${NUM.large} mt-2 text-slate-200`}>{cbi.cardCount}</dd>
+            <dt className={SECTION_LABEL}>Gemessene Karten</dt>
+            <dd className={`${NUM.large} mt-2 text-slate-200`}>{formatAmount(cbi.cardCount)}</dd>
             <dd className="mt-2.5 flex max-w-[140px] flex-wrap gap-[3px]" aria-hidden>
               {/* Ein Punkt je zehn Karten, gedeckelt. Die Menge wird abzählbar,
                   ohne dass 204 Punkte zur Fläche werden. */}
@@ -209,7 +210,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
                 />
               ))}
             </dd>
-            <dd className="mt-2 text-[11px] text-slate-600">mit Stichprobe</dd>
+            <dd className="mt-2 text-[11px] text-slate-600">mit Messung</dd>
           </div>
         </dl>
 
