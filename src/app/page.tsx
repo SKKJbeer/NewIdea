@@ -181,14 +181,14 @@ export default async function MarketPage() {
                   72-px-Ueberschrift wie ein Bedienelement wirken — hier ist er
                   Teil der Komposition. */}
               <div className="mt-11 flex flex-wrap items-center gap-4">
-                <Link
+                <Link prefetch={false}
                   href="/marktbericht"
                   className="group inline-flex h-[58px] items-center gap-2.5 rounded-full border border-violet-300/25 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-9 text-[15px] font-medium text-white shadow-[0_10px_40px_-12px_rgba(139,92,246,0.75)] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_16px_52px_-12px_rgba(139,92,246,0.9)]"
                 >
                   Marktbericht lesen
                   <ArrowRight size={17} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
-                <Link
+                <Link prefetch={false}
                   href="/sets"
                   className="inline-flex h-[58px] items-center rounded-full border border-white/[0.11] bg-white/[0.025] px-9 text-[15px] text-slate-100 backdrop-blur-xl transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.22] hover:bg-white/[0.06]"
                 >
@@ -302,7 +302,7 @@ export default async function MarketPage() {
               Derselbe Maßstab, andere Menge: Das Portfolio misst deine Karten gegen denselben
               Index — nicht nur ihren Wert, sondern ihre Entwicklung gegenüber dem Markt.
             </p>
-            <Link
+            <Link prefetch={false}
               href="/portfolio"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/[0.13] bg-white/[0.03] px-5 text-[13px] text-slate-100 transition-colors hover:border-white/[0.24]"
             >

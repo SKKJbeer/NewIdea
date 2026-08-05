@@ -77,7 +77,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             <SearchBox placeholder="Suche Karten, Sets, …" searchBtn="Suchen" />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Link
+            <Link prefetch={false}
               href="/merkliste"
               aria-label="Merkliste"
               title="Merkliste"
@@ -85,7 +85,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Star size={17} />
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/portfolio"
               aria-label="Portfolio"
               title="Portfolio"

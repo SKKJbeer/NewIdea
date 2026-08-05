@@ -60,6 +60,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
             <Link
+              prefetch={false}
               href="/"
               className="flex min-h-[44px] items-center"
               aria-label="CardBeacon — Startseite"
@@ -78,6 +79,7 @@ export function SiteFooter() {
                 {g.links.map((l) => (
                   <li key={l.href}>
                     <Link
+              prefetch={false}
                       href={l.href}
                       className="inline-flex min-h-[32px] items-center text-[12px] text-slate-500 transition-colors hover:text-slate-200"
                     >

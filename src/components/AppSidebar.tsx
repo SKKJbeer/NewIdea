@@ -49,7 +49,7 @@ export function AppSidebar({ datenstand, bestand }: Props) {
       />
 
       <div className="px-5 pt-6">
-        <Link href="/" className="block">
+        <Link prefetch={false} href="/" className="block">
           <Wordmark className="text-[17px]" />
           <p className="mt-1 text-[9.5px] leading-tight tracking-wide text-slate-600">{DESCRIPTOR_EN}</p>
         </Link>
@@ -60,6 +60,7 @@ export function AppSidebar({ datenstand, bestand }: Props) {
           const aktiv = p.href === '/' ? pfad === '/' : pfad.startsWith(p.href);
           return (
             <Link
+              prefetch={false}
               key={p.href}
               href={p.href}
               aria-current={aktiv ? 'page' : undefined}

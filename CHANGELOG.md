@@ -7,6 +7,27 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.2.0] - 5. August 2026 · Die Startseite laedt nicht mehr die halbe Site vorab
+
+### Behoben
+- **37 Vorabrufe bei EINEM Aufruf der Startseite** — jede Route vier- bis fuenfmal. Die Navigation steht auf jeder Seite und immer im Sichtfeld; Next.js ruft deshalb beim Ankommen jede verlinkte Route vorab ab. Auf Vercel ist jeder dieser Vorabrufe ein echter Serveraufruf. Die Seite lud die halbe Site, bevor jemand irgendwohin geklickt hatte
+- **Der Hauptthread war genau dann belegt, wenn der Besucher die erste Kachel anfaehrt** — daher die verzoegerte Hover-Reaktion und der Eindruck, es werde beim Ueberfahren etwas geladen
+
+### Gemessen (dieselbe Maschine, vorher/nachher)
+| | vorher | nachher |
+|---|---|---|
+| RSC-Vorabrufe | 37 | **0** |
+| Anfragen nach dem Laden | 49 | **1** |
+| Hover-Reaktion | 65 ms | **9–30 ms** |
+
+- Die eine verbleibende Anfrage ist ein nachgeladenes Kartenbild — alle 17 Bilder unterhalb des ersten Bildschirms laden korrekt verzoegert
+
+### Was NICHT abgeschaltet wurde
+- Inhaltslisten (Suchtreffer, Set-Uebersicht, Artikel) rufen weiterhin vorab ab. Dort ist es sinnvoll: Der Besucher hat die Liste absichtlich geoeffnet und klickt mit hoher Wahrscheinlichkeit hinein. Abgeschaltet ist nur die dauerhaft sichtbare Navigation
+- Sieben Pruefungen halten das fest, darunter eine, die anschlaegt, wenn die Huelle um einen weiteren Navigationsbaustein waechst, der nicht in der Liste steht
+
+---
+
 ## [6.1.0] - 5. August 2026 · Index und Marktbreite zaehlen wieder dieselbe Menge
 
 ### Behoben

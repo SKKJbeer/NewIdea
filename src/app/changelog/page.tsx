@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.2.0',
+    date: '5. August 2026',
+    label: 'Die Startseite laedt nicht mehr die halbe Site vorab',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '37 Vorabrufe bei einem Aufruf der Startseite — jede Route vier- bis fuenfmal, auf Vercel je ein echter Serveraufruf. Jetzt 0' },
+      { type: 'fixed', text: 'Anfragen nach dem Laden von 49 auf 1, Hover-Reaktion von 65 ms auf 9 bis 30 ms' },
+      { type: 'changed', text: 'Abgeschaltet ist nur die dauerhaft sichtbare Navigation — Inhaltslisten rufen weiterhin vorab ab, dort ist es sinnvoll' },
+    ],
+  },
+  {
     version: '6.1.0',
     date: '5. August 2026',
     label: 'Index und Marktbreite zaehlen wieder dieselbe Menge',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Auf einer Seite standen „Median aus 14.985 gemessenen Karten“ und „9505 von 19060 gemessenen Karten im Plus“ — der Index schloss Cent-Karten aus, die Marktbreite nicht' },
       { type: 'changed', text: 'Die Zulassung gibt es jetzt einmal (istIndexKarte); ein Test zaehlt nach, dass beide Funktionen sie benutzen' },

@@ -65,7 +65,7 @@ export function NavBar() {
             zu treffen als jedes andere Ziel der Seite, und sie ist eines der
             meistgenutzten. Die Marke selbst bleibt gleich gross; nur der
             anklickbare Bereich waechst. */}
-        <Link
+        <Link prefetch={false}
           href="/"
           className="flex min-h-[44px] shrink-0 items-center"
           aria-label="CardBeacon — Startseite"
@@ -77,7 +77,7 @@ export function NavBar() {
             darunter. Das ist die ruhigste Art, Zustand zu zeigen. */}
         <nav className="hidden md:flex items-center" aria-label="Hauptnavigation">
           {NAV.map(({ href, label }) => (
-            <Link
+            <Link prefetch={false}
               key={href}
               href={href}
               aria-current={aktiv(href) ? 'page' : undefined}
@@ -96,7 +96,7 @@ export function NavBar() {
           {/* Suche bleibt jederzeit erreichbar, aber als Werkzeug — nicht als
               Blickfang. Auf der Startseite war sie bisher das größte Element
               der Seite; dieser Platz gehört dem Index. */}
-          <Link
+          <Link prefetch={false}
             href="/suche"
             className="flex h-11 min-w-[44px] items-center justify-center gap-2 px-2 text-slate-500 transition-colors hover:text-slate-200"
             aria-label="Karten suchen"
@@ -120,7 +120,7 @@ export function NavBar() {
       {offen && (
         <nav className="border-t border-[#1c1c24] md:hidden" aria-label="Navigation">
           {NAV.map(({ href, label }) => (
-            <Link
+            <Link prefetch={false}
               key={href}
               href={href}
               aria-current={aktiv(href) ? 'page' : undefined}

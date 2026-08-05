@@ -37,7 +37,7 @@ function Panel({
       <div className="flex items-center justify-between gap-4 px-6 pt-6 sm:px-7 sm:pt-7">
         <h3 className="text-[10.5px] font-medium uppercase tracking-[0.2em] text-slate-400/80">{titel}</h3>
         {aktion && aktionHref && (
-          <Link href={aktionHref} className="shrink-0 text-[11px] text-violet-400 transition-colors hover:text-violet-300">
+          <Link prefetch={false} href={aktionHref} className="shrink-0 text-[11px] text-violet-400 transition-colors hover:text-violet-300">
             {aktion}
           </Link>
         )}
@@ -60,7 +60,7 @@ export function MoversPanel({ karten, cbi }: { karten: PokemonCard[]; cbi: numbe
             const gemessen = typeof trend === 'number';
             const gegen = gemessen && cbi !== null ? trend - cbi : null;
             return (
-              <Link
+              <Link prefetch={false}
                 key={c.id}
                 href={`/karten/${c.id}`}
                 className="group flex items-center gap-4 rounded-2xl px-3 py-3 transition-colors hover:bg-white/[0.035]"
@@ -105,7 +105,7 @@ export function SetMarketPanel({ sets }: { sets: SetRank[] }) {
           </p>
         ) : (
           sets.map((s) => (
-            <Link
+            <Link prefetch={false}
               key={s.code}
               href={`/sets/${s.code}`}
               className="group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-colors hover:bg-white/[0.035]"
@@ -180,7 +180,7 @@ export function ReportPromo({
           </p>
           <h3 className="mt-4 text-[21px] font-semibold leading-[1.25] tracking-[-0.01em] text-white">{titel}</h3>
           <p className="mt-4 text-[13.5px] leading-[1.7] text-slate-400">{text}</p>
-          <Link
+          <Link prefetch={false}
             href="/marktbericht"
             className="mt-7 inline-flex h-[46px] items-center gap-2 rounded-full border border-white/[0.11] bg-white/[0.05] px-6 text-[13.5px] font-medium text-slate-100 transition-all duration-300 hover:-translate-y-[1px] hover:border-violet-300/35 hover:bg-white/[0.09]"
           >
@@ -222,7 +222,7 @@ export function QuickActions() {
       <p className="text-[10.5px] font-medium uppercase tracking-[0.2em] text-slate-400/80">Schnellzugriff</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {SCHNELLZUGRIFF.map((e) => (
-          <Link
+          <Link prefetch={false}
             key={e.href}
             href={e.href}
             className="group flex min-h-[80px] items-center gap-4 rounded-[18px] border border-white/[0.05] bg-white/[0.015] px-5 py-4 transition-all duration-300 hover:-translate-y-[2px] hover:border-white/[0.12] hover:bg-white/[0.04]"
