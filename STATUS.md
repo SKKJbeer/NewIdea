@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v5.8.0` · **Stand:** 5. August 2026 · **Branch:** `main`
+**Version:** `v5.8.1` · **Stand:** 5. August 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v5.8.1 | Gleichnamige Treffer sind unterscheidbar — das Set steht jetzt in jeder Zeile, nicht wahlweise der deutsche Name |
 | v5.8.0 | Die Suche zeigt die gemeinte Karte zuerst — sortiert nach Rang statt nur nach Preis („mew" ergab vorher Mewtwo auf Platz 1, Mew auf Platz 6) |
 | v5.7.0 | Die Suche findet auch Sets — ein Set-Name („black bolt") lief vorher in „Keine Karten gefunden", obwohl das Feld Sets verspricht |
 | v5.6.2 | Auch die Ladezustaende zeigten die Kopfleiste doppelt — Skelett und Such-Umriss bereinigt; der Umriss der Suche war mittig statt linksbuendig |

@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.8.1',
+    date: '5. August 2026',
+    label: 'Gleichnamige Treffer sind unterscheidbar',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Seit die Liste nach Passgenauigkeit sortiert, stehen gleichnamige Karten untereinander — die zweite Zeile zeigte aber entweder den deutschen Namen oder das Set. Das Set steht jetzt immer da' },
+    ],
+  },
+  {
     version: '5.8.0',
     date: '5. August 2026',
     label: 'Die Suche zeigt die gemeinte Karte zuerst',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Trefferliste war nach Preis sortiert, nicht nach Passgenauigkeit: Bei „mew" stand „Mewtwo ★" auf Platz 1 und die Karte namens Mew auf Platz 6' },
       { type: 'changed', text: 'Sortiert wird jetzt nach Rang, dann nach Preis: exakter Name, Namensanfang, Wortanfang, irgendwo enthalten' },

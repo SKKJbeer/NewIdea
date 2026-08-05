@@ -405,8 +405,23 @@ export function SearchBox({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-slate-200">{s.name}</p>
+                    {/* DAS SET STEHT IMMER DA — das ist die Zeile, die zwei
+                        Treffer voneinander unterscheidet.
+
+                        Vorher stand hier ENTWEDER der deutsche Name ODER das
+                        Set. Seit die Trefferliste nach Passgenauigkeit sortiert
+                        (v5.8.0), stehen die gleichnamigen Karten
+                        untereinander: „mew" liefert acht Karten, die alle Mew
+                        heissen. Bei einer Karte mit abweichendem deutschen
+                        Namen — Charizard/Glurak — waeren das acht optisch
+                        identische Zeilen gewesen, unterscheidbar nur am Preis.
+                        Das Set ist die Angabe, nach der man tatsaechlich
+                        auswaehlt. */}
                     <p className="truncate text-xs text-slate-500">
-                      {s.nameDe && s.nameDe.toLowerCase() !== s.name.toLowerCase() ? s.nameDe : s.set}
+                      {s.nameDe && s.nameDe.toLowerCase() !== s.name.toLowerCase() && (
+                        <span className="text-slate-400">{s.nameDe} · </span>
+                      )}
+                      {s.set}
                     </p>
                   </div>
                   {s.price > 0 && (

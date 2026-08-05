@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.8.1] - 5. August 2026 · Gleichnamige Treffer sind unterscheidbar
+
+### Behoben
+- **Folge der neuen Reihenfolge, an der Produktion nachgemessen:** „mew" liefert jetzt acht Karten, die alle „Mew" heissen — richtig sortiert, aber die zweite Zeile zeigte ENTWEDER den deutschen Namen ODER das Set. Bei einer Karte mit abweichendem deutschen Namen (Charizard/Glurak) waeren das acht optisch identische Zeilen gewesen, unterscheidbar nur am Preis. Das Set steht jetzt IMMER da; der deutsche Name kommt davor, wenn er abweicht
+
+---
+
 ## [5.8.0] - 5. August 2026 · Die Suche zeigt die gemeinte Karte zuerst
 
 ### Behoben

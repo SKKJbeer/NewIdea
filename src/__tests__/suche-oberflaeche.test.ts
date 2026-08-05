@@ -97,6 +97,18 @@ describe('Wartezeit ist gemessen, nicht geraten', () => {
   });
 });
 
+describe('Zwei Treffer sind unterscheidbar', () => {
+  it('nennt bei jeder Zeile das Set', () => {
+    // Seit die Liste nach Passgenauigkeit sortiert, stehen gleichnamige Karten
+    // untereinander: „mew" liefert live acht Karten, die alle Mew heissen.
+    // Vorher zeigte die zweite Zeile ENTWEDER den deutschen Namen ODER das
+    // Set — bei Charizard/Glurak waeren das acht optisch identische Zeilen
+    // gewesen, unterscheidbar nur am Preis.
+    expect(boxCode).not.toMatch(/\?\s*s\.nameDe\s*:\s*s\.set/);
+    expect(boxCode).toContain('{s.set}');
+  });
+});
+
 describe('Bedienung ohne Maus', () => {
   it('führt mit den Pfeiltasten durch die Vorschläge', () => {
     expect(boxCode).toContain("'ArrowDown'");
