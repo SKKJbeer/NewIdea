@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.0.1] - 5. August 2026 · Der neue Index kam nicht durch die eigene Qualitaetspruefung
+
+### Behoben
+- **Die Startseite zeigte „Keine Messung“ und einen Gedankenstrich statt einer Zahl** — direkt nach der Umstellung auf den Gesamtbestand, live sichtbar
+- **Ursache:** Die Zeilen aus dem Kartenindex trugen weder `id` noch `imageUrl`, weil sie nur fuer Kennzahlen gedacht waren. `validateMarketData` — die Pruefung, durch die JEDE Kennzahl laeuft — verwirft aber Zeilen ohne Bild und behandelt jede weitere Zeile mit derselben (leeren) ID als Dublette. Von 19.690 Karten blieb damit genau EINE uebrig, und eine Karte reicht nicht fuer eine Aussage
+- **Warum es der Index-Vergleich nicht gezeigt hat:** Er ruft `computePmi` direkt auf, ohne die Pruefung, die im Betrieb davorsteht. Gemessen wurde also ein anderer Weg als der ausgelieferte
+- Beide Felder kommen jetzt mit. Der Name bleibt weg: Ihn prueft niemand, und er ist das mit Abstand groesste Feld
+
+### Die Lehre, festgehalten als Pruefung
+- Wer Daten fuer eine Kennzahl erzeugt, muss sie durch **dieselbe** Pruefung schicken, die sie spaeter durchlaufen — sonst prueft man etwas anderes, als man ausliefert. Fuenf neue Faelle halten das fest, darunter zwei, die die URSACHE beschreiben (ohne ID bleibt genau eine Zeile uebrig, ohne Bild keine)
+
+---
+
 ## [6.0.0] - 5. August 2026 · Der Index rechnet auf dem ganzen Markt — als Median
 
 Der CardBeacon Index steht ab sofort auf dem **gesamten erfassten Kartenbestand** statt auf einer Stichprobe, und er ist der **Median** statt eines preisgewichteten Mittels. Das ist die groesste Aenderung an der Kernaussage der Seite seit ihrem Bestehen — deshalb eine neue Hauptversion.

@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.0.1',
+    date: '5. August 2026',
+    label: 'Der neue Index kam nicht durch die eigene Qualitaetspruefung',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Startseite zeigte „Keine Messung“ statt einer Zahl: Die Index-Zeilen trugen weder ID noch Bild-URL, und validateMarketData verwirft Zeilen ohne Bild bzw. mit doppelter ID — von 19.690 Karten blieb eine uebrig' },
+      { type: 'fixed', text: 'Der Index-Vergleich hatte das nicht gezeigt, weil er die Qualitaetspruefung ueberspringt — gemessen wurde ein anderer Weg als der ausgelieferte' },
+      { type: 'changed', text: 'Fuenf Pruefungen halten fest, dass Kennzahlen-Daten dieselbe Qualitaetspruefung durchlaufen muessen wie das, was ausgeliefert wird' },
+    ],
+  },
+  {
     version: '6.0.0',
     date: '5. August 2026',
     label: 'Der Index rechnet auf dem ganzen Markt — als Median',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Grundlage: 19.690 erfasste Karten aus 155 Sets statt 204 aus 15 — die alte Stichprobe bestand nur aus den obersten Seltenheitsstufen' },
       { type: 'changed', text: 'Kennzahl: Median statt preisgewichtetem Mittel. Auf dem Gesamtbestand: Mittel +28,69 %, gestutzt +26,15 %, gedeckelt +23,71 %, Median +3,50 %' },
