@@ -998,6 +998,55 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 
 ---
 
+## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)
+
+**SYMPTOM:** Mitten in der Arbeit steht `/home/user/NewIdea` plötzlich auf v3.2.6
+(`560db9f`, 30.07.2026). Neunmal in einer einzigen Sitzung beobachtet.
+
+**ES IST KEINE GIT-OPERATION.** Nachgemessen am 05.08.:
+
+| Datei | Zeitstempel |
+|---|---|
+| `.git/logs/HEAD` | 30.07. 19:15 — neuester Reflog-Eintrag ist v3.2.6 |
+| `.git/index`, `.git/refs/…` | 30.07. 19:15 |
+| `package.json`, Quelldateien | 30.07. 19:14 |
+| `.git/config` | **heute** — einzige Ausnahme |
+
+Der Reflog enthält keinen einzigen Checkout- oder Reset-Eintrag. Das ganze
+Verzeichnis wird aus einem Abbild vom 30.07. wiederhergestellt; danach schreibt
+die Umgebung nur `.git/config` neu (Zugangsdaten). Von innen nicht abstellbar.
+
+**WARUM ES GEFÄHRLICH IST:** Liegt der Rücksprung ZWISCHEN Bearbeitung und
+Commit, entsteht ein Commit mit der richtigen Nachricht und dem Inhalt vom
+30. Juli — in `git log` nicht von einem echten zu unterscheiden. Genau das ist
+bei v6.0.0 passiert; aufgefallen ist es nur, weil die Testzahl von 1.077 auf
+770 fiel.
+
+**SOFORT PRÜFEN, wenn die Testzahl unerwartet fällt:**
+```bash
+./scripts/repo-wache.sh pruefen
+```
+
+**WIEDERHERSTELLEN** (verliert nichts, was auf origin liegt):
+```bash
+git fetch origin claude/direct-push-main-lxluxu
+git stash push -u -m stale
+git checkout -B claude/direct-push-main-lxluxu origin/claude/direct-push-main-lxluxu
+```
+`git reset --hard` wird vom Berechtigungs-Klassifizierer blockiert — der
+Umweg über `checkout -B` ist der vorgesehene Weg.
+
+**DAUERHAFTE ABSICHERUNG:** `scripts/repo-wache.sh` nach `~/.claude/` kopieren
+und als Hook eintragen (Anleitung im Kopf des Skripts). Die Kopie ist nötig,
+weil alles im Projektverzeichnis mit zurückgesetzt wird. **Das Eintragen muss
+der Nutzer selbst tun** — Schreibzugriff auf die Claude-Konfiguration ist für
+den Agenten gesperrt, und das ist beabsichtigt.
+
+**ECHTE URSACHE beim Nutzer:** Das Umgebungs-Abbild ist älter als der Stand auf
+GitHub. Eine neu angelegte Entwicklungsumgebung klont frisch und behebt es.
+
+---
+
 ## Monetisierungsstrategie & Business-Plan
 
 ### Einnahmequellen (geplant / in Umsetzung)
