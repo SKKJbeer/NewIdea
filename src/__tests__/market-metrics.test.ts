@@ -15,6 +15,7 @@ import {
   MAX_PLAUSIBLE_PRICE,
 } from '@/lib/market-metrics';
 import type { PokemonCard } from '@/types';
+import { formatCount, formatAmount } from '@/lib/format';
 
 // ANLASS: Die Rankings der Startseite waren logisch falsch. Dieselbe Liste
 // wurde zweimal sortiert und jeweils oben abgeschnitten — ohne Vorzeichenfilter.
@@ -413,5 +414,26 @@ describe('Index-Zeilen überleben die Qualitätsprüfung', () => {
     expect(abschnitt).toContain('id,set_code,price,trend,real_data,image_url');
     expect(abschnitt).toContain('id: z.id');
     expect(abschnitt).toContain('imageUrl: z.image_url');
+  });
+});
+
+describe('Anzahlen werden als Anzahlen geschrieben', () => {
+  // BEFUND, live sichtbar: Auf der Startseite stand „14.985,00 Karten · 155,00
+  // Sets" — eine Anzahl mit Cent-Genauigkeit. Ursache war `formatAmount`, der
+  // BETRAEGE formatiert und deshalb zwei Nachkommastellen setzt.
+  //
+  // Der Fehler entstand erst durch die Index-Umstellung: Vorher war die Zahl
+  // klein (204) und stand ohnehin unformatiert da. Eine groessere Zahl deckt
+  // auf, was eine kleine verdeckt.
+  it('setzt Tausenderpunkt und keine Nachkommastellen', () => {
+    expect(formatCount(14985)).toBe('14.985');
+    expect(formatCount(155)).toBe('155');
+    expect(formatCount(0)).toBe('0');
+  });
+
+  it('bleibt vom Betrags-Formatierer unterscheidbar', () => {
+    // Wuerden beide dasselbe tun, waere die Trennung wertlos.
+    expect(formatAmount(14985)).toContain(',');
+    expect(formatCount(14985)).not.toContain(',');
   });
 });

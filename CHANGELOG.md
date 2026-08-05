@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.0.3] - 5. August 2026 · Eine Anzahl hat keine Nachkommastellen
+
+### Behoben
+- **„14.985,00 Karten · 155,00 Sets“** — der Tausenderpunkt aus v6.0.2 war richtig, der Formatierer falsch: `formatAmount` formatiert BETRAEGE und setzt deshalb zwei Nachkommastellen. Eine Anzahl mit Cent-Genauigkeit
+- Neu: `formatCount` fuer Stueckzahlen. Beide Formatierer sind per Test voneinander abgegrenzt — waeren sie gleich, waere die Trennung wertlos
+
+### Anmerkung
+- Beide Fehler dieser Reihe (fehlender Tausenderpunkt, dann falsche Nachkommastellen) waren vorher vorhanden und unsichtbar: Bei 204 Karten faellt weder das eine noch das andere auf. Eine groessere Zahl deckt auf, was eine kleine verdeckt
+
+---
+
 ## [6.0.2] - 5. August 2026 · Groessere Zahlen brauchen deutsche Schreibweise
 
 ### Behoben

@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.0.3',
+    date: '5. August 2026',
+    label: 'Eine Anzahl hat keine Nachkommastellen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„14.985,00 Karten · 155,00 Sets“ — formatAmount formatiert Betraege und setzt zwei Nachkommastellen; fuer Stueckzahlen gibt es jetzt formatCount' },
+      { type: 'changed', text: 'Beide Formatierer sind per Test voneinander abgegrenzt' },
+    ],
+  },
+  {
     version: '6.0.2',
     date: '5. August 2026',
     label: 'Groessere Zahlen brauchen deutsche Schreibweise',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '„14985 Karten“ stand ohne Tausenderpunkt — bei 204 Karten unsichtbar, mit dem Gesamtbestand an sechs Stellen gleichzeitig' },
       { type: 'fixed', text: '„Stichprobe“ als Beschriftung stimmte nicht mehr: Der Index rechnet auf dem gesamten erfassten Bestand, nicht auf einer Auswahl' },

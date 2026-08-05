@@ -1,5 +1,5 @@
 import type { PmiResult, Breadth, SetRank } from './market-metrics';
-import { formatAmount } from './format';
+import { formatCount } from './format';
 
 // DIE MARKT-STORY — was heute passiert ist, in Sätzen statt in Kennzahlen.
 //
@@ -79,7 +79,7 @@ export function marketStory(
         `Sobald genügend Karten mit gemessener Preisbewegung vorliegen, steht hier, ` +
         `was sich bewegt hat.`,
       belege: [
-        { label: 'Gemessene Karten', wert: `${formatAmount(cbi.cardCount)} von ${cbi.minCards} nötigen` },
+        { label: 'Gemessene Karten', wert: `${formatCount(cbi.cardCount)} von ${cbi.minCards} nötigen` },
       ],
       belastbar: false,
     };
@@ -160,7 +160,7 @@ export function marketStory(
   const belege: Array<{ label: string; wert: string }> = [
     { label: `Index ${cbi.windowDays} Tage`, wert: prozent(cbi.value) },
     { label: 'Im Plus', wert: `${breite.up} von ${breite.total}` },
-    { label: 'Erfasste Karten', wert: `${formatAmount(cbi.cardCount)} Karten · ${formatAmount(cbi.setCount)} Sets` },
+    { label: 'Erfasste Karten', wert: `${formatCount(cbi.cardCount)} Karten · ${formatCount(cbi.setCount)} Sets` },
   ];
 
   return { schlagzeile, absatz: teile.join(' '), belege, belastbar: true };

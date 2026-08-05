@@ -9,7 +9,7 @@ import type { MarketStory } from '@/lib/market-story';
 import { formatPercent } from '@/lib/format';
 import type { PmiResult, Breadth, FearGreedResult } from '@/lib/market-metrics';
 import type { DataCoverage } from '@/lib/data-coverage';
-import { formatAmount } from '@/lib/format';
+import { formatCount } from '@/lib/format';
 
 // MARKTKOPF — die visuelle Signatur des Produkts.
 //
@@ -117,7 +117,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
             <p className="mt-3 max-w-[260px] text-[12px] leading-relaxed text-slate-500">
               {cbi.sufficient
                 ? `Durchschnittliche Preisbewegung über ${cbi.windowDays} Tage, nach Kartenwert gewichtet: Teure Karten zählen stärker.`
-                : `Noch nicht genügend Daten (${formatAmount(cbi.cardCount)} von ${cbi.minCards} Karten).`}
+                : `Noch nicht genügend Daten (${formatCount(cbi.cardCount)} von ${cbi.minCards} Karten).`}
             </p>
             <Link
               href="/methodik"
@@ -186,7 +186,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
 
           <div className="py-4 pr-4 sm:px-5 sm:py-5">
             <dt className={SECTION_LABEL}>Gemessene Karten</dt>
-            <dd className={`${NUM.large} mt-2 text-slate-200`}>{formatAmount(cbi.cardCount)}</dd>
+            <dd className={`${NUM.large} mt-2 text-slate-200`}>{formatCount(cbi.cardCount)}</dd>
             <dd className="mt-2.5 flex max-w-[140px] flex-wrap gap-[3px]" aria-hidden>
               {/* Ein Punkt je zehn Karten, gedeckelt. Die Menge wird abzählbar,
                   ohne dass 204 Punkte zur Fläche werden. */}

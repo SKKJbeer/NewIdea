@@ -45,6 +45,21 @@ export function formatAmount(value: number): string {
   return AMOUNT.format(value);
 }
 
+const ANZAHL = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
+
+/**
+ * ANZAHL mit Tausenderpunkt, ohne Nachkommastellen: "14.985".
+ *
+ * WARUM NICHT `formatAmount`: Der formatiert BETRÄGE und setzt deshalb zwei
+ * Nachkommastellen. Auf der Startseite stand damit „14.985,00 Karten · 155,00
+ * Sets" — eine Anzahl mit Cent-Genauigkeit. Der Fehler entstand erst, als der
+ * Index vom Stichproben-Wert (204) auf den Gesamtbestand umgestellt wurde:
+ * Vorher war die Zahl klein und stand ohnehin ohne Formatierung da.
+ */
+export function formatCount(value: number): string {
+  return ANZAHL.format(value);
+}
+
 /**
  * Trend in Prozent mit Vorzeichen: "+3,4 %" / "-1,2 %".
  * `withSign: false` für Stellen, an denen das Vorzeichen bereits durch ein
