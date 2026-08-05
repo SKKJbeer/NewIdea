@@ -8,15 +8,15 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 
 ---
 
-## Was gebaut ist (Stand v5.1.0)
+## Was gebaut ist (geprueft an der Produktion am 05.08.2026)
 
 | Bereich | Status | Details |
 |---|---|---|
-| Startseite `/` | ✅ Fertig | Bloomberg/TradingView Dark Mode, PMI, Fear & Greed, Sparklines, Ticker · ISR 1h |
-| Suche `/suche` | ✅ Fertig | Karten UND Sets, nach Passgenauigkeit sortiert, Autocomplete (140 ms Wartezeit, laufende Abfragen abgebrochen, hoechstens 8 Zeilen mit Deckel, Tastaturbedienung), zentrale Filterung leerer Preview-Karten |
-| Marktbericht `/marktbericht` | ⚠️ Nachziehen | v2.23.0 behebt Erzeugung + entfernt Platzhalter. Seit KW 26 kein echter Bericht — per `POST /api/market-report/generate` sofort erzeugen |
+| Startseite `/` | ✅ Fertig | CBI (Median, ganzer Bestand), Marktbreite, Markttemperatur, Bewegungen, Set-Markt · ISR 1h · keine Vorabrufe mehr (v6.2.0) |
+| Suche `/suche` | ✅ Fertig | Karten UND Sets, nach Passgenauigkeit sortiert (v5.8.0), Autocomplete 140 ms, laufende Abfragen abgebrochen, 8 Zeilen mit Deckel, Tastaturbedienung · live 0,20–0,38 s |
+| Marktbericht `/marktbericht` | ✅ Fertig | Geprueft 05.08.: KW 31 live, 3 Berichte gespeichert, Wochen-Cron laeuft (letzter 03.08.) |
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
-| Artikel-Erzeugung | ⚠️ Nachziehen | v2.22.0 behebt die Ursache (Token-Limit). Bestehende 8 Beiträge sind noch Fallbacks — per `POST /api/articles/generate` neu erzeugen |
+| Artikel-Erzeugung | ✅ Fertig | Geprueft 05.08.: 11 Artikel, echte KI-Titel (kein Fallback), letzter 02.08. (So) — naechster Do 06.08. |
 | Tagesartikel `/artikel/[date]` | ✅ Fertig | Selbstheilend (on-demand-Generierung), ISR 24h, KI + Fallback, 404-Fix |
 | Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO, ISR 1h |
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
@@ -29,12 +29,12 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Impressum & Datenschutz | ✅ Fertig | Echte Daten, § 5 DDG, Datenschutz beschreibt echten Datenfluss (cookielos) |
 | Wöchentlicher Cron (Mo 07:00) | ✅ Aktiv | Marktbericht + Newsletter-Draft, CRON_SECRET ✅ |
 | Täglicher Cron (08:00 UTC) | ✅ Aktiv | Preis-Snapshots + Publish-Artikel (So/Do), verwaiste Crons entfernt |
-| Supabase Preis-Snapshots | ✅ Aktiv | Sammelt täglich echte Daten seit Inbetriebnahme |
+| Supabase Preis-Snapshots | ✅ Aktiv | 35.344 Messpunkte, Stand 05.08. · Kartenindex 19.690 Karten · Erfassung stand 02.–05.08. still, behoben in v6.2.1 |
 | i18n DE/EN | ✅ Fertig | Cookie-basiert, NavBar-Umschalter |
 | SEO | ✅ Fertig | JSON-LD, Sitemap (inkl. Artikel/Guides/Berichte), robots.txt, OpenGraph |
-| Tests | ✅ 145 grün | Vitest — Portfolio, Median, Card-Display, Artikel-Daten, Guides, Marktbericht, Compliance, Merkliste, System-Health |
+| Tests | ✅ 1.088 gruen | Vitest, 58 Dateien — Kennzahlen, Suche, Vorabruf, Content-Compliance, Sicherheit, Datengrafiken, System-Health |
 | Monitoring: Betriebszustand | ✅ Fertig | Echte Zeilenzahlen + Datenstände + Klartext-Fehler + Setup-SQL (`src/lib/system-health.ts`) |
-| Guide-Pipeline | ⚠️ Prüfen | Diagnose eingebaut (v2.21.0) — Betriebszustand auf `/monitoring` öffnen, ggf. fehlende Tabelle per SQL anlegen, dann „Jetzt testen" |
+| Guide-Pipeline | ✅ Laeuft | Geprueft 05.08.: 8 Guides live (4 statisch + 4 generiert), letzter 04.08., 8 Themen in der Warteschlange |
 | Newsletter-System (Beehiiv) | ⏸ Bereit | Code fertig — `BEEHIIV_API_KEY` noch nicht gesetzt |
 | Social-Media (Buffer) | ⏸ Bereit | Code fertig — `BUFFER_ACCESS_TOKEN` noch nicht gesetzt |
 | Affiliate-Links | ⚠️ Standard-URLs | Eigene Links in Vercel noch nicht eingetragen (0 € Provision aktiv) |
