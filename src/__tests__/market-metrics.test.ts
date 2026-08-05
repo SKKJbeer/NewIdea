@@ -437,3 +437,32 @@ describe('Anzahlen werden als Anzahlen geschrieben', () => {
     expect(formatCount(14985)).not.toContain(',');
   });
 });
+
+describe('Index und Marktbreite zaehlen dieselbe Menge', () => {
+  // BEFUND, live auf EINER Seite: „Median aus 14.985 gemessenen Karten" oben,
+  // „9505 von 19060 gemessenen Karten im Plus" zwei Absaetze weiter. Beide
+  // richtig gerechnet, beide fuer eine andere Menge — `computePmi` schloss die
+  // Cent-Karten aus, `marketBreadth` nicht.
+  //
+  // Derselbe Widerspruch wie damals bei „16 % · 8/50" gegen „16 von 50", nur
+  // mit anderer Ursache. Deshalb gibt es die Zulassung jetzt EINMAL.
+  const boden = Array.from({ length: 40 }, (_, i) => card(`b${i}`, 20, 0.03));
+  // Kein Trend von exakt 0: Der gilt ohne `realData` als nicht gemessen und
+  // haette mit der Zulassungsregel nichts zu tun.
+  const echte = Array.from({ length: 30 }, (_, i) => card(`e${i}`, i - 15.5, 6));
+
+  it('nennt dieselbe Bezugsgroesse', () => {
+    const pmi = computePmi([...boden, ...echte]);
+    const breite = marketBreadth([...boden, ...echte]);
+    expect(breite.total).toBe(pmi.cardCount);
+    expect(breite.total).toBe(30);
+  });
+
+  it('teilt sich eine einzige Zulassungsregel', () => {
+    const quelle = readFileSync(join(process.cwd(), 'src/lib/market-metrics.ts'), 'utf8');
+    expect(quelle).toContain('export function istIndexKarte');
+    expect(quelle).toContain('cards.filter(istIndexKarte)');
+    // Beide Funktionen muessen sie benutzen — nicht nur eine.
+    expect(quelle.match(/cards\.filter\(istIndexKarte\)/g)?.length).toBe(2);
+  });
+});

@@ -11,6 +11,7 @@
 import type { PokemonCard } from '@/types';
 import { displayPrice } from './pokemon-api';
 import { median } from './portfolio';
+import { formatCount } from './format';
 
 /**
  * Hat diese Karte einen ECHTEN Trendwert?
@@ -95,7 +96,14 @@ export interface Breadth {
  * die Zählung hier einmal — für Kachel, Erklärtext und Angst & Gier.
  */
 export function marketBreadth(cards: PokemonCard[]): Breadth {
-  const mitTrend = cards.filter(hasRealTrend);
+  // DIESELBE Zulassung wie beim Index — nicht nur `hasRealTrend`.
+  //
+  // BEFUND, live auf einer Seite: „Median aus 14.985 gemessenen Karten" und
+  // zwei Absaetze weiter „9505 von 19060 gemessenen Karten im Plus". Zwei
+  // Zahlen fuer dieselbe Menge, weil `computePmi` die Cent-Karten ausschliesst
+  // und diese Funktion nicht. Genau derselbe Widerspruch wie damals bei
+  // „16 % · 8/50" gegen „16 von 50" — nur mit einer anderen Ursache.
+  const mitTrend = cards.filter(istIndexKarte);
   const up = mitTrend.filter((c) => (c.trendPercent as number) > 0).length;
   const down = mitTrend.filter((c) => (c.trendPercent as number) < 0).length;
   return {
@@ -258,6 +266,18 @@ export interface PmiResult {
 export const INDEX_MIN_PREIS = 0.1;
 
 /**
+ * Zaehlt diese Karte fuer eine Marktaussage?
+ *
+ * EINE Regel fuer Index UND Marktbreite. Zwei getrennte Filter waren live als
+ * Widerspruch auf derselben Seite zu sehen: „Median aus 14.985 gemessenen
+ * Karten" oben, „9505 von 19060 gemessenen Karten im Plus" zwei Absaetze
+ * weiter. Beide Zahlen richtig gerechnet, beide fuer eine andere Menge.
+ */
+export function istIndexKarte(card: PokemonCard): boolean {
+  return hasRealTrend(card) && displayPrice(card) >= INDEX_MIN_PREIS;
+}
+
+/**
  * Markttrend als MEDIAN der gemessenen Bewegungen.
  *
  * WAS SICH GEÄNDERT HAT UND WARUM — gemessen am 05.08.2026 auf dem gesamten
@@ -290,7 +310,7 @@ export const INDEX_MIN_PREIS = 0.1;
  * nicht, dass eine Karte häufiger gehandelt wird.
  */
 export function computePmi(cards: PokemonCard[]): PmiResult {
-  const mitTrend = cards.filter((c) => hasRealTrend(c) && displayPrice(c) >= INDEX_MIN_PREIS);
+  const mitTrend = cards.filter(istIndexKarte);
   const setCount = new Set(mitTrend.map((c) => c.setCode).filter(Boolean)).size;
 
   // `median` gibt bei leerer Liste `null` — hier wird daraus 0, weil
@@ -366,7 +386,7 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
       label: 'Marktbreite',
       score: breite.pct,
       weight: FEAR_GREED_WEIGHTS.breadth,
-      detail: `${breite.up} von ${breite.total} Karten über ihrem 30-Tage-Schnitt`,
+      detail: `${formatCount(breite.up)} von ${formatCount(breite.total)} Karten über ihrem 30-Tage-Schnitt`,
     },
     {
       label: 'Momentum',
@@ -378,7 +398,7 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
       label: 'Gewinner zu Verlierer',
       score: verhaeltnis,
       weight: FEAR_GREED_WEIGHTS.ratio,
-      detail: `${breite.up} gestiegen, ${breite.down} gefallen`,
+      detail: `${formatCount(breite.up)} gestiegen, ${formatCount(breite.down)} gefallen`,
     },
   ];
 

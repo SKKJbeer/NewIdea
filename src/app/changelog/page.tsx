@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.1.0',
+    date: '5. August 2026',
+    label: 'Index und Marktbreite zaehlen wieder dieselbe Menge',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Auf einer Seite standen „Median aus 14.985 gemessenen Karten“ und „9505 von 19060 gemessenen Karten im Plus“ — der Index schloss Cent-Karten aus, die Marktbreite nicht' },
+      { type: 'changed', text: 'Die Zulassung gibt es jetzt einmal (istIndexKarte); ein Test zaehlt nach, dass beide Funktionen sie benutzen' },
+      { type: 'fixed', text: 'Alle Anzahlen im Fliesstext deutsch formatiert — an sechs weiteren Stellen' },
+    ],
+  },
+  {
     version: '6.0.3',
     date: '5. August 2026',
     label: 'Eine Anzahl hat keine Nachkommastellen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: '„14.985,00 Karten · 155,00 Sets“ — formatAmount formatiert Betraege und setzt zwei Nachkommastellen; fuer Stueckzahlen gibt es jetzt formatCount' },
       { type: 'changed', text: 'Beide Formatierer sind per Test voneinander abgegrenzt' },

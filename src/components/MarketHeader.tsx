@@ -160,7 +160,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
               </dd>
             )}
             <dd className="mt-2 text-[11px] tabular-nums text-slate-600">
-              {breite.total > 0 ? `${breite.up} von ${breite.total} im Plus` : 'keine Messung'}
+              {breite.total > 0 ? `${formatCount(breite.up)} von ${formatCount(breite.total)} im Plus` : 'keine Messung'}
             </dd>
           </div>
 

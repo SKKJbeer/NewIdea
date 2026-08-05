@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.1.0] - 5. August 2026 · Index und Marktbreite zaehlen wieder dieselbe Menge
+
+### Behoben
+- **Zwei Zahlen fuer dieselbe Menge, auf EINER Seite.** Oben stand „Median aus 14.985 gemessenen Karten“, zwei Absaetze weiter „9505 von 19060 gemessenen Karten im Plus“. Beide richtig gerechnet, beide fuer eine andere Grundgesamtheit: Der Index schliesst Karten unter zehn Cent aus, die Marktbreite tat es nicht
+- Die Zulassung gibt es jetzt **einmal** (`istIndexKarte`) und beide Funktionen benutzen sie. Ein Test zaehlt nach, dass es genau zwei Verwendungen sind — eine allein waere derselbe Fehler
+- **Alle Anzahlen im Fliesstext deutsch formatiert** („9505 von 19060“ → „9.505 von 19.060“) an sechs weiteren Stellen: Marktgeschichte, Marktzusammenfassung, Kopfzeile, Kennzahlkarte und die beiden Erklaertexte zur Markttemperatur
+
+### Anmerkung
+- Es ist derselbe Widerspruch wie damals bei „16 % · 8/50“ gegen „16 von 50“ — nur mit anderer Ursache. Eine Anzeigegrenze war es diesmal nicht, sondern zwei getrennte Filter fuer dieselbe Frage
+
+---
+
 ## [6.0.3] - 5. August 2026 · Eine Anzahl hat keine Nachkommastellen
 
 ### Behoben

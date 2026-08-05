@@ -128,15 +128,15 @@ export function marketStory(
 
   if (schmal) {
     teile.push(
-      `Getragen wird das von einer Minderheit: Nur ${pct} % der ${breite.total} gemessenen Karten notieren über ihrem Vergleichswert, ${breite.down} darunter.`,
+      `Getragen wird das von einer Minderheit: Nur ${pct} % der ${formatCount(breite.total)} gemessenen Karten notieren über ihrem Vergleichswert, ${formatCount(breite.down)} darunter.`,
     );
   } else if (breitGetragen) {
     teile.push(
-      `Die Bewegung steht auf breiter Basis — ${pct} % der ${breite.total} gemessenen Karten liegen über ihrem Vergleichswert.`,
+      `Die Bewegung steht auf breiter Basis — ${pct} % der ${formatCount(breite.total)} gemessenen Karten liegen über ihrem Vergleichswert.`,
     );
   } else {
     teile.push(
-      `Gewinner und Verlierer halten sich dabei ungefähr die Waage: ${breite.up} von ${breite.total} gemessenen Karten im Plus.`,
+      `Gewinner und Verlierer halten sich dabei ungefähr die Waage: ${formatCount(breite.up)} von ${formatCount(breite.total)} gemessenen Karten im Plus.`,
     );
   }
 
@@ -159,7 +159,7 @@ export function marketStory(
 
   const belege: Array<{ label: string; wert: string }> = [
     { label: `Index ${cbi.windowDays} Tage`, wert: prozent(cbi.value) },
-    { label: 'Im Plus', wert: `${breite.up} von ${breite.total}` },
+    { label: 'Im Plus', wert: `${formatCount(breite.up)} von ${formatCount(breite.total)}` },
     { label: 'Erfasste Karten', wert: `${formatCount(cbi.cardCount)} Karten · ${formatCount(cbi.setCount)} Sets` },
   ];
 

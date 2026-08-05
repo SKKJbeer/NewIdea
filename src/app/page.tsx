@@ -22,6 +22,7 @@ import {
   computePmi, computeFearGreed, validateMarketData, logDataIssues,
 } from '@/lib/market-metrics';
 import { BRAND, DESCRIPTOR_DE, LEGAL_NO_ADVICE, LEGAL_UNOFFICIAL } from '@/lib/brand';
+import { formatCount } from '@/lib/format';
 
 // STARTSEITE — umgesetzt nach dem gelieferten Entwurf.
 //
@@ -280,7 +281,7 @@ export default async function MarketPage() {
           <SectionHead
             num="03"
             title="Schwächste Bewegungen"
-            meta={`${breite.down} im Minus`}
+            meta={`${formatCount(breite.down)} im Minus`}
             href="/suche"
             hrefLabel="Karten durchsuchen"
           />

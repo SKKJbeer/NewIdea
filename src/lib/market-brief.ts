@@ -71,17 +71,17 @@ export function marketBrief(
       text: flach
         ? 'Hinter dem ruhigen Gesamtbild steht eine schmale Basis: Die Mehrheit der gemessenen Karten notiert unter ihrem Vergleichswert.'
         : 'Die Bewegung wird von wenigen Karten getragen — die Mehrheit notiert unter ihrem Vergleichswert.',
-      beleg: `${pct} % im Plus (${breite.up} von ${breite.total})`,
+      beleg: `${pct} % im Plus (${formatCount(breite.up)} von ${formatCount(breite.total)})`,
     });
   } else if (breite.pct > BREITE_STARK) {
     saetze.push({
       text: 'Die Bewegung ist breit abgestützt: Die Mehrheit der gemessenen Karten liegt über ihrem Vergleichswert.',
-      beleg: `${pct} % im Plus (${breite.up} von ${breite.total})`,
+      beleg: `${pct} % im Plus (${formatCount(breite.up)} von ${formatCount(breite.total)})`,
     });
   } else {
     saetze.push({
       text: 'Gewinner und Verlierer halten sich ungefähr die Waage.',
-      beleg: `${pct} % im Plus (${breite.up} von ${breite.total})`,
+      beleg: `${pct} % im Plus (${formatCount(breite.up)} von ${formatCount(breite.total)})`,
     });
   }
 
