@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '5.8.0',
+    date: '5. August 2026',
+    label: 'Die Suche zeigt die gemeinte Karte zuerst',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Die Trefferliste war nach Preis sortiert, nicht nach Passgenauigkeit: Bei „mew" stand „Mewtwo ★" auf Platz 1 und die Karte namens Mew auf Platz 6' },
+      { type: 'changed', text: 'Sortiert wird jetzt nach Rang, dann nach Preis: exakter Name, Namensanfang, Wortanfang, irgendwo enthalten' },
+      { type: 'changed', text: 'Die Index-Abfrage holt das Fuenffache der angezeigten Menge — sonst waere die beste Antwort gar nicht erst im Fenster' },
+      { type: 'fixed', text: 'Wortgrenzen ohne \\b bestimmt: Kartennamen sind voll mit δ, ★ und é, die \\b nicht fuer Buchstaben haelt' },
+    ],
+  },
+  {
     version: '5.7.0',
     date: '5. August 2026',
     label: 'Die Suche findet auch Sets',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Ein Set-Name lief in eine Sackgasse: „black bolt" ergab 0 Vorschlaege und „Keine Karten gefunden" — dabei verspricht das Feld „Suche Karten, Sets, …" und die Startseite nennt Sets beim Namen' },
       { type: 'new', text: 'Set-Treffer im Vorschlagsfeld, ueber den Karten und ausserhalb des Rollbereichs' },

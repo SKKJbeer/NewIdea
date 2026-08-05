@@ -7,6 +7,19 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [5.8.0] - 5. August 2026 · Die Suche zeigt die gemeinte Karte zuerst
+
+### Behoben
+- **Die Trefferliste war nach Preis sortiert, nicht nach Passgenauigkeit.** An der Produktion gemessen, Eingabe „mew": Platz 1 war „Mewtwo ★" (1599,66 €), Platz 4 und 5 waren „Team Rocket's Mewtwo ex" und „Rocket's Mewtwo ex" — und die Karte, die schlicht **Mew** heisst, stand auf Platz 6. Das war eine Liste der teuersten passenden Karten, keine Liste der gemeinten
+- Sortiert wird jetzt zuerst nach Rang, dann nach Preis: exakter Name → Namensanfang → Wortanfang → irgendwo enthalten. Der Preis bleibt bewusst das zweite Kriterium — wer „charizard" tippt, will unter zwanzig Charizard-Karten zuerst die sehen, ueber die gesprochen wird
+- **Die Wortgrenze wird ohne `\b` bestimmt.** Kartennamen sind voll mit `δ`, `★` und `é`; `\b` haelt die nicht fuer Buchstaben und haette „Mew δ" falsch eingestuft
+
+### Geaendert
+- Die Index-Abfrage holt das Fuenffache der angezeigten Menge (gedeckelt bei 200). Die Datenbank kann nur nach Preis sortieren — wer genau passt, entscheidet sich danach, und bei einem engen Fenster waere die beste Antwort gar nicht erst dabei. Nach aussen geht unveraendert nur die angeforderte Menge
+- Die Rangfolge liegt als eigene, reine Funktion in `src/lib/such-relevanz.ts` und ist mit den echten Produktionsdaten aus dem Befund geprueft (12 Faelle), nicht nur gegen den Quelltext
+
+---
+
 ## [5.7.0] - 5. August 2026 · Die Suche findet auch Sets
 
 ### Behoben

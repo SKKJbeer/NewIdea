@@ -1,5 +1,6 @@
 import { getSupabase } from './supabase';
 import type { PokemonCard } from '@/types';
+import { nachRelevanz } from './such-relevanz';
 
 // EIGENER KARTENINDEX — damit die Suche nicht mehr nach außen geht.
 //
@@ -109,7 +110,9 @@ function zuKarte(z: IndexZeile): IndexTreffer {
  * „Charizard" nach außen gehen muss — die Übersetzung bleibt trotzdem als
  * Rückfall bestehen, weil der Index nicht jeden deutschen Namen kennt.
  *
- * Sortiert nach Preis absteigend, wie überall sonst.
+ * Sortiert nach RANG, dann nach Preis — siehe `such-relevanz.ts`. Nur nach
+ * Preis war es eine Liste der teuersten passenden Karten, keine Liste der
+ * gemeinten: Bei „mew" stand die Karte, die genau so heißt, an sechster Stelle.
  */
 export async function searchCardIndex(query: string, limit = 40): Promise<IndexTreffer[]> {
   const sb = getSupabase();
@@ -120,18 +123,35 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   const begriff = query.trim().replace(/[%_\\]/g, '');
   if (begriff.length < 2) return [];
 
+  // MEHR HOLEN, ALS ANGEZEIGT WIRD — sonst wirkt die Rangfolge nicht.
+  //
+  // Die Datenbank kann nur nach Preis sortieren. Wer genau passt, entscheidet
+  // sich erst hier. Holten wir nur `limit` Zeilen, waere die beste Antwort
+  // moeglicherweise gar nicht dabei: Bei „mew" stand die Karte, die genau so
+  // heisst, an sechster Stelle NACH PREIS — bei einem engeren Fenster haette
+  // sie auch dahinter liegen koennen.
+  //
+  // Fuenffach, gedeckelt: Das kostet in derselben Abfrage ein paar Millisekunden
+  // mehr und bleibt server-seitig — nach aussen geht weiterhin nur `limit`.
+  const fenster = Math.min(limit * 5, 200);
+
   const { data, error } = await sb
     .from('cards_index')
     .select('*')
     .or(`name.ilike.%${begriff}%,name_de.ilike.%${begriff}%`)
     .order('price', { ascending: false })
-    .limit(limit);
+    .limit(fenster);
 
   if (error) {
     console.warn('[Kartenindex] Suche fehlgeschlagen:', error.message);
     return [];
   }
-  return (data as unknown as IndexZeile[]).map(zuKarte);
+
+  const karten = (data as unknown as IndexZeile[]).map(zuKarte);
+  return nachRelevanz(karten, begriff, (k) => ({ name: k.name, nameDe: k.nameDe })).slice(
+    0,
+    limit,
+  );
 }
 
 export interface SetTreffer {

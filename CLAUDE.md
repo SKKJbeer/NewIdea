@@ -677,6 +677,7 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 | Übersetzungen | `src/lib/i18n.ts` + `getLang()` aus Cookie (`next/headers`) |
 | Autocomplete | `/api/search/suggestions?q=&n=` liefert `{ cards, sets }` — 140 ms Wartezeit im SearchBox-Client, laufende Abfragen per `AbortController` abgebrochen, höchstens 8 sichtbare Zeilen, Browser-Speicher mit 5-Minuten-Frist (Preise!), Verlängerungen bekannter Begriffe ohne Netzweg. Abgesichert durch `suche-oberflaeche.test.ts` |
 | Set-Suche | `searchSetIndex()` (`card-index.ts`) — Set-Namen stehen bereits in jeder Index-Zeile, KEINE eigene Tabelle. Ohne Kartenzahl: sie wäre innerhalb der Abfragegrenze gezählt und damit still zu niedrig |
+| Trefferreihenfolge | `such-relevanz.ts` — Rang (exakt → Namensanfang → Wortanfang → enthalten), dann Preis. Die Datenbank kann nur nach Preis sortieren, deshalb holt `searchCardIndex` das 5-fache Fenster (max. 200) und ordnet danach. Nur-nach-Preis war eine Liste der teuersten, nicht der gemeinten Karten |
 | SEO | JSON-LD auf Karten-Detailseiten (Product+Offer), ItemList auf Suchergebnissen |
 | Supabase | Graceful: App läuft auch ohne Konfiguration (client gibt `null` zurück) |
 | Boosterpack-Bild | Überall wo Karten erscheinen → `<BoosterPackImage>` Pflicht (siehe UI-Design-Regeln) |
