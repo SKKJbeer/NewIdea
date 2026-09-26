@@ -1,8 +1,3 @@
-import {
-  MYTHIC_RINGS, MYTHIC_FILAMENTS, MYTHIC_CREST, MYTHIC_SILHOUETTE,
-  MYTHIC_EYE, MYTHIC_TEETH, MYTHIC_HATCH,
-} from '@/lib/mythic-art';
-
 // DIE ATMOSPHAERE DES HERO — sieben Ebenen, wie vorgegeben.
 //
 // Der Hintergrund ist NICHT schwarz. Tiefe entsteht nicht aus einer Farbe,
@@ -16,7 +11,7 @@ import {
 //   4. Warmes goldenes Licht
 //   5. Sehr feines holografisches Korn
 //   6. Sehr zurueckhaltende diagonale Struktur
-//   7. Das Drachen-Artwork
+//   7. Die gepraegte Folie (Guilloche, berechnet)
 //
 // LICHT STATT FARBE: Die Hoefe sind unsichtbare Lichtquellen — oben links,
 // Mitte, oben rechts, unten. Kein Neon, kein RGB, nur weiches Aufhellen.
@@ -101,53 +96,41 @@ export function HeroAtmosphere({ className = '' }: { className?: string }) {
         }}
       />
 
-      {/* ── 7 · DAS DRACHEN-ARTWORK ──────────────────────────────────────
-          NUR KONTUR, KEINE FUELLUNG, rund 3 % Deckkraft.
-          Gross und teils ausserhalb des Bildausschnitts — sichtbar bleiben
-          Kopf, Hals und Fluegelfragmente.
+      {/* ── 7 · DIE GEPRAEGTE FOLIE ─────────────────────────────────────
+          Was hier VORHER stand, war ein Drachenkopf aus von Hand gesetzten
+          Bezier-Punkten. Der Befund dazu lautete: „sieht aus wie von einem
+          Kind gemalt" — und das lag nicht an zu wenig Muehe, sondern an der
+          Technik. Anatomie entsteht aus tausenden Entscheidungen ueber Kontur,
+          Volumen und Licht; als Zahlenreihe in eine Datei getippt ergibt sie
+          Striche, keine Kreatur. Weitere Anlaeufe haetten daran nichts
+          geaendert.
 
-          Es ist keine Dekoration und kein Blickfang: Wer die Seite oeffnet,
-          soll es NICHT zuerst sehen, sondern beim zweiten Hinsehen entdecken.
-          Die Vorgaengerfassung war gefuellt und deutlich staerker — dadurch
-          war sie Motiv statt Atmosphaere.
+          JETZT: eine Guilloche — die verschlungene Linienrosette von
+          Wertpapieren und den Rueckseiten veredelter Sammelkarten. Sie ist
+          BERECHNET (`src/lib/foil-art.ts`), nicht gezeichnet, und kann deshalb
+          gar nicht kindlich wirken. Und sie gehoert hierher: Die Bildsprache
+          einer veredelten Karte ist die des Gegenstands, um den es auf dieser
+          Seite geht.
 
-          Die Figur ist eine eigene Konstruktion (`mythic-art.ts`), kein
-          nachgezeichnetes Vorbild. */}
-      <svg
-        className="absolute -right-[16%] -top-[16%] hidden h-[126vh] w-[88vw] text-slate-200 md:block xl:-right-[8%] xl:w-[64vw]"
-        viewBox="0 0 720 640"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Ein einziger Farbwert, keine Verlaufsfuellung: Eine Gravur bei 3 %
-            braucht keine Farbnuancen — sie wuerden ohnehin verschwinden und
-            nur Rechenzeit kosten. */}
-        <g opacity="0.03" strokeWidth="1.6">
-          {MYTHIC_SILHOUETTE.map((d) => <path key={d} d={d} />)}
-          {MYTHIC_CREST.map((d) => <path key={d} d={d} />)}
-          {MYTHIC_EYE.map((d) => <path key={d} d={d} />)}
-        </g>
-        <g opacity="0.024" strokeWidth="1.1">
-          {MYTHIC_FILAMENTS.map((d) => <path key={d} d={d} />)}
-          {MYTHIC_TEETH.map((d) => <path key={d} d={d} />)}
-        </g>
-        <g opacity="0.018" strokeWidth="0.9">
-          {MYTHIC_HATCH.map((d) => <path key={d} d={d} />)}
-          {MYTHIC_RINGS.map(([cx, cy, r, anteil]) => (
-            <circle
-              key={r}
-              cx={cx}
-              cy={cy}
-              r={r}
-              strokeDasharray={`${2 * Math.PI * r * anteil} ${2 * Math.PI * r}`}
-              transform={`rotate(-38 ${cx} ${cy})`}
-            />
-          ))}
-        </g>
-      </svg>
+          BEWUSST KEINE FIGUR. Eine erkennbare Pokemon-Gestalt waere eine
+          Schutzrechtsverletzung — daran aendert auch eine gelockerte Hausregel
+          nichts, und die Seite nennt sich selbst eine inoffizielle Fan-Seite.
+          Muster, Licht und Folie sind frei.
+
+          ALS EIGENE DATEI, nicht als SVG im Markup: Die Rosette besteht aus
+          zehntausenden Koordinaten. Im Markup wuerde sie die Seitenantwort
+          vervielfachen — und zwar doppelt, weil Next die Struktur zusaetzlich
+          als RSC-Nutzlast mitschickt. So laedt sie einmal und wird
+          zwischengespeichert. Erzeugt mit `npm run folie`. */}
+      <div
+        className="absolute inset-0 hidden opacity-[0.85] md:block"
+        style={{
+          backgroundImage: 'url(/hintergrund-folie.svg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'right top',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
 
       {/* Abschluss nach unten: Der Hero endet nicht an einer Kante, sondern
           laeuft in den Seitengrund aus. */}

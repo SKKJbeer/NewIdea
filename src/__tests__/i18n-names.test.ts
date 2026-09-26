@@ -45,7 +45,9 @@ describe('Übersetzungen', () => {
   });
 
   it('gibt für beide Sprachen den passenden Text zurück', () => {
-    const key = Object.keys(translations.de)[0] as keyof typeof translations.de;
+    // `Object.keys` liefert `string[]` — die Umdeutung muss auf den Typ von
+    // `de` gehen, den `t()` erwartet, nicht auf den der Sammlung.
+    const key = Object.keys(translations.de)[0] as Parameters<typeof t>[1];
     expect(t('de', key)).toBe(translations.de[key]);
     expect(t('en', key)).toBe(translations.en[key]);
   });

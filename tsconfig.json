@@ -17,5 +17,14 @@
     "paths": {"@/*": ["./src/*"]}
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
-  "exclude": ["node_modules", "remotion"]
+  "exclude": [
+    "node_modules",
+    "remotion",
+    // Werkzeuge, die NICHT gebuendelt werden: Sie laufen ueber Nodes
+    // Typ-Entfernung (`node --experimental-strip-types`) und muessen
+    // ihre Importe deshalb MIT `.ts`-Endung schreiben — was der
+    // Anwendungs-Typcheck zu Recht verbietet (TS5097). Zwei
+    // verschiedene Laufzeiten, zwei verschiedene Regeln.
+    "scripts"
+  ]
 }

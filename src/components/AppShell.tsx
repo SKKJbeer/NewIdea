@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Star, Briefcase } from 'lucide-react';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NavBar } from '@/components/NavBar';
-import { SearchBox } from '@/components/SearchBox';
+import { TopbarSearch } from '@/components/TopbarSearch';
 import { SiteFooter } from '@/components/SiteFooter';
 import { getDataCoverage } from '@/lib/data-coverage';
 
@@ -74,7 +74,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             zwei Inseln mit Leere dazwischen. */}
         <div className="relative z-30 hidden items-center gap-3 px-6 pt-5 sm:px-10 lg:flex lg:px-14 xl:px-16">
           <div className="max-w-[640px] flex-1">
-            <SearchBox placeholder="Suche Karten, Sets, …" searchBtn="Suchen" />
+            <TopbarSearch />
           </div>
           <div className="ml-auto flex items-center gap-2">
             <Link prefetch={false}

@@ -40,15 +40,28 @@ export interface PokemonCard {
   };
 }
 
+/** Eine Preisgruppe der TCG-API — jedes Feld kann fehlen. */
+export interface PreisGruppe {
+  low?: number;
+  mid?: number;
+  high?: number;
+  market?: number;
+}
+
 export interface CardPrices {
   market?: number;
   low?: number;
   mid?: number;
   high?: number;
   directLow?: number;
-  holofoil?: { low: number; mid: number; high: number; market: number };
-  reverseHolofoil?: { low: number; mid: number; high: number; market: number };
-  normal?: { low: number; mid: number; high: number; market: number };
+  // Die Untergruppen kommen von der TCG-API oft UNVOLLSTAENDIG — mal nur
+  // `market`, mal nur `low`. Als Pflichtfelder deklariert, liesse sich kein
+  // realistischer Testfall mehr bauen, und der Code liest sie ohnehin nur
+  // optional (`prices.holofoil?.market`). Pflicht waere hier eine Behauptung
+  // ueber fremde Daten, die wir nicht kontrollieren.
+  holofoil?: PreisGruppe;
+  reverseHolofoil?: PreisGruppe;
+  normal?: PreisGruppe;
 }
 
 export interface PriceDataPoint {

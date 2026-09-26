@@ -18,7 +18,8 @@ import {
 
 function makeHolding(overrides: Partial<PortfolioHolding> & { cardId: string }): PortfolioHolding {
   return {
-    cardId: overrides.cardId,
+    // `cardId` kommt aus `...overrides` (die Signatur verlangt es dort) —
+    // eine zweite Zuweisung davor wird ueberschrieben und verwirrt nur.
     cardName: 'Test Card',
     setName: 'Test Set',
     setCode: 'sv1',

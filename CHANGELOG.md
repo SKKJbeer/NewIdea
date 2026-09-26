@@ -7,6 +7,23 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.3.0] - 26. September 2026 · Neuer Hintergrund, und das Suchfeld steht nur noch einmal da
+
+### Geaendert
+- **Das Hintergrund-Artwork ist komplett neu.** Vorher stand dort ein Drachenkopf aus von Hand gesetzten Bezier-Punkten — der Befund lautete „sieht aus wie von einem Kind gemalt“, und das lag an der Technik, nicht an der Muehe: Anatomie entsteht aus tausenden Entscheidungen ueber Kontur, Volumen und Licht; als Zahlenreihe in eine Datei getippt ergibt sie Striche. Weitere Anlaeufe haetten daran nichts geaendert
+- **Jetzt eine Guilloche** — die verschlungene Linienrosette von Wertpapieren und den Rueckseiten veredelter Sammelkarten. Sie wird BERECHNET (`src/lib/foil-art.ts`) statt gezeichnet und kann deshalb gar nicht kindlich wirken. Und sie gehoert hierher: Die Bildsprache einer veredelten Karte ist die des Gegenstands, um den es auf dieser Seite geht
+
+### Behoben
+- **Auf dem Desktop standen zwei Suchfelder** auf `/suche` und `/einsteiger` — eines bei y=20 (Kopfleiste), eines bei y≈274 (Seitenkopf). Die Kopfleiste steht auf jeder Seite; Seiten mit eigenem Feld bekamen dadurch zwei. Die Kopfleiste weicht jetzt dort, wo die Seite ein eigenes Feld traegt — nicht umgekehrt, denn das Feld im Seitenkopf traegt Zustand (die laufende Anfrage) und Gestaltung, das der Kopfleiste traegt nichts davon
+- **Der Build war rot** und niemandem aufgefallen: drei echte Typfehler in Testdateien (unvollstaendige Preisgruppe, falsch umgedeuteter Uebersetzungsschluessel, doppeltes `cardId`). Die TCG-API liefert Preisgruppen oft unvollstaendig — als Pflichtfelder deklariert liess sich kein realistischer Testfall mehr bauen
+
+### Technisch
+- Die Folie liegt als eigene Datei (`public/hintergrund-folie.svg`, 99 KB / 38 KB gezippt), nicht im Markup: Zehntausende Koordinaten wuerden die Seitenantwort vervielfachen — doppelt sogar, weil Next die Struktur zusaetzlich als RSC-Nutzlast mitschickt. Direkt nach v6.2.0, das die Startseite gerade erst entlastet hat, waere das der Rueckschritt gewesen
+- Erzeugt mit `npm run folie`; der Generator ist mitgeliefert, damit die Datei aenderbar bleibt statt ein Fundstueck zu sein
+- **Keine Figur, bewusst.** Eine erkennbare Pokemon-Gestalt waere eine Schutzrechtsverletzung — daran aendert auch eine gelockerte Hausregel nichts, und die Seite nennt sich selbst eine inoffizielle Fan-Seite. Muster, Licht und Folie sind frei
+
+---
+
 ## [6.2.1] - 5. August 2026 · Die Preiserfassung stand drei Tage still
 
 ### Behoben

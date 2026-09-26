@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.3.0',
+    date: '26. September 2026',
+    label: 'Neuer Hintergrund, und das Suchfeld steht nur noch einmal da',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Das Hintergrund-Artwork ist komplett neu: statt eines von Hand gezeichneten Drachen eine berechnete Guilloche — die Linienrosette veredelter Sammelkarten' },
+      { type: 'fixed', text: 'Auf dem Desktop standen zwei Suchfelder auf /suche und /einsteiger — die Kopfleiste weicht jetzt dort, wo die Seite ein eigenes traegt' },
+      { type: 'fixed', text: 'Drei echte Typfehler in Testdateien, die den Build rot machten' },
+      { type: 'changed', text: 'Die Folie liegt als eigene Datei (38 KB gezippt) statt im Markup — sonst waere die Seitenantwort vervielfacht worden' },
+    ],
+  },
+  {
     version: '6.2.1',
     date: '5. August 2026',
     label: 'Die Preiserfassung stand drei Tage still',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Die Erfassung stand seit dem 02.08. still, waehrend derselbe Cron am 04.08. einen Guide erzeugte — der Anstoss kam nie an' },
       { type: 'fixed', text: 'Dem Tages-Cron fehlte jede Laufzeitgrenze; die Route, die er aufruft, hat 300 Sekunden' },

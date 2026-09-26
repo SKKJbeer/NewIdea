@@ -1,6 +1,6 @@
 {
   "name": "pokemarketapp",
-  "version": "6.2.1",
+  "version": "6.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,7 +11,8 @@
     "lint": "eslint",
     "video:preview": "remotion studio remotion/src/index.ts",
     "video:render:youtube": "remotion render remotion/src/index.ts PokemonVideoYouTube out/youtube.mp4",
-    "video:render:shorts": "remotion render remotion/src/index.ts PokemonVideoShorts out/shorts.mp4"
+    "video:render:shorts": "remotion render remotion/src/index.ts PokemonVideoShorts out/shorts.mp4",
+    "folie": "node --experimental-strip-types scripts/folie-erzeugen.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
@@ -39,7 +40,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/fluent-ffmpeg": "^2.1.28",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
