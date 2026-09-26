@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/AppShell";
+import { Seitenzaehler } from "@/components/Seitenzaehler";
 import "./globals.css";
 import { siteUrlOrLocal } from '@/lib/site';
 
@@ -77,6 +79,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             eine 236-px-Leiste neben 390 px Inhalt waere kein Menue, sondern
             ein Rand. */}
         <AppShell>{children}</AppShell>
+        {/* ZAEHLUNG DER AUFRUFE — eigene Erfassung, siehe `src/lib/aufrufe.ts`.
+            `<Analytics />` daneben ist keine Doppelung: Vercel zaehlt nur im
+            eigenen Dashboard und beantwortet die Frage „ueber welchen Weg?"
+            in der kostenlosen Stufe nicht.
+
+            DIE SUSPENSE-GRENZE IST PFLICHT, nicht Vorsicht: `useSearchParams`
+            ohne sie nimmt JEDE Seite aus der statischen Erzeugung heraus —
+            dieselbe Falle wie `cookies()` in einem Server-Baustein
+            (Stolperstelle 8). Ein Zaehler, der die ganze Seite langsamer
+            macht, kostet mehr, als er misst. */}
+        <Suspense fallback={null}>
+          <Seitenzaehler />
+        </Suspense>
         <Analytics />
       </body>
     </html>

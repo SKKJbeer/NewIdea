@@ -100,6 +100,9 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
 
 **Offene Nutzer-Aufgaben (nur Steffen kann sie erledigen):**
+- **Aufbau-SQL fuer die Reichweitenmessung im Supabase-SQL-Editor ausfuehren** (steht
+  im Monitoring unter „Reichweite", sobald es fehlt — Tabelle, Zaehlfunktion UND
+  Zeilenschutz zusammen). Bis dahin wird nichts gezaehlt
 - Google Search Console anmelden (SEO-Basis ist bereit)
 - Amazon PartnerNet + Cardmarket-Affiliate beantragen → Env-Vars setzen
 - Supabase service_role Key rotieren (falls noch offen)
@@ -800,6 +803,55 @@ Apple mit und schreibt die Sitzung in Cookies, die auch der Server liest.
    und prüfen, ohne dass Besucher schon eine halb fertige Anmeldung sehen.
    Er ist opt-in — ein vergessener Schalter bedeutet, dass ein Feature NICHT
    erscheint, nicht dass eines versehentlich erscheint.
+
+---
+
+## Reichweitenmessung (Aufrufe & Herkunft) — seit v6.5.0
+
+**Zweck:** Beantwortet die zwei Fragen, die vorher unbeantwortbar waren — wie viele
+Aufrufe hat die Seite, und ueber welchen Weg kommen sie. `<Analytics />` von Vercel
+bleibt daneben stehen, liefert seine Zahlen aber nur im Vercel-Dashboard und nennt
+in der kostenlosen Stufe keine Herkunft.
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| Einordnung + Auswertung | `src/lib/aufrufe.ts` | `einordnen()` (Weg + Herkunft), `pfadBereinigen()`, `zaehleAufruf()`, `auswerten()`, `AUFRUFE_SETUP_SQL` |
+| Zaehlpunkt | `src/app/api/zaehler/route.ts` | Nimmt die Meldung entgegen, ordnet SERVER-seitig ein, Missbrauchsbremse 120/Min |
+| Melder | `src/components/Seitenzaehler.tsx` | `sendBeacon` bei jedem Seitenaufruf — im Grundgeruest, in einer Suspense-Grenze |
+| Anzeige | `src/components/ReichweitePanel.tsx` | Abschnitt „Reichweite" im Monitoring, ganz oben |
+
+### Regeln (nicht verhandelbar)
+
+1. **Es werden AUFRUFE gezaehlt, keine Besucher.** Kein Cookie, kein Kennzeichen,
+   keine IP-Adresse, keine Browserkennung in der Datenbank. Eine Besucherzahl waere
+   geschaetzt — und geschaetzte Zahlen stehen auf dieser Seite nirgends (dieselbe
+   Regel wie bei Preisen). Nie eine „Besucher"-Kennzahl einfuehren, ohne dass es
+   dafuer eine echte Messung gibt.
+2. **Die Einordnung liegt auf dem SERVER.** Im Browser koennte sie jeder setzen, und
+   eine Herkunftsstatistik, die der Aufrufer selbst bestimmt, ist keine Messung.
+3. **`document.referrer` bleibt bei einem Seitenwechsel stehen** (Next tauscht nur den
+   Inhalt aus). Deshalb `einstieg`: Der Verweis wird nur beim ERSTEN Aufruf eines
+   Seitenladens gemeldet. Ohne das zaehlte ein Besuch mit fuenf Seitenwechseln
+   fuenfmal „von Google gekommen".
+4. **Weg und Herkunft beziehen sich auf EINSTIEGE, die Aufrufzahl auf alles.** Zaehlte
+   der interne Seitenwechsel als Weg mit, stuende er mit ueber der Haelfte an der
+   Spitze und verdraengte genau die Angabe, wegen der man hinsieht.
+5. **Verdichtet speichern, nie eine Zeile je Aufruf.** Eine Zeile je Tag, Seite und
+   Weg, hochgezaehlt per `zaehle_aufruf`-Funktion in EINER SQL-Anweisung. Eine Zeile
+   je Aufruf waechst mit dem Verkehr und laeuft in die Lesegrenze — die Summe faellt
+   dann still zu niedrig aus. Wird die Grenze doch erreicht, steht das als Warnung da
+   (`abgeschnitten`), statt als Ergebnis ausgegeben zu werden.
+6. **Der Zaehler gehoert in eine Suspense-Grenze.** `useSearchParams` ohne sie nimmt
+   JEDE Seite aus der statischen Erzeugung heraus (dieselbe Falle wie Stolperstelle 8).
+7. **`/studio` und `/monitoring` zaehlen nicht mit** — die eigene Arbeit ist kein
+   Publikum.
+8. **Neue Felder = Datenschutzerklaerung anfassen.** Abschnitt 3 zaehlt auf, was
+   gespeichert wird. Kommt etwas dazu, gehoert es dort hinein — sonst stimmt der Text
+   nicht mehr, und das ist eine Rechtsfrage, keine Fleissaufgabe.
+
+**Absicherung:** `aufrufe.test.ts` (35 Tests) prueft Einordnung, Pfadgrenzen,
+Auswertung, Aufbau-SQL, Suspense-Grenze und die Datenschutz-Angaben — und dass
+nirgends Cookie, localStorage, IP oder User-Agent auftauchen.
 
 ---
 

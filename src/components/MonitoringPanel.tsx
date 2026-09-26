@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, BookMarked, GitBranch, TriangleAlert, CircleAlert, Activity,
 } from 'lucide-react';
 import { recentPublishDates } from '@/lib/publish-days';
+import { ReichweitePanel, type AufrufStatistikDaten } from '@/components/ReichweitePanel';
 
 interface ApiKeyStatus {
   set: boolean;
@@ -93,6 +94,7 @@ interface SystemHealth {
 }
 
 interface MonitoringData {
+  aufrufe: AufrufStatistikDaten | null;
   build: { version: string; siteUrl: string | null; siteUrlMissing: boolean; nodeEnv: string };
   apiKeys: Record<string, ApiKeyStatus>;
   affiliates: Record<string, AffiliateStatus>;
@@ -633,7 +635,14 @@ export function MonitoringPanel() {
         )}
       </div>
 
-      {/* Betriebszustand — steht bewusst ganz oben: echte Ergebnisse vor Konfiguration */}
+      {/* REICHWEITE VOR ALLEM ANDEREN.
+          „Wie viele Menschen sehen die Seite, und woher kommen sie?" ist die
+          Frage, wegen der man ueberhaupt hierherkommt. Betriebszustand und
+          Konfiguration beantworten, ob die Maschine laeuft — nicht, ob sie
+          jemanden erreicht. */}
+      <ReichweitePanel daten={data.aufrufe} />
+
+      {/* Betriebszustand — echte Ergebnisse vor Konfiguration */}
       {data.health && <HealthSection health={data.health} onRefresh={load} />}
 
       {/* API Keys */}

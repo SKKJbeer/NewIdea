@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.5.0',
+    date: '26. September 2026',
+    label: 'Aufrufe und Herkunft werden gezaehlt',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Eigene Reichweitenmessung: Aufrufe je Tag, Weg (Suche / soziale Netze / Verweis / Kampagne), konkrete Herkunft, meistaufgerufene Seiten, Geraet — im Monitoring ganz oben' },
+      { type: 'new', text: 'Kampagnenlinks aus utm-Parametern werden erkannt — ab jetzt laesst sich nachsehen, was von den Reel-Bildunterschriften ankommt' },
+      { type: 'changed', text: 'Gezaehlt werden Aufrufe, keine Besucher: kein Cookie, kein Kennzeichen, keine IP-Adresse, keine Browserkennung — deshalb kein Einwilligungsbanner' },
+      { type: 'changed', text: 'Verdichtet zu einer Zeile je Tag, Seite und Weg statt einer Zeile je Aufruf — sonst faellt jede Summe an der Lesegrenze still zu niedrig aus' },
+      { type: 'changed', text: 'Datenschutzerklaerung beschreibt die eigene Zaehlung vollstaendig' },
+    ],
+  },
+  {
     version: '6.4.0',
     date: '26. September 2026',
     label: 'Der Hintergrund zeigt jetzt Karten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Vor der Guilloche liegen drei aufgefaecherte Sammelkarten im Format 63:88 — die Rosette allein war Ornament, austauschbar mit jedem Wertpapier' },
       { type: 'changed', text: 'Der Holo-Effekt ist berechnet: je Karte 300 Lichtpunkte, deren Radius mit der vierten Potenz waechst — gleichverteilt saehe dasselbe Verfahren aus wie ein Raster' },

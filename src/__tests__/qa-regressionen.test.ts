@@ -175,6 +175,29 @@ describe('Die Fußzeile zeigt in Produktion eine Version', () => {
   });
 });
 
+describe('Die Changelog-Seite kennt jede verwendete Aenderungsart', () => {
+  // BEINAHE-UNFALL beim Eintrag zu v6.5.0: `type: 'added'` getippt statt
+  // `'new'`. `TYPE_STYLE[...]` haette `undefined` geliefert und der Zugriff
+  // auf `.icon` die ganze Seite geworfen — die Release-Historie waere weg
+  // gewesen, ohne dass irgendein Test etwas dazu zu sagen gehabt haette.
+  it('jede `type`-Angabe in RELEASES hat ein Aussehen in TYPE_STYLE', () => {
+    const seite = lies('src/app/changelog/page.tsx');
+
+    const stilBlock = seite.match(/const TYPE_STYLE = \{([\s\S]*?)\n\};/);
+    expect(stilBlock).not.toBeNull();
+    const bekannt = new Set(
+      [...stilBlock![1].matchAll(/^\s*(\w+):\s*\{/gm)].map((t) => t[1]),
+    );
+    expect(bekannt.size).toBeGreaterThan(0);
+
+    const benutzt = new Set([...seite.matchAll(/\{\s*type:\s*'([^']+)'/g)].map((t) => t[1]));
+    expect(benutzt.size).toBeGreaterThan(0);
+
+    const unbekannt = [...benutzt].filter((t) => !bekannt.has(t));
+    expect(unbekannt).toEqual([]);
+  });
+});
+
 describe('Ein Aussetzer der Kartendatenbank bricht nicht das Deployment', () => {
   const seite = lies('src/app/sets/page.tsx');
 

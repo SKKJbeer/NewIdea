@@ -7,6 +7,29 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.5.0] - 26. September 2026 · Aufrufe und Herkunft werden gezaehlt
+
+### Neu
+- **Eine eigene Reichweitenmessung.** Bisher war beides unbeantwortbar: wie viele Menschen die Seite sehen, und ueber welchen Weg sie kommen. `<Analytics />` von Vercel stand zwar im Grundgeruest, liefert seine Zahlen aber nur im Vercel-Dashboard — auf `/monitoring`, wo jeder andere Betriebswert steht, kam nichts an. Und die fuer die Reichweite entscheidende Frage „ueber welchen Weg?" beantwortet es in der kostenlosen Stufe nicht
+- **Abschnitt „Reichweite" im Monitoring, ganz oben.** Aufrufe heute und ueber 30 Tage, Verlauf je Tag, Weg (Suchmaschine / soziale Netze / Verweis / Kampagne / ohne Verweis), konkrete Herkunft je Hostname, Kampagnen aus `utm_campaign`, meistaufgerufene Seiten, Geraeteklasse
+- **Kampagnenlinks werden erkannt.** Die Reel-Bildunterschriften enden seit v2.17.0 auf `?utm_source=instagram&utm_medium=reel&utm_campaign=top-mover` — ab jetzt laesst sich nachsehen, was davon ankommt
+
+### Technisch
+- `src/lib/aufrufe.ts` ordnet einen Aufruf einem Weg zu; `POST /api/zaehler` nimmt ihn entgegen, `<Seitenzaehler />` meldet ihn. Die Zuordnung liegt bewusst auf dem SERVER: im Browser koennte sie jeder setzen, und eine Herkunftsstatistik, die der Aufrufer selbst bestimmt, ist keine Messung
+- **Verdichtet statt eine Zeile je Aufruf.** Eine Zeile je Tag, Seite und Weg, hochgezaehlt in einer einzigen SQL-Anweisung. Bei einer Zeile je Aufruf waechst die Tabelle mit dem Verkehr, und jede Auswertung liefe in die Lesegrenze — die Summe fiele still zu niedrig aus. Wird die Grenze doch erreicht, steht das als Warnung da, statt als Ergebnis ausgegeben zu werden
+- **`document.referrer` bleibt bei einem Seitenwechsel stehen** — Next tauscht nur den Inhalt aus. Ohne Gegenmassnahme zaehlte ein Besuch mit fuenf Seitenwechseln fuenfmal „von Google gekommen". Der Verweis wird deshalb nur beim ersten Aufruf eines Seitenladens gemeldet; Weg und Herkunft beziehen sich auf Einstiege, die Gesamtzahl der Aufrufe auf alles
+- Der Zaehler steht in einer Suspense-Grenze: `useSearchParams` ohne sie nimmt JEDE Seite aus der statischen Erzeugung heraus — dieselbe Falle wie `cookies()` in einem Server-Baustein. Nachgeprueft, die Startseite bleibt statisch
+- Aufbau-SQL (Tabelle, Zaehlfunktion, Zeilenschutz) steht im Monitoring, sobald es fehlt. **Der Zeilenschutz ist kein Beiwerk:** Ohne ihn waere die eigene Reichweite oeffentlich lesbar, sobald der anon-Schluessel fuer die Portfolio-Anmeldung gesetzt wird
+
+### Geaendert
+- **Datenschutzerklaerung, Abschnitt 3** beschreibt die eigene Zaehlung vollstaendig: was gespeichert wird, was nicht, und warum keine Einwilligung noetig ist
+
+### Hinweis
+- **Es werden Aufrufe gezaehlt, keine Besucher.** Kein Cookie, kein Kennzeichen, keine IP-Adresse, keine Browserkennung — damit greift § 25 TDDDG nicht und es braucht kein Einwilligungsbanner. Der Preis ist ehrlich benannt: Ohne Kennzeichen lassen sich Aufrufe nicht zu Personen zusammenfassen, eine Besucherzahl steht deshalb nirgends
+- **Bevor gezaehlt wird, muss das SQL aus dem Monitoring einmal im Supabase-SQL-Editor laufen** — Tabelle UND Funktion, beides zusammen
+
+---
+
 ## [6.4.0] - 26. September 2026 · Der Hintergrund zeigt jetzt Karten
 
 ### Geaendert

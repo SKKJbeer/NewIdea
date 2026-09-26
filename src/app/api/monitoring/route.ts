@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { APP_VERSION } from '@/lib/app-version';
 import { loadUsageSummary, AI_USAGE_SETUP_SQL } from '@/lib/ai-usage';
+import { ladeAufrufStatistik, AUFRUFE_SETUP_SQL } from '@/lib/aufrufe';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { collectSystemHealth } from '@/lib/system-health';
@@ -164,7 +165,18 @@ export async function GET(request: Request) {
     return null;
   });
 
+  // Reichweite der letzten 30 Tage — beantwortet „wie viele Aufrufe?" und
+  // „ueber welchen Weg kamen sie?". Faellt der Abruf aus, fehlt der Abschnitt;
+  // die uebrige Seite bleibt benutzbar.
+  const aufrufe = await ladeAufrufStatistik(30).catch((err) => {
+    console.warn('Reichweite konnte nicht geladen werden:', err);
+    return null;
+  });
+
   const data = {
+    // Das Aufbau-SQL wird erst mitgeschickt, wenn es gebraucht wird — sonst
+    // steht eine Anleitung fuer ein Problem da, das niemand hat.
+    aufrufe: aufrufe ? { ...aufrufe, setupSql: aufrufe.fehltAufbau ? AUFRUFE_SETUP_SQL : null } : null,
     aiUsage: aiUsage ? { ...aiUsage, setupSql: aiUsage.missingTable ? AI_USAGE_SETUP_SQL : null } : null,
     // Build info
     build: {

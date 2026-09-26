@@ -48,14 +48,43 @@ export default function Datenschutz() {
           </section>
 
           <section>
-            <h2 className="font-bold text-slate-200 mb-2">3. Reichweitenmessung (Vercel Web Analytics)</h2>
-            <p>
+            <h2 className="font-bold text-slate-200 mb-2">3. Reichweitenmessung</h2>
+            <p className="mb-3">
               Zur Messung der Seitennutzung setzen wir <strong>Vercel Web Analytics</strong> ein.
               Dieses Verfahren arbeitet <strong>ohne Cookies</strong> und ohne Speicherung auf deinem
               Endgerät: Besuche werden über einen anonymisierten, täglich wechselnden Hash gezählt,
               der keine Wiedererkennung über mehrere Tage oder Websites hinweg erlaubt. Es werden
-              keine Nutzerprofile gebildet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
-              (berechtigtes Interesse an der statistischen Auswertung und Verbesserung des Angebots).
+              keine Nutzerprofile gebildet.
+            </p>
+            <p className="mb-3">
+              Zusätzlich führen wir eine <strong>eigene Aufrufzählung</strong> auf unserem Server.
+              Bei jedem Seitenaufruf wird eine Meldung an <code className="font-mono">/api/zaehler</code>{' '}
+              gesendet, aus der ausschließlich diese Angaben gespeichert werden:
+            </p>
+            <ul className="mb-3 list-disc space-y-1 pl-5">
+              <li>das Datum (tagesgenau, ohne Uhrzeit),</li>
+              <li>die aufgerufene Seite (Pfad ohne Abfrageparameter),</li>
+              <li>die Herkunft des Aufrufs: der <strong>Hostname</strong> der verweisenden Seite
+                  (z.&nbsp;B. „google.com") beziehungsweise die Kampagnenangaben aus den
+                  <code className="font-mono"> utm_</code>-Parametern der aufgerufenen Adresse,</li>
+              <li>eine grobe Geräteklasse (mobil, Tablet oder Desktop), abgeleitet aus der
+                  Fensterbreite.</li>
+            </ul>
+            <p className="mb-3">
+              Diese Angaben werden <strong>unmittelbar zu einem Zähler zusammengefasst</strong> — es
+              entsteht kein Eintrag je Aufruf, sondern eine Zeile je Tag, Seite und Herkunftsweg.
+              <strong> Es wird kein Cookie gesetzt, nichts auf deinem Endgerät gespeichert oder
+              ausgelesen und kein Kennzeichen vergeben.</strong> Weder deine IP-Adresse noch deine
+              Browserkennung werden gespeichert. Eine Wiedererkennung — auch innerhalb desselben
+              Besuchs — ist damit technisch ausgeschlossen; wir können Aufrufe nicht zu Besuchern
+              oder Personen zusammenführen.
+            </p>
+            <p>
+              Weil dabei weder Informationen auf deinem Endgerät gespeichert noch von dort abgerufen
+              werden, ist § 25 TDDDG nicht einschlägig und es ist keine Einwilligung erforderlich.
+              Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
+              an der statistischen Auswertung und Verbesserung des Angebots). Die verdichteten
+              Zählerstände enthalten keinen Personenbezug.
             </p>
           </section>
 
