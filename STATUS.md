@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.3.0` · **Stand:** 26. September 2026 · **Branch:** `main`
+**Version:** `v6.4.0` · **Stand:** 26. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.4.0 | Hintergrund zeigt drei aufgefaecherte Sammelkarten mit berechnetem Holo-Effekt vor der Guilloche; Rosette an den Rand, Ausblendung zur Ueberschrift |
 | v6.3.0 | Hintergrund komplett neu (berechnete Guilloche statt handgezeichnetem Drachen); doppeltes Suchfeld auf Desktop behoben; roter Build repariert |
 | v6.2.1 | Preiserfassung stand 3 Tage still — Tages-Cron ohne Laufzeitgrenze, Anstoss hinter langsamen Netzabrufen |
 | v6.2.0 | Startseite rief bei einem Aufruf 37 Routen vorab ab (jede 4-5x) — jetzt 0; Anfragen nach dem Laden 49 -> 1, Hover 65 -> 9-30 ms |

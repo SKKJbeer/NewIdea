@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.4.0] - 26. September 2026 · Der Hintergrund zeigt jetzt Karten
+
+### Geaendert
+- **Vor der Guilloche liegen drei aufgefaecherte Sammelkarten.** Die Rosette allein war Ornament — schoen, aber austauschbar mit jedem Wertpapier. Was die Flaeche zu DIESER Seite macht, ist der Gegenstand selbst: das Kartenformat 63:88, leicht gedreht, mit dem Lichtbild einer veredelten Karte darauf
+- **Der Holo-Effekt ist berechnet, nicht gemalt.** Je Karte 300 Lichtpunkte aus `kosmos()`, deren Radius mit der VIERTEN Potenz des Zufallswerts waechst — dadurch sind fast alle winzig und wenige gross. Gleichverteilt gestreut sieht dasselbe Verfahren aus wie ein Raster, nicht wie Folie
+- **Die Rosette steht jetzt am Rand** (Mittelpunkt ausserhalb des Bildes) statt mittig. Zentriert zog sie den Blick von der Ueberschrift weg; angeschnitten liest sie sich als Untergrund
+- Zur Ueberschrift hin blendet die Flaeche aus (`nachLinksAus`), damit der Text auf ruhigem Grund steht
+
+### Technisch
+- Die Datei bleibt bei 106 KB / 31 KB gezippt und damit unter der im Test verankerten Grenze von 150 KB — der Entwurf wurde getrimmt statt die Grenze angehoben
+- Verworfen wurde ein Strahlenfaecher hinter den Karten: mit der Rosette zusammen ergab er ein Fischernetz. Nachpruefbar im Generator, der Aufruf ist entfernt, nicht auskommentiert
+
+---
+
 ## [6.3.0] - 26. September 2026 · Neuer Hintergrund, und das Suchfeld steht nur noch einmal da
 
 ### Geaendert

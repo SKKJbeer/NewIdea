@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.4.0',
+    date: '26. September 2026',
+    label: 'Der Hintergrund zeigt jetzt Karten',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Vor der Guilloche liegen drei aufgefaecherte Sammelkarten im Format 63:88 — die Rosette allein war Ornament, austauschbar mit jedem Wertpapier' },
+      { type: 'changed', text: 'Der Holo-Effekt ist berechnet: je Karte 300 Lichtpunkte, deren Radius mit der vierten Potenz waechst — gleichverteilt saehe dasselbe Verfahren aus wie ein Raster' },
+      { type: 'changed', text: 'Die Rosette steht am Rand statt mittig und blendet zur Ueberschrift hin aus, damit der Text auf ruhigem Grund steht' },
+      { type: 'changed', text: 'Die Datei bleibt bei 31 KB gezippt — der Entwurf wurde getrimmt statt die Grenze anzuheben' },
+    ],
+  },
+  {
     version: '6.3.0',
     date: '26. September 2026',
     label: 'Neuer Hintergrund, und das Suchfeld steht nur noch einmal da',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Das Hintergrund-Artwork ist komplett neu: statt eines von Hand gezeichneten Drachen eine berechnete Guilloche — die Linienrosette veredelter Sammelkarten' },
       { type: 'fixed', text: 'Auf dem Desktop standen zwei Suchfelder auf /suche und /einsteiger — die Kopfleiste weicht jetzt dort, wo die Seite ein eigenes traegt' },

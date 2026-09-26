@@ -118,3 +118,70 @@ export function spiro({ cx, cy, R, r, d, umlaeufe = 12, schritte = 2400 }: Spiro
   }
   return alsPfad(punkte);
 }
+
+// ── KARTEN UND FOLIE ───────────────────────────────────────────────────────
+//
+// Was eine seltene Karte optisch ausmacht, sind drei Dinge — und keines davon
+// ist eine Figur: das KARTENFORMAT (63:88, seit Jahrzehnten unverändert), die
+// KOSMOS-FOLIE (das Sternen-Bläschen-Muster unter dem Bild) und die
+// REGENBOGENBRECHUNG beim Kippen. Zusammen liest man sie sofort als
+// Sammelkarte, ohne dass irgendwo ein geschütztes Motiv auftaucht.
+
+/** Abgerundetes Kartenrechteck im echten Seitenverhältnis 63:88. */
+export function kartenPfad(x: number, y: number, breite: number, radius = 18): string {
+  const hoehe = (breite * 88) / 63;
+  const r = Math.min(radius, breite / 2, hoehe / 2);
+  return [
+    `M ${k(x + r)} ${k(y)}`,
+    `H ${k(x + breite - r)}`, `A ${k(r)} ${k(r)} 0 0 1 ${k(x + breite)} ${k(y + r)}`,
+    `V ${k(y + hoehe - r)}`, `A ${k(r)} ${k(r)} 0 0 1 ${k(x + breite - r)} ${k(y + hoehe)}`,
+    `H ${k(x + r)}`, `A ${k(r)} ${k(r)} 0 0 1 ${k(x)} ${k(y + hoehe - r)}`,
+    `V ${k(y + r)}`, `A ${k(r)} ${k(r)} 0 0 1 ${k(x + r)} ${k(y)}`,
+    'Z',
+  ].join(' ');
+}
+
+/**
+ * Ein linearer Kongruenzgenerator.
+ *
+ * KEIN `Math.random()`: Der Hintergrund muss bei jedem Aufbau identisch sein,
+ * sonst flackert er. Ein Startwert erzeugt immer dieselbe Streuung — und wer
+ * eine andere Verteilung will, ändert den Startwert und sieht das im Diff.
+ */
+function streuung(startwert: number): () => number {
+  let z = startwert >>> 0;
+  return () => {
+    z = (z * 1664525 + 1013904223) >>> 0;
+    return z / 4294967296;
+  };
+}
+
+export interface KosmosPunkt {
+  cx: number;
+  cy: number;
+  r: number;
+  /** 0…1 — wie hell dieses Bläschen leuchtet. */
+  licht: number;
+}
+
+/**
+ * Kosmos-Folie: unregelmäßige Bläschen in wechselnder Größe.
+ *
+ * Das Muster lebt davon, dass die Größen WEIT auseinanderliegen — wenige große
+ * Bläschen zwischen vielen winzigen. Gleich große Punkte ergeben ein Raster,
+ * und ein Raster sieht nach Bildschirm aus, nicht nach Folie.
+ */
+export function kosmos(
+  startwert: number, anzahl: number, breite: number, hoehe: number,
+): KosmosPunkt[] {
+  const z = streuung(startwert);
+  const punkte: KosmosPunkt[] = [];
+  for (let i = 0; i < anzahl; i++) {
+    const roh = z();
+    // Vierte Potenz: die allermeisten Bläschen bleiben klein, einzelne werden
+    // deutlich groß. Linear verteilt sähe alles gleich aus.
+    const r = 0.6 + roh * roh * roh * roh * 9;
+    punkte.push({ cx: z() * breite, cy: z() * hoehe, r, licht: 0.25 + z() * 0.75 });
+  }
+  return punkte;
+}
