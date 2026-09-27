@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.11.3',
+    date: '27. September 2026',
+    label: 'Globale Anmeldegrenze',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Sperre je Adresse ließ sich mit wechselnden Adressen umgehen — zusätzlich globale Grenze von 100 Fehlversuchen in 15 Minuten' },
+    ],
+  },
+  {
     version: '6.11.2',
     date: '27. September 2026',
     label: 'Diagnose der Anmeldesperre',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Anmeldestatus im Studio nennt den Zählerstand der Anmeldesperre (Adresse nur als Hash)' },
     ],

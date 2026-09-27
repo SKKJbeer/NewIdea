@@ -12,6 +12,15 @@ import { legeAb, listeOrdner, loescheDateien } from './social-speicher';
 // Gezaehlt wird ueber die Ordnerliste. Keine Tabelle, kein Handgriff.
 
 export const MAX_FEHLVERSUCHE = 10;
+/**
+ * GLOBALE GRENZE ueber alle Adressen. Gemessen 27.09.2026: Anfragen aus einem
+ * Adress-Pool kamen bei Vercel mit jedesmal anderer Absenderadresse an — die
+ * Grenze je Adresse greift dann nie. Mehr als 100 Fehlversuche in 15 Minuten
+ * sind kein Vertippen; dann ist die Anmeldung fuer alle gesperrt. Eine
+ * bestehende Studio-Sitzung (Cookie) bleibt davon unberuehrt.
+ */
+export const MAX_FEHLVERSUCHE_GESAMT = 100;
+const ALLE = 'sicherheit/anmeldung-alle';
 export const FENSTER_MS = 15 * 60_000;
 
 function ordner(ip: string): string {
@@ -33,7 +42,11 @@ export async function istGesperrt(ip: string, jetzt = Date.now()): Promise<boole
     // Nebenbei aufraeumen: abgelaufene Eintraege loeschen.
     const alt = namen.filter((n) => Number(n.split('-')[0]) <= jetzt - FENSTER_MS);
     if (alt.length > 0) loescheDateien(alt.map((n) => `${ordner(ip)}/${n}`)).catch(() => undefined);
-    return fehlversucheImFenster(namen, jetzt) >= MAX_FEHLVERSUCHE;
+    if (fehlversucheImFenster(namen, jetzt) >= MAX_FEHLVERSUCHE) return true;
+    const alle = await listeOrdner(ALLE, 5_000);
+    const altAlle = alle.filter((n) => Number(n.split('-')[0]) <= jetzt - FENSTER_MS);
+    if (altAlle.length > 0) loescheDateien(altAlle.map((n) => `${ALLE}/${n}`)).catch(() => undefined);
+    return fehlversucheImFenster(alle, jetzt) >= MAX_FEHLVERSUCHE_GESAMT;
   } catch (err) {
     console.warn('[anmelde-sperre] nicht pruefbar:', err instanceof Error ? err.message : err);
     return false;
@@ -41,19 +54,20 @@ export async function istGesperrt(ip: string, jetzt = Date.now()): Promise<boole
 }
 
 /** Diagnose fuer das Studio: Schluessel-Kurzform und Zaehlerstand. */
-export async function sperrDiagnose(ip: string, jetzt = Date.now()): Promise<{ schluessel: string; fehlversuche: number | null; fehler: string | null }> {
+export async function sperrDiagnose(ip: string, jetzt = Date.now()): Promise<{ schluessel: string; fehlversuche: number | null; gesamt: number | null; fehler: string | null }> {
   const schluessel = ordner(ip).split('/').pop()!.slice(0, 8);
   try {
-    const namen = await listeOrdner(ordner(ip), 2_000);
-    return { schluessel, fehlversuche: fehlversucheImFenster(namen, jetzt), fehler: null };
+    const [namen, alle] = await Promise.all([listeOrdner(ordner(ip), 2_000), listeOrdner(ALLE, 5_000)]);
+    return { schluessel, fehlversuche: fehlversucheImFenster(namen, jetzt), gesamt: fehlversucheImFenster(alle, jetzt), fehler: null };
   } catch (err) {
-    return { schluessel, fehlversuche: null, fehler: err instanceof Error ? err.message : 'unbekannt' };
+    return { schluessel, fehlversuche: null, gesamt: null, fehler: err instanceof Error ? err.message : 'unbekannt' };
   }
 }
 
 export async function merkeFehlversuch(ip: string, jetzt = Date.now()): Promise<void> {
   try {
-    await legeAb(`${ordner(ip)}/${jetzt}-${randomBytes(4).toString('hex')}`, '1');
+    const name = `${jetzt}-${randomBytes(4).toString('hex')}`;
+    await Promise.all([legeAb(`${ordner(ip)}/${name}`, '1'), legeAb(`${ALLE}/${name}`, '1')]);
   } catch (err) {
     console.warn('[anmelde-sperre] Fehlversuch nicht gemerkt:', err instanceof Error ? err.message : err);
   }

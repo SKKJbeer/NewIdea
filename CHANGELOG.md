@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.11.3] - 27. September 2026 · Globale Anmeldegrenze
+
+### Sicherheit
+- **Die Sperre je Adresse ließ sich mit wechselnden Adressen umgehen** — auf Produktion gemessen: Anfragen aus einem Adress-Pool kamen jedes Mal mit anderer Absenderadresse an. Zusätzliche globale Grenze: mehr als 100 Fehlversuche in 15 Minuten sperren die Anmeldung für alle; eine bestehende Studio-Sitzung bleibt unberührt
+
+---
+
 ## [6.11.2] - 27. September 2026 · Diagnose der Anmeldesperre
 
 ### Geändert

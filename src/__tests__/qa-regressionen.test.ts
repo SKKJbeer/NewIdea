@@ -314,4 +314,10 @@ describe('Studio-Anmeldung: Sperre ueber alle Instanzen', () => {
     expect(r).toMatch(/safeEqual\(makeToken\(password\), makeToken\(secret\)\)/);
     expect(r).not.toMatch(/password !== secret/);
   });
+  it('hat zusaetzlich eine globale Grenze ueber alle Adressen', () => {
+    // Gemessen: Anfragen aus einem Adress-Pool kamen mit wechselnder Adresse an.
+    const l = readFileSync(join(process.cwd(), 'src/lib/anmelde-sperre.ts'), 'utf8');
+    expect(l).toMatch(/MAX_FEHLVERSUCHE_GESAMT = 100/);
+    expect(l).toMatch(/legeAb\(`\$\{ALLE\}\/\$\{name\}`/);
+  });
 });
