@@ -56,6 +56,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.pokemontcg.io' },
+      // Neuere Set-Logos liefert die Kartendatenbank von hier. Ohne Eintrag
+      // antwortete der Optimierer mit 400, und /sets zeigte Platzhalter.
+      // Die Inhaltsrichtlinie bleibt unberuehrt: Optimierte Bilder kommen von
+      // der eigenen Adresse.
+      { protocol: 'https', hostname: 'images.scrydex.com' },
     ],
     formats: ['image/avif', 'image/webp'],
     // Optimierte Bilder 31 Tage im Vercel-Cache behalten — reduziert

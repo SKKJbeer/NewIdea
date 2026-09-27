@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.10.1] - 27. September 2026 · Set-Logos neuerer Sets
+
+### Behoben
+- **Neuere Set-Logos zeigten einen Platzhalter.** Die Kartendatenbank liefert sie von `images.scrydex.com`; der Bildoptimierer kannte den Host nicht und antwortete mit Fehler 400. Der Host ist jetzt eingetragen, die Inhaltsrichtlinie bleibt unverändert
+
+---
+
 ## [6.10.0] - 27. September 2026 · Reichweitenmessung zählt wieder
 
 ### Behoben

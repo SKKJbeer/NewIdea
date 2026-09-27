@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.10.1',
+    date: '27. September 2026',
+    label: 'Set-Logos neuerer Sets',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Neuere Set-Logos zeigten einen Platzhalter — der Bildoptimierer kannte ihren Host nicht' },
+    ],
+  },
+  {
     version: '6.10.0',
     date: '27. September 2026',
     label: 'Reichweitenmessung zählt wieder',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Seit v6.5.0 wurde kein Seitenaufruf gezählt — die nötige Datenbanktabelle war nie angelegt worden' },
       { type: 'changed', text: 'Aufrufzählung ohne Tabelle: ein Eintrag je Aufruf, täglich zu Zählerständen zusammengefasst' },

@@ -30,9 +30,20 @@ describe('Bild-Hosts: Proxy-Liste und Richtlinie passen zusammen', () => {
   });
 
   it('weicht die Inhaltsrichtlinie nicht auf', () => {
-    // Der Proxy löst das Problem als gleiche Herkunft. Die Richtlinie darf
-    // deshalb so eng bleiben wie bisher.
-    expect(lies('next.config.ts')).not.toContain('scrydex');
+    // Der Proxy bzw. der Optimierer liefern als gleiche Herkunft. Die
+    // Richtlinie (img-src) darf deshalb so eng bleiben wie bisher.
+    const cfg = lies('next.config.ts');
+    const start = cfg.indexOf('const CSP');
+    expect(start).toBeGreaterThan(-1);
+    const csp = cfg.slice(start, cfg.indexOf('remotePatterns'));
+    expect(csp).toMatch(/img-src/);
+    expect(csp).not.toContain('scrydex');
+  });
+
+  it('der Optimierer kennt den Host der neueren Set-Logos', () => {
+    // Befund 27.09.2026: images.scrydex.com durch den Optimierer → HTTP 400 →
+    // Platzhalter statt Logo auf /sets (BoosterPackImage nutzt next/image).
+    expect(lies('next.config.ts')).toMatch(/hostname: 'images\.scrydex\.com'/);
   });
 });
 
@@ -255,3 +266,4 @@ describe('Jede Seite hat einen Titel und eine Beschreibung', () => {
     expect(ohne, `Seiten ohne Metadaten:\n${ohne.join('\n')}`).toEqual([]);
   });
 });
+
