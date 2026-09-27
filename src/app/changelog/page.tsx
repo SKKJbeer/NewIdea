@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.2',
+    date: '27. September 2026',
+    label: 'Kein Vergleich zwischen verschiedenen Datenständen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Instagram-Bilder verglichen Preise von gestern mit dem noch veralteten Index („pp zum Markt") — entfällt bei Frischpreisen' },
+    ],
+  },
+  {
     version: '6.8.1',
     date: '27. September 2026',
     label: 'Nur Bewegungen, die die Verkäufe tragen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Scheinbewegungen wie „+1.459 %" bei Karten mit wenigen Verkäufen — eine Bewegung zählt nur noch, wenn der 7-Tage-Verkaufsschnitt sie bestätigt' },
       { type: 'fixed', text: 'Karten mit identischen Preisdaten (zwei Karten auf einer Cardmarket-Seite) werden verworfen' },

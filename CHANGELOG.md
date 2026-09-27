@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.2] - 27. September 2026 · Kein Vergleich zwischen verschiedenen Datenständen
+
+### Behoben
+- **„+149,2 pp zum Markt" im Instagram-Bild.** Der Abstand zum CardBeacon Index verglich einen Cardmarket-Preis von gestern mit einem Index, der noch auf Monate alten Werten rechnet. Bei Frischpreisen entfällt die Zeile, bis beide auf derselben Grundlage stehen
+
+---
+
 ## [6.8.1] - 27. September 2026 · Nur Bewegungen, die die Verkäufe tragen
 
 ### Behoben

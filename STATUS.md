@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.8.1` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.8.2` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.8.2 | Kein „pp zum Markt“ bei Frischpreisen (Index noch auf alten Werten) |
 | v6.8.1 | Bewegungen nur mit Bestätigung durch Ø 7 Tage (Band ⅓–3×); mehrdeutige Zuordnungen verworfen; Reel = Karussell-Maßstab |
 | v6.8.0 | Befund: pokemontcg.io-Cardmarket-Preise 3–10 Monate alt. Frischpreise über TCGdex (400 wertvollste Karten täglich, Namensprobe); Instagram nur noch daraus |
 | v6.7.0 | 20 neue Guide-Themen (Warteschlange war leer); Sitemaps/robots bei Abruf statt beim Build, Fehler statt leerer Liste |

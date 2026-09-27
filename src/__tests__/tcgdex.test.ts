@@ -155,3 +155,12 @@ describe('Nur Bewegungen, die die Verkaeufe tragen', () => {
     expect(lib).toMatch(/buildStory\(validateMarketData\(basis\.karten\)\.clean/);
   });
 });
+
+describe('Kein Vergleich zwischen verschiedenen Datenstaenden', () => {
+  // Erster Probelauf: „+149,2 pp zum Markt" — ein Preis von gestern gegen einen
+  // Index auf Monate alten Werten.
+  it('bei Frischpreisen entfaellt der Abstand zum Index', () => {
+    const src = readFileSync(join(process.cwd(), 'src/lib/marktbilder.tsx'), 'utf8');
+    expect(src).toMatch(/gegenMarkt: basis\.quelle === 'frisch' \? null/);
+  });
+});

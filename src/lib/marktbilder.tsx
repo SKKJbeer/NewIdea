@@ -165,7 +165,11 @@ export async function ladeMarktlage(): Promise<Marktlage | null> {
     set: k.set,
     trend: k.trendPercent as number,
     preis: displayPrice(k),
-    gegenMarkt: (k.trendPercent as number) - cbi.value,
+    // Abstand zum Index nur, wenn Karte und Index auf DERSELBEN Grundlage
+    // stehen. Bei Frischpreisen rechnet der Index noch auf den Monate alten
+    // pokemontcg.io-Werten — „+149,2 pp zum Markt" (erster Probelauf) verglich
+    // einen Preis von gestern mit einem Marktstand vom Fruehjahr.
+    gegenMarkt: basis.quelle === 'frisch' ? null : (k.trendPercent as number) - cbi.value,
     bild: k.imageUrl ? await bildAlsDataUri(k.imageUrl) : null,
   });
   const gewinner = await Promise.all(gainers.slice(0, 3).map(alsMover));
