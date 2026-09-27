@@ -232,7 +232,11 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
   });
 
   it('ist wie jeder Cron mit dem Geheimnis geschützt', () => {
-    expect(route).toContain('Bearer ${process.env.CRON_SECRET}');
+    // Vorher pruefte dieser Test die Zeichenfolge `Bearer ${CRON_SECRET}` — die
+    // steht aber auch im Header, mit dem sich der Durchlauf SELBST weiterreicht.
+    // Der Test waere also auch ohne jede Eingangspruefung gruen geblieben.
+    // Geprueft wird jetzt die Pruefung selbst.
+    expect(route).toContain('isCronAuthedFromRequest(request)');
     expect(route).toContain('401');
   });
 

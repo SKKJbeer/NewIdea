@@ -10,10 +10,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.6.0',
+    date: '27. September 2026',
+    label: 'Instagram-Autopilot, alle Kartenseiten bei Suchmaschinen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Instagram-Autopilot: jeden Abend ein Reel oder Karussell aus echten Marktdaten, dazu täglich eine Story — nie zweimal am selben Tag, jede Bildunterschrift durch die Inhaltsschranke' },
+      { type: 'new', text: 'Probelauf und Einrichtungshelfer im Studio: Beiträge vorher ansehen, dauerhaften Zugang aus dem Graph-Explorer-Token erzeugen' },
+      { type: 'new', text: 'Alle ~20.000 Kartenseiten und alle Sets in der Sitemap statt 40 Karten und 24 Sets; IndexNow meldet Änderungen täglich an Bing & Co.' },
+      { type: 'fixed', text: 'Reels sind auf Produktion nie entstanden — FFmpeg wurde unter einem Platzhalterpfad gesucht' },
+      { type: 'fixed', text: 'Reels sprachen von „dieser Woche", gemessen wird aber gegen den 30-Tage-Schnitt' },
+      { type: 'fixed', text: 'Cron-Prüfung jetzt zeitkonstant und ohne Secret geschlossen; robots.txt sperrt Studio und Monitoring wirklich' },
+    ],
+  },
+  {
     version: '6.5.0',
     date: '26. September 2026',
     label: 'Aufrufe und Herkunft werden gezaehlt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Eigene Reichweitenmessung: Aufrufe je Tag, Weg (Suche / soziale Netze / Verweis / Kampagne), konkrete Herkunft, meistaufgerufene Seiten, Geraet — im Monitoring ganz oben' },
       { type: 'new', text: 'Kampagnenlinks aus utm-Parametern werden erkannt — ab jetzt laesst sich nachsehen, was von den Reel-Bildunterschriften ankommt' },

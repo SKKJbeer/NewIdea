@@ -18,7 +18,7 @@ import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
 import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
-import { Suspense } from 'react';
+import { Suspense, cache } from 'react';
 import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
 
@@ -34,6 +34,16 @@ const SITE_URL = siteUrlOrLocal();
 // On-Demand + ISR + Loading-Skeleton ist robuster.
 export const revalidate = 3600;
 
+// EIN ABRUF PRO ANFRAGE, nicht zwei.
+//
+// `generateMetadata` und die Seite fragten die Karte jeweils selbst ab.
+// `fetchCardById` nutzt axios, nicht `fetch` — Next dedupliziert das also
+// NICHT. Jede Kartenseite kostete damit zwei Aufrufe der TCG-API. Seit v6.6.0
+// stehen alle ~20.000 Kartenseiten in der Sitemap; wenn Google sie abarbeitet,
+// haette das die Last verdoppelt. `cache()` teilt das Ergebnis innerhalb
+// derselben Anfrage.
+const karteLaden = cache(fetchCardById);
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -41,7 +51,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   // Metadata darf bei API-Fehlern nie den Seitenaufbau verhindern
-  const card = await fetchCardById(id).catch(() => null);
+  const card = await karteLaden(id).catch(() => null);
   if (!card) return { title: 'Pokémon Karte' };
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
@@ -79,7 +89,7 @@ export default async function CardDetailPage({ params }: Props) {
   // notFound() nur bei echtem 404 der Datenbank (fetchCardById liefert dann null).
   let card;
   try {
-    card = await fetchCardById(id);
+    card = await karteLaden(id);
   } catch {
     return <ApiErrorState />;
   }

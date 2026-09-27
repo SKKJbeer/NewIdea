@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
+import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { revalidatePath } from 'next/cache';
 import { fetchTrendingCards, fetchTopValueCards } from '@/lib/pokemon-api';
 import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
+import { meldeAnIndexNow } from '@/lib/indexnow';
+import { siteUrl } from '@/lib/site';
+import { kartenTeil } from '@/lib/sitemap-karten';
 import { generateNextGuide } from '@/lib/guide-generator';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { computePmi, validateMarketData } from '@/lib/market-metrics';
@@ -29,8 +33,7 @@ export const maxDuration = 300;
 
 // Called daily at 08:00 to pre-warm today's article so first visitors don't wait
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthedFromRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -198,6 +201,31 @@ export async function GET(request: Request) {
   // Revalidate the listing page so it shows today's article fresh
   revalidatePath('/artikel');
   results.listingRevalidated = true;
+
+  // INDEXNOW — geaenderte Seiten an Bing & Co. melden. Eigener try/catch:
+  // Ein Aussetzer bei der Meldung darf nichts von oben mitreissen
+  // (Stolperstelle 24). Gemeldet wird, was sich heute tatsaechlich geaendert
+  // hat: Startseite und Uebersichten (Preise), der heutige Artikel bzw. Guide
+  // falls entstanden, und die meistgesuchten Karten, deren Preise der
+  // Durchlauf gerade aufgefrischt hat.
+  try {
+    const basis = siteUrl();
+    if (basis) {
+      const urls = ['/', '/marktbericht', '/artikel', '/sets', '/guides', '/suche'].map((p) => `${basis}${p}`);
+      if (results.articleGenerated === true) urls.push(`${basis}/artikel/${today}`);
+      if (typeof results.guideSlug === 'string' && results.guide === 'created') {
+        urls.push(`${basis}/guides/${results.guideSlug}`);
+      }
+      const topKarten = await kartenTeil(0);
+      urls.push(...topKarten.slice(0, 300).map((k) => `${basis}/karten/${encodeURIComponent(k.id)}`));
+      const meldung = await meldeAnIndexNow(urls);
+      results.indexNow = meldung.fehler ? `Fehler: ${meldung.fehler}` : `${meldung.gemeldet} Adressen gemeldet`;
+    } else {
+      results.indexNow = 'uebersprungen (keine Produktionsadresse)';
+    }
+  } catch (err) {
+    results.indexNow = `Fehler: ${err instanceof Error ? err.message : 'unbekannt'}`;
+  }
 
   return NextResponse.json({
     success: true,

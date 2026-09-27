@@ -42,3 +42,18 @@ export function isStudioAuthedFromRequest(request: Request): boolean {
   const token = match?.[1] ?? '';
   return safeEqual(token, makeToken(secret));
 }
+
+/**
+ * Prueft den Cron-Aufruf (`Authorization: Bearer <CRON_SECRET>`).
+ *
+ * VORHER stand in fuenf Routen `authHeader !== \`Bearer ${process.env.CRON_SECRET}\``.
+ * Zwei Maengel: nicht zeitkonstant (Regel 1), und bei fehlender Variable
+ * wurde daraus „Bearer undefined" — ein Aufrufer, der genau das schickt, waere
+ * durchgekommen. Fail-closed in Produktion (Regel 2), wie beim Studio.
+ */
+export function isCronAuthedFromRequest(request: Request): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return isDevOpen();
+  const header = request.headers.get('authorization') ?? '';
+  return safeEqual(header, `Bearer ${secret}`);
+}

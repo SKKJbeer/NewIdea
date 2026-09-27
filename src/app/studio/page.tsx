@@ -12,6 +12,7 @@ import type { MarketSummary } from '@/types';
 import { MonitoringPanel } from '@/components/MonitoringPanel';
 import { ReelsStudio } from '@/components/ReelsStudio';
 import { AutoReelPanel } from '@/components/AutoReelPanel';
+import { InstagramAutopilotPanel } from '@/components/InstagramAutopilotPanel';
 import { StoryPanel } from '@/components/StoryPanel';
 
 interface Integration {
@@ -338,6 +339,9 @@ export default function StudioPage() {
           <MonitoringPanel />
         ) : tab === 'reels' ? (
           <>
+            {/* Der Autopilot zuerst: Er ist der Normalfall, die Einzelwerkzeuge
+                darunter sind fuer Sonderfaelle. */}
+            <InstagramAutopilotPanel />
             <StoryPanel />
             <AutoReelPanel />
             <ReelsStudio />

@@ -7,6 +7,33 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.6.0] - 27. September 2026 · Instagram-Autopilot, alle Kartenseiten bei Suchmaschinen
+
+### Neu
+- **Instagram-Autopilot.** Jeden Abend (16:40 UTC) erscheint automatisch ein Beitrag aus echten Marktdaten: Reel an Mo/Mi/Fr/So, Karussell an Di/Do/Sa, dazu täglich eine Story. Die vier Reel-Formate rotieren so, dass jede Woche jedes Format einmal läuft
+- **Nie zweimal am selben Tag.** Vor jedem Beitrag fragt der Autopilot Instagram selbst, ob am Berliner Tag schon etwas erschienen ist — keine eigene Tabelle, die still ausfallen könnte
+- **Inhaltsschranke vor jeder Veröffentlichung.** Verletzt eine Bildunterschrift die Regeln der Seite (Kaufempfehlung, Ich-Form, Floskeln, über 2.200 Zeichen), wird nicht veröffentlicht
+- **Probelauf im Studio.** Baut den heutigen Beitrag komplett, legt Bilder bzw. Video ab und zeigt sie an — ohne zu veröffentlichen. Funktioniert auch ohne Instagram-Zugang
+- **Einrichtungshelfer.** Aus dem kurzlebigen Token des Graph-API-Explorers wird im Studio ein dauerhafter Seiten-Token plus Konto-ID. Die Laufzeit wird bei Meta geprüft und angezeigt, nicht behauptet
+- **Alle ~20.000 Kartenseiten in der Sitemap** statt bisher 40, aufgeteilt in Teile zu je 5.000 und in robots.txt gemeldet. Dazu alle Sets statt der 24 neuesten
+- **IndexNow.** Neue und geänderte Seiten werden täglich an Bing, Yandex, Seznam und Naver gemeldet (Bing speist auch DuckDuckGo, Ecosia, Yahoo und die ChatGPT-Suche). Braucht kein Konto — der Nachweis ist eine Schlüsseldatei auf der eigenen Domain
+
+### Behoben
+- **Reels sind auf Produktion nie entstanden.** `spawn /ROOT/node_modules/ffmpeg-static/ffmpeg ENOENT`: Die Binary lag im Bundle, aber Turbopack ersetzt `__dirname` durch den Platzhalter `/ROOT`. Der Pfad wird jetzt aus dem Arbeitsverzeichnis abgeleitet. Alle früheren Korrekturen am Reel (Schrift, Bündeln, Ausführbar-Bit) waren echt — sie kamen nur nie zum Zug
+- **Falsche Zeitangabe in jedem Reel.** „Die stärksten Bewegungen dieser Woche" — gemessen wird aber der aktuelle Preis gegen den 30-Tage-Schnitt, eine Woche wird nirgends ausgewertet. Vor dem automatischen Veröffentlichen korrigiert
+- **„14985" ohne Tausenderpunkt** im Marktbild — jetzt „14.985"
+- **Cron-Prüfung nicht zeitkonstant, und ohne Secret offen für `Bearer undefined`.** Fünf Routen verglichen mit `!==`; jetzt eine gemeinsame Prüfung, zeitkonstant und fail-closed
+- **robots.txt sperrte `/studio` nicht** (nur `/studio/…`) und das Monitoring gar nicht
+- **Kartenseiten fragten die Kartendatenbank doppelt ab** (Metadaten und Seite, axios ohne Deduplizierung) — bei 20.000 gemeldeten Seiten hätte das die Last verdoppelt
+
+### Geändert
+- Reels bekommen eine stumme AAC-Tonspur — Instagram lehnt Videos ohne Audiostrom teils ab
+- „Stärkste Bewegung" zeigt jetzt das Kartenbild; im Hochformat (Stories) über dem Text
+- Die Bildlogik liegt in `marktbilder.tsx`, damit Bild-Route und Autopilot garantiert dieselben Zahlen zeigen
+- `sharp` steht ausdrücklich in den Abhängigkeiten statt nur indirekt über Next
+
+---
+
 ## [6.5.0] - 26. September 2026 · Aufrufe und Herkunft werden gezaehlt
 
 ### Neu

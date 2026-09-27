@@ -88,7 +88,11 @@ function topMover(cards: PokemonCard[], siteUrl: string): ReelStory | null {
       kind: 'hook',
       seconds: 2.0,
       headline: `${pool.length} Karten mit der stärksten Bewegung`,
-      sub: 'Diese Woche im Pokémon-Kartenmarkt',
+      // NICHT „diese Woche": `trendPercent` ist der aktuelle Preis gegen den
+      // 30-Tage-Schnitt (pokemon-api.ts). Eine Woche wird nirgends ausgewertet —
+      // eine Zeitangabe, die keine Messung hat, ist eine Behauptung
+      // (Stolperstelle 23), und dieser Text geht automatisch öffentlich raus.
+      sub: 'Aktueller Preis gegen den 30-Tage-Schnitt',
       accent: 'violet',
     },
   ];
@@ -110,7 +114,7 @@ function topMover(cards: PokemonCard[], siteUrl: string): ReelStory | null {
     kind: 'insight',
     seconds: 3.4,
     headline: 'Was das heißt',
-    body: `${top.name} hat am deutlichsten ${richtung}. Einzelne Wochenwerte schwanken stark — aussagekräftig wird ein Preis erst im Verlauf über mehrere Wochen.`,
+    body: `${top.name} hat am deutlichsten ${richtung}. Ein einzelner Stand schwankt — aussagekräftig wird ein Preis erst im Verlauf über mehrere Wochen.`,
   });
   scenes.push({ kind: 'outro', seconds: 2.6, line: 'Preise täglich aktuell' });
 
@@ -124,8 +128,8 @@ function topMover(cards: PokemonCard[], siteUrl: string): ReelStory | null {
     title: 'Stärkste Bewegungen',
     scenes,
     caption:
-      `Die stärksten Bewegungen dieser Woche im Pokémon-Kartenmarkt.\n\n${liste}\n\n` +
-      'Einzelne Wochenwerte schwanken — der Verlauf über mehrere Wochen sagt mehr.\n\n' +
+      `Die stärksten Bewegungen im Pokémon-Kartenmarkt — aktueller Preis gegen den 30-Tage-Schnitt.\n\n${liste}\n\n` +
+      'Ein einzelner Stand schwankt — der Verlauf über mehrere Wochen sagt mehr.\n\n' +
       captionFooter(siteUrl, 'top-mover'),
   };
 }
@@ -332,13 +336,23 @@ export function weekIndex(now: Date = new Date()): number {
 export function buildStory(
   cards: PokemonCard[],
   siteUrl: string,
-  options: { conceptId?: string; now?: Date } = {},
+  options: {
+    conceptId?: string;
+    now?: Date;
+    /**
+     * Eigener Rotationszaehler statt der Kalenderwoche. Der Autopilot postet
+     * mehrere Reels pro Woche; mit der Wochennummer kaeme jedes Mal dasselbe
+     * Format. Er uebergibt deshalb „Woche × Reels je Woche + Platz in der Woche".
+     */
+    rotation?: number;
+  } = {},
 ): ReelStory | null {
   if (options.conceptId) {
     const chosen = CONCEPTS.find((c) => c.id === options.conceptId);
     return chosen ? chosen.build(cards, siteUrl) : null;
   }
-  const start = weekIndex(options.now ?? new Date()) % CONCEPTS.length;
+  const basis = options.rotation ?? weekIndex(options.now ?? new Date());
+  const start = ((basis % CONCEPTS.length) + CONCEPTS.length) % CONCEPTS.length;
   for (let i = 0; i < CONCEPTS.length; i++) {
     const story = CONCEPTS[(start + i) % CONCEPTS.length].build(cards, siteUrl);
     if (story) return story;

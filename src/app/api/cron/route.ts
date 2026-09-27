@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { revalidatePath } from 'next/cache';
 import { fetchTrendingCards } from '@/lib/pokemon-api';
 import { generateMarketSummary, generateNewsletterContent } from '@/lib/ai-generator';
@@ -16,8 +17,7 @@ import { splitMovers } from '@/lib/market-metrics';
 export const maxDuration = 300;
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthedFromRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

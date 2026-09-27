@@ -93,6 +93,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Täglicher Cron',
     },
     {
+      name: 'Instagram-Autopilot',
+      endpoint: '/api/cron/social',
+      schedule: '40 16 * * *',
+      scheduleLabel: 'Täglich 16:40 UTC (18:40 Sommerzeit)',
+      description:
+        'Reel (Mo/Mi/Fr/So) oder Karussell (Di/Do/Sa) aus echten Marktdaten, dazu täglich eine Story. Nie zweimal am selben Tag; Bildunterschrift läuft durch die Inhaltsschranke',
+      active: cronActive && !!process.env.INSTAGRAM_ACCESS_TOKEN && !!process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Newsletter-Versand',
       endpoint: '/api/newsletter',
       schedule: 'On Demand',

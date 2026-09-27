@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.5.0` · **Stand:** 26. September 2026 · **Branch:** `main`
+**Version:** `v6.6.0` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.6.0 | Instagram-Autopilot (Reel/Karussell/Story täglich, Dedupe, Inhaltsschranke, Probelauf, Einrichtungshelfer); Reel-Rendering auf Produktion repariert (/ROOT-Pfad); alle ~20.000 Karten + alle Sets in der Sitemap; IndexNow; Cron-Auth zeitkonstant |
 | v6.5.0 | Eigene Reichweitenmessung: Aufrufe, Weg und Herkunft im Monitoring — verdichtet, ohne Cookie und ohne Kennzeichen |
 | v6.4.0 | Hintergrund zeigt drei aufgefaecherte Sammelkarten mit berechnetem Holo-Effekt vor der Guilloche; Rosette an den Rand, Ausblendung zur Ueberschrift |
 | v6.3.0 | Hintergrund komplett neu (berechnete Guilloche statt handgezeichnetem Drachen); doppeltes Suchfeld auf Desktop behoben; roter Build repariert |

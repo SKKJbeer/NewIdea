@@ -100,6 +100,10 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
 
 **Offene Nutzer-Aufgaben (nur Steffen kann sie erledigen):**
+- **Instagram-Zugang einrichten** (Business-Konto + Facebook-Seite + Meta-App →
+  Studio → Reels → „Zugang einrichten" → zwei Werte in Vercel). Bis dahin läuft
+  der Autopilot täglich an und meldet „übersprungen"
+- **Bio-Link auf Instagram:** `https://new-idea-livid.vercel.app/?utm_source=instagram&utm_medium=bio`
 - **Aufbau-SQL fuer die Reichweitenmessung im Supabase-SQL-Editor ausfuehren** (steht
   im Monitoring unter „Reichweite", sobald es fehlt — Tabelle, Zaehlfunktion UND
   Zeilenschutz zusammen). Bis dahin wird nichts gezaehlt
@@ -806,6 +810,45 @@ Apple mit und schreibt die Sitzung in Cookies, die auch der Server liest.
 
 ---
 
+## Instagram-Autopilot — seit v6.6.0
+
+**Ablauf:** Vercel-Cron `/api/cron/social` täglich 16:40 UTC. Wochenplan in
+`src/lib/social-plan.ts` (`WOCHENPLAN`): Reel Mo/Mi/Fr/So, Karussell Di/Do/Sa,
+dazu täglich eine Story. Orchestrierung in `src/lib/instagram-autopilot.ts`,
+Graph-API in `src/lib/instagram.ts`, Bilder aus `src/lib/marktbilder.tsx`
+(dieselbe Quelle wie `/api/story/[vorlage]`), Ablage in Supabase Storage
+Eimer `social` (signierte Adressen, 14 Tage Aufbewahrung).
+
+| Regel | Warum |
+|---|---|
+| Vor jedem Beitrag `heuteSchonGepostet()` gegen Instagram selbst | Keine eigene Tabelle — die fallen hier still aus (Stolperstellen 21/45) |
+| `captionVerstoesse()` VOR `veroeffentlichen()` | Öffentlich + automatisch = nicht zurückholbar |
+| Feed und Story in getrennten try/catch | Stolperstelle 24 |
+| Berliner Datum, nicht UTC | Sonst zwei Beiträge am selben Abend möglich |
+| Reel-Rotation über `reelRotation()` | Wochennummer → immer dasselbe Format; Tag des Jahres → nur zwei von vier |
+| Seiten-Token aus langlebigem Nutzer-Token (Facebook Login) | Läuft nicht ab. Instagram-Login-Tokens laufen nach 60 Tagen ab — ein Autopilot, der dann still steht, ist keiner |
+| Stumme AAC-Spur im Reel | Instagram lehnt Videos ohne Audiostrom teils ab |
+| Bilder als JPEG (`sharp`) | Instagram nimmt kein PNG |
+| Texte nennen den gemessenen Zeitraum (30-Tage-Schnitt), NIE „diese Woche" | `trendPercent` ist Preis gegen Ø 30 Tage |
+
+**Zugang (nur der Nutzer):** Instagram-Business-Konto mit Facebook-Seite →
+Meta-App → Graph-API-Explorer-Token → Studio → Reels → „Zugang einrichten" →
+`INSTAGRAM_ACCESS_TOKEN` + `INSTAGRAM_BUSINESS_ACCOUNT_ID` in Vercel.
+**Bio-Link:** `…/?utm_source=instagram&utm_medium=bio` — sonst fällt Instagram-
+Verkehr in der Reichweitenmessung unter „ohne Verweis".
+
+## SEO-Skalierung — seit v6.6.0
+
+- **Kartenseiten-Sitemaps** `/karten/sitemap/N.xml` (je 5.000, nach Preis),
+  gemeldet in robots.txt. `kartenTeil()` holt seitenweise zu 1.000 — PostgREST
+  kappt jede Anfrage bei 1.000 Zeilen, `range(0, 4999)` liefert STILL 1.000.
+- **IndexNow** (`src/lib/indexnow.ts`): Schlüsseldatei `public/<schlüssel>.txt`
+  (öffentlich, kein Geheimnis). Täglich im Daily-Cron (eigener try/catch),
+  Vollmeldung einmalig per `POST /api/studio/indexnow`.
+- **Google nimmt an IndexNow nicht teil** — dort bleibt Search Console + Sitemap.
+
+---
+
 ## Reichweitenmessung (Aufrufe & Herkunft) — seit v6.5.0
 
 **Zweck:** Beantwortet die zwei Fragen, die vorher unbeantwortbar waren — wie viele
@@ -1047,6 +1090,14 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 45. **Eine Abfrage ohne Antwortkörper liefert auch keine Fehlermeldung — `head: true` verschluckt „Tabelle fehlt"** → Das Monitoring meldete `market_index` als „vorhanden, 0 Zeilen", während JEDER Schreibversuch mit `Could not find the table` scheiterte: Die Tabelle existierte gar nicht. `select('*', { count: 'exact', head: true })` ist eine HEAD-Anfrage; auf eine fehlende Tabelle antwortet PostgREST mit 404 und LEEREM Körper. Ohne Körper gibt es nichts zu lesen, der Client gibt `error: null, count: null` zurück — und `count ?? 0` machte daraus eine Null-Zeilen-Meldung. Das galt für jede Tabelle, nicht nur diese eine; der Fix legte sofort eine zweite offen (`portfolio_holdings`). Ausgerechnet das Monitoring, das stille Ausfälle sichtbar machen soll, war selbst einer. **Regeln:** (a) Die Existenz einer Tabelle IMMER mit einer Abfrage prüfen, die einen Antwortkörper hat (`select(spalte).limit(1)`) — erst danach zählen; (b) `count ?? 0` ist eine Behauptung: „nicht gezählt" ist `null` und muss als `—` sichtbar bleiben, nie als Null; (c) Neue Supabase-Tabelle eingeführt? Nach dem Deploy `/api/monitoring` ansehen UND einen echten Schreibversuch machen — grün im Monitoring war schon einmal falsch.
 
 46. **`captured_on` als `TIMESTAMPTZ`, wo der Code ein Datum schreibt, macht die Altersprüfung still wirkungslos** → `loadLatestMarketIndex` schreibt `'2026-07-31'` und rechnet beim Lesen mit `` `${captured_on}T00:00:00Z` ``. Ist die Spalte ein Zeitstempel, kommt `2026-07-31T00:00:00+00:00` zurück, das Anhängen ergibt ein ungültiges Datum → `Date.parse` liefert `NaN` → `NaN > maxAgeDays` ist **false**, die Prüfung lässt also JEDEN beliebig alten Stand durch. **Regeln:** (a) Tagesgrößen als `DATE` anlegen (wie `price_snapshots`), nicht als Zeitstempel; (b) Zurückgelesene Datumswerte vor dem Rechnen auf `slice(0, 10)` kürzen; (c) nach jeder Datumsdifferenz `Number.isFinite` prüfen — eine Altersgrenze, die bei NaN durchwinkt, ist keine.
+
+47. **`ffmpeg-static` meldet auf Vercel einen Pfad, den es nicht gibt** → `spawn /ROOT/node_modules/ffmpeg-static/ffmpeg ENOENT`. Die Binary WAR im Bundle; das Paket berechnet den Pfad aber über `__dirname`, und Turbopack ersetzt `__dirname` in gebündelten Modulen durch den Platzhalter `/ROOT`. Kein einziges Reel ist dadurch je auf Produktion entstanden. **Regel:** Pfade zu mitgebündelten Dateien IMMER aus `process.cwd()` ableiten (`ffmpegKandidaten()` in `ffmpeg-setup.ts`), nie aus dem, was ein Paket über sich selbst meldet. Und: eine Funktion, die nur per Knopfdruck läuft, einmal auf Produktion AUSLÖSEN — lokal lief es immer.
+
+48. **Dateizugriffe mit variablem Pfad packen das ganze Projekt in die Funktion** → Turbopack-Warnung „Dynamic filesystem access causes tracing of the whole project". Bei der Reel-Funktion (75 MB Binary) gefährdet das Vercels Größengrenze. **Regel:** `/*turbopackIgnore: true*/` vor den Pfad, wenn die Datei ohnehin über `outputFileTracingIncludes` mitkommt.
+
+49. **axios wird von Next NICHT dedupliziert** → `generateMetadata` und Seite riefen `fetchCardById` je einmal ab: zwei TCG-Aufrufe pro Kartenseite. Nur `fetch` wird innerhalb einer Anfrage zusammengefasst. **Regel:** Wird dieselbe axios-Abfrage in Metadaten UND Seite gebraucht, mit `cache()` aus React umhüllen.
+
+50. **Wächter-Tests, die auf Zeichenfolgen prüfen, müssen neue Schutzfunktionen kennen** → Nach Einführung von `isCronAuthedFromRequest` meldete der KI-Kostenwächter vier geschützte Routen als ungeschützt, weil er nur `CRON_SECRET` suchte. Umgekehrt prüfte ein Test „Bearer ${CRON_SECRET}" im Quelltext — das stand aber auch im Header, mit dem sich die Route SELBST weiterreicht; der Test wäre ohne jede Eingangsprüfung grün gewesen. **Regel:** Beim Einführen einer gemeinsamen Schutzfunktion alle Wächter auf sie umstellen und prüfen, dass sie die PRÜFUNG finden, nicht nur ein Vorkommen der Zeichenfolge.
 
 ---
 

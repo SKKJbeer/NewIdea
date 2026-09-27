@@ -28,6 +28,11 @@ describe('Ein Layout, drei Formate', () => {
 
 describe('Bilder aus echten Marktdaten', () => {
   const route = ohneKommentare('src/app/api/story/[vorlage]/route.tsx');
+  // Seit dem Instagram-Autopiloten liegt die Datenlogik in `marktbilder.tsx`,
+  // damit Route und Autopilot dieselben Zahlen zeigen. Die Regeln gelten fuer
+  // beide zusammen — geprueft wird deshalb die Summe.
+  const lib = ohneKommentare('src/lib/marktbilder.tsx');
+  const beide = route + '\n' + lib;
 
   it('nimmt KEINEN Text aus der Adresse entgegen', () => {
     // Eine oeffentliche Adresse, die beliebigen Text im CardBeacon-Layout
@@ -40,7 +45,7 @@ describe('Bilder aus echten Marktdaten', () => {
   });
 
   it('prueft Vorlage und Format gegen feste Listen', () => {
-    expect(route).toMatch(/function istVorlage/);
+    expect(beide).toMatch(/function istVorlage/);
     expect(route).toMatch(/function istFormat/);
   });
 
@@ -48,20 +53,24 @@ describe('Bilder aus echten Marktdaten', () => {
     // BEFUND beim ersten Rendern: Das Bild zeigte „CBI +28,6 %", waehrend die
     // Startseite −0,2 % auswies — beide rechneten fuer sich. Ein geteiltes Bild
     // lebt laenger als der Moment, in dem es entstand.
-    expect(route).toContain('getMarketBenchmark()');
-    expect(route).toMatch(/gespeichert\?\.value \?\?/);
+    expect(lib).toContain('getMarketBenchmark()');
+    expect(lib).toMatch(/gespeichert\?\.value \?\?/);
   });
 
   it('erzeugt bei zu duenner Datenlage KEIN Bild', () => {
     // Ein Marktbild ohne belastbaren Index waere genau die erfundene Kennzahl,
     // die dieses Projekt sonst ueberall vermeidet.
     expect(route).toMatch(/zu wenig Daten für eine Marktaussage/);
-    expect(route).toMatch(/keine gemessene Bewegung/);
-    expect(route).toMatch(/zu wenige gemessene Sets/);
+    expect(route).toMatch(/keine gemessene Grundlage/);
+    // Ohne Mover bzw. mit weniger als zwei gemessenen Sets liefert die
+    // Bibliothek `null` — die Route macht daraus ein 503 statt eines Bildes.
+    expect(lib).toMatch(/if \(!lage\.mover\) return null/);
+    expect(lib).toMatch(/if \(s\.length < 2\) return null/);
+    expect(lib).toMatch(/if \(indexWert === null\) return null/);
   });
 
   it('vergleicht im Set-Duell nur gemessene Sets', () => {
-    expect(route).toMatch(/typeof s\.avgTrend === 'number'/);
+    expect(lib).toMatch(/typeof s\.avgTrend === 'number'/);
   });
 
   it('haelt das Bild nicht laenger vor als seine Quelle', () => {

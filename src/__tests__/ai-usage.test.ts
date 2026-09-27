@@ -155,7 +155,9 @@ describe('Kein KI-Endpunkt ohne Zugriffsschutz', () => {
     // Aufruf eine vollständige Opus-Generierung aus — jeder Crawler konnte
     // damit Guthaben verbrennen. Diese Prüfung verhindert eine Wiederholung.
     const generatoren = /generateMarketSummary|generateNewsletterContent|generateVideoScript|generateSocialPosts|generateArticle|generateGuide|generateAndSaveMarketReport/;
-    const schutz = /isStudioAuthed(FromRequest)?\(|CRON_SECRET|Authorization/;
+    // `isCronAuthedFromRequest` ist seit v6.6.0 die gemeinsame, zeitkonstante
+    // Cron-Pruefung — sie ersetzt den Vergleich mit `CRON_SECRET` in den Routen.
+    const schutz = /isStudioAuthed(FromRequest)?\(|isCronAuthedFromRequest\(|CRON_SECRET|Authorization/;
 
     const ungeschuetzt: string[] = [];
     for (const file of globSync('src/app/api/**/route.ts', { cwd: process.cwd() })) {

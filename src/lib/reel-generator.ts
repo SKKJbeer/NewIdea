@@ -155,6 +155,31 @@ async function frameToSegment(
 }
 
 /**
+ * Stille als WAV (16 Bit, Mono, 44,1 kHz) — nur Nullen hinter einem Kopf.
+ * Exportiert fuer den Test, der die Kopfdaten prueft.
+ */
+export function stilleWav(sekunden: number): Buffer {
+  const rate = 44100;
+  const proben = Math.max(1, Math.round(rate * sekunden));
+  const daten = proben * 2;
+  const b = Buffer.alloc(44 + daten);
+  b.write('RIFF', 0, 'ascii');
+  b.writeUInt32LE(36 + daten, 4);
+  b.write('WAVE', 8, 'ascii');
+  b.write('fmt ', 12, 'ascii');
+  b.writeUInt32LE(16, 16);       // Laenge des fmt-Blocks
+  b.writeUInt16LE(1, 20);        // PCM
+  b.writeUInt16LE(1, 22);        // Mono
+  b.writeUInt32LE(rate, 24);
+  b.writeUInt32LE(rate * 2, 28); // Bytes je Sekunde
+  b.writeUInt16LE(2, 32);        // Blockgroesse
+  b.writeUInt16LE(16, 34);       // Bit je Probe
+  b.write('data', 36, 'ascii');
+  b.writeUInt32LE(daten, 40);
+  return b;
+}
+
+/**
  * Rendert eine Geschichte (siehe reel-concepts.ts) zum fertigen MP4.
  *
  * Der Generator kennt keine Formate — er setzt nur Szenen um. Neue Formate
@@ -256,10 +281,27 @@ export async function renderStory(story: ReelStory): Promise<Buffer> {
     await writeFile(listPath, segments.map((s) => `file '${s}'`).join('\n'));
     cleanup.push(listPath);
 
+    // STUMME TONSPUR — Instagram lehnt Reels ohne Audiostrom teils mit
+    // „unsupported format" ab (Fehler 2207026). Eine stille AAC-Spur kostet
+    // wenige Kilobyte. Die Stille wird als WAV in JavaScript erzeugt, nicht
+    // per `-f lavfi anullsrc`: fluent-ffmpeg lehnt `lavfi` grundsaetzlich ab
+    // (Stolperstelle 30).
+    const gesamtSekunden = story.scenes.reduce((n, sc) => n + sc.seconds, 0) + 1;
+    const stillePfad = tmp('stille.wav');
+    await writeFile(stillePfad, stilleWav(gesamtSekunden));
+    cleanup.push(stillePfad);
+
     const finalPath = tmp('final.mp4');
     cleanup.push(finalPath);
     await run(
-      ffmpeg().input(listPath).inputOptions(['-f concat', '-safe 0']).outputOptions(['-c copy', '-movflags +faststart']),
+      ffmpeg()
+        .input(listPath).inputOptions(['-f concat', '-safe 0'])
+        .input(stillePfad)
+        .outputOptions([
+          '-map 0:v:0', '-map 1:a:0',
+          '-c:v copy', '-c:a aac', '-b:a 64k', '-ar 44100',
+          '-shortest', '-movflags +faststart',
+        ]),
       finalPath,
     );
     return await readFile(finalPath);

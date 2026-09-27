@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { formatEur, formatPercent, formatPp } from '@/lib/format';
+import { formatCount, formatEur, formatPercent, formatPp } from '@/lib/format';
 import { STORY_FORMATE, type StoryFormat } from '@/lib/story-formats';
 
 export { STORY_FORMATE };
@@ -134,6 +134,11 @@ export interface MoverDaten {
   preis: number;
   /** Abstand zum Index in Prozentpunkten. `null` = nicht vergleichbar. */
   gegenMarkt: number | null;
+  /**
+   * Kartenbild als Data-URI. Optional: Schlaegt der Abruf fehl, entsteht das
+   * Bild ohne Karte statt gar nicht — die Zahl bleibt die Aussage.
+   */
+  bild?: string | null;
 }
 
 /**
@@ -144,6 +149,14 @@ export interface MoverDaten {
  */
 export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; format: StoryFormat; datenstand: string }) {
   const kompakt = format === 'og';
+  // Das Kartenbild nur dort, wo Platz ist. In der Teilen-Vorschau (1200×630)
+  // haette es die Zahl verdraengt — und die Zahl ist die Aussage.
+  const mitBild = !kompakt && Boolean(karte.bild);
+  // Hochformat (Story, 1080×1920): Bild ueber dem Text und deutlich groesser —
+  // nebeneinander blieb dort das untere Drittel leer.
+  const hoch = format === 'reel';
+  const bildBreite = hoch ? 600 : 330;
+  const bildHoehe = Math.round((bildBreite * 88) / 63); // echtes Kartenformat 63:88
   return (
     <Buehne kompakt={kompakt}>
       <Marke text="Stärkste Bewegung · 30 Tage" kompakt={kompakt} />
@@ -158,13 +171,39 @@ export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; for
       >
         {formatPercent(karte.trend)}
       </div>
-      <div style={{ display: 'flex', fontSize: kompakt ? 46 : 76, marginTop: kompakt ? 20 : 44 }}>
-        {karte.name}
-      </div>
-      <div style={{ display: 'flex', fontSize: kompakt ? 24 : 38, color: MUTED, marginTop: 12 }}>
-        {karte.set} · {formatEur(karte.preis)}
-        {karte.gegenMarkt !== null ? ` · ${formatPp(karte.gegenMarkt)} zum Markt` : ''}
-      </div>
+      {mitBild ? (
+        <div style={{ display: 'flex', flexDirection: hoch ? 'column' : 'row', alignItems: hoch ? 'flex-start' : 'center', marginTop: 52 }}>
+          {/* Schatten und Rahmen auf demselben Element sind in Satori
+              unkritisch — verworfen wird nur `transform` neben `boxShadow`
+              (Stolperstelle 31), und gedreht wird hier nichts. */}
+          <img
+            src={karte.bild as string}
+            width={bildBreite}
+            height={bildHoehe}
+            style={{ borderRadius: 18, boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', marginLeft: hoch ? 0 : 48, marginTop: hoch ? 48 : 0, ...(hoch ? {} : { flex: 1, minWidth: 0 }) }}>
+            <div style={{ display: 'flex', fontSize: hoch ? 80 : 62, lineHeight: 1.1 }}>{karte.name}</div>
+            <div style={{ display: 'flex', fontSize: 34, color: MUTED, marginTop: 18 }}>{karte.set}</div>
+            <div style={{ display: 'flex', fontSize: 44, marginTop: 34 }}>{formatEur(karte.preis)}</div>
+            {karte.gegenMarkt !== null && (
+              <div style={{ display: 'flex', fontSize: 30, color: MUTED, marginTop: 10 }}>
+                {`${formatPp(karte.gegenMarkt)} zum Markt`}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'flex', fontSize: kompakt ? 46 : 76, marginTop: kompakt ? 20 : 44 }}>
+            {karte.name}
+          </div>
+          <div style={{ display: 'flex', fontSize: kompakt ? 24 : 38, color: MUTED, marginTop: 12 }}>
+            {karte.set} · {formatEur(karte.preis)}
+            {karte.gegenMarkt !== null ? ` · ${formatPp(karte.gegenMarkt)} zum Markt` : ''}
+          </div>
+        </>
+      )}
       <div style={{ display: 'flex', flexGrow: 1 }} />
       <Fuss kompakt={kompakt} datenstand={datenstand} />
     </Buehne>
@@ -245,7 +284,9 @@ export function MarketState({ markt, format, datenstand }: { markt: MarktDaten; 
         {[
           ['Marktbreite', `${Math.round(markt.breite)} %`],
           ['Temperatur', markt.temperatur],
-          [`Stichprobe · ${markt.sets} Sets`, `${markt.karten}`],
+          // formatCount, nicht die nackte Zahl: live stand hier „14985" ohne
+          // Tausenderpunkt (Stolperstelle 26).
+          [`Stichprobe · ${formatCount(markt.sets)} Sets`, formatCount(markt.karten)],
         ].map(([k, v]) => (
           <div key={k} style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', fontSize: kompakt ? 16 : 22, color: MUTED, letterSpacing: 2 }}>

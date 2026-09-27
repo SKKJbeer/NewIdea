@@ -50,6 +50,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/api/video/auto-reel': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
     '/api/video/process': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
+    // Der Instagram-Autopilot rendert Reels — dieselben Dateien wie oben.
+    '/api/cron/social': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
   },
   images: {
     remotePatterns: [

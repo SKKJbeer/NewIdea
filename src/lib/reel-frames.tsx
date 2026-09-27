@@ -299,7 +299,7 @@ export function cardFrame(
   total: number,
   imageDataUri: string,
   {
-    label = 'TOP-MOVER DER WOCHE',
+    label = 'STÄRKSTE BEWEGUNG',
     metric = 'trend',
     hideValue = false,
     translucent = false,

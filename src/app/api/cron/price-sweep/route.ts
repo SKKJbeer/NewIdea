@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { sweepChunk, markChainError, loadSweepState } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
@@ -62,8 +63,7 @@ const MAX_CHAIN = 150;
 const BUDGET_MS = 240_000;
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthedFromRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

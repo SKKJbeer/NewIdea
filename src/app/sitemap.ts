@@ -3,7 +3,7 @@ import { GUIDES } from '@/lib/guides';
 import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
-import { fetchRecentSets, fetchTopValueCards } from '@/lib/pokemon-api';
+import { fetchRecentSets } from '@/lib/pokemon-api';
 import { listGeneratedGuideSlugs } from '@/lib/guide-storage';
 import { siteUrlOrLocal } from '@/lib/site';
 
@@ -73,8 +73,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }));
 
-  // Set-Landingpages — die wichtigsten SEO-Einstiege (falls TCG-API down: leerer Fallback).
-  const sets = await fetchRecentSets(24).catch(() => []);
+  // Set-Landingpages — ALLE Sets, nicht nur die 24 neuesten. Aeltere Sets
+  // („base set preise", „evolving skies wert") sind gerade die gesuchten.
+  // Falls die TCG-API ausfaellt: leerer Rueckfall, die Kartensitemaps bleiben.
+  const sets = await fetchRecentSets(250).catch(() => []);
   const setPages: MetadataRoute.Sitemap = sets.map((s) => ({
     url: `${BASE_URL}/sets/${s.id}`,
     lastModified: now,
@@ -82,15 +84,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Top-Karten-Detailseiten — die wertvollsten Karten sind die stärksten
-  // Such-Einstiege ("charizard ex sir preis" etc.). Falls TCG-API down: leer.
-  const topCards = await fetchTopValueCards(40).catch(() => []);
-  const cardPages: MetadataRoute.Sitemap = topCards.map((c) => ({
-    url: `${BASE_URL}/karten/${c.id}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }));
+  // Kartenseiten stehen NICHT hier, sondern in eigenen Teil-Sitemaps
+  // (/karten/sitemap/N.xml, gemeldet in robots.txt) — alle ~20.000 statt
+  // bisher 40. Siehe `src/lib/sitemap-karten.ts`.
 
-  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages, ...cardPages];
+  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages];
 }
