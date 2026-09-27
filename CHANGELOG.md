@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.9.0] - 27. September 2026 · Tagespreise für alle Karten
+
+### Neu
+- **Täglicher Preisdurchlauf für alle ~19.700 Karten** mit dem Cardmarket-Stand vom Vortag (TCGdex), in sechs Etappen am frühen Morgen. Jede Zuordnung wird über den Kartennamen geprüft; Preise älter als 3 Tage werden nicht übernommen
+- **Qualitätsschranke „Preise von heute"**: Fehlt der Durchlauf, bleibt er unvollständig, scheitert das Schreiben oder bringt er weniger als 50 % frische Preise, meldet der Cron einen Fehler und das Monitoring zeigt den Verstoß ganz oben
+- Jede Tagesmessung trägt das Datum ihres Quellstands, nicht das Datum des Speicherns
+
+### Geändert
+- Der bisherige Durchlauf über pokemontcg.io nimmt nur noch neue Karten auf und überschreibt keine Preise mehr
+- Der CardBeacon Index rechnet nur noch aus Karten mit Preisen der letzten 3 Tage, in fester Reihenfolge gelesen
+- **Suche:** Wörter werden unabhängig vom Trenner gefunden („mimikyu gx" findet „Mimikyu-GX"); ohne Treffer kommt die Antwort sofort statt nach 4 Sekunden; Filterzeichen aus der Eingabe gelangen nicht mehr in die Datenbankabfrage
+- Die Suchseite lädt Treffer und Marktbezug gleichzeitig
+
+### Behoben
+- Der tägliche Durchlauf schrieb Monate alte Preise mit heutigem Datum in Kartenindex und Preisverlauf
+
+---
+
 ## [6.8.7] - 27. September 2026 · Zeitbudget für den Kartenabruf
 
 ### Behoben

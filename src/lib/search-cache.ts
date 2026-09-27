@@ -63,8 +63,17 @@ export async function cachedSearchCards(query: string, limit = 40): Promise<Poke
   // Kein Zwischenspeicher davor: Die Abfrage ist bereits schnell, und ein
   // Zwischenspeicher über einer schnellen Quelle bringt nichts außer einer
   // weiteren Stelle, an der etwas veralten kann.
-  const ausIndex = await searchCardIndex(normalisiert, limit).catch(() => []);
-  if (ausIndex.length > 0) return ausIndex;
+  //
+  // „KEINE TREFFER" IST EINE ANTWORT, KEIN AUSFALL. Der Index enthaelt alle
+  // anzeigbaren Karten (~19.700). Findet er nichts, findet die fremde
+  // Kartendatenbank auch nichts Brauchbares — sie kostete aber gemessen 4 s
+  // bis zur Zeitgrenze (27.09.2026: „mimikyu gx"). Der Rueckfall laeuft
+  // deshalb NUR, wenn der Index selbst ausfaellt (er wirft dann).
+  try {
+    return await searchCardIndex(normalisiert, limit);
+  } catch (err) {
+    console.warn('[Suche] Index nicht erreichbar, Rueckfall auf die Kartendatenbank:', err instanceof Error ? err.message : err);
+  }
 
   const laden = unstable_cache(
     async () => {

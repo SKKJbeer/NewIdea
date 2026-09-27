@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.9.0',
+    date: '27. September 2026',
+    label: 'Tagespreise für alle Karten',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Täglicher Preisdurchlauf für alle ~19.700 Karten mit dem Cardmarket-Stand vom Vortag, Namensprobe je Karte' },
+      { type: 'new', text: 'Qualitätsschranke „Preise von heute": Cron-Fehler und Monitoring-Warnung, wenn Preise fehlen oder veraltet sind' },
+      { type: 'changed', text: 'Alter Durchlauf überschreibt keine Preise mehr; CardBeacon Index nur aus Preisen der letzten 3 Tage' },
+      { type: 'changed', text: 'Suche findet Wörter unabhängig vom Trenner, antwortet ohne Treffer sofort' },
+      { type: 'fixed', text: 'Monate alte Preise wurden täglich mit heutigem Datum gespeichert' },
+    ],
+  },
+  {
     version: '6.8.7',
     date: '27. September 2026',
     label: 'Zeitbudget für den Kartenabruf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Karten- und Set-Seiten liefen bei hängender Kartendatenbank ins 30-s-Limit — jetzt Gesamtbudget (8 s bzw. 9 s), danach Rückfall auf den eigenen Index' },
     ],

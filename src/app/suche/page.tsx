@@ -86,6 +86,9 @@ export default async function SearchPage({
   // einem Set.
   let sets: SetTreffer[] = [];
   let error = false;
+  // Der Marktbezug startet GLEICHZEITIG mit der Suche, nicht danach — vorher
+  // addierten sich beide Wartezeiten.
+  const marktLaden = getMarketBenchmark().catch(() => null);
   if (query.length >= 2) {
     try {
       [results, sets] = await Promise.all([
@@ -105,7 +108,7 @@ export default async function SearchPage({
   //
   // Schlägt der Abruf fehl, bleibt die Spalte leer. Ein fehlender Vergleich ist
   // kein Fehler der Suche; eine erfundene Null wäre einer.
-  const markt = await getMarketBenchmark().catch(() => null);
+  const markt = await marktLaden;
 
   const structuredData =
     results.length > 0

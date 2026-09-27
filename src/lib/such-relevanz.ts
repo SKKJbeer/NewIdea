@@ -19,6 +19,35 @@
 // die gesprochen wird — und das ist fast immer die teuerste. Preis ist hier ein
 // Näherungswert für Bekanntheit, nicht für Wichtigkeit.
 
+/**
+ * Suchform eines Namens oder einer Eingabe: klein, Trenner vereinheitlicht.
+ *
+ * BEFUND (27.09.2026): „mimikyu gx" fand nichts, weil die Karte „Mimikyu-GX"
+ * heisst — Bindestrich statt Leerzeichen. Wer tippt, unterscheidet das nicht.
+ * Bindestrich, Unterstrich, Punkt und Komma zaehlen deshalb wie ein Leerzeichen,
+ * Apostrophe fallen weg („Rocket's" ↔ „rockets").
+ */
+export function suchForm(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/['’`]/g, '')
+    .replace(/[\s\-–—_.,/]+/g, ' ')
+    .trim();
+}
+
+/**
+ * Datenbank-Muster fuer ILIKE: Woerter der Eingabe in Reihenfolge, beliebiges
+ * dazwischen („mimikyu gx" → `%mimikyu%gx%`). Zeichen, die in der Filtersprache
+ * von PostgREST eine Bedeutung haben (`,()"`) oder als Platzhalter wirken
+ * (`%_\`), werden vorher entfernt — sonst liesse sich ueber die Eingabe die
+ * Abfrage selbst veraendern.
+ */
+export function suchMuster(eingabe: string): string | null {
+  const woerter = suchForm(eingabe.replace(/[%_\\,()"*:]/g, ' ')).split(' ').filter(Boolean);
+  if (woerter.join('').length < 2) return null;
+  return `%${woerter.join('%')}%`;
+}
+
 /** Je kleiner, desto besser der Treffer. `NICHT_GEFUNDEN` steht ganz hinten. */
 export const NICHT_GEFUNDEN = 9;
 
@@ -35,8 +64,8 @@ export const NICHT_GEFUNDEN = 9;
  * Reihenfolge entschiede wieder allein der Preis.
  */
 export function namensRang(name: string, q: string): number {
-  const n = name.trim().toLowerCase();
-  const s = q.trim().toLowerCase();
+  const n = suchForm(name);
+  const s = suchForm(q);
   if (!n || !s) return NICHT_GEFUNDEN;
 
   if (n === s) return 0;

@@ -110,10 +110,9 @@ Namensprobe, max. 3 Tage alt, wirft nie). Stand der Abdeckung (400 wertvollste,
 Promos, Secret Rares — über diese Quelle nicht lösbar), 16 Schreibweisen (in v6.8.5
 behoben), 11 Nummern-Formate (teils behoben). Diagnose: `GET /api/cron/frischpreise`
 liefert `gruende` + `beispiele`.
-**Noch offen:** Preisdurchlauf (Kartenindex → Suche, Listen, CardBeacon Index) läuft
-weiter auf pokemontcg.io. Nächster Schritt: Durchlauf auf TCGdex umstellen (nur pro
-Karte abrufbar → ~20.000 Abrufe, verteilt), danach Marktkontext auf Kartenseiten
-wieder einschalten (entfällt bei frischem Kartenpreis, solange Set/Index alt sind).
+**Seit v6.9.0:** ALLE Karten täglich über TCGdex (siehe Abschnitt „Preis-Pipeline").
+Noch offen: Marktkontext auf Kartenseiten wieder einschalten, sobald Set/Index nachweislich
+auf frischen Preisen stehen (entfällt bis dahin bei frischem Kartenpreis).
 
 **Performance (Nutzer-Auftrag: „alles muss instant da sein"):** Karten- und Set-Seiten
 waren trotz `revalidate` bei JEDEM Aufruf dynamisch (2–14 s). Seit v6.8.5 ISR über
@@ -122,6 +121,33 @@ waren trotz `revalidate` bei JEDEM Aufruf dynamisch (2–14 s). Seit v6.8.5 ISR 
 **Nächste Richtung laut Nutzer:** Geld verdienen mit Werbung. Voraussetzungen: eigene
 Domain (AdSense verlangt `ads.txt` auf der Stamm-Domain — auf `vercel.app` unmöglich),
 zertifiziertes Einwilligungsbanner (CMP) für personalisierte Werbung in der EU.
+
+## ⛔ Preis-Pipeline (PFLICHT — das Herzstück, seit v6.9.0 fest verankert)
+
+**Nutzer-Auftrag (27.09.2026):** „stelle wirklich mit Qualitäts-Gates sicher, dass die Preise
+täglich bei uns gespeichert und aktualisiert werden. Das ist das Wichtigste bei uns."
+
+| Schritt | Wann | Datei | Was |
+|---|---|---|---|
+| Tagespreise aller Karten | 6 Etappen: 02/03/04/05/09/11:05 UTC (`/api/cron/preise?etappe=N`) | `src/lib/preis-durchlauf.ts` | Jede Karte im Index → TCGdex (Cardmarket, Stand Vortag), Namensprobe, max. 3 Tage alt → Kartenindex + Tageswert |
+| Neue Karten | 06:10 UTC (`/api/cron/price-sweep`) | `price-sweep.ts` → `upsertCardIndex` | NUR EINFÜGEN (`ignoreDuplicates`) — überschreibt NIE einen Preis |
+| Top 400 für Instagram | 10:15 UTC (`/api/cron/frischpreise`) | `frischpreise.ts` | Datei `marktdaten/<datum>.json` mit bestätigten Bewegungen |
+| Marktindex | 08:00 UTC (`/api/cron/daily`) | `card-index.ts` → `indexKartenFuerIndex` | NUR Zeilen mit `updated_at` ≥ heute − 3 Tage |
+
+**Bedeutung der Felder (nicht verhandelbar):**
+- `cards_index.updated_at` = **Quellstand des Preises**, NICHT Schreibzeitpunkt. Alte Preise sind dadurch als alt erkennbar.
+- `price_snapshots.captured_on` = **Tag des Quellstands**. Ein Tageswert entsteht NUR aus einem Stand ≤ 3 Tage (`snapshotTauglich`, `standFrisch`).
+
+**Qualitätsschranken:**
+1. `preisGate()` — hält nur, wenn der heutige Durchlauf existiert, fertig ist, ohne Schreibfehler lief und ≥ `MIN_FRISCH_ANTEIL` (50 %) frische Preise brachte. Gemessen 27.09.: ~72 % (Rest: TCGdex hat keinen Cardmarket-Preis, Stolperstelle 58).
+2. Verstoß → Cron-Route antwortet **HTTP 500** (sichtbar als fehlgeschlagener Cron bei Vercel) UND steht im Monitoring **ganz oben** als „PREISE NICHT AKTUELL".
+3. `preis-pipeline.test.ts` bricht den Build, wenn: weniger als 4 Etappen vor 08:00 eingeplant sind, der Sweep wieder Preise überschreibt, alte Werte als Tageswert gespeichert werden, der Index ohne Altersfilter rechnet, die Schwelle unter 50 % sinkt oder die 500-Antwort fehlt.
+
+**Diagnose:** `GET /api/cron/preise` (Studio-Cookie) → `stand.gruende` zeigt, warum Karten keinen Frischpreis bekamen. Stand-Datei: Speicher-Eimer `social`, `marktdaten/durchlauf.json`.
+
+**Niemals:** den Durchlauf abschalten, die Schwelle senken ohne Messung, TCGplayer-USD als Ersatz für Cardmarket nehmen, `updated_at` wieder auf „jetzt" setzen.
+
+---
 
 ## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
@@ -1161,6 +1187,8 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 56. **Ein alter Preis mit heutigem Datum ist eine erfundene Messung** → `recordPriceSnapshot(s)` speicherte jeden Tag `captured_on = heute` mit dem Preis aus pokemontcg.io — der aber Monate alt war. Die „Tageshistorie" bestand aus demselben alten Wert, täglich neu datiert, und sah aus wie ein stabiler Markt. **Regel:** Tageswerte nur über `snapshotTauglich()` (Quellstand ≤ 3 Tage). Weniger Punkte sind ehrlicher als falsche.
 
 57. **Frischer Wert gegen alten Vergleichswert = kein Vergleich** → Nach dem Überlegen des Vortagspreises verglich der Marktkontext die Karte (Stand gestern) mit Set und Index (Stand Frühjahr). Gleicher Fehler wie v6.8.2 bei Instagram („pp zum Markt"). **Regel:** Bei jeder Gegenüberstellung prüfen, ob beide Seiten denselben Datenstand haben; sonst die Gegenüberstellung weglassen.
+
+59. **Leerer Suchtreffer ≠ Ausfall; Trenner sind egal** → „mimikyu gx" fand nichts (Karte heißt „Mimikyu-GX") und fiel danach auf pokemontcg.io zurück — 4 s bis zur Zeitgrenze. **Regeln:** (a) Suchmuster aus WÖRTERN bauen (`suchMuster()`, `%mimikyu%gx%`), Bindestrich/Punkt/Unterstrich wie Leerzeichen, Apostrophe weg; (b) `searchCardIndex` WIRFT bei Datenbankfehlern, liefert `[]` bei keinem Treffer — nur ein Wurf löst den langsamen Rückfall aus; (c) PostgREST-Filterzeichen (`,()"`) nie ungefiltert in `or()`.
 
 58. **TCGdex hat für viele teure Sonderkarten KEINEN Cardmarket-Preis** (`pricing.cardmarket: null` — ★-Karten, POP, Nintendo-/Wizards-Promos, SM-Shiny-Vault, einzelne Secret Rares; gemessen 81 von 400). Dort NIE auf TCGplayer (USD, anderer Markt) ausweichen, sondern den alten Stand mit Datum und Hinweis stehen lassen. Schreibweisen-Unterschiede: `★` ↔ `Star`, `LV.X` fehlt bei TCGdex, Holo-Nummern `H9` ↔ `H09` — in `namenGleich()` / `dexKandidaten()` abgedeckt, jede weitere Ausnahme nur mit Beleg aus `beispiele`.
 

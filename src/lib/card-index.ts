@@ -1,6 +1,6 @@
 import { getSupabase } from './supabase';
 import type { PokemonCard } from '@/types';
-import { nachRelevanz } from './such-relevanz';
+import { nachRelevanz, suchMuster } from './such-relevanz';
 
 // EIGENER KARTENINDEX — damit die Suche nicht mehr nach außen geht.
 //
@@ -24,6 +24,9 @@ import { nachRelevanz } from './such-relevanz';
 // zweiter Wahrheitsanspruch — deshalb steht sein Alter im Monitoring, und
 // deshalb bleibt der Abruf von außen als Rückfall bestehen.
 
+/** Aelter darf ein Preis nicht sein, um in den Marktindex einzugehen. */
+export const INDEX_MAX_PREISALTER_TAGE = 3;
+
 export interface IndexTreffer extends PokemonCard {
   /** Wann dieser Eintrag zuletzt aus der Quelle aufgefrischt wurde. */
   indexStand?: string;
@@ -35,10 +38,25 @@ function istIndexierbar(c: PokemonCard): boolean {
 }
 
 /**
- * Schreibt Karten in den Index.
+ * Quellstand eines Preises als Zeitstempel. pokemontcg.io liefert `2026/03/01`;
+ * ohne Angabe gilt der Preis als uralt (Epoche) — nie als „jetzt".
+ */
+export function quellStand(c: PokemonCard): string {
+  const roh = c.cmPrices?.updatedAt;
+  const t = roh ? Date.parse(roh.replace(/\//g, '-')) : NaN;
+  return new Date(Number.isFinite(t) ? t : 0).toISOString();
+}
+
+/**
+ * Nimmt NEUE Karten in den Index auf. Bestehende Zeilen bleiben unberührt.
  *
- * Wird vom Tages-Durchlauf je Seite aufgerufen. `upsert` auf den Primärschlüssel:
- * Eine Karte, die es schon gibt, wird aufgefrischt statt verdoppelt.
+ * SEIT v6.8.8 NUR NOCH EINFUEGEN. Vorher überschrieb der tägliche Durchlauf
+ * (pokemontcg.io) jede Zeile mit Preisen, die 3–10 Monate alt sind, und setzte
+ * `updated_at` auf JETZT. Der TCGdex-Durchlauf (`preis-durchlauf.ts`) schreibt
+ * die frischen Preise; dieser Weg liefert nur noch Karten, die neu erscheinen.
+ *
+ * `updated_at` ist der QUELLSTAND des Preises (Stolperstelle 53), nicht der
+ * Schreibzeitpunkt — so erkennt der Marktindex alte Werte als alt.
  */
 export async function upsertCardIndex(cards: PokemonCard[]): Promise<string | null> {
   const sb = getSupabase();
@@ -57,11 +75,13 @@ export async function upsertCardIndex(cards: PokemonCard[]): Promise<string | nu
     trend: typeof c.trendPercent === 'number' ? c.trendPercent : null,
     real_data: c.realData === true,
     types: c.types ?? null,
-    updated_at: new Date().toISOString(),
+    updated_at: quellStand(c),
   }));
   if (zeilen.length === 0) return null;
 
-  const { error } = await sb.from('cards_index').upsert(zeilen, { onConflict: 'id' });
+  const { error } = await sb
+    .from('cards_index')
+    .upsert(zeilen, { onConflict: 'id', ignoreDuplicates: true });
   // Die ECHTE Meldung zurückgeben — ein `return false` hat in diesem Projekt
   // schon einmal wochenlang eine Diagnose verschluckt.
   return error ? error.message : null;
@@ -118,10 +138,12 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   const sb = getSupabase();
   if (!sb) return [];
 
-  // Platzhalter der Suchsprache entschärfen: `%` und `_` würden sonst als
-  // Muster wirken und eine Eingabe wie „%" die ganze Tabelle zurückgeben.
-  const begriff = query.trim().replace(/[%_\\]/g, '');
-  if (begriff.length < 2) return [];
+  // Muster aus den WOERTERN der Eingabe (`such-relevanz.ts`): Trenner egal,
+  // Platzhalter und Filter-Sonderzeichen entfernt. Vorher wurden `,` und `(`
+  // nicht entfernt — sie landeten ungefiltert im `or()`-Ausdruck.
+  const muster = suchMuster(query);
+  if (!muster) return [];
+  const begriff = query.trim();
 
   // MEHR HOLEN, ALS ANGEZEIGT WIRD — sonst wirkt die Rangfolge nicht.
   //
@@ -138,14 +160,14 @@ export async function searchCardIndex(query: string, limit = 40): Promise<IndexT
   const { data, error } = await sb
     .from('cards_index')
     .select('*')
-    .or(`name.ilike.%${begriff}%,name_de.ilike.%${begriff}%`)
+    .or(`name.ilike.${muster},name_de.ilike.${muster}`)
     .order('price', { ascending: false })
     .limit(fenster);
 
-  if (error) {
-    console.warn('[Kartenindex] Suche fehlgeschlagen:', error.message);
-    return [];
-  }
+  // WERFEN statt `[]`: Ein Datenbankfehler ist etwas anderes als „keine
+  // Treffer". Nur beim Fehler lohnt der langsame Rueckfall auf die fremde
+  // Kartendatenbank — bei „keine Treffer" haette er nur 4 s Wartezeit gekostet.
+  if (error) throw new Error(`Kartenindex-Suche: ${error.message}`);
 
   const karten = (data as unknown as IndexZeile[]).map(zuKarte);
   return nachRelevanz(karten, begriff, (k) => ({ name: k.name, nameDe: k.nameDe })).slice(
@@ -181,12 +203,21 @@ export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
   const SEITE = 1000;
   const MAX_SEITEN = 40;
   const karten: PokemonCard[] = [];
+  const frischGrenze = new Date(Date.now() - INDEX_MAX_PREISALTER_TAGE * 86_400_000).toISOString();
 
   for (let seite = 0; seite < MAX_SEITEN; seite++) {
     const von = seite * SEITE;
+    // NUR ZEILEN MIT JUNGEM QUELLSTAND (seit v6.8.8): `updated_at` ist der
+    // Stand des Preises bei der Quelle. Ein Index „vom heutigen Tag" aus
+    // Preisen vom Fruehjahr waere Stolperstelle 53.
+    // FESTE SORTIERUNG: Ohne `order` ist die Reihenfolge zwischen zwei
+    // Seitenabfragen nicht garantiert — Karten konnten doppelt oder gar nicht
+    // gezaehlt werden.
     const { data, error } = await sb
       .from('cards_index')
       .select('id,set_code,price,trend,real_data,image_url')
+      .gte('updated_at', frischGrenze)
+      .order('id', { ascending: true })
       .range(von, von + SEITE - 1);
     if (error) {
       console.warn('[Kartenindex] Bestand für Index nicht lesbar:', error.message);
@@ -247,8 +278,8 @@ export async function searchSetIndex(query: string, limit = 3): Promise<SetTreff
   const sb = getSupabase();
   if (!sb) return [];
 
-  const begriff = query.trim().replace(/[%_\\]/g, '');
-  if (begriff.length < 2) return [];
+  const muster = suchMuster(query);
+  if (!muster) return [];
 
   // 400 Zeilen reichen: Ein Set hat höchstens ein paar hundert Karten, und die
   // teuersten stehen vorn. Ohne Deckel wäre das eine Volltabellen-Abfrage bei
@@ -256,7 +287,7 @@ export async function searchSetIndex(query: string, limit = 3): Promise<SetTreff
   const { data, error } = await sb
     .from('cards_index')
     .select('set_name,set_code,price')
-    .ilike('set_name', `%${begriff}%`)
+    .ilike('set_name', muster)
     .order('price', { ascending: false })
     .limit(400);
 

@@ -33,7 +33,8 @@ describe('Die Suche fragt zuerst den eigenen Index', () => {
   });
 
   it('ein Fehler im Index laesst die Suche weiterlaufen', () => {
-    expect(cache).toMatch(/searchCardIndex\(normalisiert, limit\)\.catch\(\(\) => \[\]\)/);
+    // Seit v6.8.8: Fehler (Wurf) → Rueckfall; leeres Ergebnis → sofort leer.
+    expect(cache).toMatch(/try \{\s*return await searchCardIndex\(normalisiert, limit\);\s*\} catch/);
   });
 });
 
@@ -63,7 +64,9 @@ describe('Der Index behauptet nichts', () => {
 
   it('entschaerft Platzhalter in der Eingabe', () => {
     // Ohne das wuerde eine Eingabe wie „%" die ganze Tabelle zurueckgeben.
-    expect(idx).toContain("replace(/[%_");
+    // Seit v6.8.8 zentral in `suchMuster` (such-relevanz.ts).
+    expect(idx).toContain('suchMuster(query)');
+    expect(idx).not.toMatch(/ilike\.%\$\{begriff\}/);
   });
 
   it('gibt die echte Fehlermeldung zurueck', () => {

@@ -2,6 +2,7 @@ import { getSupabase } from './supabase';
 import { upsertCardIndex } from './card-index';
 import { fetchCardPage } from './pokemon-api';
 import { displayPrice } from './pokemon-api';
+import { snapshotTauglich } from './price-history';
 import type { PokemonCard } from '@/types';
 
 // FLÄCHENDECKENDE PREISERFASSUNG
@@ -302,7 +303,13 @@ export async function sweepChunk({
       if (indexFehler) console.warn('[Kartenindex] nicht geschrieben:', indexFehler);
 
       const vergleich = await letzteMesspunkte(cards.map((c) => c.id));
-      const faellig = cards.filter((c) => needsSnapshot(displayPrice(c), vergleich.get(c.id), datum));
+      // NUR FRISCHE QUELLSTAENDE (seit v6.8.8). pokemontcg.io liefert Monate
+      // alte Cardmarket-Werte; sie mit heutigem Datum zu speichern, erfand eine
+      // Tagesmessung (Stolperstelle 56). Die Tageswerte schreibt jetzt der
+      // TCGdex-Durchlauf.
+      const faellig = cards.filter(
+        (c) => snapshotTauglich(c) && needsSnapshot(displayPrice(c), vergleich.get(c.id), datum),
+      );
       const geschrieben = await schreibe(faellig, datum);
 
       seenThisRun += cards.length;

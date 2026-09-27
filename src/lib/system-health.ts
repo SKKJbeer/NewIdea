@@ -14,6 +14,7 @@
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { loadSweepState, heute, seitenGesamt as seitenTotal } from '@/lib/price-sweep';
 import { GUIDE_TOPICS } from './guide-topics';
+import { leseDurchlaufStand, preisGate, type PreisGate, type DurchlaufStand } from './preis-durchlauf';
 import { GUIDES } from './guides';
 
 /** Postgres-Fehlercode für „Tabelle existiert nicht". */
@@ -53,6 +54,12 @@ export interface SystemHealth {
   guidePipeline: GuidePipelineHealth;
   /** Fortschritt der flächendeckenden Preiserfassung — siehe `SweepHealth`. */
   sweep: SweepHealth | null;
+  /**
+   * QUALITAETSSCHRANKE „Preise von heute" (seit v6.8.8) — der Stand des
+   * TCGdex-Durchlaufs, der ALLE Karten mit dem Cardmarket-Stand vom Vortag
+   * auffrischt. `null`, wenn nicht lesbar.
+   */
+  preise: { gate: PreisGate; stand: DurchlaufStand | null } | null;
   problems: string[];
   checkedAt: string;
 }
@@ -394,6 +401,7 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
         stalled: false,
       },
       sweep: null,
+      preise: null,
       problems: ['Supabase ist nicht konfiguriert — es werden keine Daten gespeichert'],
       checkedAt,
     };
@@ -510,5 +518,20 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
     }
   }
 
-  return { configured: true, tables, guidePipeline, sweep, problems, checkedAt };
+  // ── FRISCHE PREISE (die eigentliche Frage) ───────────────────────────────
+  //
+  // Der obige Durchlauf sagt nur, ob pokemontcg.io gelesen wurde — deren Preise
+  // sind Monate alt. Ob die Seite PREISE VON GESTERN hat, sagt allein diese
+  // Schranke. Ein Verstoss steht ganz oben.
+  let preise: SystemHealth['preise'] = null;
+  try {
+    const dstand = await leseDurchlaufStand();
+    const gate = preisGate(dstand, heute());
+    preise = { gate, stand: dstand };
+    if (!gate.ok) problems.unshift(`PREISE NICHT AKTUELL: ${gate.befund}`);
+  } catch (err) {
+    problems.unshift(`PREISE NICHT PRÜFBAR: ${err instanceof Error ? err.message : 'unbekannt'}`);
+  }
+
+  return { configured: true, tables, guidePipeline, sweep, preise, problems, checkedAt };
 }

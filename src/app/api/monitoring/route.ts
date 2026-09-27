@@ -64,6 +64,66 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Tagespreise aller Karten — Etappe 1',
+      endpoint: '/api/cron/preise?etappe=1',
+      schedule: '5 2 * * *',
+      scheduleLabel: 'Täglich 02:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Tagespreise aller Karten — Etappe 2',
+      endpoint: '/api/cron/preise?etappe=2',
+      schedule: '5 3 * * *',
+      scheduleLabel: 'Täglich 03:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Tagespreise aller Karten — Etappe 3',
+      endpoint: '/api/cron/preise?etappe=3',
+      schedule: '5 4 * * *',
+      scheduleLabel: 'Täglich 04:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Tagespreise aller Karten — Etappe 4',
+      endpoint: '/api/cron/preise?etappe=4',
+      schedule: '5 5 * * *',
+      scheduleLabel: 'Täglich 05:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Tagespreise aller Karten — Etappe 5',
+      endpoint: '/api/cron/preise?etappe=5',
+      schedule: '5 9 * * *',
+      scheduleLabel: 'Täglich 09:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
+      name: 'Tagespreise aller Karten — Etappe 6',
+      endpoint: '/api/cron/preise?etappe=6',
+      schedule: '5 11 * * *',
+      scheduleLabel: 'Täglich 11:05 UTC',
+      description:
+        'Frischt ALLE Karten mit dem Cardmarket-Stand vom Vortag (TCGdex) auf: Kartenindex + Tageswert im Preisverlauf. Setzt fort, wo die vorige Etappe aufhörte; meldet 500, wenn die Preis-Schranke nicht hält',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Flächendeckende Preiserfassung',
       endpoint: '/api/cron/price-sweep',
       // Seit v6.6.3 ein eigener Cron. Vorher stiess nur der Tages-Cron den
