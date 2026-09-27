@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.3] - 27. September 2026 · Anmeldung bei Search Console und Bing vorbereitet
+
+### Neu
+- **Eigentumsnachweis für Google Search Console und Bing Webmaster Tools über Umgebungsvariablen** (`GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION`). Auf einer vercel.app-Adresse gibt es keinen DNS-Zugang, der Weg ist das HTML-Meta-Tag — jetzt ohne Code-Änderung: Wert eintragen, neu deployen, bestätigen
+- Das Monitoring listet die neuen Schlüssel (Instagram, Search Console, Bing) mit Hinweis, woher sie kommen
+
+---
+
 ## [6.8.2] - 27. September 2026 · Kein Vergleich zwischen verschiedenen Datenständen
 
 ### Behoben

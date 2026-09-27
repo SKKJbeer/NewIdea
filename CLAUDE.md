@@ -95,7 +95,24 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 
 ---
 
-## Aktueller Stand & Richtung (v2.16.0 — 19. Juli 2026)
+## Aktueller Stand & Richtung (v6.8.x — 27. September 2026)
+
+**Reichweiten-Offensive umgesetzt:** Instagram-Autopilot (Reel/Karussell/Story täglich,
+auf Produktion im Probelauf verifiziert — veröffentlicht, sobald `INSTAGRAM_*` gesetzt
+ist), alle ~19.700 Kartenseiten + 176 Sets in Sitemaps, IndexNow-Vollmeldung (19.881
+Adressen), Guide-Warteschlange +20 Themen, Preisdurchlauf repariert (stand 53 Tage).
+
+**Größter offener Befund:** Die Cardmarket-Preise aus pokemontcg.io sind 3–10 Monate alt.
+Instagram nutzt deshalb nur noch Frischpreise (TCGdex, 400 wertvollste Karten). Die
+Umstellung der GANZEN Seite (Kartenseiten, Suche, CardBeacon Index) auf TCGdex ist
+vorbereitet, braucht aber Freigabe — sie ändert alle sichtbaren Zahlen und die
+Index-Grundlage.
+
+**Nächste Richtung laut Nutzer:** Geld verdienen mit Werbung. Voraussetzungen: eigene
+Domain (AdSense verlangt `ads.txt` auf der Stamm-Domain — auf `vercel.app` unmöglich),
+zertifiziertes Einwilligungsbanner (CMP) für personalisierte Werbung in der EU.
+
+## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
 
@@ -724,6 +741,11 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `NEXT_PUBLIC_PORTFOLIO_LOGIN` | ⭐ Freischalter der Anmeldung | Wert `on` — erst damit erscheinen die Anmeldeknöpfe |
 | `NEXT_PUBLIC_SUPABASE_URL` | ⭐ Konto-Anmeldung Portfolio | Zugangsdaten für die Anmeldung |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ⭐ Konto-Anmeldung Portfolio | **anon/publishable** Key — NIEMALS der service_role Key |
+| `INSTAGRAM_ACCESS_TOKEN` | ⭐ Instagram-Autopilot | Dauerhafter Seiten-Token (Einrichtungshelfer im Studio). Ohne: nur Probelauf |
+| `INSTAGRAM_BUSINESS_ACCOUNT_ID` | ⭐ Instagram-Autopilot | Konto-ID aus demselben Helfer |
+| `META_GRAPH_VERSION` | Optional | Graph-API-Version (Standard `v23.0`) — Meta schaltet alte Versionen nach ~2 Jahren ab |
+| `GOOGLE_SITE_VERIFICATION` | ⭐ Search Console | content-Wert des HTML-Tags; danach neu deployen, dann in der Konsole bestätigen |
+| `BING_SITE_VERIFICATION` | Bing Webmaster Tools | content-Wert von `msvalidate.01` |
 | `BEEHIIV_API_KEY` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
 | `BEEHIIV_PUBLICATION_ID` | Newsletter automatisch versenden | Newsletter-Cron aktiv |
 | `ELEVENLABS_API_KEY` | KI-Stimme für Videos | Video-Cron aktiv |

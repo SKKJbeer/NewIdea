@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.3',
+    date: '27. September 2026',
+    label: 'Anmeldung bei Search Console und Bing vorbereitet',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Eigentumsnachweis für Google Search Console und Bing über Umgebungsvariablen — ohne Code-Änderung' },
+      { type: 'changed', text: 'Monitoring listet die Schlüssel für Instagram, Search Console und Bing' },
+    ],
+  },
+  {
     version: '6.8.2',
     date: '27. September 2026',
     label: 'Kein Vergleich zwischen verschiedenen Datenständen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Instagram-Bilder verglichen Preise von gestern mit dem noch veralteten Index („pp zum Markt") — entfällt bei Frischpreisen' },
     ],

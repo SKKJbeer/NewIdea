@@ -57,6 +57,19 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} — Pokémon Karten Preise`,
     description: 'Echte Cardmarket-Preise & Markt-Scores für Pokémon-Karten.',
   },
+  // EIGENTUMSNACHWEIS FUER SUCHMASCHINEN-KONSOLEN.
+  //
+  // Auf einer vercel.app-Adresse gibt es keinen DNS-Zugang — der Weg ist das
+  // HTML-Meta-Tag. Der Code kommt aus der Umgebung, damit fuer die Anmeldung
+  // bei Google Search Console und Bing Webmaster Tools kein Code-Aenderung
+  // noetig ist: Wert eintragen, neu deployen, in der Konsole bestaetigen.
+  // Ohne Variable entsteht kein Tag (Next laesst leere Eintraege weg).
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION
+      ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION }
+      : undefined,
+  },
   alternates: {
     // Relativ ('./') → löst pro Seite auf die eigene URL auf (mit metadataBase).
     // NIEMALS SITE_URL absolut setzen: das würde von JEDER Unterseite als

@@ -160,3 +160,11 @@ describe('Ein Aussetzer wird nicht als leere Sitemap gespeichert', () => {
     }
   });
 });
+
+describe('Eigentumsnachweis fuer Search Console und Bing', () => {
+  it('liest die Codes aus der Umgebung, statt sie festzuschreiben', () => {
+    const layout = lies('src/app/layout.tsx');
+    expect(layout).toMatch(/google: process\.env\.GOOGLE_SITE_VERIFICATION/);
+    expect(layout).toMatch(/'msvalidate\.01': process\.env\.BING_SITE_VERIFICATION/);
+  });
+});
