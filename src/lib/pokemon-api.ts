@@ -221,7 +221,10 @@ export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
   // eine Set-Seite bei einem kurzen Aussetzer einen Fehler statt ihrer Karten.
   const data = await tcgList(
     { q: `set.id:${setCode}`, pageSize: 60 },
-    { retries: 2, timeout: 12000, beiAusfall: 'werfen' },
+    // Gesamtfrist: Ohne sie waren es bis zu 3 × 12 s + Wartezeiten — auf
+    // Produktion riss die Set-Seite damit ihr 30-s-Limit, bevor der Rueckfall
+    // auf den eigenen Index greifen konnte (27.09.2026).
+    { retries: 2, timeout: 8000, beiAusfall: 'werfen', gesamtbudgetMs: 9000 },
   );
   return mapAndFilter(data).sort(byPriceDesc);
 }
@@ -354,14 +357,22 @@ export async function searchCards(query: string, limit = 30): Promise<PokemonCar
 // aufgibt — aber nur, solange „vier Sekunden" die Ausnahme bleibt.
 const KARTE_VERSUCHE = 4;
 
-export async function fetchCardById(id: string): Promise<PokemonCard | null> {
+// GESAMTBUDGET (optional). Ohne Budget kann der Abruf 4 × 8 s + Wartezeiten
+// dauern — auf Produktion gemessen (27.09.2026) riss die Kartenseite damit
+// ihr 30-s-Limit, BEVOR der Rueckfall auf den eigenen Index greifen konnte.
+// Mit Budget wird nur so lange wiederholt, wie Zeit bleibt; danach wirft der
+// Abruf, und der Aufrufer entscheidet ueber den Rueckfall.
+export async function fetchCardById(id: string, opts: { gesamtMs?: number } = {}): Promise<PokemonCard | null> {
+  const frist = opts.gesamtMs ? Date.now() + opts.gesamtMs : Infinity;
   for (let attempt = 0; attempt < KARTE_VERSUCHE; attempt++) {
+    const rest = frist - Date.now();
+    if (rest < 500) throw new Error(`Kartenabruf ${id}: Zeitbudget erschoepft`);
     try {
       const response = await axios.get(`${TCG_API_BASE}/cards/${id}`, {
         headers: {
           ...tcgHeaders(),
         },
-        timeout: 8000,
+        timeout: Math.min(8000, rest),
       });
       return mapApiCardToCard(response.data.data);
     } catch (err) {

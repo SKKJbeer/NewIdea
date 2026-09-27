@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.7] - 27. September 2026 · Zeitbudget für den Kartenabruf
+
+### Behoben
+- **Einzelne Karten- und Set-Seiten liefen in das 30-Sekunden-Limit**, bevor der Rückfall auf den Kartenindex greifen konnte. Die Kartendatenbank hing dabei pro Versuch bis zu 8 bzw. 12 Sekunden. Der Kartenabruf hat jetzt ein Gesamtbudget von 8 Sekunden, der Set-Abruf eine Gesamtfrist von 9 Sekunden. Danach übernimmt der eigene Index
+
+---
+
 ## [6.8.6] - 27. September 2026 · Karten- und Set-Seiten überstehen Aussetzer der Kartendatenbank
 
 ### Behoben

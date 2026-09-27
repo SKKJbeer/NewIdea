@@ -121,3 +121,16 @@ describe('Kartenseite ueberlebt einen Ausfall der Kartendatenbank', () => {
     expect(block).toMatch(/catch \(err\) \{[\s\S]*cardsFromIndex\(\[id\]\)[\s\S]*if \(!ersatz\) throw err;/);
   });
 });
+
+describe('Der Rueckfall kommt vor dem Funktionslimit', () => {
+  it('Kartenabruf hat ein Gesamtbudget, und die Kartenseite nutzt es', () => {
+    const api = lies('src/lib/pokemon-api.ts');
+    expect(api).toMatch(/fetchCardById\(id: string, opts: \{ gesamtMs\?: number \}/);
+    expect(lies('src/app/karten/[id]/page.tsx')).toMatch(/fetchCardById\(id, \{ gesamtMs: KARTE_BUDGET_MS \}\)/);
+  });
+  it('Set-Abruf hat eine Gesamtfrist', () => {
+    const api = lies('src/lib/pokemon-api.ts');
+    const block = api.slice(api.indexOf('export async function fetchCardsBySet'));
+    expect(block.slice(0, 1200)).toMatch(/gesamtbudgetMs: \d/);
+  });
+});

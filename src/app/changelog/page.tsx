@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.7',
+    date: '27. September 2026',
+    label: 'Zeitbudget für den Kartenabruf',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Karten- und Set-Seiten liefen bei hängender Kartendatenbank ins 30-s-Limit — jetzt Gesamtbudget (8 s bzw. 9 s), danach Rückfall auf den eigenen Index' },
+    ],
+  },
+  {
     version: '6.8.6',
     date: '27. September 2026',
     label: 'Karten- und Set-Seiten überstehen Aussetzer der Kartendatenbank',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Karten- und Set-Seiten fallen bei einem Ausfall von pokemontcg.io auf den eigenen Kartenindex zurück statt auf eine Fehlerseite' },
     ],

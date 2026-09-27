@@ -66,10 +66,11 @@ export const revalidate = 3600;
 // Der Index hat Name, Set, Nummer, Bild und Preis — genug fuer die Seite, und
 // der frische Preis kommt ohnehin von TCGdex. Nur wenn auch der Index die
 // Karte nicht kennt, wird geworfen.
+const KARTE_BUDGET_MS = 8_000;
 const karteLaden = cache(async (id: string) => {
   let karte;
   try {
-    karte = await fetchCardById(id);
+    karte = await fetchCardById(id, { gesamtMs: KARTE_BUDGET_MS });
   } catch (err) {
     const ersatz = (await cardsFromIndex([id]).catch(() => null))?.get(id);
     if (!ersatz) throw err;
