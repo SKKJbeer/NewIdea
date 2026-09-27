@@ -100,6 +100,10 @@ Drei Dateien müssen synchron gehalten werden — keine Ausnahmen:
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
 
 **Offene Nutzer-Aufgaben (nur Steffen kann sie erledigen):**
+- **Entscheidung Preisquelle der ganzen Seite:** Kartenseiten, Suche und CardBeacon Index
+  zeigen Cardmarket-Werte, die bei pokemontcg.io 3–10 Monate alt sind. Umstellung auf
+  TCGdex (Stand Vortag) ist vorbereitet (`tcgdex.ts`), ändert aber alle sichtbaren Zahlen
+  und die Index-Grundlage — braucht Freigabe
 - **Instagram-Zugang einrichten** (Business-Konto + Facebook-Seite + Meta-App →
   Studio → Reels → „Zugang einrichten" → zwei Werte in Vercel). Bis dahin läuft
   der Autopilot täglich an und meldet „übersprungen"
@@ -679,7 +683,8 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 
 | Entscheidung | Details |
 |---|---|
-| Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`) |
+| Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`). **ACHTUNG (gemessen 27.09.2026): diese Werte sind bei pokemontcg.io 3–10 Monate alt** (`cardmarket.updatedAt` Nov 2025 – Jul 2026), neue Sets haben keine. Der Tagesdurchlauf schreibt sie täglich neu — „Index-Stand heute" heißt NICHT „Preise von heute" |
+| Frischpreise | `src/lib/tcgdex.ts` + `frischpreise.ts`: TCGdex liefert dieselben Cardmarket-Felder mit Stand Vortag. Täglich für die ~400 wertvollsten Karten (Cron 10:15 UTC), Ablage `social/marktdaten/<datum>.json`. Set-Zuordnung über Namen (167/176) + `SET_AUSNAHMEN` (9); JEDE Karte per Namensprobe gegengeprüft. Instagram veröffentlicht NUR daraus (`datenTaugen` lehnt `index` ab) |
 | CardBeacon Index (CBI) | **MEDIAN** der gemessenen 30-Tage-Bewegungen, KEINE Preisgewichtung mehr (v6.0.0). Grundlage: der GANZE erfasste Bestand über `getMarketBasis()` (`market-basis.ts`), nicht mehr `getHomepageCards(250)`. Karten unter `INDEX_MIN_PREIS` (0,10 €) zählen nicht mit. Gemessen am 05.08.2026 auf 19.063 Karten: gewichtetes Mittel +28,69 %, gestutzt +26,15 %, gedeckelt +23,71 %, **Median +3,50 %** — die Verteilung ist stark rechtsschief (P90 +40 %, P99 +100 %, Max +1191 %). Ausgeschlossen als Ursache: veraltete Indexwerte (250 von 250 Karten stimmen exakt mit dem Live-Abruf überein) |
 | Vorabruf (`prefetch`) | Dauerhaft sichtbare Navigation (Seitenleiste, Kopfleiste, Fusszeile, Schnellzugriff, Hero-Knoepfe) IMMER mit `prefetch={false}`. GEMESSEN: Ohne das rief EIN Aufruf der Startseite 37 Routen vorab ab (jede 4–5×) — auf Vercel je ein echter Serveraufruf; Hover reagierte erst nach 65 ms. Inhaltslisten (Suchtreffer, Sets, Artikel) behalten den Vorabruf. Abgesichert durch `vorabruf.test.ts` |
 | Anzeige vs. Kennzahl | ZWEI Grundlagen, bewusst getrennt: Listen (Mover, Set-Rangliste) brauchen Karten mit Namen/Bild → `getHomepageCards(250)`. Index und Marktbreite brauchen Messpunkte → `getMarketBasis()`. Nie vermischen |
@@ -1112,6 +1117,10 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 51. **Vercel-Funktionen haben EINEN Kern — lokale Messungen täuschen um den Faktor 2 bis 3** → Das Reel renderte lokal in 55 s und auf Vercel in ~140 s. Der Entwicklungsrechner hat vier Kerne, x264 nutzt sie alle. **Regel:** Rechenlastige Schritte lokal mit `taskset -c 0 …` messen, bevor man ein Zeitbudget festlegt.
 
 52. **Ein Anstoß, den niemand nachprüft, kann 53 Tage lang ins Leere gehen** → Der tägliche Cron stieß den Preisdurchlauf per Selbstaufruf an `new URL(request.url).origin` an, mit 3-Sekunden-Abbruch und ohne Kontrolle, ob er ankam. Vom 05.08. bis 27.09. startete der Durchlauf kein einziges Mal; aus dem Studio gestartet lief er sofort. Wahrscheinliche Ursache: Beim Cron ist `request.url` die deployment-eigene Adresse, und die sperrt Vercel standardmäßig. Das Monitoring zeigte „Kartenindex veraltet" — aber niemand sah hin, und der Marktindex wurde weiter täglich mit HEUTIGEM Datum aus den alten Preisen gespeichert. **Regeln:** (a) Was täglich laufen muss, bekommt einen EIGENEN Vercel-Cron, keinen Anstoß über einen anderen; (b) Selbstaufrufe nur über `oeffentlicheBasis(request)`; (c) jede abgeleitete Tageszahl prüft das Alter ihrer Grundlage (`MAX_BESTANDSALTER_TAGE` in `market-basis.ts`); (d) ein Ausfall, der nur im Monitoring steht, ist nicht gemeldet — gefunden hat ihn erst die Datenschranke des Instagram-Autopiloten.
+
+53. **Ein frischer Zeitstempel beweist keine frischen Daten** → Nach dem Reparieren des Durchlaufs stand der Kartenindex auf „heute" — und der CardBeacon Index kam trotzdem exakt gleich heraus (+3,5 %, 14.985 Karten). Ursache: Die Quelle selbst (pokemontcg.io) liefert Cardmarket-Preise mit `updatedAt` aus Nov 2025 bis Jul 2026. Der eigene `updated_at` sagt nur, wann WIR geschrieben haben. **Regeln:** (a) Aktualität immer am Datenstand der QUELLE messen (`cardmarket.updatedAt`, bei TCGdex `pricing.cardmarket.updated`), nie am eigenen Schreibzeitpunkt; (b) ein unveränderter Kennwert nach einer „Auffrischung" ist ein Befund, keine Bestätigung; (c) Aussagen „Markt am <Datum>" nur aus Daten mit belegtem Quellstand.
+
+54. **`cardsFromIndex` kappt still bei 200 IDs** (`ids.slice(0, 200)`). Wer mehr braucht, lädt in Stücken — sonst fällt der Rest ohne Meldung weg.
 
 ---
 

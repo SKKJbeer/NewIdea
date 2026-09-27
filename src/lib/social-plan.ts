@@ -1,8 +1,8 @@
-import { formatCount, formatPercent } from '@/lib/format';
+import { formatPercent } from '@/lib/format';
 import { weekIndex } from '@/lib/reel-concepts';
 import { BUY_ADVICE, FIRST_PERSON, PERSONA_NAME, AI_PHRASES } from '@/lib/content-rules';
 import type { Marktlage } from '@/lib/marktbilder';
-import type { Vorlage } from '@/lib/marktbilder';
+import type { MoverDaten } from '@/lib/story-frames';
 
 // WAS WANN AUF INSTAGRAM ERSCHEINT — ein Plan, eine Stelle.
 //
@@ -27,8 +27,24 @@ export const WOCHENPLAN: Readonly<Record<number, Beitragsart>> = {
   6: 'karussell',
 };
 
-/** Reihenfolge der Karussell-Bilder: Ueberblick zuerst, dann Einzelheiten. */
-export const KARUSSELL_VORLAGEN: readonly Vorlage[] = ['market-state', 'big-mover', 'card-vs-market', 'set-battle'];
+/**
+ * Folien des Karussells: die drei staerksten Anstiege, dann der staerkste
+ * Rueckgang — jede mit Kartenbild.
+ *
+ * FRUEHER: Marktlage, Karte gegen Markt, Set-Duell. Alle drei rechnen mit dem
+ * CardBeacon Index, und der steht noch auf pokemontcg.io-Preisen, die drei bis
+ * zehn Monate alt sind. Veroeffentlicht wird nur, was die Frischpreise tragen.
+ * Nur Folien MIT Kartenbild: eine nackte Zahl wird auf Instagram ueberblaettert.
+ */
+export function karussellFolien(lage: Marktlage): Array<{ mover: MoverDaten; titel: string }> {
+  const folien: Array<{ mover: MoverDaten; titel: string }> = [];
+  lage.gewinner.forEach((m, i) => {
+    if (m.bild) folien.push({ mover: m, titel: i === 0 ? 'Stärkster Anstieg · 30 Tage' : `Anstieg Nr. ${i + 1} · 30 Tage` });
+  });
+  const r = lage.verlierer[0];
+  if (r?.bild) folien.push({ mover: r, titel: 'Stärkster Rückgang · 30 Tage' });
+  return folien;
+}
 
 export function berlinerWochentag(d: Date): number {
   const name = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Berlin', weekday: 'short' }).format(d);
@@ -82,25 +98,19 @@ export function kampagnenLink(siteUrl: string, medium: 'reel' | 'post' | 'story'
 }
 
 export function karussellCaption(lage: Marktlage, siteUrl: string): string {
-  const zeilen: string[] = [`Pokémon-Kartenmarkt am ${lage.datenstand}`, ''];
-  zeilen.push(
-    `CardBeacon Index: ${formatPercent(lage.cbi.value)} — Median aus ${formatCount(lage.cbi.cardCount)} Karten, aktueller Preis gegen den 30-Tage-Schnitt.`,
-  );
-  if (lage.mover) {
-    zeilen.push(`Stärkste Bewegung: ${lage.mover.name} (${lage.mover.set}) ${formatPercent(lage.mover.trend)}`);
-  }
-  const s = lage.setsSortiert;
-  if (s.length >= 2) {
-    zeilen.push(
-      `Stärkstes Set: ${s[0].name} ${formatPercent(s[0].avgTrend)} · Schwächstes Set: ${s[s.length - 1].name} ${formatPercent(s[s.length - 1].avgTrend)}`,
-    );
-  }
+  const zeilen: string[] = [
+    `Die stärksten Bewegungen unter den wertvollsten Pokémon-Karten — Cardmarket-Stand ${lage.datenstand}`,
+    '',
+  ];
+  for (const m of lage.gewinner) zeilen.push(`${m.name} (${m.set}): ${formatPercent(m.trend)}`);
+  const r = lage.verlierer[0];
+  if (r) zeilen.push(`Stärkster Rückgang: ${r.name} (${r.set}) ${formatPercent(r.trend)}`);
   zeilen.push(
     '',
-    'Zum Durchblättern: Marktlage, stärkste Bewegung, Karte gegen Markt, Set-Duell.',
+    'Gemessen: aktueller Preistrend gegen den 30-Tage-Schnitt. Ein einzelner Stand schwankt — der Verlauf über mehrere Wochen sagt mehr.',
     '',
     'Alle Preise und Verläufe kostenlos — Link in der Bio',
-    kampagnenLink(siteUrl, 'post', 'marktlage'),
+    kampagnenLink(siteUrl, 'post', 'bewegungen'),
     '',
     HASHTAGS,
   );

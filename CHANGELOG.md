@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.0] - 27. September 2026 · Tagesaktuelle Cardmarket-Preise für Instagram
+
+### Befund
+- **Die Cardmarket-Preise der bisherigen Quelle pokemontcg.io sind drei bis zehn Monate alt.** Stichprobe über mehrere Seiten der Kartendatenbank: `updatedAt` zwischen November 2025 und Juli 2026; Base-Set-Glurak steht auf dem 01.07.; die neuesten Sets haben dort gar keine Cardmarket-Daten. Der eigene Tagesdurchlauf holt also täglich dieselben alten Werte — der Index-Stand „heute" sagt nur, wann geschrieben wurde, nicht wie alt die Preise sind
+
+### Neu
+- **Frischpreise aus TCGdex.** Dort stehen dieselben Cardmarket-Felder (Trend, Ø, ab, Ø 1/7/30 Tage) in EUR mit Stand des Vortags, auch für neue Sets, ohne Schlüssel. Ein täglicher Lauf (10:15 UTC) holt sie für die ~400 wertvollsten Karten. Preise gibt es dort nur je Karte — für alle 20.000 täglich wäre das unfaire Last auf einer freien Schnittstelle
+- **Zuordnung mit Namensprobe.** Die beiden Quellen benennen Sets verschieden (`sv3pt5` gegen `sv03.5`). 167 von 176 Sets lassen sich über den Namen zuordnen, neun per Hand; Promos brauchen dreistellige Nummern. Jede Karte wird über den Namen gegengeprüft — stimmt er nicht, wird der Preis verworfen. Ein fehlender Preis ist besser als der einer anderen Karte
+
+### Geändert
+- **Instagram veröffentlicht nur noch aus Frischpreisen.** Kartenindex-Werte werden abgelehnt, weil sie Monate alt sind
+- **Das Karussell zeigt die stärksten Anstiege und den stärksten Rückgang**, jede Folie mit Kartenbild. Marktlage, Karte gegen Markt und Set-Duell sind vorerst draußen: Sie rechnen mit dem CardBeacon Index, und der steht noch auf den alten Preisen. Ihn in einem Beitrag mit heutigem Datum zu zeigen, wäre eine falsche Zeitangabe
+- Die Story zeigt die stärkste Bewegung mit Kartenbild statt der Marktlage
+
+### Behoben
+- `cardsFromIndex` kappt still bei 200 IDs — die Marktbilder laden jetzt in Stücken
+
+---
+
 ## [6.7.0] - 27. September 2026 · 20 neue Guide-Themen, Sitemaps ohne leere Stände
 
 ### Neu

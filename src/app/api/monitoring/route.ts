@@ -96,6 +96,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Täglicher Cron',
     },
     {
+      name: 'Frischpreise (wertvollste Karten)',
+      endpoint: '/api/cron/frischpreise',
+      schedule: '15 10 * * *',
+      scheduleLabel: 'Täglich 10:15 UTC',
+      description:
+        'Holt für die ~400 wertvollsten Karten den Cardmarket-Stand vom Vortag (TCGdex), prüft jede Zuordnung über den Namen. Einzige Quelle mit belegter Aktualität — Instagram veröffentlicht nur daraus',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Instagram-Autopilot',
       endpoint: '/api/cron/social',
       schedule: '40 16 * * *',

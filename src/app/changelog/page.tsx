@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.0',
+    date: '27. September 2026',
+    label: 'Tagesaktuelle Cardmarket-Preise für Instagram',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Befund: Die Cardmarket-Preise der bisherigen Quelle sind drei bis zehn Monate alt, neue Sets haben dort keine' },
+      { type: 'new', text: 'Täglicher Frischpreis-Lauf über TCGdex für die ~400 wertvollsten Karten — Cardmarket-Stand vom Vortag, jede Zuordnung über den Namen geprüft' },
+      { type: 'changed', text: 'Instagram veröffentlicht nur noch aus Frischpreisen; das Karussell zeigt die stärksten Bewegungen mit Kartenbild, ohne den noch veralteten Index' },
+    ],
+  },
+  {
     version: '6.7.0',
     date: '27. September 2026',
     label: '20 neue Guide-Themen, Sitemaps ohne leere Stände',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: '20 neue Guide-Themen nach deutschen Suchanfragen — die Warteschlange war seit dem 08.09. leer' },
       { type: 'fixed', text: 'Eine Teil-Sitemap war leer und die Hauptsitemap ohne Set-Seiten — beim Bauen entstanden, bis zum nächsten Deploy stehen geblieben' },

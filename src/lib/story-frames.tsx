@@ -178,7 +178,17 @@ export interface MoverDaten {
  * Die Zahl ist der Held: Sie füllt die halbe Fläche. Der Name erklärt sie, nicht
  * umgekehrt.
  */
-export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; format: StoryFormat; datenstand: string }) {
+export function BigMover({
+  karte,
+  format,
+  datenstand,
+  titel = 'Stärkste Bewegung · 30 Tage',
+}: {
+  karte: MoverDaten;
+  format: StoryFormat;
+  datenstand: string;
+  titel?: string;
+}) {
   const kompakt = format === 'og';
   // Das Kartenbild nur dort, wo Platz ist. In der Teilen-Vorschau (1200×630)
   // haette es die Zahl verdraengt — und die Zahl ist die Aussage.
@@ -190,7 +200,7 @@ export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; for
   const bildHoehe = Math.round((bildBreite * 88) / 63); // echtes Kartenformat 63:88
   return (
     <Buehne kompakt={kompakt}>
-      <Marke text="Stärkste Bewegung · 30 Tage" kompakt={kompakt} />
+      <Marke text={titel} kompakt={kompakt} />
       <div
         style={{
           display: 'flex',

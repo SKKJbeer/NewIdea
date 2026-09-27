@@ -1,13 +1,13 @@
 import sharp from 'sharp';
 import { buildStory } from '@/lib/reel-concepts';
 import { renderStory } from '@/lib/reel-generator';
-import { ladeMarktlage, ladeMarktkarten, rendereMarktbild } from '@/lib/marktbilder';
+import { ladeMarktlage, ladeMarktkarten, rendereBewegung, type Marktlage } from '@/lib/marktbilder';
 import { siteUrlOrLocal } from '@/lib/site';
 import {
   planFuer,
   karussellCaption,
   captionVerstoesse,
-  KARUSSELL_VORLAGEN,
+  karussellFolien,
   type Beitragsart,
 } from '@/lib/social-plan';
 import { ablegen, aufraeumen, merkeOffen, leseOffen, vergissOffen, type OffeneVeroeffentlichung } from '@/lib/social-speicher';
@@ -117,14 +117,18 @@ export const MAX_DATENALTER_TAGE = 2;
  * obwohl der Preisdurchlauf stillsteht. In beiden Faellen: kein Beitrag.
  * Lieber ein Tag Pause als eine Aussage, die sich nicht halten laesst.
  */
-export function datenTaugen(quelle: 'index' | 'stichprobe', datenTag: string | null, heute: string): string | null {
-  if (quelle !== 'index') return 'Kartenindex nicht verfuegbar — aus einer Zufallsstichprobe wird nichts veroeffentlicht';
+export function datenTaugen(quelle: Marktlage['quelle'], datenTag: string | null, heute: string): string | null {
+  if (quelle === 'stichprobe') return 'Keine Frischpreise — aus einer Zufallsstichprobe wird nichts veroeffentlicht';
+  // Der Kartenindex wird taeglich geschrieben, seine Preise stammen aber aus
+  // pokemontcg.io und sind dort drei bis zehn Monate alt (gemessen 27.09.2026).
+  // Ein Beitrag „Markt am <heute>" daraus waere eine falsche Zeitangabe.
+  if (quelle !== 'frisch') return 'Keine Frischpreise fuer heute — Kartenindex-Werte sind Monate alt und werden nicht veroeffentlicht';
   if (!datenTag) return 'Datenstand des Kartenindex unbekannt';
   const alter = (Date.parse(`${heute}T00:00:00Z`) - Date.parse(`${datenTag.slice(0, 10)}T00:00:00Z`)) / 86_400_000;
   // Stolperstelle 46: Eine Altersgrenze, die bei NaN durchwinkt, ist keine.
   if (!Number.isFinite(alter)) return `Datenstand unlesbar (${datenTag})`;
   if (alter > MAX_DATENALTER_TAGE) {
-    return `Kartenindex ist ${alter} Tage alt (Stand ${datenTag}) — Preisdurchlauf pruefen`;
+    return `Datenstand ist ${alter} Tage alt (Stand ${datenTag}) — Frischpreise bzw. Preisdurchlauf pruefen`;
   }
   return null;
 }
@@ -135,14 +139,16 @@ async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorb
   const einwand = datenTaugen(lage.quelle, lage.datenTag, datum);
   if (einwand) throw new Error(einwand);
 
+  // Nur Bewegungen mit Kartenbild — ohne Karte ist die Folie eine nackte Zahl,
+  // und genau die wird auf Instagram ueberblaettert.
+  const folien = karussellFolien(lage);
   const urls: string[] = [];
-  for (const vorlage of KARUSSELL_VORLAGEN) {
-    const png = await rendereMarktbild(vorlage, lage, 'post');
-    if (!png) continue; // diese Vorlage hat heute keine Grundlage
-    const ablage = await ablegen(datum, `karussell-${urls.length + 1}-${vorlage}.jpg`, await alsJpeg(png), 'image/jpeg');
+  for (const f of folien) {
+    const png = await rendereBewegung(f.mover, lage, 'post', f.titel);
+    const ablage = await ablegen(datum, `karussell-${urls.length + 1}.jpg`, await alsJpeg(png), 'image/jpeg');
     urls.push(ablage.url);
   }
-  if (urls.length < 2) throw new Error(`Nur ${urls.length} Bild(er) mit Datengrundlage — Karussell braucht mindestens zwei`);
+  if (urls.length < 2) throw new Error(`Nur ${urls.length} Bewegung(en) mit Kartenbild — Karussell braucht mindestens zwei`);
 
   const caption = karussellCaption(lage, siteUrl);
   return {
@@ -320,15 +326,14 @@ export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<A
       if (!lage) throw new Error('Zu wenig Marktdaten fuer eine Story');
       const einwand = datenTaugen(lage.quelle, lage.datenTag, datum);
       if (einwand) throw new Error(einwand);
-      // Im Wechsel: die Karte mit der staerksten Bewegung (mit Kartenbild —
-      // im Hochformat das staerkste Motiv) und die Marktlage. Hat die Karte
-      // heute keine Grundlage, springt die Marktlage ein.
-      const bevorzugt = plan.wochentag % 2 === 0 ? 'big-mover' : 'market-state';
-      const png =
-        (await rendereMarktbild(bevorzugt, lage, 'reel')) ??
-        (await rendereMarktbild('market-state', lage, 'reel'));
-      if (!png) throw new Error('Marktlage ohne Grundlage');
-      const ablage = await ablegen(datum, `story-${bevorzugt}.jpg`, await alsJpeg(png), 'image/jpeg');
+      // Die Karte mit der staerksten Bewegung, mit Kartenbild — im Hochformat
+      // das staerkste Motiv. KEINE Marktlage mit Index: Der CardBeacon Index
+      // rechnet noch auf dem Monate alten Bestand (siehe datenTaugen).
+      const mover = lage.gewinner[0] ?? lage.verlierer[0];
+      if (!mover) throw new Error('Keine gemessene Bewegung fuer eine Story');
+      const titel = mover.trend >= 0 ? 'Stärkster Anstieg · 30 Tage' : 'Stärkster Rückgang · 30 Tage';
+      const png = await rendereBewegung(mover, lage, 'reel', titel);
+      const ablage = await ablegen(datum, 'story-bewegung.jpg', await alsJpeg(png), 'image/jpeg');
 
       if (trocken || !k) {
         ergebnis.story = { status: 'trocken', dateien: [ablage.url] };

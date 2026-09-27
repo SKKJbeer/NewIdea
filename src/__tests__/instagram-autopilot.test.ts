@@ -9,7 +9,7 @@ import {
   captionVerstoesse,
   kampagnenLink,
   WOCHENPLAN,
-  KARUSSELL_VORLAGEN,
+  karussellFolien,
 } from '@/lib/social-plan';
 import { heuteSchonGepostet, berlinerDatum } from '@/lib/instagram';
 import { CONCEPTS, buildStory } from '@/lib/reel-concepts';
@@ -63,10 +63,17 @@ describe('Der Wochenplan', () => {
     expect(a?.conceptId).not.toBe(b?.conceptId);
   });
 
-  it('das Karussell beginnt mit dem Ueberblick', () => {
-    expect(KARUSSELL_VORLAGEN[0]).toBe('market-state');
-    expect(KARUSSELL_VORLAGEN.length).toBeGreaterThanOrEqual(2);
-    expect(KARUSSELL_VORLAGEN.length).toBeLessThanOrEqual(10);
+  it('das Karussell zeigt nur Bewegungen mit Kartenbild, Anstiege zuerst', () => {
+    const m = (name: string, trend: number, bild: string | null) =>
+      ({ name, set: 'S', trend, preis: 10, gegenMarkt: null, bild });
+    const folien = karussellFolien({
+      gewinner: [m('A', 50, 'data:x'), m('B', 40, null), m('C', 30, 'data:x')],
+      verlierer: [m('D', -20, 'data:x')],
+    } as never);
+    expect(folien.map((f) => f.mover.name)).toEqual(['A', 'C', 'D']);
+    expect(folien[0].titel).toMatch(/Stärkster Anstieg/);
+    expect(folien[folien.length - 1].titel).toMatch(/Stärkster Rückgang/);
+    expect(folien.length).toBeLessThanOrEqual(10);
   });
 });
 
@@ -87,11 +94,15 @@ describe('Nie zweimal am selben Tag', () => {
 });
 
 describe('Bildunterschriften', () => {
+  const bewegt = (name: string, trend: number) =>
+    ({ name, set: 'Black Bolt', trend, preis: 50.02, gegenMarkt: null, bild: 'data:x' });
   const lage: Marktlage = {
-    quelle: 'index',
+    quelle: 'frisch',
     datenTag: '2026-09-28',
     cbi: { value: 3.5, cardCount: 14985, setCount: 155 },
-    mover: { name: 'Meloetta ex', set: 'Black Bolt', trend: 55.7, preis: 50.02, gegenMarkt: 52.2 },
+    mover: bewegt('Meloetta ex', 55.7),
+    gewinner: [bewegt('Meloetta ex', 55.7), bewegt('Zekrom ex', 22.1)],
+    verlierer: [bewegt('Reshiram ex', -11.3)],
     setsSortiert: [
       { name: 'Black Bolt', avgTrend: 6.7 },
       { name: 'Mitte', avgTrend: 1 },
@@ -109,8 +120,17 @@ describe('Bildunterschriften', () => {
   });
 
   it('formatiert Zahlen deutsch', () => {
-    expect(text).toContain('14.985');
-    expect(text).toMatch(/\+3,5\s%/);
+    expect(text).toMatch(/\+55,7\s%/);
+    expect(text).toMatch(/-11,3\s%|−11,3\s%/);
+  });
+
+  // Der CardBeacon Index rechnet noch auf Monate alten Preisen — in einem
+  // Beitrag mit heutigem Datum waere er eine falsche Zeitangabe.
+  it('nennt keinen Index, sondern die gemessenen Karten mit Datenstand', () => {
+    expect(text).not.toMatch(/CardBeacon Index/);
+    expect(text).toMatch(/Cardmarket-Stand 28\.09\.2026/);
+    expect(text).toMatch(/Meloetta ex/);
+    expect(text).toMatch(/Stärkster Rückgang: Reshiram ex/);
   });
 
   it('besteht die eigene Inhaltsschranke', () => {
@@ -284,16 +304,24 @@ describe('Veroeffentlicht wird nur aus einem frischen, datierten Tagesstand', ()
     expect(datenTaugen('stichprobe', '2026-09-28', '2026-09-28')).toMatch(/stichprobe/i);
   });
 
+  // BEFUND 27.09.: Der Index wird taeglich geschrieben, seine Preise stammen
+  // aber aus pokemontcg.io und sind dort drei bis zehn Monate alt.
+  it('lehnt auch den Kartenindex ab — nur Frischpreise werden veroeffentlicht', async () => {
+    const { datenTaugen } = await import('@/lib/instagram-autopilot');
+    expect(datenTaugen('index', '2026-09-28', '2026-09-28')).toMatch(/Monate alt/);
+    expect(datenTaugen('frisch', '2026-09-28', '2026-09-28')).toBeNull();
+  });
+
   it('lehnt einen alten oder unlesbaren Stand ab — auch bei NaN (Stolperstelle 46)', async () => {
     const { datenTaugen, MAX_DATENALTER_TAGE } = await import('@/lib/instagram-autopilot');
-    expect(datenTaugen('index', '2026-09-28', '2026-09-28')).toBeNull();
-    expect(datenTaugen('index', '2026-09-26', '2026-09-28')).toBeNull();
+    expect(datenTaugen('frisch', '2026-09-28', '2026-09-28')).toBeNull();
+    expect(datenTaugen('frisch', '2026-09-26', '2026-09-28')).toBeNull();
     expect(MAX_DATENALTER_TAGE).toBe(2);
-    expect(datenTaugen('index', '2026-09-25', '2026-09-28')).toMatch(/3 Tage alt/);
-    expect(datenTaugen('index', 'kaputt', '2026-09-28')).toMatch(/unlesbar/);
-    expect(datenTaugen('index', null, '2026-09-28')).toMatch(/unbekannt/);
+    expect(datenTaugen('frisch', '2026-09-25', '2026-09-28')).toMatch(/3 Tage alt/);
+    expect(datenTaugen('frisch', 'kaputt', '2026-09-28')).toMatch(/unlesbar/);
+    expect(datenTaugen('frisch', null, '2026-09-28')).toMatch(/unbekannt/);
     // Zeitstempel statt Datum wird gekuerzt, nicht zu NaN.
-    expect(datenTaugen('index', '2026-09-28T08:12:00+00:00', '2026-09-28')).toBeNull();
+    expect(datenTaugen('frisch', '2026-09-28T08:12:00+00:00', '2026-09-28')).toBeNull();
   });
 
   it('Karussell, Reel und Story pruefen alle drei', () => {

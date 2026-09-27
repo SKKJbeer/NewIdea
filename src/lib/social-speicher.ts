@@ -144,3 +144,30 @@ export async function vergissOffen(datum: string): Promise<void> {
   const { error } = await sb.storage.from(EIMER).remove([offenPfad(datum)]);
   if (error) console.warn('[social-speicher] offen.json nicht geloescht:', error.message);
 }
+
+// ── Allgemeine JSON-Ablage ──────────────────────────────────────────────────
+// Fuer Tagesstaende, die kein eigene Tabelle rechtfertigen (Stolperstelle 21:
+// jede neue Tabelle ist eine Stelle, die still fehlen kann).
+
+export async function schreibeJson(pfad: string, daten: unknown): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase nicht konfiguriert');
+  await eimerSicherstellen();
+  const { error } = await sb.storage
+    .from(EIMER)
+    .upload(pfad, Buffer.from(JSON.stringify(daten)), { contentType: 'application/json', upsert: true });
+  if (error) throw new Error(`${pfad} nicht gespeichert: ${error.message}`);
+}
+
+export async function leseJson<T>(pfad: string): Promise<T | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data, error } = await sb.storage.from(EIMER).download(pfad);
+  if (error || !data) return null;
+  try {
+    return JSON.parse(await data.text()) as T;
+  } catch (err) {
+    console.warn(`[social-speicher] ${pfad} unlesbar:`, (err as Error).message);
+    return null;
+  }
+}
