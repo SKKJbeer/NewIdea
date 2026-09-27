@@ -297,3 +297,21 @@ describe('Zahl und Einheit trennen sich nie', () => {
     expect(treffer).toEqual([]);
   });
 });
+
+describe('Studio-Anmeldung: Sperre ueber alle Instanzen', () => {
+  it('zaehlt nur Fehlversuche im Fenster', async () => {
+    const { fehlversucheImFenster, FENSTER_MS } = await import('@/lib/anmelde-sperre');
+    const jetzt = 1_000_000_000;
+    const namen = [`${jetzt - 1000}-a`, `${jetzt - FENSTER_MS - 1}-b`, 'fremd', `${jetzt - 5}-c`];
+    expect(fehlversucheImFenster(namen, jetzt)).toBe(2);
+  });
+  it('die Route prueft die Sperre, merkt Fehlversuche und vergleicht per Hash', () => {
+    // Befund 27.09.2026: 26 falsche Versuche, keiner abgewiesen — die Grenze
+    // im Arbeitsspeicher galt je Instanz.
+    const r = readFileSync(join(process.cwd(), 'src/app/api/studio-auth/route.ts'), 'utf8');
+    expect(r).toMatch(/await istGesperrt\(ip\)/);
+    expect(r).toMatch(/await merkeFehlversuch\(ip\)/);
+    expect(r).toMatch(/safeEqual\(makeToken\(password\), makeToken\(secret\)\)/);
+    expect(r).not.toMatch(/password !== secret/);
+  });
+});

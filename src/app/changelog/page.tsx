@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.11.1',
+    date: '27. September 2026',
+    label: 'Anmeldesperre über alle Instanzen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Versuchsgrenze der Studio-Anmeldung zählte je Serverinstanz und griff nicht — jetzt instanzübergreifend, 15 Minuten Sperre nach 10 Fehlversuchen' },
+    ],
+  },
+  {
     version: '6.11.0',
     date: '27. September 2026',
     label: 'Ketten-Review: eine Preisquelle, Sicherheit, Tempo',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Kartenseiten konnten beim Ausfall des Vortagsabrufs den Monate alten Preis zeigen — jetzt greift der frische Indexpreis' },
       { type: 'fixed', text: 'Startseite, Sets und Marktbericht lesen aus derselben frischen Quelle wie Index und Suche' },

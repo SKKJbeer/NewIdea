@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.11.0` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.11.1` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.11.1 | Anmeldesperre instanzübergreifend (Speicher-Eimer) |
 | v6.11.0 | Ketten-Review: eine Preisquelle (Index) für alle Anzeigen, Stichtag für Tageswerte, Sicherheits-Härtung, Mobile-Kartenseite, Vorwärmen |
 | v6.10.1 | Set-Logos von images.scrydex.com über den Optimierer |
 | v6.10.0 | Reichweitenmessung ohne Tabelle (Speicher-Eimer) — zählte seit v6.5.0 nichts |

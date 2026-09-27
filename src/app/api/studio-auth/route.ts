@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { makeToken, isStudioAuthedFromRequest, safeEqual, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/studio-auth';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+import { istGesperrt, merkeFehlversuch } from '@/lib/anmelde-sperre';
 
 // SCHUTZ GEGEN PASSWORT-RATEN (seit v6.10.2). Vorher: beliebig viele Versuche,
 // Vergleich per `!==` (Zeitunterschiede verraten, wie viele Zeichen stimmen —
@@ -18,11 +19,14 @@ export async function GET(request: Request) {
 
 // POST — validate password, set HttpOnly session cookie
 export async function POST(req: Request) {
-  const grenze = versuche(clientIp(req));
-  if (!grenze.allowed) {
+  const ip = clientIp(req);
+  const grenze = versuche(ip);
+  // Zwei Stufen: schnelle Bremse je Instanz, verbindliche Sperre ueber alle
+  // Instanzen (anmelde-sperre.ts) — die erste allein griff auf Produktion nicht.
+  if (!grenze.allowed || (await istGesperrt(ip))) {
     return NextResponse.json(
       { ok: false, error: 'too_many_attempts' },
-      { status: 429, headers: { 'Retry-After': String(grenze.retryAfterSeconds) } },
+      { status: 429, headers: { 'Retry-After': String(Math.max(grenze.retryAfterSeconds, 900)) } },
     );
   }
   const { password } = await req.json().catch(() => ({ password: undefined }));
@@ -38,6 +42,9 @@ export async function POST(req: Request) {
   } else if (typeof password !== 'string' || !safeEqual(makeToken(password), makeToken(secret))) {
     // Beide Seiten als Hash vergleichen: gleiche Laenge, also verraet auch die
     // Laufzeit nicht die Laenge des Passworts.
+    // Jeder Fehlversuch wird gemerkt und kostet eine Sekunde.
+    await merkeFehlversuch(ip);
+    await new Promise((r) => setTimeout(r, 1000));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

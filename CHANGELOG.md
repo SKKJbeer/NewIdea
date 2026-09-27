@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.11.1] - 27. September 2026 · Anmeldesperre über alle Instanzen
+
+### Sicherheit
+- **Die Versuchsgrenze der Studio-Anmeldung griff auf Produktion nicht** (26 falsche Versuche, keiner abgewiesen): Sie zählte je Serverinstanz im Arbeitsspeicher. Fehlversuche werden jetzt instanzübergreifend gezählt (die Adresse nur als Hash), nach 10 Fehlversuchen ist 15 Minuten gesperrt; jeder Fehlversuch kostet zusätzlich eine Sekunde
+
+---
+
 ## [6.11.0] - 27. September 2026 · Ketten-Review: eine Preisquelle, Sicherheit, Tempo
 
 ### Behoben
