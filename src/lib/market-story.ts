@@ -57,7 +57,7 @@ const BREITE_STARK = 60;
 
 const prozent = (v: number, stellen = 1) =>
   // toFixed erlaubt: Zahl im Fließtext eines Kommentars, keine Preisangabe
-  `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(stellen).replace('.', ',')} %`;
+  `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(stellen).replace('.', ',')}\u00A0%`;
 
 /**
  * Baut die Story aus geprüften Kennzahlen.
@@ -128,11 +128,11 @@ export function marketStory(
 
   if (schmal) {
     teile.push(
-      `Getragen wird das von einer Minderheit: Nur ${pct} % der ${formatCount(breite.total)} gemessenen Karten notieren über ihrem Vergleichswert, ${formatCount(breite.down)} darunter.`,
+      `Getragen wird das von einer Minderheit: Nur ${pct}\u00A0% der ${formatCount(breite.total)} gemessenen Karten notieren über ihrem Vergleichswert, ${formatCount(breite.down)} darunter.`,
     );
   } else if (breitGetragen) {
     teile.push(
-      `Die Bewegung steht auf breiter Basis — ${pct} % der ${formatCount(breite.total)} gemessenen Karten liegen über ihrem Vergleichswert.`,
+      `Die Bewegung steht auf breiter Basis — ${pct}\u00A0% der ${formatCount(breite.total)} gemessenen Karten liegen über ihrem Vergleichswert.`,
     );
   } else {
     teile.push(

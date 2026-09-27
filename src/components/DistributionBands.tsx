@@ -59,7 +59,7 @@ export function DistributionBands({ trends }: { trends: number[] }) {
             <span className="flex items-baseline gap-1.5 tabular-nums">
               <span className="text-[13px] text-slate-200">{b.anzahl}</span>
               <span className="w-[42px] text-right text-[11px] text-slate-600">
-                {Math.round(b.anteil)} %
+                {Math.round(b.anteil)}&nbsp;%
               </span>
             </span>
           </div>

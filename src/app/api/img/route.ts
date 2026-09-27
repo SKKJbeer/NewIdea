@@ -19,6 +19,7 @@ const ALLOWED_HOSTS = new Set([
 
 /** Höchstens so viele Weiterleitungen — jede wird erneut geprüft. */
 const MAX_REDIRECTS = 3;
+const MAX_BYTES = 8 * 1024 * 1024;
 
 function istErlaubt(url: URL): boolean {
   return url.protocol === 'https:' && ALLOWED_HOSTS.has(url.hostname);
@@ -84,6 +85,13 @@ export async function GET(request: Request) {
     const contentType = upstream.headers.get('content-type') || '';
     if (!contentType.startsWith('image/')) {
       return new NextResponse('not an image', { status: 502 });
+    }
+    // GROESSENGRENZE (seit v6.10.2): Kartenbilder haben unter 2 MB. Ohne
+    // Grenze liesse sich ueber diesen offenen Weg beliebig grosse Last durch
+    // die eigene Funktion leiten.
+    const laenge = Number(upstream.headers.get('content-length') || 0);
+    if (laenge > MAX_BYTES) {
+      return new NextResponse('too large', { status: 502 });
     }
     return new NextResponse(upstream.body, {
       headers: {

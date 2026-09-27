@@ -323,7 +323,7 @@ export function MarketState({ markt, format, datenstand }: { markt: MarktDaten; 
         }}
       >
         {[
-          ['Marktbreite', `${Math.round(markt.breite)} %`],
+          ['Marktbreite', `${Math.round(markt.breite)}\u00A0%`],
           ['Temperatur', markt.temperatur],
           // formatCount, nicht die nackte Zahl: live stand hier „14985" ohne
           // Tausenderpunkt (Stolperstelle 26).

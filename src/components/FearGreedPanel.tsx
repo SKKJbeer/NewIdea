@@ -117,7 +117,7 @@ export function FearGreedPanel({ result }: { result: FearGreedResult }) {
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-xs font-bold text-slate-200">{k.label}</span>
                     <span className="text-xs tabular-nums text-slate-400">
-                      {Math.round(k.score)} / 100 · Gewicht {Math.round(k.weight * 100)} %
+                      {Math.round(k.score)} / 100 · Gewicht {Math.round(k.weight * 100)}&nbsp;%
                     </span>
                   </div>
                   <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#0c0c14]">

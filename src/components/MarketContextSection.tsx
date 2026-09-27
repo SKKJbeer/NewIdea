@@ -50,11 +50,11 @@ export function MarketContextSkeleton() {
  */
 export async function MarketContextSection({ card }: { card: PokemonCard }) {
   // KEIN VERGLEICH ZWISCHEN VERSCHIEDENEN DATENSTAENDEN (wie v6.8.2 bei
-  // Instagram). Traegt die Karte den frischen Cardmarket-Stand von TCGdex,
-  // Set und Index aber noch den Monate alten von pokemontcg.io, waere „Karte
-  // gegen Markt" ein Vergleich von heute mit dem Fruehjahr. Der Abschnitt
-  // entfaellt dann, bis beide auf derselben Grundlage stehen.
-  if (card.cmPrices?.quelle === 'tcgdex') return null;
+  // Instagram). Seit v6.10.2 stehen Set-Vergleich und Index auf Preisen vom
+  // Vortag. Der Abschnitt erscheint deshalb NUR fuer Karten mit ebenso
+  // frischem Preis — eine Karte mit Monate altem Wert gegen den Markt von
+  // gestern zu stellen, waere derselbe Fehler andersherum.
+  if (card.cmPrices?.quelle !== 'tcgdex') return null;
 
   const [setBenchmark, marktBenchmark] = await Promise.all([
     card.setCode ? getSetBenchmark(card.setCode) : Promise.resolve(null),

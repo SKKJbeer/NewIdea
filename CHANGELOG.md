@@ -7,6 +7,29 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.11.0] - 27. September 2026 · Ketten-Review: eine Preisquelle, Sicherheit, Tempo
+
+### Behoben
+- **Kartenseiten konnten den Monate alten Preis zeigen**, wenn der Abruf des Vortagspreises beim Erzeugen scheiterte — und diese Fassung lag eine Stunde im Cache. Jetzt greift vorher der frische Preis aus dem eigenen Kartenindex
+- **Startseite, Set-Übersicht, Set-Seiten und Marktbericht** bezogen Listen und Werte noch von der Quelle mit Monate alten Preisen, während Index und Suche schon frisch waren. Alle Anzeigen lesen jetzt aus dem frischen Kartenindex
+- **Kennzahlen und Kurven aus Monate alten Tageswerten** („24 h +22,5 %", flache Indexkurve): Preisverlauf und Indexverlauf zählen erst ab Beginn der täglichen Frischpreise; ein Trend heißt nur „30 Tage", wenn die Messpunkte diesen Zeitraum umfassen
+- **Set-Übersicht war leer**, wenn die Quelle beim Erzeugen ausfiel — jetzt mit gesicherter Liste als Rückfall, Erneuerung stündlich statt täglich
+- Zahl und Einheit brechen nicht mehr auseinander („+2,1" / „%"), auch nicht in Berichtstexten
+- Die Preisachse im Kartendiagramm schnitt vierstellige Beträge ab
+
+### Sicherheit
+- Studio-Anmeldung: Vergleich in konstanter Zeit, höchstens 10 Versuche je 15 Minuten
+- Mengenbremse für Portfolio-Preise und Suchvorschläge, Prüfung der Eingaben (Karten-IDs, Sprache, Länge)
+- Ungenutzte offene Schnittstelle `/api/cards` entfernt; Größengrenze im Bild-Zwischenspeicher; keine internen Fehlertexte in Antworten
+
+### Geändert
+- Kartenseite am Handy: Name, Preis und 30-Tage-Bewegung stehen im ersten Bildschirm
+- Marktkontext auf Kartenseiten wieder da — für Karten mit frischem Preis, Set-Vergleich aus dem eigenen Index
+- Wichtige Seiten werden nach dem täglichen Preisdurchlauf vorgewärmt; die leere Suchseite lädt ohne Marktabfrage
+- `/changelog` zeigt die 15 neuesten Versionen ausführlich, ältere kompakt (vorher 1,2 MB)
+
+---
+
 ## [6.10.1] - 27. September 2026 · Set-Logos neuerer Sets
 
 ### Behoben

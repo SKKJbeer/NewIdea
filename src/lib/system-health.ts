@@ -506,11 +506,11 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
     } else if (!fertig && stillstandMinuten !== null && stillstandMinuten > 20) {
       problems.push(
         `Preiserfassung steht seit ${stillstandMinuten} Minuten bei Seite ${stand.nextPage} von ${seitenGesamt} ` +
-          `(${anteil} % der Karten). Die Kette ist abgerissen — die restlichen Karten bekommen heute keinen neuen Preis.`,
+          `(${anteil}\u00A0% der Karten). Die Kette ist abgerissen — die restlichen Karten bekommen heute keinen neuen Preis.`,
       );
     } else if (!fertig) {
       problems.push(
-        `Preiserfassung läuft: Seite ${stand.nextPage} von ${seitenGesamt} (${anteil} % der Karten).`,
+        `Preiserfassung läuft: Seite ${stand.nextPage} von ${seitenGesamt} (${anteil}\u00A0% der Karten).`,
       );
     }
     if (stand.lastError) {

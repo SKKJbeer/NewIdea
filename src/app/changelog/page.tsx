@@ -10,10 +10,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.11.0',
+    date: '27. September 2026',
+    label: 'Ketten-Review: eine Preisquelle, Sicherheit, Tempo',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kartenseiten konnten beim Ausfall des Vortagsabrufs den Monate alten Preis zeigen — jetzt greift der frische Indexpreis' },
+      { type: 'fixed', text: 'Startseite, Sets und Marktbericht lesen aus derselben frischen Quelle wie Index und Suche' },
+      { type: 'fixed', text: 'Kennzahlen und Kurven nicht mehr aus Monate alten Tageswerten; Set-Übersicht nie mehr leer' },
+      { type: 'fixed', text: 'Zahl und Einheit bleiben zusammen; Preisachse schneidet keine Beträge mehr ab' },
+      { type: 'changed', text: 'Sicherheit: Studio-Anmeldung mit Versuchsgrenze, Mengenbremsen und Eingabeprüfung, offene Alt-Schnittstelle entfernt' },
+      { type: 'changed', text: 'Kartenseite am Handy mit Preis im ersten Bildschirm; Vorwärmen wichtiger Seiten; Changelog-Seite schlank' },
+    ],
+  },
+  {
     version: '6.10.1',
     date: '27. September 2026',
     label: 'Set-Logos neuerer Sets',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Neuere Set-Logos zeigten einen Platzhalter — der Bildoptimierer kannte ihren Host nicht' },
     ],
@@ -2235,6 +2249,9 @@ const RELEASES = [
   },
 ];
 
+/** So viele Versionen erscheinen mit allen Einzelheiten, der Rest kompakt. */
+const VOLL_ANZEIGEN = 15;
+
 const TYPE_STYLE = {
   new:     { icon: Plus,       color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Neu' },
   changed: { icon: RefreshCw,  color: 'text-blue-400',    bg: 'bg-blue-500/10',    label: 'Geändert' },
@@ -2266,7 +2283,7 @@ export default function ChangelogPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 pb-16 pt-6 space-y-4">
-        {RELEASES.map((release) => (
+        {RELEASES.slice(0, VOLL_ANZEIGEN).map((release) => (
           <div key={release.version} className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">
             <div className="px-5 py-4 border-b border-[#1e1e30] flex items-start justify-between gap-3">
               <div>
@@ -2299,6 +2316,26 @@ export default function ChangelogPage() {
             </ul>
           </div>
         ))}
+
+        {/* AELTERE VERSIONEN KOMPAKT. Alle 193 Versionen mit jedem Eintrag
+            und Icon ergaben 1,2 MB HTML (gemessen 27.09.2026) — auf einem
+            Telefon eine spuerbare Ladezeit fuer eine Seite, die fast niemand
+            ganz liest. Die Einzelheiten stehen in CHANGELOG.md. */}
+        {RELEASES.length > VOLL_ANZEIGEN && (
+          <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] px-5 py-4">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Ältere Versionen</p>
+            <ul className="divide-y divide-[#1e1e30] text-sm">
+              {RELEASES.slice(VOLL_ANZEIGEN).map((r) => (
+                <li key={r.version} className="flex items-baseline justify-between gap-3 py-2">
+                  <span className="min-w-0 text-slate-400">
+                    <span className="font-bold text-slate-300">v{r.version}</span> · {r.label}
+                  </span>
+                  <span className="shrink-0 text-xs text-slate-600">{r.date}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <p className="text-center text-xs text-slate-600 pt-2">
           Vollständiger Verlauf: <a href="https://github.com/SKKJbeer/NewIdea/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[32px] items-center text-violet-400 underline hover:text-violet-300">CHANGELOG.md auf GitHub</a>

@@ -9,6 +9,23 @@ function cardPrice(card: PokemonCard): number {
   return card.prices.market || card.prices.holofoil?.market || 0;
 }
 
+/**
+ * AB DIESEM TAG SIND TAGESWERTE ECHT (Start des TCGdex-Durchlaufs, v6.9.0).
+ *
+ * Davor schrieb der alte Durchlauf Monate alte Preise von pokemontcg.io jeden
+ * Tag mit HEUTIGEM Datum (Stolperstelle 56). Diese Zeilen sind nicht von
+ * echten zu unterscheiden — sie erzeugten auf der Kartenseite Kennzahlen wie
+ * „24 h +22,5 %" (alter Wert gegen Vortagswert) und eine Kurve, die wochenlang
+ * einen Wert hielt, den es am Markt nicht gab. Gelesen wird deshalb erst ab
+ * hier. Die Zeilen bleiben in der Datenbank; nichts wird geloescht.
+ */
+export const ECHTE_TAGESWERTE_AB = '2026-09-26';
+
+/** Spaeteres von zwei ISO-Daten (YYYY-MM-DD). */
+export function spaeteres(a: string, b: string): string {
+  return a > b ? a : b;
+}
+
 /** Hoechstalter des Quellstands, damit ein Preis als Tageswert gespeichert wird. */
 export const SNAPSHOT_MAX_QUELLALTER_TAGE = 3;
 
@@ -82,7 +99,7 @@ export async function getStoredPriceHistory(cardId: string, days = 90): Promise<
     .from('price_snapshots')
     .select('captured_on, price')
     .eq('card_id', cardId)
-    .gte('captured_on', since.toISOString().split('T')[0])
+    .gte('captured_on', spaeteres(since.toISOString().split('T')[0], ECHTE_TAGESWERTE_AB))
     .order('captured_on', { ascending: true });
 
   if (error || !data) return [];
@@ -135,7 +152,7 @@ export async function getStoredPriceHistories(
     .from('price_snapshots')
     .select('card_id, captured_on, price')
     .in('card_id', cardIds)
-    .gte('captured_on', since.toISOString().split('T')[0])
+    .gte('captured_on', spaeteres(since.toISOString().split('T')[0], ECHTE_TAGESWERTE_AB))
     .order('captured_on', { ascending: true });
 
   if (error || !data) {

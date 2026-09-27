@@ -228,21 +228,21 @@ export function pmiScore(
     {
       label: 'Momentum',
       value: Math.round(momentum),
-      detail: `30-Tage-Trend ${trend >= 0 ? '+' : ''}${Math.round(trend * 10) / 10} %`,
+      detail: `30-Tage-Trend ${trend >= 0 ? '+' : ''}${Math.round(trend * 10) / 10}\u00A0%`,
     },
     {
       label: 'Stabilität',
       value: Math.round(stabilitaet),
       detail:
         stats.volatilityPct !== null
-          ? `Mittlere Tagesschwankung ${Math.round(vola * 10) / 10} %`
+          ? `Mittlere Tagesschwankung ${Math.round(vola * 10) / 10}\u00A0%`
           : 'Zu wenige Punkte für eine Schwankungsbreite',
     },
     {
       label: 'Nachfrage',
       value: Math.round(nachfrage),
       detail: stats.ath
-        ? `${Math.round(Math.abs(stats.ath.distancePct))} % unter dem Höchstwert der Reihe`
+        ? `${Math.round(Math.abs(stats.ath.distancePct))}\u00A0% unter dem Höchstwert der Reihe`
         : 'Kein Höchstwert bestimmbar',
     },
     {

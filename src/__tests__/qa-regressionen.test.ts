@@ -217,8 +217,19 @@ describe('Ein Aussetzer der Kartendatenbank bricht nicht das Deployment', () => 
     // zuletzt erfolgreiche Seite). Während des Builds gibt es keine solche
     // Seite — dort brach ein einzelner Aussetzer den gesamten Export ab und
     // hätte alle übrigen Änderungen mit blockiert.
-    expect(seite).toContain("process.env.NEXT_PHASE === 'phase-production-build'");
-    expect(seite).toContain('throw err;');
+    // Seit v6.10.2: erst live, dann die gesicherte Liste (set-liste.ts); nur
+    // wenn beides fehlt, wirft die Seite — ausser im Build.
+    expect(seite).toContain("process.env.NEXT_PHASE !== 'phase-production-build'");
+    expect(seite).toMatch(/throw new Error\(/);
+    expect(seite).toContain('ladeSetListe(');
+  });
+
+  it('sichert jede erfolgreich geladene Set-Liste als Rueckfall', () => {
+    // Befund 27.09.2026: /sets stand auf Produktion leer, weil der Abruf beim
+    // Build ausfiel und der Leerzustand 24 h gecacht wurde.
+    const liste = lies('src/lib/set-liste.ts');
+    expect(liste).toMatch(/schreibeJson\(PFAD/);
+    expect(liste).toMatch(/leseJson<Gesichert>\(PFAD\)/);
   });
 
   it('schluckt den Fehler nicht pauschal', () => {
@@ -267,3 +278,22 @@ describe('Jede Seite hat einen Titel und eine Beschreibung', () => {
   });
 });
 
+
+describe('Zahl und Einheit trennen sich nie', () => {
+  it('kein normales Leerzeichen zwischen Wert und % / pp im Anzeige-Code', () => {
+    // Befund 27.09.2026: „+2,1" am Zeilenende, „%" in der naechsten Zeile —
+    // auf der Startseite im ersten Bildschirm. 28 Stellen setzten ein
+    // normales Leerzeichen, darunter eine zweite Prozent-Formatierung.
+    const dateien = globSync('src/**/*.{ts,tsx}', { cwd: process.cwd() }).filter((f) => !f.includes('__tests__'));
+    expect(dateien.length).toBeGreaterThan(50);
+    const treffer: string[] = [];
+    for (const f of dateien) {
+      readFileSync(join(process.cwd(), f), 'utf8').split('\n').forEach((z, i) => {
+        const t = z.trim();
+        if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*') || t.startsWith('{/*')) return;
+        if (/\} (%|pp\b)/.test(z)) treffer.push(`${f}:${i + 1}`);
+      });
+    }
+    expect(treffer).toEqual([]);
+  });
+});

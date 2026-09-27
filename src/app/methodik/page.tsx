@@ -177,9 +177,9 @@ export default function MethodikPage() {
         <Abschnitt nummer={5} titel="Markttemperatur">
           <p>Die Temperatur von 0 bis 100 entsteht aus drei Teilwerten:</p>
           <Formel>
-            {Math.round(gewichte.breadth * 100)} % Marktbreite ·{' '}
-            {Math.round(gewichte.momentum * 100)} % Momentum ·{' '}
-            {Math.round(gewichte.ratio * 100)} % Gewinner-zu-Verlierer
+            {Math.round(gewichte.breadth * 100)}&nbsp;% Marktbreite ·{' '}
+            {Math.round(gewichte.momentum * 100)}&nbsp;% Momentum ·{' '}
+            {Math.round(gewichte.ratio * 100)}&nbsp;% Gewinner-zu-Verlierer
           </Formel>
           <ul className="list-inside list-disc space-y-1.5 marker:text-violet-500">
             <li>
@@ -275,7 +275,7 @@ export default function MethodikPage() {
             <li>Karten ohne Marktpreis oder ohne Bild</li>
             <li>doppelte Einträge derselben Karte</li>
             <li>Preise über {MAX_PLAUSIBLE_PRICE.toLocaleString('de-DE')} €</li>
-            <li>30-Tage-Bewegungen über {MAX_PLAUSIBLE_TREND} %</li>
+            <li>30-Tage-Bewegungen über {MAX_PLAUSIBLE_TREND}&nbsp;%</li>
           </ul>
           <p className="text-slate-500">
             Aussortierte Datensätze werden serverseitig protokolliert, damit Auffälligkeiten

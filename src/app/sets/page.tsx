@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { SetLibrary, type SetEintrag } from '@/components/SetLibrary';
-import { fetchRecentSets } from '@/lib/pokemon-api';
+import { ladeSetListe } from '@/lib/set-liste';
 import { getHomepageCards } from '@/lib/homepage-data';
 import { rankSets, validateMarketData, type SetRank } from '@/lib/market-metrics';
 import type { Metadata } from 'next';
 import { SECTION_LABEL } from '@/lib/ui';
 import { LEGAL_NO_ADVICE, LEGAL_UNOFFICIAL } from '@/lib/brand';
 
-export const revalidate = 86400;
+// Stuendlich statt taeglich: Ein Aussetzer beim Erzeugen hielt sich sonst 24 h.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Pokémon TCG Sets — Kartenpreise & Übersicht aller Erweiterungen',
@@ -18,27 +19,17 @@ export const metadata: Metadata = {
 
 
 export default async function SetsPage() {
-  // BEWUSST OHNE pauschales `.catch(() => [])`: Ein verschluckter Fehler wurde
-  // hier mit `revalidate = 86400` einen GANZEN TAG als Leerzustand gecacht.
-  // Zur Laufzeit darf der Fehler deshalb durchschlagen — Next.js behält dann
-  // die zuletzt erfolgreiche Seite und zeigt `error.tsx` nur bei kaltem Cache,
-  // mit Wiederholmöglichkeit.
-  //
-  // WÄHREND DES BUILDS gilt das Gegenteil: Dort gibt es keine vorherige Seite,
-  // die Next.js behalten könnte — ein Fehler bricht stattdessen den GESAMTEN
-  // Build ab. Genau das ist passiert: ein Aussetzer der Kartendatenbank (die
-  // laut Stolperstelle 28 regelmäßig welche hat) hätte das ganze Deployment
-  // verhindert, inklusive aller Änderungen, die mit Sets nichts zu tun haben.
-  // In dieser Phase ist der ehrliche Leerzustand das kleinere Übel: Die erste
-  // Neuvalidierung holt die Sets nach.
-  let sets = await fetchRecentSets(24).catch((err) => {
-    if (process.env.NEXT_PHASE === 'phase-production-build') {
-      console.warn('[sets] Abruf während des Builds fehlgeschlagen — Leerzustand:', err);
-      return [];
-    }
-    throw err;
-  });
-  sets = sets ?? [];
+  // SET-LISTE MIT GESICHERTEM RUECKFALL (seit v6.10.2, siehe set-liste.ts).
+  // Vorher: nur live — fiel der Abruf beim Build aus, stand bis zu 24 h
+  // „Noch keine Sets geladen" auf Produktion. Nur wenn weder Quelle noch
+  // Sicherung etwas liefern, wirft die Seite zur Laufzeit (error.tsx, nie
+  // gecacht); im Build bleibt der Leerzustand, damit ein Aussetzer nicht das
+  // ganze Deployment verhindert.
+  const liste = await ladeSetListe(24);
+  if (liste.sets.length === 0 && process.env.NEXT_PHASE !== 'phase-production-build') {
+    throw new Error('Set-Liste weder live noch gesichert verfuegbar');
+  }
+  const sets = liste.sets;
 
   // MARKTBEWEGUNG JE SET — aus derselben Stichprobe wie die Marktübersicht.
   //

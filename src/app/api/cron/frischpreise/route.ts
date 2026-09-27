@@ -21,6 +21,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok, ...ergebnis }, { status: ok ? 200 : 500 });
   } catch (err) {
     console.error('[cron/frischpreise] fehlgeschlagen:', err);
-    return NextResponse.json({ ok: false, fehler: err instanceof Error ? err.message : 'unbekannt' }, { status: 500 });
+    // Ursache nur ins Log (Code-Regel 3) — die Antwort nennt keine internen Details.
+    return NextResponse.json({ ok: false, error: 'internal_error' }, { status: 500 });
   }
 }

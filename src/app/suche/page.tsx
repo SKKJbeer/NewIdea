@@ -88,7 +88,9 @@ export default async function SearchPage({
   let error = false;
   // Der Marktbezug startet GLEICHZEITIG mit der Suche, nicht danach — vorher
   // addierten sich beide Wartezeiten.
-  const marktLaden = getMarketBenchmark().catch(() => null);
+  // Ohne Suchbegriff gibt es keine Treffer, denen der Marktbezug zugeordnet
+  // wuerde — dann auch keine Abfrage (die leere Suchseite brauchte 1,5 s).
+  const marktLaden = query.length >= 2 ? getMarketBenchmark().catch(() => null) : Promise.resolve(null);
   if (query.length >= 2) {
     try {
       [results, sets] = await Promise.all([

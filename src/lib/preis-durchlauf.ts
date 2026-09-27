@@ -262,7 +262,7 @@ export function preisGate(stand: DurchlaufStand | null, heute: string): PreisGat
     return { ok: alter < 1, befund: `Durchlauf ${stand.datum} laeuft: ${stand.geprueft} geprueft, ${stand.frisch} frisch`, anteil };
   }
   if (anteil < MIN_FRISCH_ANTEIL) {
-    return { ok: false, befund: `Nur ${Math.round(anteil * 100)} % frische Preise (Schwelle ${Math.round(MIN_FRISCH_ANTEIL * 100)} %)`, anteil };
+    return { ok: false, befund: `Nur ${Math.round(anteil * 100)}\u00A0% frische Preise (Schwelle ${Math.round(MIN_FRISCH_ANTEIL * 100)}\u00A0%)`, anteil };
   }
-  return { ok: true, befund: `${stand.frisch} von ${stand.geprueft} Karten mit Preis vom Vortag (${Math.round(anteil * 100)} %)`, anteil };
+  return { ok: true, befund: `${stand.frisch} von ${stand.geprueft} Karten mit Preis vom Vortag (${Math.round(anteil * 100)}\u00A0%)`, anteil };
 }

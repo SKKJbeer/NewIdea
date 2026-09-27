@@ -65,7 +65,7 @@ function Balken({ zeilen, leerText, bezugLabel }: { zeilen: ZeileMitAnteil[]; le
             <span className="shrink-0 text-[11px] font-semibold tabular-nums text-slate-400">
               {formatCount(z.aufrufe)}
               <span className="ml-1 text-[10px] font-normal text-slate-600">
-                {z.anteil.toLocaleString('de-DE', { maximumFractionDigits: 0 })} %
+                {z.anteil.toLocaleString('de-DE', { maximumFractionDigits: 0 })}&nbsp;%
               </span>
             </span>
           </div>

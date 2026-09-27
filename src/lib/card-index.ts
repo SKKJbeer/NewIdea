@@ -390,6 +390,10 @@ export async function wertvollsteAusIndex(
     .select('*')
     .eq('real_data', true)
     .gt('price', 0)
+    // NUR JUNGE PREISE (seit v6.10.2): `updated_at` ist der Quellstand. Ohne
+    // diese Grenze kamen Karten, fuer die TCGdex keinen Preis hat, mit ihrem
+    // Monate alten Wert in dieselbe Liste wie Preise von gestern.
+    .gte('updated_at', new Date(Date.now() - INDEX_MAX_PREISALTER_TAGE * 86_400_000).toISOString())
     .order('price', { ascending: false })
     .order('id', { ascending: true })
     .limit(Math.min(anzahl, 1000));

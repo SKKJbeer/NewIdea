@@ -1,3 +1,11 @@
+import { spaeteres } from './price-history';
+
+/**
+ * Ab diesem Tag rechnet der Index auf Preisen vom Vortag (v6.9.0). Davor kam
+ * er aus Monate alten Werten und hielt wochenlang denselben Stand — in der
+ * Kurve eine flache Linie, die nach „ruhigem Markt" aussah.
+ */
+export const INDEX_ECHT_AB = '2026-09-27';
 import { getSupabase } from './supabase';
 
 // GESPEICHERTER INDEXSTAND
@@ -126,7 +134,7 @@ export async function loadMarketIndexHistory(days = 90): Promise<MarketIndexPoin
   const { data, error } = await sb
     .from('market_index')
     .select('captured_on, value, card_count, set_count, window_days')
-    .gte('captured_on', seit.toISOString().split('T')[0])
+    .gte('captured_on', spaeteres(seit.toISOString().split('T')[0], INDEX_ECHT_AB))
     .order('captured_on', { ascending: true });
 
   if (error || !data) return [];

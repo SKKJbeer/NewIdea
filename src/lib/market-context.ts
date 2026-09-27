@@ -1,5 +1,5 @@
 import { getMarketBasis } from './market-basis';
-import { fetchCardsBySet } from './pokemon-api';
+import { setAusIndex, INDEX_MAX_PREISALTER_TAGE } from './card-index';
 import { computePmi, rankSets, hasRealTrend, MIN_SET_SAMPLE } from './market-metrics';
 import { loadLatestMarketIndex } from './market-index-store';
 import type { PokemonCard } from '@/types';
@@ -147,8 +147,13 @@ export interface SetBenchmark {
  */
 export async function getSetBenchmark(setCode: string): Promise<SetBenchmark | null> {
   try {
-    const cards = await mitZeitgrenze(fetchCardsBySet(setCode), BUDGET_MS);
-    if (cards === null) return null;
+    // AUS DEM FRISCHEN INDEX (seit v6.10.2), nicht mehr live von pokemontcg.io:
+    // gleiche Grundlage wie die Karte selbst (Stand Vortag) und eine
+    // Datenbankabfrage statt eines langsamen Fremdabrufs.
+    const grenze = Date.now() - INDEX_MAX_PREISALTER_TAGE * 86_400_000;
+    const alle = await mitZeitgrenze(setAusIndex(setCode), BUDGET_MS);
+    if (alle === null) return null;
+    const cards = alle.filter((k) => k.indexStand && Date.parse(k.indexStand) >= grenze);
     const gemessen = cards.filter(hasRealTrend);
     if (gemessen.length < MIN_SET_SAMPLE) return null;
 

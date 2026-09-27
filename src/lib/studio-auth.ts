@@ -9,7 +9,7 @@ export function makeToken(password: string): string {
 }
 
 // Constant-time string comparison — prevents timing oracle attacks on the session token.
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   try {
     return timingSafeEqual(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8'));
   } catch {

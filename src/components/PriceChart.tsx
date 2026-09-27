@@ -94,7 +94,10 @@ export function PriceChart({ data }: { data: PricePoint[] }) {
           tickLine={false}
           axisLine={false}
           tickFormatter={(v: number) => formatEurRounded(v)}
-          width={38}
+          // Breite aus der LAENGSTEN Beschriftung, nicht fest: Bei 38 px wurde
+          // „1.721 €" links abgeschnitten und las sich als „.721 €" (Befund
+          // 27.09.2026, Kartenseite am Handy).
+          width={Math.max(38, Math.ceil(formatEurRounded(maxPrice + padding).length * 6.2) + 6)}
         />
         <Tooltip content={<CustomTooltip />} />
         <Area

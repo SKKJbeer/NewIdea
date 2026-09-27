@@ -392,7 +392,7 @@ export function computeFearGreed(cards: PokemonCard[]): FearGreedResult {
       label: 'Momentum',
       score: skalieren(pmi, -15, 15),
       weight: FEAR_GREED_WEIGHTS.momentum,
-      detail: `Median-Trend ${pmi >= 0 ? '+' : ''}${pmi.toFixed(1)} %, abgebildet von −15 % bis +15 %`, // toFixed erlaubt: Erklärtext, keine Preisangabe
+      detail: `Median-Trend ${pmi >= 0 ? '+' : ''}${pmi.toFixed(1)}\u00A0%, abgebildet von −15\u00A0% bis +15\u00A0%`, // toFixed erlaubt: Erklärtext, keine Preisangabe
     },
     {
       label: 'Gewinner zu Verlierer',
@@ -510,7 +510,7 @@ export function validateMarketData(cards: PokemonCard[]): DataQualityReport {
       issues.push({
         kind: 'extremer_trend',
         cardId: card.id,
-        detail: `${card.name}: ${trend} % in 30 Tagen ist kein Marktvorgang`,
+        detail: `${card.name}: ${trend}\u00A0% in 30 Tagen ist kein Marktvorgang`,
       });
       continue;
     }

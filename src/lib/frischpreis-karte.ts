@@ -92,3 +92,32 @@ export async function karteMitFrischpreis(card: PokemonCard, zeitlimitMs = KARTE
     return card;
   }
 }
+
+/**
+ * RUECKFALL: frischer Preis aus dem eigenen Kartenindex.
+ *
+ * Befund 27.09.2026: Scheiterte der Live-Abruf bei TCGdex beim Rendern, zeigte
+ * die Kartenseite den Monate alten Wert von pokemontcg.io (Umbreon VMAX
+ * 1.579,48 € „Stand 18.11.2025") — waehrend Suche und Index den Vortagswert
+ * 1.289,51 € hatten. Und diese Fassung lag dann eine Stunde im Cache.
+ *
+ * Der Index traegt seit v6.9.0 den Vortagspreis jeder zugeordneten Karte
+ * (`updated_at` = Quellstand). Er hat keine Aufschluesselung (ab / Ø Verkauf /
+ * Ø 30) — die bleibt dann leer, statt alte Werte zu zeigen.
+ */
+export function mitIndexPreis(card: PokemonCard, t: { prices: { market?: number }; trendPercent?: number; realData?: boolean; indexStand?: string }, jetzt = Date.now()): PokemonCard {
+  const preis = t.prices.market ?? 0;
+  if (!t.indexStand || !(preis > 0) || !standFrisch(t.indexStand, jetzt)) return card;
+  const neu: PokemonCard = {
+    ...card,
+    prices: { ...card.prices, market: preis },
+    // Die Anker aus pokemontcg.io gehoeren zum alten Stand — nicht mischen.
+    priceHistory: undefined,
+    trendPercent: t.trendPercent ?? 0,
+    priceSource: 'cardmarket',
+    realData: t.realData === true,
+    cmPrices: { trend: preis, updatedAt: t.indexStand, quelle: 'tcgdex' },
+  };
+  neu.investmentScore = calculateInvestmentScore(neu);
+  return neu;
+}

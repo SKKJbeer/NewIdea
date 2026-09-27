@@ -56,7 +56,8 @@ export async function POST(request: Request) {
   });
   const containerData = await containerRes.json() as { id?: string; error?: { message: string } };
   if (containerData.error) {
-    return NextResponse.json({ error: containerData.error.message }, { status: 500 });
+    console.error('[publish-instagram] Container:', containerData.error.message);
+    return NextResponse.json({ error: 'instagram_container_failed' }, { status: 500 });
   }
   const containerId = containerData.id!;
 
@@ -75,7 +76,8 @@ export async function POST(request: Request) {
   });
   const publishData = await publishRes.json() as { id?: string; error?: { message: string } };
   if (publishData.error) {
-    return NextResponse.json({ error: publishData.error.message }, { status: 500 });
+    console.error('[publish-instagram] Veroeffentlichen:', publishData.error.message);
+    return NextResponse.json({ error: 'instagram_publish_failed' }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, mediaId: publishData.id });

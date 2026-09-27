@@ -149,7 +149,7 @@ export function MarketHeader({ cbi, breite, stimmung, abdeckung, trends, datenst
           <div className="py-4 pr-4 sm:py-5 sm:pr-5">
             <dt className={SECTION_LABEL}>Marktbreite</dt>
             <dd className={`${NUM.large} mt-2 ${breite.total > 0 ? 'text-slate-200' : 'text-slate-700'}`}>
-              {breite.total > 0 ? `${Math.round(breite.pct)} %` : '—'}
+              {breite.total > 0 ? `${Math.round(breite.pct)}\u00A0%` : '—'}
             </dd>
             {breite.total > 0 && (
               <dd className="mt-2.5 flex h-[3px] max-w-[140px] overflow-hidden" aria-hidden>

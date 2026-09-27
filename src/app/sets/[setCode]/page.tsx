@@ -34,14 +34,13 @@ export const revalidate = 86400;
 // Rueckfall auf den eigenen Index, wenn die Quelle aussetzt (wie karten/[id]).
 // Nur wenn auch der Index nichts kennt, wird geworfen.
 const setLaden = cache(async (setCode: string) => {
-  try {
-    return await fetchCardsBySet(setCode);
-  } catch (err) {
-    const ersatz = await setAusIndex(setCode).catch(() => []);
-    if (ersatz.length === 0) throw err;
-    console.warn(`[set] ${setCode}: Kartendatenbank ausgefallen, Rueckfall auf den Index`);
-    return ersatz;
-  }
+  // ZUERST DER EIGENE INDEX (seit v6.10.2): Preise vom Vortag, eine
+  // Datenbankabfrage. Vorher kamen Karten und „Gesamtwert" live von
+  // pokemontcg.io — mit Monate alten Preisen und bis zu 9 s Wartezeit.
+  const ausIndex = await setAusIndex(setCode).catch(() => []);
+  if (ausIndex.length > 0) return ausIndex;
+  // Rueckfall: Set noch nicht im Index (ganz neu) — dann live.
+  return fetchCardsBySet(setCode);
 });
 
 const SITE_URL = siteUrlOrLocal();

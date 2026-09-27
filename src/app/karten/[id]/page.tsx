@@ -13,14 +13,14 @@ import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
 import { ambientFor } from '@/lib/collector';
 import type { Metadata } from 'next';
-import { formatEur } from '@/lib/format';
+import { formatEur, formatPercent } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
 import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
 import { Suspense, cache } from 'react';
 import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
-import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
+import { karteMitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex } from '@/lib/card-index';
 
 const SITE_URL = siteUrlOrLocal();
@@ -77,7 +77,12 @@ const karteLaden = cache(async (id: string) => {
     console.warn(`[karte] ${id}: Kartendatenbank ausgefallen, Rueckfall auf den Index`);
     karte = ersatz;
   }
-  return karte ? karteMitFrischpreis(karte) : null;
+  if (!karte) return null;
+  const frisch = await karteMitFrischpreis(karte);
+  if (frisch.cmPrices?.quelle === 'tcgdex') return frisch;
+  // Live-Abruf gescheitert: frischer Preis aus dem eigenen Index (Stand Vortag).
+  const t = (await cardsFromIndex([id]).catch(() => null))?.get(id);
+  return t ? mitIndexPreis(frisch, t) : frisch;
 });
 
 interface Props {
@@ -150,8 +155,14 @@ export default async function CardDetailPage({ params }: Props) {
   const realData = card.realData || stored.length > 0;
 
   // Trend passend zum Chart: aus echten Snapshots (erster→letzter), sonst Cardmarket (ggü. Ø30).
+  // NUR wenn die Snapshots wirklich ~30 Tage umfassen: Die Anzeige nennt den
+  // Wert „30 Tage". Aus zwei Tageswerten waere es eine Tagesbewegung unter
+  // falscher Ueberschrift.
   let displayTrend = trend;
-  if (stored.length >= 2 && stored[0].price > 0) {
+  const spanneTage = stored.length >= 2
+    ? (Date.parse(stored[stored.length - 1].date) - Date.parse(stored[0].date)) / 86_400_000
+    : 0;
+  if (spanneTage >= 25 && stored[0].price > 0) {
     displayTrend = Math.round(((stored[stored.length - 1].price - stored[0].price) / stored[0].price) * 1000) / 10;
   }
 
@@ -258,6 +269,25 @@ export default async function CardDetailPage({ params }: Props) {
           <ArrowLeft size={16} />Alle Karten
         </Link>
 
+        {/* KURZFASSUNG AM HANDY. Befund 27.09.2026: Im ersten Bildschirm
+            standen nur Bild und Kaufknoepfe — Name und Preis, weswegen man
+            die Seite oeffnet, kamen erst nach einem ganzen Bildschirm
+            Scrollen. Auf breiten Bildschirmen stehen sie ohnehin daneben. */}
+        <div className="md:hidden border-t border-[#1c1c24] pt-4 pb-1">
+          <p className="text-[11px] uppercase tracking-wide text-slate-600">{card.set}</p>
+          <p className="mt-0.5 text-xl font-black text-white">{card.name}</p>
+          {price > 0 && (
+            <p className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-black tabular-nums text-white">{formatEur(price)}</span>
+              {displayTrend !== 0 && (
+                <span className={`text-sm font-semibold tabular-nums ${displayTrend > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {formatPercent(displayTrend)} (30 T)
+                </span>
+              )}
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* DIE KARTE ALS OBJEKT.
               Vorher lag das Bild in einem grauen Kasten mit dem Seitenverhältnis
@@ -269,7 +299,7 @@ export default async function CardDetailPage({ params }: Props) {
               Der Folienstreifen läuft nur auf Karten, die auch wirklich
               glänzen. */}
           <div className="group border-t border-[#1c1c24] p-6 flex flex-col items-center">
-            <div className="relative w-full max-w-[340px]">
+            <div className="relative w-full max-w-[250px] md:max-w-[340px]">
               <div
                 aria-hidden
                 className={`absolute -inset-6 rounded-[50%] blur-3xl ${ambient.glow}`}

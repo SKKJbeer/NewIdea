@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server';
 import { fetchCardById } from '@/lib/pokemon-api';
-import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
+import { karteMitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex, cardIndexStand } from '@/lib/card-index';
 import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
 import { PriceDataPoint, PokemonCard } from '@/types';
 import { getStoredPriceHistories, mergePriceHistory, recordPriceSnapshots } from '@/lib/price-history';
 import { after } from 'next/server';
+import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+
+// MENGENBREMSE (seit v6.10.2): Eine Anfrage loest bis zu 50 Abrufe bei der
+// Kartendatenbank (mit unserem Schluessel) und bei TCGdex aus. Ohne Grenze
+// liesse sich ueber diese offene Route beides leerziehen. 30 je Minute und
+// Adresse sind fuer jedes echte Portfolio reichlich.
+const bremse = createRateLimiter({ limit: 30, windowMs: 60_000 });
+const SPRACHEN = new Set<CardLanguage>(['EN', 'DE', 'JP', 'KR']);
 
 export const maxDuration = 30;
 
@@ -48,6 +56,10 @@ interface LiveCardData {
 }
 
 export async function POST(request: Request) {
+  const grenze = bremse(clientIp(request));
+  if (!grenze.allowed) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429, headers: { 'Retry-After': String(grenze.retryAfterSeconds) } });
+  }
   const body = (await request.json().catch(() => ({}))) as {
     cards?: unknown[];
     cardIds?: unknown[];
@@ -57,17 +69,19 @@ export async function POST(request: Request) {
 
   if (Array.isArray(body.cards)) {
     cards = (body.cards as Array<Record<string, unknown>>)
-      .filter((c) => typeof c.id === 'string')
+      .filter((c) => typeof c.id === 'string' && /^[a-zA-Z0-9.-]{1,40}$/.test(c.id as string))
       .map((c) => ({
         id: c.id as string,
-        language: ((c.language as string) || 'EN') as CardLanguage,
-        name: (c.name as string) || '',
+        // Nur bekannte Sprachen — alles andere gilt als Englisch, statt
+        // ungeprueft an die Cardmarket-Abfrage zu gehen.
+        language: SPRACHEN.has(c.language as CardLanguage) ? (c.language as CardLanguage) : 'EN',
+        name: typeof c.name === 'string' ? c.name.slice(0, 120) : '',
       }))
       .slice(0, 50);
   } else if (Array.isArray(body.cardIds)) {
     // Legacy format — treat all as English
     cards = (body.cardIds as string[])
-      .filter((id) => typeof id === 'string')
+      .filter((id) => typeof id === 'string' && /^[a-zA-Z0-9.-]{1,40}$/.test(id))
       .map((id) => ({ id, language: 'EN' as CardLanguage, name: '' }))
       .slice(0, 50);
   } else {
@@ -112,7 +126,10 @@ export async function POST(request: Request) {
       const roh = await withTimeout(fetchCardById(c.id));
       // Frischer Cardmarket-Stand (TCGdex, Vortag) — wirft nie, faellt still
       // auf den alten Stand zurueck (siehe frischpreis-karte.ts).
-      const live = roh ? await karteMitFrischpreis(roh) : null;
+      const frisch = roh ? await karteMitFrischpreis(roh) : null;
+      // Live-Abruf bei TCGdex gescheitert → frischer Preis aus dem Index.
+      const ausIdx = ausIndex.get(c.id);
+      const live = frisch && frisch.cmPrices?.quelle !== 'tcgdex' && ausIdx ? mitIndexPreis(frisch, ausIdx) : frisch;
       const card = live ?? ausIndex.get(c.id) ?? null;
       if (!card) return null;
       const quelle: 'live' | 'index' = live ? 'live' : 'index';

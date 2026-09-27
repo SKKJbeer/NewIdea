@@ -285,7 +285,7 @@ function HealthSection({ health, onRefresh }: { health: SystemHealth; onRefresh:
                     : health.sweep.laufTag !== health.sweep.heute ? 'text-rose-400'
                     : 'text-amber-400'
                 }`}>
-                  {health.sweep.fertig ? 'vollständig' : `${health.sweep.anteil} %`}
+                  {health.sweep.fertig ? 'vollständig' : `${health.sweep.anteil}\u00A0%`}
                 </p>
               </div>
 

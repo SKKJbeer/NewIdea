@@ -108,7 +108,7 @@ export function MetricCards({
         icon={<Activity size={19} className="text-violet-300" />}
         ton="bg-violet-500/10"
         label="Marktbreite"
-        wert={breite.total > 0 ? `${Math.round(breite.pct)} %` : '—'}
+        wert={breite.total > 0 ? `${Math.round(breite.pct)}\u00A0%` : '—'}
         unter={breite.total > 0 ? 'der Karten im Plus' : 'keine Messung'}
       >
         {breite.total > 0 && (
@@ -171,7 +171,7 @@ export function MetricCards({
         icon={<Layers size={19} className="text-fuchsia-300" />}
         ton="bg-fuchsia-500/10"
         label="Abdeckung"
-        wert={abdeckungPct !== null ? `${abdeckungPct} %` : '—'}
+        wert={abdeckungPct !== null ? `${abdeckungPct}\u00A0%` : '—'}
         unter={
           abdeckungPct !== null ? 'aller Pokémon-Karten mit Preis erfasst' : 'Bestand noch nicht ermittelt'
         }

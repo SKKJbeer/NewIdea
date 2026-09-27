@@ -2,6 +2,11 @@ import { displayPrice } from '@/lib/pokemon-api';
 import { cachedSearchCards } from '@/lib/search-cache';
 import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { NextResponse } from 'next/server';
+import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+
+// Grosszuegig: Die Suchbox fragt nach jeder Tipp-Pause. 240 je Minute reichen
+// fuer schnelles Tippen, bremsen aber ein Skript, das den Index abzieht.
+const bremse = createRateLimiter({ limit: 240, windowMs: 60_000 });
 
 // VORSCHLÄGE BEIM TIPPEN
 //
@@ -53,8 +58,9 @@ function grenze(roh: string | null): number {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const q = (searchParams.get('q') || '').trim();
+  const q = (searchParams.get('q') || '').trim().slice(0, 80);
   if (q.length < 2) return NextResponse.json(LEER);
+  if (!bremse(clientIp(request)).allowed) return NextResponse.json(LEER, { status: 429 });
 
   try {
     // Karten und Sets NEBENEINANDER, nicht nacheinander: Die Set-Suche geht in

@@ -36,7 +36,10 @@ function mitZubehoer(text: string, keyBase: string, bereits: Set<AccessoryType>)
 function emphasize(text: string, keyBase: string): ReactNode[] {
   return text.split(SPLIT).map((part, i) =>
     HIT.test(part) ? (
-      <span key={`${keyBase}-${i}`} className="font-semibold text-violet-300">
+      // `whitespace-nowrap`: Zahl und Einheit bleiben in einer Zeile. Generierte
+      // Texte setzen ein normales Leerzeichen („22,2 %"), und am Handy brach
+      // die Zeile genau dort um (Befund 27.09.2026, Marktbericht).
+      <span key={`${keyBase}-${i}`} className="whitespace-nowrap font-semibold text-violet-300">
         {part}
       </span>
     ) : (

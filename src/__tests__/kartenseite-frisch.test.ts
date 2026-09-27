@@ -98,8 +98,12 @@ describe('Kartenseite wird gecacht', () => {
     expect(seite).toContain('karteMitFrischpreis(karte)');
   });
 
-  it('vergleicht keinen frischen Kartenpreis mit einem alten Index', () => {
-    expect(lies('src/components/MarketContextSection.tsx')).toMatch(/quelle === 'tcgdex'\) return null/);
+  it('vergleicht nur frische Kartenpreise mit dem (frischen) Markt', () => {
+    expect(lies('src/components/MarketContextSection.tsx')).toMatch(/quelle !== 'tcgdex'\) return null/);
+    // Set-Vergleich aus dem frischen Index, nicht live von pokemontcg.io
+    const mc = lies('src/lib/market-context.ts');
+    expect(mc).toMatch(/setAusIndex\(setCode\)/);
+    expect(mc).not.toMatch(/fetchCardsBySet/);
   });
 });
 

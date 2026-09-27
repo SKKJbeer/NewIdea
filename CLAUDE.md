@@ -1194,6 +1194,20 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 
 58. **TCGdex hat für viele teure Sonderkarten KEINEN Cardmarket-Preis** (`pricing.cardmarket: null` — ★-Karten, POP, Nintendo-/Wizards-Promos, SM-Shiny-Vault, einzelne Secret Rares; gemessen 81 von 400). Dort NIE auf TCGplayer (USD, anderer Markt) ausweichen, sondern den alten Stand mit Datum und Hinweis stehen lassen. Schreibweisen-Unterschiede: `★` ↔ `Star`, `LV.X` fehlt bei TCGdex, Holo-Nummern `H9` ↔ `H09` — in `namenGleich()` / `dexKandidaten()` abgedeckt, jede weitere Ausnahme nur mit Beleg aus `beispiele`.
 
+60. **Ein stiller Rückfall auf alte Preise wird gecacht** → Scheiterte der TCGdex-Abruf beim Rendern einer Kartenseite, fiel `karteMitFrischpreis` still auf den pokemontcg-Wert zurück (Umbreon VMAX 1.579,48 € „Stand 18.11.2025" statt 1.289,51 €) — und diese Fassung lag eine Stunde im ISR-Cache, während Suche und Index den frischen Wert zeigten. **Regel:** Nach jedem gescheiterten Live-Abruf ZUERST den frischen Indexpreis (`mitIndexPreis`), erst dann den alten Stand. Gilt für Kartenseite und Portfolio.
+
+61. **Alte Tageswerte bleiben in der Datenbank — gelesen wird ab `ECHTE_TAGESWERTE_AB`** → Vor v6.9.0 wurden Monate alte Preise täglich neu datiert gespeichert (Stolperstelle 56). Diese Zeilen erzeugten „24 h +22,5 %", „30 T +102,6 %" und eine CBI-Kurve, die wochenlang flach lag. `getStoredPriceHistory(ies)` lesen ab `2026-09-26`, `loadMarketIndexHistory` ab `INDEX_ECHT_AB` (`2026-09-27`). Die Zeilen werden nicht gelöscht. Ein Trend heißt nur „30 Tage", wenn die Messpunkte ≥ 25 Tage umfassen.
+
+62. **EINE Preisquelle für alle Anzeigen: der frische Index** → Startseite (Mover, Set-Markt), Set-Übersicht, Set-Seiten und Marktbericht zogen noch live von pokemontcg.io, während Index und Suche schon frisch waren — dieselbe Seite zeigte zwei Datenstände. **Regel:** `getHomepageCards()` und `setAusIndex()` lesen zuerst den Index (nur `updated_at` ≤ 3 Tage in Listen), pokemontcg.io nur noch als Rückfall. Marktkontext auf Kartenseiten nur für Karten mit `cmPrices.quelle === 'tcgdex'`.
+
+63. **Beim Build eingebackener Leerzustand** → `/sets` zeigte „Noch keine Sets geladen": Die Liste kam nur live, der Abruf fiel beim Build aus, `revalidate = 86400` hielt den Leerzustand einen Tag. **Regel:** Listen aus Fremdquellen sichern (`set-liste.ts` → `daten/sets.json`) und bei Ausfall die Sicherung zeigen; `revalidate` für solche Übersichten höchstens 1 h.
+
+64. **Zahl und Einheit nie trennen** → „+2,1" am Zeilenende, „%" in der nächsten Zeile — 28 Stellen setzten ein normales Leerzeichen. **Regel:** Im Code `\u00A0` (Template) bzw. `&nbsp;` (JSX), generierter Fließtext über `<Prose>` (Kennzahlen `whitespace-nowrap`). Wächter-Test in `qa-regressionen.test.ts`.
+
+65. **Screenshots der Live-Seite aus der Sandbox** → Chromium über den Agent-Proxy bricht Verbindungen ab (`ERR_TOO_MANY_RETRIES`). Funktionierender Weg: Anfragen per `context.route` an `curl` durchreichen (Skript-Muster in der Sitzung vom 27.09.2026: `shot2.mjs`). Lange Seiten mit `ffmpeg -vf crop` in Stücke schneiden.
+
+66. **Studio-Anmeldung: Hash-Vergleich + Mengenbremse** → `password !== secret` war nicht zeitkonstant und ohne Versuchsgrenze. Jetzt `safeEqual(makeToken(pw), makeToken(secret))` (gleiche Länge) und 10 Versuche / 15 min je Adresse. Offene Routen mit Fremdabrufen (`/api/portfolio/prices`, `/api/search/suggestions`) haben eine Mengenbremse; `/api/cards` (ungenutzt, unbegrenzte Menge) ist entfernt.
+
 ---
 
 ## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)
