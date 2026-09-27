@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
 import {
   einordnen,
@@ -64,21 +64,24 @@ export async function POST(request: Request) {
     einstieg: daten.einstieg === true,
   });
 
-  const ergebnis = await zaehleAufruf({
+  const eintrag = {
     pfad,
     kanal: einordnung.kanal,
     herkunft: einordnung.herkunft,
     kampagne: einordnung.kampagne,
     geraet: geraetVonBreite(daten.breite),
     tag: new Date().toISOString().slice(0, 10),
-  });
+  };
 
-  if (!ergebnis.ok) {
-    // Die Ursache gehoert ins Log, nicht in die Antwort (keine internen
-    // Details nach aussen) — aber sie darf auch nicht verschwinden, sonst
-    // steht das Monitoring vor einem stillen Ausfall.
-    console.warn('[Zaehler] nicht gespeichert:', ergebnis.fehler);
-  }
+  // NACH der Antwort speichern: Der Besucher wartet nicht auf den Speicher.
+  after(async () => {
+    const ergebnis = await zaehleAufruf(eintrag);
+    if (!ergebnis.ok) {
+      // Die Ursache gehoert ins Log, nicht in die Antwort (keine internen
+      // Details nach aussen) — aber sie darf auch nicht verschwinden.
+      console.warn('[Zaehler] nicht gespeichert:', ergebnis.fehler);
+    }
+  });
 
   // Immer 204, auch wenn das Speichern scheiterte: Der Browser kann daran
   // nichts aendern, und ein Fehler in der Konsole eines Besuchers hilft

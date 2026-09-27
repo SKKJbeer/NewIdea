@@ -171,3 +171,54 @@ export async function leseJson<T>(pfad: string): Promise<T | null> {
     return null;
   }
 }
+
+// ── Allgemeine Ablage (seit v6.10.0) ────────────────────────────────────────
+//
+// Fuer Daten, die sonst eine eigene Tabelle braeuchten — und eine eigene
+// Tabelle braucht einen Handgriff im SQL-Editor, der nachweislich vergessen
+// wird (Reichweitenmessung: von v6.5.0 bis v6.9.0 kein einziger Aufruf
+// gezaehlt, weil `page_views` nie angelegt wurde). Der Eimer legt sich selbst an.
+
+/** Legt eine kleine Datei ab (ueberschreibt nie etwas anderes als sich selbst). */
+export async function legeAb(pfad: string, inhalt: string): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase nicht konfiguriert');
+  await eimerSicherstellen();
+  const { error } = await sb.storage
+    .from(EIMER)
+    .upload(pfad, Buffer.from(inhalt), { contentType: 'application/json', upsert: true });
+  if (error) throw new Error(`${pfad} nicht abgelegt: ${error.message}`);
+}
+
+/**
+ * ALLE Eintraege eines Ordners — seitenweise. Der Speicher liefert hoechstens
+ * 1.000 je Abfrage; ohne Weiterblaettern fiele der Rest still weg (dieselbe
+ * Falle wie bei PostgREST, Stolperstelle 54).
+ */
+export async function listeOrdner(ordner: string, maxEintraege = 200_000): Promise<string[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const namen: string[] = [];
+  for (let offset = 0; offset < maxEintraege; offset += 1000) {
+    const { data, error } = await sb.storage.from(EIMER).list(ordner, { limit: 1000, offset, sortBy: { column: 'name', order: 'asc' } });
+    if (error) throw new Error(`${ordner} nicht lesbar: ${error.message}`);
+    const stapel = (data ?? []).map((d) => d.name).filter((n) => n && n !== '.emptyFolderPlaceholder');
+    namen.push(...stapel);
+    if ((data ?? []).length < 1000) break;
+  }
+  return namen;
+}
+
+/** Loescht Dateien in Stapeln zu 1.000. Gibt die Zahl geloeschter Dateien zurueck. */
+export async function loescheDateien(pfade: string[]): Promise<number> {
+  const sb = getSupabase();
+  if (!sb) return 0;
+  let n = 0;
+  for (let i = 0; i < pfade.length; i += 1000) {
+    const teil = pfade.slice(i, i + 1000);
+    const { error } = await sb.storage.from(EIMER).remove(teil);
+    if (error) throw new Error(`Loeschen fehlgeschlagen: ${error.message}`);
+    n += teil.length;
+  }
+  return n;
+}

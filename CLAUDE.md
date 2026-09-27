@@ -162,9 +162,7 @@ täglich bei uns gespeichert und aktualisiert werden. Das ist das Wichtigste bei
   Studio → Reels → „Zugang einrichten" → zwei Werte in Vercel). Bis dahin läuft
   der Autopilot täglich an und meldet „übersprungen"
 - **Bio-Link auf Instagram:** `https://new-idea-livid.vercel.app/?utm_source=instagram&utm_medium=bio`
-- **Aufbau-SQL fuer die Reichweitenmessung im Supabase-SQL-Editor ausfuehren** (steht
-  im Monitoring unter „Reichweite", sobald es fehlt — Tabelle, Zaehlfunktion UND
-  Zeilenschutz zusammen). Bis dahin wird nichts gezaehlt
+- ~~Aufbau-SQL fuer die Reichweitenmessung~~ — seit v6.10.0 nicht mehr noetig, die Zaehlung laeuft ohne Tabelle
 - Google Search Console anmelden (SEO-Basis ist bereit)
 - Amazon PartnerNet + Cardmarket-Affiliate beantragen → Env-Vars setzen
 - Supabase service_role Key rotieren (falls noch offen)
@@ -934,7 +932,7 @@ in der kostenlosen Stufe keine Herkunft.
 | Baustein | Datei | Aufgabe |
 |---|---|---|
 | Einordnung + Auswertung | `src/lib/aufrufe.ts` | `einordnen()` (Weg + Herkunft), `pfadBereinigen()`, `zaehleAufruf()`, `auswerten()`, `AUFRUFE_SETUP_SQL` |
-| Zaehlpunkt | `src/app/api/zaehler/route.ts` | Nimmt die Meldung entgegen, ordnet SERVER-seitig ein, Missbrauchsbremse 120/Min |
+| Zaehlpunkt | `src/app/api/zaehler/route.ts` | Nimmt die Meldung entgegen, ordnet SERVER-seitig ein, Missbrauchsbremse 120/Min, speichert per `after()` NACH der Antwort |
 | Melder | `src/components/Seitenzaehler.tsx` | `sendBeacon` bei jedem Seitenaufruf — im Grundgeruest, in einer Suspense-Grenze |
 | Anzeige | `src/components/ReichweitePanel.tsx` | Abschnitt „Reichweite" im Monitoring, ganz oben |
 
@@ -954,11 +952,15 @@ in der kostenlosen Stufe keine Herkunft.
 4. **Weg und Herkunft beziehen sich auf EINSTIEGE, die Aufrufzahl auf alles.** Zaehlte
    der interne Seitenwechsel als Weg mit, stuende er mit ueber der Haelfte an der
    Spitze und verdraengte genau die Angabe, wegen der man hinsieht.
-5. **Verdichtet speichern, nie eine Zeile je Aufruf.** Eine Zeile je Tag, Seite und
-   Weg, hochgezaehlt per `zaehle_aufruf`-Funktion in EINER SQL-Anweisung. Eine Zeile
-   je Aufruf waechst mit dem Verkehr und laeuft in die Lesegrenze — die Summe faellt
-   dann still zu niedrig aus. Wird die Grenze doch erreicht, steht das als Warnung da
-   (`abgeschnitten`), statt als Ergebnis ausgegeben zu werden.
+5. **Ablage OHNE Tabelle (seit v6.10.0).** Von v6.5.0 bis v6.9.0 wurde KEIN EINZIGER
+   Aufruf gezaehlt: `page_views` musste per SQL angelegt werden, das geschah nie. Jetzt:
+   eine winzige Datei je Aufruf im Speicher-Eimer `social` unter `aufrufe/roh/<tag>/`,
+   alle Angaben im DATEINAMEN (`kanal.geraet.b64(herkunft).b64(kampagne).b64(pfad).zufall`)
+   — neue Dateien ueberschreiben nie eine andere, also keine verlorenen Zaehlungen. Der
+   Tages-Cron verdichtet abgeschlossene Tage zu `aufrufe/tage/<tag>.json` (erst
+   schreiben, dann loeschen; `enthalten` verhindert Doppelzaehlung). Ordnerlisten
+   blaettern ueber die 1.000er-Grenze. NIE wieder eine Messung einfuehren, die erst
+   nach einem Handgriff des Nutzers zaehlt.
 6. **Der Zaehler gehoert in eine Suspense-Grenze.** `useSearchParams` ohne sie nimmt
    JEDE Seite aus der statischen Erzeugung heraus (dieselbe Falle wie Stolperstelle 8).
 7. **`/studio` und `/monitoring` zaehlen nicht mit** — die eigene Arbeit ist kein

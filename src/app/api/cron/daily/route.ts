@@ -6,6 +6,7 @@ import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
 import { meldeAnIndexNow } from '@/lib/indexnow';
+import { verdichteAufrufe } from '@/lib/aufrufe';
 import { siteUrl, oeffentlicheBasis } from '@/lib/site';
 import { kartenTeil } from '@/lib/sitemap-karten';
 import { generateNextGuide } from '@/lib/guide-generator';
@@ -226,6 +227,13 @@ export async function GET(request: Request) {
   } catch (err) {
     results.indexNow = `Fehler: ${err instanceof Error ? err.message : 'unbekannt'}`;
   }
+
+  // REICHWEITE VERDICHTEN — Einzeldateien abgeschlossener Tage zu einer
+  // Tagesdatei. Wirft nie; eigener Block trotzdem, damit die Meldung ankommt.
+  const verdichtet = await verdichteAufrufe(today);
+  results.aufrufeVerdichtet = verdichtet.fehler
+    ? `Fehler: ${verdichtet.fehler}`
+    : `${verdichtet.dateien} Aufrufe aus ${verdichtet.tage} Tagen verdichtet`;
 
   return NextResponse.json({
     success: true,

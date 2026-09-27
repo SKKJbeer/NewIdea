@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.10.0] - 27. September 2026 · Reichweitenmessung zählt wieder
+
+### Behoben
+- **Seit v6.5.0 wurde kein einziger Seitenaufruf gezählt.** Die Zählung schrieb in eine Datenbanktabelle, die erst von Hand per SQL angelegt werden musste — das war nie geschehen, jeder Aufruf ging verloren
+
+### Geändert
+- Die Aufrufzählung braucht keine Tabelle mehr: Jeder Aufruf wird als eigener Eintrag im Speicher abgelegt (kein Eintrag überschreibt einen anderen), der tägliche Lauf fasst abgeschlossene Tage zu Tageszählerständen zusammen und löscht die Einzeleinträge
+- Gespeichert wird nach der Antwort — der Seitenaufruf wartet nicht auf den Speicher
+- Datenschutzerklärung beschreibt die Einzeleinträge bis zur Zusammenfassung am Folgetag
+
+---
+
 ## [6.9.0] - 27. September 2026 · Tagespreise für alle Karten
 
 ### Neu

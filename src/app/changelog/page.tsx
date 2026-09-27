@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.10.0',
+    date: '27. September 2026',
+    label: 'Reichweitenmessung zählt wieder',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Seit v6.5.0 wurde kein Seitenaufruf gezählt — die nötige Datenbanktabelle war nie angelegt worden' },
+      { type: 'changed', text: 'Aufrufzählung ohne Tabelle: ein Eintrag je Aufruf, täglich zu Zählerständen zusammengefasst' },
+      { type: 'changed', text: 'Gespeichert wird nach der Antwort; Datenschutzerklärung angepasst' },
+    ],
+  },
+  {
     version: '6.9.0',
     date: '27. September 2026',
     label: 'Tagespreise für alle Karten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Täglicher Preisdurchlauf für alle ~19.700 Karten mit dem Cardmarket-Stand vom Vortag, Namensprobe je Karte' },
       { type: 'new', text: 'Qualitätsschranke „Preise von heute": Cron-Fehler und Monitoring-Warnung, wenn Preise fehlen oder veraltet sind' },

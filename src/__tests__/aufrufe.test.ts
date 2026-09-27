@@ -8,7 +8,9 @@ import {
   geraetVonBreite,
   wirdGezaehlt,
   auswerten,
-  AUFRUFE_SETUP_SQL,
+  aufrufDateiname,
+  leseDateiname,
+  verdichte,
   type AufrufZeile,
 } from '@/lib/aufrufe';
 
@@ -221,36 +223,56 @@ describe('Die Zaehlung bleibt ohne Kennzeichen und ohne Speicher im Browser', ()
   });
 });
 
-describe('Der Aufbau der Datenbank ist vollstaendig beschrieben', () => {
-  it('nennt Tabelle UND Zaehlfunktion — ohne eine von beiden zaehlt nichts', () => {
-    expect(AUFRUFE_SETUP_SQL).toMatch(/CREATE TABLE IF NOT EXISTS page_views/);
-    expect(AUFRUFE_SETUP_SQL).toMatch(/CREATE OR REPLACE FUNCTION zaehle_aufruf/);
-    expect(AUFRUFE_SETUP_SQL).toMatch(/ON CONFLICT/);
+describe('Die Zaehlung braucht keinen Handgriff mehr (Befund 27.09.2026)', () => {
+  // Von v6.5.0 bis v6.9.0 wurde kein einziger Aufruf gezaehlt: Die Tabelle
+  // `page_views` musste per SQL angelegt werden, und das geschah nie.
+  const lib = ohneKommentare(lies('src/lib/aufrufe.ts'));
+
+  it('schreibt nicht mehr in eine Tabelle, die es erst geben muesste', () => {
+    expect(lib).not.toMatch(/page_views/);
+    expect(lib).not.toMatch(/\.rpc\(/);
+    expect(lib).toMatch(/legeAb\(/);
   });
 
-  // Die Tabelle steht in derselben Datenbank wie die Portfolios. Sobald der
-  // oeffentliche anon-Schluessel gesetzt ist, ist alles ohne Zeilenschutz
-  // fuer jeden lesbar -- auch die eigene Reichweite.
-  it('schaltet den Zeilenschutz ein', () => {
-    expect(AUFRUFE_SETUP_SQL).toMatch(/ALTER TABLE page_views ENABLE ROW LEVEL SECURITY/);
+  it('Dateiname hin und zurueck — auch mit Umlauten, Punkten und Schraegstrichen', () => {
+    const e = { pfad: '/karten/sv3pt5-199', kanal: 'sozial' as const, herkunft: 'instagram.com', kampagne: 'top-mover.ü', geraet: 'mobil' as const };
+    const name = aufrufDateiname(e, 'abc123');
+    expect(name.split('.')).toHaveLength(6);
+    expect(name).not.toMatch(/\//);
+    expect(leseDateiname(name, '2026-09-27')).toEqual({ tag: '2026-09-27', aufrufe: 1, ...e });
   });
 
-  // SECURITY DEFINER waere hier ein Loch: Die Zaehlfunktion liesse sich dann
-  // mit dem oeffentlichen Schluessel direkt aufrufen, an der Missbrauchsbremse
-  // in /api/zaehler vorbei.
-  it('laesst die Zaehlfunktion mit den Rechten des Aufrufers laufen', () => {
-    expect(AUFRUFE_SETUP_SQL).not.toMatch(/SECURITY DEFINER/);
+  it('jeder Aufruf bekommt einen eigenen Namen — nichts ueberschreibt sich', () => {
+    const e = { pfad: '/', kanal: 'direkt' as const, herkunft: 'direkt', kampagne: '', geraet: 'desktop' as const };
+    expect(aufrufDateiname(e)).not.toBe(aufrufDateiname(e));
   });
 
-  it('legt den Tag als DATE an, nicht als Zeitstempel (Stolperstelle 46)', () => {
-    expect(AUFRUFE_SETUP_SQL).toMatch(/tag\s+DATE NOT NULL/);
-    expect(AUFRUFE_SETUP_SQL).not.toMatch(/tag\s+TIMESTAMPTZ/);
+  it('fremde Dateien im Ordner zaehlen nicht', () => {
+    expect(leseDateiname('.emptyFolderPlaceholder', '2026-09-27')).toBeNull();
+    expect(leseDateiname('hacker.mobil.a.b.c.d', '2026-09-27')).toBeNull();
   });
 
-  it('das Monitoring bietet das SQL an, wenn der Aufbau fehlt', () => {
-    const api = lies('src/app/api/monitoring/route.ts');
-    expect(api).toMatch(/AUFRUFE_SETUP_SQL/);
-    expect(api).toMatch(/ladeAufrufStatistik/);
+  it('verdichten fasst zusammen, ohne etwas zu verlieren', () => {
+    const z = (pfad: string, n = 1): AufrufZeile => ({ tag: '2026-09-27', pfad, kanal: 'direkt', herkunft: 'direkt', kampagne: '', geraet: 'mobil', aufrufe: n });
+    const v = verdichte([z('/'), z('/'), z('/suche'), z('/', 3)]);
+    expect(v.find((r) => r.pfad === '/')!.aufrufe).toBe(5);
+    expect(v.reduce((s, r) => s + (r.aufrufe ?? 0), 0)).toBe(6);
+  });
+
+  it('verdichtet erst schreiben, dann loeschen — und merkt sich, was schon drin ist', () => {
+    const block = lib.slice(lib.indexOf('export async function verdichteAufrufe'));
+    expect(block.indexOf('schreibeJson')).toBeLessThan(block.indexOf('loescheDateien'));
+    expect(block).toMatch(/enthalten/);
+  });
+
+  it('der Tages-Cron verdichtet, der Zaehler speichert nach der Antwort', () => {
+    expect(lies('src/app/api/cron/daily/route.ts')).toMatch(/verdichteAufrufe\(today\)/);
+    expect(lies('src/app/api/zaehler/route.ts')).toMatch(/after\(async \(\) => \{\s*const ergebnis = await zaehleAufruf/);
+  });
+
+  it('die Ordnerliste blaettert weiter (1.000er-Grenze des Speichers)', () => {
+    const sp = ohneKommentare(lies('src/lib/social-speicher.ts'));
+    expect(sp).toMatch(/offset \+= 1000/);
   });
 });
 

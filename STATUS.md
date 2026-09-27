@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.9.0` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.10.0` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.10.0 | Reichweitenmessung ohne Tabelle (Speicher-Eimer) — zählte seit v6.5.0 nichts |
 | v6.9.0 | Tagespreise aller Karten (TCGdex, 6 Etappen) + Preis-Schranke; Suche: Trenner egal, leerer Treffer sofort |
 | v6.8.7 | Gesamtbudget für Karten-/Set-Abruf, damit der Index-Rückfall vor dem Funktionslimit greift |
 | v6.8.6 | Karten-/Set-Seite: Rückfall auf den Kartenindex bei Quellausfall |

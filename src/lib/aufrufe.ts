@@ -19,7 +19,8 @@
 // „Besucher" gibt es nirgends — sie waere geraten, und geratene Zahlen sind
 // auf dieser Seite der teuerste Fehler.
 
-import { getSupabase } from './supabase';
+import { randomBytes } from 'crypto';
+import { legeAb, listeOrdner, loescheDateien, leseJson, schreibeJson } from './social-speicher';
 
 /** Ueber welchen Weg jemand hergefunden hat. */
 export type Kanal = 'suche' | 'sozial' | 'verweis' | 'kampagne' | 'direkt' | 'intern';
@@ -192,42 +193,134 @@ export interface SchreibErgebnis {
   fehltAufbau: boolean;
 }
 
-/** Erkennt „Tabelle/Funktion existiert nicht" ueber Code UND Meldung. */
-function fehltInDatenbank(code: string | undefined, meldung: string): boolean {
-  return code === '42P01' || code === '42883' || code === 'PGRST202' ||
-    /does not exist|schema cache|could not find/i.test(meldung);
+// ── Ablage im Speicher-Eimer (seit v6.10.0) ────────────────────────────────
+//
+// BEFUND (27.09.2026): Von v6.5.0 bis v6.9.0 wurde KEIN EINZIGER Aufruf
+// gezaehlt. Der Zaehler schrieb in eine Tabelle `page_views`, die erst per
+// Aufbau-SQL im Supabase-Editor angelegt werden musste — das geschah nie, und
+// jeder Aufruf lief still ins Leere. Das Monitoring zeigte den Aufbau-Hinweis,
+// aber niemand sah hin (Stolperstellen 21 und 52 in neuer Form).
+//
+// JETZT: Jeder Aufruf wird als eigene, winzige Datei im Speicher-Eimer
+// abgelegt. Der Eimer legt sich selbst an — es gibt keinen Handgriff mehr,
+// der vergessen werden kann.
+//
+// WARUM EINE DATEI JE AUFRUF statt einer hochgezaehlten Datei: Lesen, eins
+// addieren, Zurueckschreiben verliert bei gleichzeitigen Aufrufen Zaehlungen.
+// Neue Dateien ueberschreiben nie eine andere. Die Angaben stehen im
+// DATEINAMEN — die Auswertung braucht nur die Ordnerliste, nicht tausend
+// Einzelabrufe.
+//
+// VERDICHTUNG: Einmal taeglich (Tages-Cron) werden die Einzeldateien
+// abgeschlossener Tage zu EINER Tagesdatei zusammengefasst und danach
+// geloescht. Die Tagesdatei merkt sich, welche Einzeldateien sie schon
+// enthaelt — bricht das Loeschen ab, zaehlt der naechste Lauf nichts doppelt.
+
+const ROH = 'aufrufe/roh';
+const TAGE = 'aufrufe/tage';
+
+/** base64url — ohne Punkt, damit der Punkt als Trenner im Dateinamen taugt. */
+function kodiere(text: string): string {
+  return Buffer.from(text, 'utf8').toString('base64url');
+}
+function dekodiere(text: string): string {
+  return Buffer.from(text, 'base64url').toString('utf8');
+}
+
+const KANAELE: readonly Kanal[] = ['suche', 'sozial', 'verweis', 'kampagne', 'direkt', 'intern'];
+const GERAETE: readonly Geraet[] = ['mobil', 'tablet', 'desktop'];
+
+/** Dateiname eines Aufrufs: `kanal.geraet.herkunft.kampagne.pfad.zufall`. */
+export function aufrufDateiname(e: Omit<AufrufEintrag, 'tag'>, zufall = randomBytes(6).toString('hex')): string {
+  return [e.kanal, e.geraet, kodiere(e.herkunft), kodiere(e.kampagne), kodiere(e.pfad), zufall].join('.');
+}
+
+/** Liest einen Dateinamen zurueck. `null` bei allem, was nicht von hier stammt. */
+export function leseDateiname(name: string, tag: string): AufrufZeile | null {
+  const teile = name.split('.');
+  if (teile.length !== 6) return null;
+  const [kanal, geraet, herkunft, kampagne, pfad] = teile;
+  if (!KANAELE.includes(kanal as Kanal) || !GERAETE.includes(geraet as Geraet)) return null;
+  try {
+    return {
+      tag, kanal, geraet,
+      herkunft: dekodiere(herkunft),
+      kampagne: dekodiere(kampagne),
+      pfad: dekodiere(pfad),
+      aufrufe: 1,
+    };
+  } catch {
+    // catch erlaubt: fremder Dateiname im Ordner zaehlt schlicht nicht
+    return null;
+  }
+}
+
+/** Zaehlt einen Aufruf: eine neue Datei, die keine andere ueberschreiben kann. */
+export async function zaehleAufruf(eintrag: AufrufEintrag): Promise<SchreibErgebnis> {
+  try {
+    await legeAb(`${ROH}/${eintrag.tag}/${aufrufDateiname(eintrag)}`, '1');
+    return { ok: true, fehler: null, fehltAufbau: false };
+  } catch (err) {
+    // catch erlaubt: Ein Speicherfehler darf den Seitenaufruf nie stoeren —
+    // die Ursache geht an den Aufrufer (Log), nicht verloren.
+    return { ok: false, fehler: err instanceof Error ? err.message : 'Unbekannter Fehler', fehltAufbau: false };
+  }
+}
+
+/** Verdichtete Zeilen eines Tages plus die Einzeldateien, die schon darin stecken. */
+interface TagesDatei {
+  tag: string;
+  zeilen: AufrufZeile[];
+  enthalten: string[];
+}
+
+/** Fasst gleiche Zeilen zusammen (rein, testbar). */
+export function verdichte(zeilen: AufrufZeile[]): AufrufZeile[] {
+  const karte = new Map<string, AufrufZeile>();
+  for (const z of zeilen) {
+    const k = [z.tag, z.pfad, z.kanal, z.herkunft, z.kampagne, z.geraet].join('\u0000');
+    const vorhanden = karte.get(k);
+    if (vorhanden) vorhanden.aufrufe = (vorhanden.aufrufe ?? 0) + (z.aufrufe ?? 0);
+    else karte.set(k, { ...z });
+  }
+  return [...karte.values()];
 }
 
 /**
- * Zaehlt einen Aufruf hoch.
- *
- * Ueber eine Datenbankfunktion und nicht als eine Zeile je Aufruf: Bei einer
- * Zeile je Aufruf waechst die Tabelle mit dem Verkehr, und jede Auswertung
- * muesste alle Zeilen lesen — bei einer Lesegrenze faellt die Summe still zu
- * niedrig aus. Verdichtet bleibt eine Zeile je Tag, Seite und Weg, und die
- * Zahl darin ist exakt, egal wie viel los ist.
+ * Verdichtet alle ABGESCHLOSSENEN Tage (vor `heute`). Wirft nie; meldet,
+ * was passiert ist.
  */
-export async function zaehleAufruf(eintrag: AufrufEintrag): Promise<SchreibErgebnis> {
-  const sb = getSupabase();
-  if (!sb) return { ok: false, fehler: 'Supabase nicht konfiguriert', fehltAufbau: false };
-
+export async function verdichteAufrufe(heute = new Date().toISOString().slice(0, 10)): Promise<{ tage: number; dateien: number; fehler: string | null }> {
+  let tage = 0;
+  let dateien = 0;
   try {
-    const { error } = await sb.rpc('zaehle_aufruf', {
-      p_tag: eintrag.tag,
-      p_pfad: eintrag.pfad,
-      p_kanal: eintrag.kanal,
-      p_herkunft: eintrag.herkunft,
-      p_kampagne: eintrag.kampagne,
-      p_geraet: eintrag.geraet,
-    });
-    if (error) {
-      const meldung = error.message ?? 'Unbekannter Fehler';
-      return { ok: false, fehler: meldung, fehltAufbau: fehltInDatenbank(error.code, meldung) };
+    const ordner = (await listeOrdner(ROH)).filter((t) => /^\d{4}-\d{2}-\d{2}$/.test(t) && t < heute);
+    for (const tag of ordner) {
+      const namen = await listeOrdner(`${ROH}/${tag}`);
+      const alt = (await leseJson<TagesDatei>(`${TAGE}/${tag}.json`)) ?? { tag, zeilen: [], enthalten: [] };
+      const schonDrin = new Set(alt.enthalten);
+      const neu = namen.filter((n) => !schonDrin.has(n));
+      const zeilen = neu.map((n) => leseDateiname(n, tag)).filter((z): z is AufrufZeile => z !== null);
+      // Erst die Tagesdatei schreiben, DANN loeschen. `enthalten` verhindert
+      // Doppelzaehlung, falls das Loeschen abbricht.
+      await schreibeJson(`${TAGE}/${tag}.json`, {
+        tag,
+        zeilen: verdichte([...alt.zeilen, ...zeilen]),
+        enthalten: [...alt.enthalten, ...neu],
+      } satisfies TagesDatei);
+      await loescheDateien(namen.map((n) => `${ROH}/${tag}/${n}`));
+      // Nach erfolgreichem Loeschen braucht die Liste niemand mehr.
+      await schreibeJson(`${TAGE}/${tag}.json`, {
+        tag,
+        zeilen: verdichte([...alt.zeilen, ...zeilen]),
+        enthalten: [],
+      } satisfies TagesDatei);
+      tage++;
+      dateien += namen.length;
     }
-    return { ok: true, fehler: null, fehltAufbau: false };
+    return { tage, dateien, fehler: null };
   } catch (err) {
-    // catch erlaubt: Netzfehler zur Datenbank darf den Aufruf nie stoeren
-    return { ok: false, fehler: err instanceof Error ? err.message : 'Unbekannter Fehler', fehltAufbau: false };
+    return { tage, dateien, fehler: err instanceof Error ? err.message : 'Unbekannter Fehler' };
   }
 }
 
@@ -375,87 +468,37 @@ export function auswerten(
   };
 }
 
-/** Obergrenze gelesener Zeilen — darueber wird die Auswertung als unvollstaendig gekennzeichnet. */
-export const LESE_GRENZE = 20000;
+/** Zeilen eines Tages: verdichtete Tagesdatei plus noch nicht verdichtete Einzeldateien. */
+async function zeilenDesTages(tag: string): Promise<AufrufZeile[]> {
+  const [datei, namen] = await Promise.all([
+    leseJson<TagesDatei>(`${TAGE}/${tag}.json`),
+    listeOrdner(`${ROH}/${tag}`),
+  ]);
+  const drin = new Set(datei?.enthalten ?? []);
+  const roh = namen
+    .filter((n) => !drin.has(n))
+    .map((n) => leseDateiname(n, tag))
+    .filter((z): z is AufrufZeile => z !== null);
+  return [...(datei?.zeilen ?? []), ...roh];
+}
 
-export const AUFRUFE_SETUP_SQL = `-- Aufrufe und Herkunft. Verdichtet: eine Zeile je Tag, Seite und Weg.
--- Beides zusammen ausfuehren — ohne die Funktion zaehlt nichts hoch.
-CREATE TABLE IF NOT EXISTS page_views (
-  tag       DATE NOT NULL,
-  pfad      TEXT NOT NULL,
-  kanal     TEXT NOT NULL,
-  herkunft  TEXT NOT NULL,
-  kampagne  TEXT NOT NULL DEFAULT '',
-  geraet    TEXT NOT NULL,
-  aufrufe   INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (tag, pfad, kanal, herkunft, kampagne, geraet)
-);
-
-CREATE INDEX IF NOT EXISTS page_views_tag_idx ON page_views (tag DESC);
-
--- Zeilenschutz OHNE Regel: Der service_role-Schluessel (nur auf dem Server)
--- umgeht ihn, jeder andere sieht nichts. Das ist noetig, sobald der
--- oeffentliche anon-Schluessel fuer die Portfolio-Anmeldung gesetzt ist --
--- ohne diese Zeile koennte ihn dann jeder auslesen und die Reichweite der
--- Seite mitlesen.
-ALTER TABLE page_views ENABLE ROW LEVEL SECURITY;
-
--- Hochzaehlen in EINER Anweisung. Lesen-dann-Schreiben aus der Anwendung
--- heraus wuerde bei gleichzeitigen Aufrufen Zaehlungen verlieren.
-CREATE OR REPLACE FUNCTION zaehle_aufruf(
-  p_tag DATE, p_pfad TEXT, p_kanal TEXT,
-  p_herkunft TEXT, p_kampagne TEXT, p_geraet TEXT
-) RETURNS void LANGUAGE sql AS $$
-  INSERT INTO page_views (tag, pfad, kanal, herkunft, kampagne, geraet, aufrufe)
-  VALUES (p_tag, p_pfad, p_kanal, p_herkunft, p_kampagne, p_geraet, 1)
-  ON CONFLICT (tag, pfad, kanal, herkunft, kampagne, geraet)
-  DO UPDATE SET aufrufe = page_views.aufrufe + 1;
-$$;`;
-
-/** Liest die Aufrufe der letzten `tage` Tage und wertet sie aus. */
-export async function ladeAufrufStatistik(tage = 30): Promise<AufrufStatistik> {
-  const leer: AufrufStatistik = {
-    konfiguriert: false,
-    fehltAufbau: false,
-    fehler: null,
-    tage,
-    gesamt: 0,
-    heute: 0,
-    einstiege: 0,
-    proTag: [],
-    topSeiten: [],
-    kanaele: [],
-    herkuenfte: [],
-    kampagnen: [],
-    geraete: [],
-    abgeschnitten: false,
-  };
-
-  const sb = getSupabase();
-  if (!sb) return leer;
-
-  const seit = new Date();
-  seit.setDate(seit.getDate() - tage);
-  const seitStr = seit.toISOString().slice(0, 10);
-
-  const { data, error } = await sb
-    .from('page_views')
-    .select('tag, pfad, kanal, herkunft, kampagne, geraet, aufrufe')
-    .gte('tag', seitStr)
-    .order('tag', { ascending: false })
-    .limit(LESE_GRENZE);
-
-  if (error) {
-    const meldung = error.message ?? 'Unbekannter Fehler';
+/** Liest die Aufrufe der letzten `tage` Tage (inklusive heute) und wertet sie aus. */
+export async function ladeAufrufStatistik(tage = 30, jetzt = new Date()): Promise<AufrufStatistik> {
+  const heuteStr = jetzt.toISOString().slice(0, 10);
+  const liste: string[] = [];
+  for (let i = 0; i < tage; i++) {
+    const d = new Date(jetzt.getTime() - i * 86_400_000);
+    liste.push(d.toISOString().slice(0, 10));
+  }
+  try {
+    const proTag = await Promise.all(liste.map(zeilenDesTages));
+    return auswerten(proTag.flat(), tage, heuteStr);
+  } catch (err) {
     return {
-      ...leer,
-      konfiguriert: true,
-      fehltAufbau: fehltInDatenbank(error.code, meldung),
-      fehler: meldung,
+      konfiguriert: true, fehltAufbau: false,
+      fehler: err instanceof Error ? err.message : 'Unbekannter Fehler',
+      tage, gesamt: 0, heute: 0, einstiege: 0, proTag: [], topSeiten: [], kanaele: [],
+      herkuenfte: [], kampagnen: [], geraete: [], abgeschnitten: false,
     };
   }
-
-  const zeilen = (data ?? []) as AufrufZeile[];
-  const heuteStr = new Date().toISOString().slice(0, 10);
-  return auswerten(zeilen, tage, heuteStr, zeilen.length >= LESE_GRENZE);
 }

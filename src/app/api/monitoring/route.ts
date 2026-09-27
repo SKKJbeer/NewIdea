@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { APP_VERSION } from '@/lib/app-version';
 import { loadUsageSummary, AI_USAGE_SETUP_SQL } from '@/lib/ai-usage';
-import { ladeAufrufStatistik, AUFRUFE_SETUP_SQL } from '@/lib/aufrufe';
+import { ladeAufrufStatistik } from '@/lib/aufrufe';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { collectSystemHealth } from '@/lib/system-health';
@@ -269,7 +269,7 @@ export async function GET(request: Request) {
   const data = {
     // Das Aufbau-SQL wird erst mitgeschickt, wenn es gebraucht wird — sonst
     // steht eine Anleitung fuer ein Problem da, das niemand hat.
-    aufrufe: aufrufe ? { ...aufrufe, setupSql: aufrufe.fehltAufbau ? AUFRUFE_SETUP_SQL : null } : null,
+    aufrufe: aufrufe ? { ...aufrufe, setupSql: null } : null,
     aiUsage: aiUsage ? { ...aiUsage, setupSql: aiUsage.missingTable ? AI_USAGE_SETUP_SQL : null } : null,
     // Build info
     build: {

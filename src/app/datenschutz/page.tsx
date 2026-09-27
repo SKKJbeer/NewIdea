@@ -71,8 +71,11 @@ export default function Datenschutz() {
                   Fensterbreite.</li>
             </ul>
             <p className="mb-3">
-              Diese Angaben werden <strong>unmittelbar zu einem Zähler zusammengefasst</strong> — es
-              entsteht kein Eintrag je Aufruf, sondern eine Zeile je Tag, Seite und Herkunftsweg.
+              Je Aufruf entsteht zunächst ein Eintrag, der <strong>ausschließlich diese Angaben</strong>{' '}
+              enthält; der Speicher vermerkt dabei technisch den Zeitpunkt des Anlegens, der nicht
+              ausgewertet wird. <strong>Spätestens am Folgetag</strong> werden die Einträge eines Tages
+              zu Zählerständen je Tag, Seite und Herkunftsweg zusammengefasst und die Einzeleinträge
+              gelöscht.
               <strong> Es wird kein Cookie gesetzt, nichts auf deinem Endgerät gespeichert oder
               ausgelesen und kein Kennzeichen vergeben.</strong> Weder deine IP-Adresse noch deine
               Browserkennung werden gespeichert. Eine Wiedererkennung — auch innerhalb desselben
