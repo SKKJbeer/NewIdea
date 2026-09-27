@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.11.2',
+    date: '27. September 2026',
+    label: 'Diagnose der Anmeldesperre',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Anmeldestatus im Studio nennt den Zählerstand der Anmeldesperre (Adresse nur als Hash)' },
+    ],
+  },
+  {
     version: '6.11.1',
     date: '27. September 2026',
     label: 'Anmeldesperre über alle Instanzen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Versuchsgrenze der Studio-Anmeldung zählte je Serverinstanz und griff nicht — jetzt instanzübergreifend, 15 Minuten Sperre nach 10 Fehlversuchen' },
     ],

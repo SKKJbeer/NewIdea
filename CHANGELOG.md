@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.11.2] - 27. September 2026 · Diagnose der Anmeldesperre
+
+### Geändert
+- Der Anmeldestatus des Studios nennt angemeldeten Nutzern den Zählerstand der Anmeldesperre (Adresse nur als Hash) — zur Prüfung auf Produktion
+
+---
+
 ## [6.11.1] - 27. September 2026 · Anmeldesperre über alle Instanzen
 
 ### Sicherheit

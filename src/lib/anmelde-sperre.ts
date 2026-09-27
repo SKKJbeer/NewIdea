@@ -40,6 +40,17 @@ export async function istGesperrt(ip: string, jetzt = Date.now()): Promise<boole
   }
 }
 
+/** Diagnose fuer das Studio: Schluessel-Kurzform und Zaehlerstand. */
+export async function sperrDiagnose(ip: string, jetzt = Date.now()): Promise<{ schluessel: string; fehlversuche: number | null; fehler: string | null }> {
+  const schluessel = ordner(ip).split('/').pop()!.slice(0, 8);
+  try {
+    const namen = await listeOrdner(ordner(ip), 2_000);
+    return { schluessel, fehlversuche: fehlversucheImFenster(namen, jetzt), fehler: null };
+  } catch (err) {
+    return { schluessel, fehlversuche: null, fehler: err instanceof Error ? err.message : 'unbekannt' };
+  }
+}
+
 export async function merkeFehlversuch(ip: string, jetzt = Date.now()): Promise<void> {
   try {
     await legeAb(`${ordner(ip)}/${jetzt}-${randomBytes(4).toString('hex')}`, '1');

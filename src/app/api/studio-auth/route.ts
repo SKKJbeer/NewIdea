@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { makeToken, isStudioAuthedFromRequest, safeEqual, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/studio-auth';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
-import { istGesperrt, merkeFehlversuch } from '@/lib/anmelde-sperre';
+import { istGesperrt, merkeFehlversuch, sperrDiagnose } from '@/lib/anmelde-sperre';
 
 // SCHUTZ GEGEN PASSWORT-RATEN (seit v6.10.2). Vorher: beliebig viele Versuche,
 // Vergleich per `!==` (Zeitunterschiede verraten, wie viele Zeichen stimmen —
@@ -14,7 +14,10 @@ const versuche = createRateLimiter({ limit: 10, windowMs: 15 * 60_000 });
 // GET — check if current session cookie is valid
 export async function GET(request: Request) {
   const ok = isStudioAuthedFromRequest(request);
-  return NextResponse.json({ ok }, { status: ok ? 200 : 401 });
+  if (!ok) return NextResponse.json({ ok }, { status: 401 });
+  // Diagnose der Anmeldesperre — nur fuer Angemeldete, Adresse nur als Hash.
+  const sperre = await sperrDiagnose(clientIp(request));
+  return NextResponse.json({ ok, sperre });
 }
 
 // POST — validate password, set HttpOnly session cookie
