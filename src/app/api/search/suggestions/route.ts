@@ -31,6 +31,20 @@ const N_MAX = 20;
 // mitpflegt.
 const LEER = { cards: [], sets: [] };
 
+// ZEITGRENZE. Findet der eigene Index nichts, faellt die Suche auf die
+// Kartendatenbank zurueck — und die hing beim ersten Aufruf gemessen 30
+// Sekunden (27.09.2026). Ein Vorschlag, der nach 30 Sekunden kommt, ist
+// keiner; nach dieser Grenze gibt es eine leere Liste, die Suche selbst
+// funktioniert weiter ueber die Eingabetaste.
+const VORSCHLAG_BUDGET_MS = 4_000;
+
+function mitGrenze<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, weg) => setTimeout(() => weg(new Error('zeitgrenze')), ms)),
+  ]);
+}
+
 function grenze(roh: string | null): number {
   const n = Number.parseInt(roh ?? '', 10);
   if (!Number.isFinite(n)) return N_MAX;
@@ -45,12 +59,12 @@ export async function GET(request: Request) {
   try {
     // Karten und Sets NEBENEINANDER, nicht nacheinander: Die Set-Suche geht in
     // dieselbe Datenbank und würde sonst die Antwortzeit verdoppeln.
-    const [cards, sets] = await Promise.all([
+    const [cards, sets] = await mitGrenze(Promise.all([
       cachedSearchCards(q, grenze(searchParams.get('n'))),
       // Ein Ausfall der Set-Suche darf die Kartenvorschläge nicht mitreißen —
       // sie sind der Hauptzweck dieser Route.
       searchSetIndex(q, 2).catch(() => [] as SetTreffer[]),
-    ]);
+    ]), VORSCHLAG_BUDGET_MS);
     const suggestions = cards.map((c) => ({
       id: c.id,
       name: c.name,

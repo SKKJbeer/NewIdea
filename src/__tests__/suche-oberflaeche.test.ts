@@ -219,7 +219,8 @@ describe('Die Suche haelt, was das Feld verspricht', () => {
     // Beide gehen in dieselbe Datenbank; nacheinander verdoppelt sich die
     // Antwortzeit fuer nichts.
     expect(seite).toContain('await Promise.all([');
-    expect(ohneKommentare(route)).toContain('await Promise.all([');
+    // Seit v6.8.5 zusaetzlich unter einer Zeitgrenze.
+    expect(ohneKommentare(route)).toContain('await mitGrenze(Promise.all([');
   });
 
   it('laesst einen Ausfall der Set-Suche die Kartensuche nicht mitreissen', () => {

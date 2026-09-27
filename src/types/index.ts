@@ -37,6 +37,8 @@ export interface PokemonCard {
     avgSell?: number;
     avg30?: number;
     updatedAt?: string;
+    /** Woher der Stand kommt: `tcgdex` = Cardmarket vom Vortag, sonst pokemontcg.io (oft Monate alt). */
+    quelle?: 'tcgdex' | 'pokemontcg';
   };
 }
 

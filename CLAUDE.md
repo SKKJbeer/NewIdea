@@ -102,11 +102,22 @@ auf Produktion im Probelauf verifiziert — veröffentlicht, sobald `INSTAGRAM_*
 ist), alle ~19.700 Kartenseiten + 176 Sets in Sitemaps, IndexNow-Vollmeldung (19.881
 Adressen), Guide-Warteschlange +20 Themen, Preisdurchlauf repariert (stand 53 Tage).
 
-**Größter offener Befund:** Die Cardmarket-Preise aus pokemontcg.io sind 3–10 Monate alt.
-Instagram nutzt deshalb nur noch Frischpreise (TCGdex, 400 wertvollste Karten). Die
-Umstellung der GANZEN Seite (Kartenseiten, Suche, CardBeacon Index) auf TCGdex ist
-vorbereitet, braucht aber Freigabe — sie ändert alle sichtbaren Zahlen und die
-Index-Grundlage.
+**Preise (Nutzer-Auftrag 27.09.: „stelle wirklich sicher dass wir die preise haben"):**
+pokemontcg.io liefert Cardmarket-Werte, die 3–10 Monate alt sind. Seit v6.8.5 legen
+Kartenseite UND Portfolio den TCGdex-Stand (Vortag) darüber (`frischpreis-karte.ts`,
+Namensprobe, max. 3 Tage alt, wirft nie). Stand der Abdeckung (400 wertvollste,
+27.09.): 289 frisch, 81 ohne Cardmarket-Preis BEI TCGDEX SELBST (★-Karten, alte
+Promos, Secret Rares — über diese Quelle nicht lösbar), 16 Schreibweisen (in v6.8.5
+behoben), 11 Nummern-Formate (teils behoben). Diagnose: `GET /api/cron/frischpreise`
+liefert `gruende` + `beispiele`.
+**Noch offen:** Preisdurchlauf (Kartenindex → Suche, Listen, CardBeacon Index) läuft
+weiter auf pokemontcg.io. Nächster Schritt: Durchlauf auf TCGdex umstellen (nur pro
+Karte abrufbar → ~20.000 Abrufe, verteilt), danach Marktkontext auf Kartenseiten
+wieder einschalten (entfällt bei frischem Kartenpreis, solange Set/Index alt sind).
+
+**Performance (Nutzer-Auftrag: „alles muss instant da sein"):** Karten- und Set-Seiten
+waren trotz `revalidate` bei JEDEM Aufruf dynamisch (2–14 s). Seit v6.8.5 ISR über
+`generateStaticParams(){return []}`. Gemessen davor: übrige Seiten 0,15–0,4 s (Cache-HIT).
 
 **Nächste Richtung laut Nutzer:** Geld verdienen mit Werbung. Voraussetzungen: eigene
 Domain (AdSense verlangt `ads.txt` auf der Stamm-Domain — auf `vercel.app` unmöglich),
@@ -701,6 +712,7 @@ import { AccessoryLink } from '@/components/AccessoryLink';
 | Entscheidung | Details |
 |---|---|
 | Preise | Cardmarket EUR via TCG-API (`tcgplayer.prices.cardmarket`). **ACHTUNG (gemessen 27.09.2026): diese Werte sind bei pokemontcg.io 3–10 Monate alt** (`cardmarket.updatedAt` Nov 2025 – Jul 2026), neue Sets haben keine. Der Tagesdurchlauf schreibt sie täglich neu — „Index-Stand heute" heißt NICHT „Preise von heute" |
+| Frischpreis Einzelkarte | `src/lib/frischpreis-karte.ts` → `karteMitFrischpreis()`: Kartenseite (in `cache()`, Metadaten + Seite teilen den Abruf) und Portfolio. 4 s Zeitgrenze, Set-Liste 12 h je Instanz vorgehalten, wirft nie. `cmPrices.quelle = 'tcgdex'` markiert frische Werte |
 | Frischpreise | `src/lib/tcgdex.ts` + `frischpreise.ts`: TCGdex liefert dieselben Cardmarket-Felder mit Stand Vortag. Täglich für die ~400 wertvollsten Karten (Cron 10:15 UTC), Ablage `social/marktdaten/<datum>.json`. Set-Zuordnung über Namen (167/176) + `SET_AUSNAHMEN` (9); JEDE Karte per Namensprobe gegengeprüft. Instagram veröffentlicht NUR daraus (`datenTaugen` lehnt `index` ab). Bewegung zählt nur via `bestaetigteBewegung()` (Trend + Ø 7 im Band ⅓–3× des Ø 30, Ø 7 gleiche Richtung, ≥ halbe Stärke) — sonst „Dark Dragoran +1.459 %“ aus einem Einzelangebot. Identische Preisdaten zweier Karten → beide raus (`ohneMehrdeutige`) |
 | CardBeacon Index (CBI) | **MEDIAN** der gemessenen 30-Tage-Bewegungen, KEINE Preisgewichtung mehr (v6.0.0). Grundlage: der GANZE erfasste Bestand über `getMarketBasis()` (`market-basis.ts`), nicht mehr `getHomepageCards(250)`. Karten unter `INDEX_MIN_PREIS` (0,10 €) zählen nicht mit. Gemessen am 05.08.2026 auf 19.063 Karten: gewichtetes Mittel +28,69 %, gestutzt +26,15 %, gedeckelt +23,71 %, **Median +3,50 %** — die Verteilung ist stark rechtsschief (P90 +40 %, P99 +100 %, Max +1191 %). Ausgeschlossen als Ursache: veraltete Indexwerte (250 von 250 Karten stimmen exakt mit dem Live-Abruf überein) |
 | Vorabruf (`prefetch`) | Dauerhaft sichtbare Navigation (Seitenleiste, Kopfleiste, Fusszeile, Schnellzugriff, Hero-Knoepfe) IMMER mit `prefetch={false}`. GEMESSEN: Ohne das rief EIN Aufruf der Startseite 37 Routen vorab ab (jede 4–5×) — auf Vercel je ein echter Serveraufruf; Hover reagierte erst nach 65 ms. Inhaltslisten (Suchtreffer, Sets, Artikel) behalten den Vorabruf. Abgesichert durch `vorabruf.test.ts` |
@@ -1143,6 +1155,14 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 53. **Ein frischer Zeitstempel beweist keine frischen Daten** → Nach dem Reparieren des Durchlaufs stand der Kartenindex auf „heute" — und der CardBeacon Index kam trotzdem exakt gleich heraus (+3,5 %, 14.985 Karten). Ursache: Die Quelle selbst (pokemontcg.io) liefert Cardmarket-Preise mit `updatedAt` aus Nov 2025 bis Jul 2026. Der eigene `updated_at` sagt nur, wann WIR geschrieben haben. **Regeln:** (a) Aktualität immer am Datenstand der QUELLE messen (`cardmarket.updatedAt`, bei TCGdex `pricing.cardmarket.updated`), nie am eigenen Schreibzeitpunkt; (b) ein unveränderter Kennwert nach einer „Auffrischung" ist ein Befund, keine Bestätigung; (c) Aussagen „Markt am <Datum>" nur aus Daten mit belegtem Quellstand.
 
 54. **`cardsFromIndex` kappt still bei 200 IDs** (`ids.slice(0, 200)`). Wer mehr braucht, lädt in Stücken — sonst fällt der Rest ohne Meldung weg.
+
+55. **Dynamisches Segment ohne `generateStaticParams` = dynamisch, `revalidate` wirkt NICHT** → `/karten/[id]` und `/sets/[setCode]` hatten `revalidate`, aber keine `generateStaticParams` (bewusst weggelassen nach dem 404-Einbrennen in v2.12.0). In Next 16 ist so ein Segment `ƒ`: jede Anfrage rendert neu, 2–6 s je Karte, bis 14 s je Set — auch beim zehnten Aufruf. **Regel:** `export async function generateStaticParams() { return []; }` — backt beim Build nichts ein und macht die Route zu `●` (ISR auf Abruf). Build-Ausgabe prüfen: `●` statt `ƒ`. Folge-Regel: Eine ISR-Seite darf bei einem Aussetzer KEINE Fehlerseite rendern (die wäre für die ganze Frist gecacht) — sie WIRFT, und eine `error.tsx` daneben zeigt die Wiederholung. Geworfene Renderfehler cacht Next nie.
+
+56. **Ein alter Preis mit heutigem Datum ist eine erfundene Messung** → `recordPriceSnapshot(s)` speicherte jeden Tag `captured_on = heute` mit dem Preis aus pokemontcg.io — der aber Monate alt war. Die „Tageshistorie" bestand aus demselben alten Wert, täglich neu datiert, und sah aus wie ein stabiler Markt. **Regel:** Tageswerte nur über `snapshotTauglich()` (Quellstand ≤ 3 Tage). Weniger Punkte sind ehrlicher als falsche.
+
+57. **Frischer Wert gegen alten Vergleichswert = kein Vergleich** → Nach dem Überlegen des Vortagspreises verglich der Marktkontext die Karte (Stand gestern) mit Set und Index (Stand Frühjahr). Gleicher Fehler wie v6.8.2 bei Instagram („pp zum Markt"). **Regel:** Bei jeder Gegenüberstellung prüfen, ob beide Seiten denselben Datenstand haben; sonst die Gegenüberstellung weglassen.
+
+58. **TCGdex hat für viele teure Sonderkarten KEINEN Cardmarket-Preis** (`pricing.cardmarket: null` — ★-Karten, POP, Nintendo-/Wizards-Promos, SM-Shiny-Vault, einzelne Secret Rares; gemessen 81 von 400). Dort NIE auf TCGplayer (USD, anderer Markt) ausweichen, sondern den alten Stand mit Datum und Hinweis stehen lassen. Schreibweisen-Unterschiede: `★` ↔ `Star`, `LV.X` fehlt bei TCGdex, Holo-Nummern `H9` ↔ `H09` — in `namenGleich()` / `dexKandidaten()` abgedeckt, jede weitere Ausnahme nur mit Beleg aus `beispiele`.
 
 ---
 

@@ -164,3 +164,20 @@ describe('Kein Vergleich zwischen verschiedenen Datenstaenden', () => {
     expect(src).toMatch(/gegenMarkt: basis\.quelle === 'frisch' \? null/);
   });
 });
+
+describe('Zuordnung — belegte Schreibweisen (Diagnose 27.09.2026)', () => {
+  it('Stern und LV.X gelten als gleich, andere Namen nicht', async () => {
+    const { namenGleich } = await import('@/lib/tcgdex');
+    expect(namenGleich('Pikachu Star', 'Pikachu ★')).toBe(true);
+    expect(namenGleich('Mudkip ☆', 'Mudkip ★')).toBe(true);
+    expect(namenGleich('Charizard G', 'Charizard G LV.X')).toBe(true);
+    expect(namenGleich('Rayquaza C', 'Rayquaza C LV.X')).toBe(true);
+    expect(namenGleich('Pikachu', 'Raichu')).toBe(false);
+    expect(namenGleich('Charizard', 'Charizard ex')).toBe(false);
+  });
+  it('Holo-Nummern mit einer Ziffer werden zweistellig versucht', () => {
+    expect(dexKandidaten('ecard3', 'H9')).toEqual(['ecard3-H9', 'ecard3-H09']);
+    expect(dexKandidaten('ecard3', 'H10')).toEqual(['ecard3-H10']);
+    expect(dexKandidaten('sm12', '143a')).toEqual(['sm12-143a']);
+  });
+});

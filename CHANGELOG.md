@@ -7,6 +7,25 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.5] - 27. September 2026 · Kartenseiten mit Preisen vom Vortag, sofort geladen
+
+### Neu
+- **Kartenseiten zeigen den Cardmarket-Stand vom Vortag** (TCGdex), sobald die Karte per Set, Nummer und Namensprobe sicher zugeordnet ist. Vorher kamen die Werte von pokemontcg.io und waren 3 bis 10 Monate alt. Ohne sichere Zuordnung bleibt der alte Stand stehen, mit Datum und Hinweis
+- Das Portfolio bezieht dieselben frischen Preise
+
+### Geändert
+- **Karten- und Set-Seiten werden gecacht** (ISR auf Abruf). Ohne `generateStaticParams` waren sie in Next 16 dynamisch und wurden bei jedem Aufruf neu gerendert: 2 bis 6 Sekunden je Kartenseite, bis 14 Sekunden je Set-Seite
+- Set-Seiten fragen die Kartendatenbank einmal statt zweimal ab
+- Ein Datenbank-Aussetzer zeigt eine eigene Fehlerseite mit Wiederholung, die nie gecacht wird
+- Suchvorschläge haben eine harte Zeitgrenze von 4 Sekunden
+- Der Marktkontext entfällt auf Karten mit frischem Preis, solange Set und Index noch auf dem alten Stand beruhen — kein Vergleich zwischen verschiedenen Datenständen
+
+### Behoben
+- **Preisverläufe speicherten Monate alte Werte täglich mit heutigem Datum.** Tageswerte entstehen jetzt nur noch aus einem Quellstand, der höchstens 3 Tage alt ist
+- Frischpreis-Zuordnung: Stern-Karten („★" / „Star"), LV.X-Karten und Holo-Nummern wie H9/H09 werden erkannt
+
+---
+
 ## [6.8.4] - 27. September 2026 · Frischpreise nennen den Grund, wenn eine Karte fehlt
 
 ### Geändert

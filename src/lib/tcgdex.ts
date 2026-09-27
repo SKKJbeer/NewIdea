@@ -84,10 +84,16 @@ export function dexSetFuer(setCode: string, setName: string, dexSets: DexSet[]):
   return null;
 }
 
-/** Moegliche TCGdex-IDs einer Karte: Nummer wie sie ist, und bei reinen Ziffern dreistellig (Promos: svp-001). */
+/**
+ * Moegliche TCGdex-IDs einer Karte: Nummer wie sie ist; bei reinen Ziffern
+ * dreistellig (Promos: svp-001); bei Buchstabe + einer Ziffer zweistellig
+ * (Holo-Karten aus Skyridge: pokemontcg `H9`, TCGdex `H09` — gemessen 27.09.2026).
+ */
 export function dexKandidaten(dexSet: string, nummer: string): string[] {
   const roh = `${dexSet}-${nummer}`;
   if (/^\d+$/.test(nummer) && nummer.length < 3) return [roh, `${dexSet}-${nummer.padStart(3, '0')}`];
+  const kurz = /^([A-Za-z]+)(\d)$/.exec(nummer);
+  if (kurz) return [roh, `${dexSet}-${kurz[1]}0${kurz[2]}`];
   return [roh];
 }
 
@@ -177,12 +183,19 @@ export async function holeFrischenPreis(
 }
 
 /**
- * Namensgleichheit fuer die Zuordnungsprobe. Vorerst streng: normierte
- * Zeichenfolgen muessen gleich sein. Erweiterungen nur mit Beleg aus der
- * Diagnose (`name-abweichend` mit Beispielen).
+ * Namensgleichheit fuer die Zuordnungsprobe. Streng, mit genau zwei belegten
+ * Schreibweisen-Unterschieden (Diagnose vom 27.09.2026, `name-abweichend`):
+ * - Stern: pokemontcg „Pikachu ★", TCGdex „Pikachu Star"
+ * - LV.X: pokemontcg „Charizard G LV.X", TCGdex „Charizard G"
+ * Alles andere bleibt eine Abweichung. Set und Nummer stimmen hier bereits
+ * ueberein; die Probe faengt verrutschte Nummern, keine Schreibweisen.
  */
 export function namenGleich(a: string, b: string): boolean {
-  return normiere(a) === normiere(b);
+  return namensSchluessel(a) === namensSchluessel(b);
+}
+
+function namensSchluessel(name: string): string {
+  return normiere(name.replace(/[★☆]/g, ' Star').replace(/\s+LV\.?\s?X\s*$/i, ''));
 }
 
 /** Bewegung wie auf der ganzen Seite: aktueller Preistrend gegen den 30-Tage-Schnitt, in Prozent. */

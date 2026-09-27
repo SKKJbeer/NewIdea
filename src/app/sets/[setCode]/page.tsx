@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { SECTION_LABEL } from '@/lib/ui';
 import Link from 'next/link';
@@ -6,17 +7,29 @@ import { dominantAmbient } from '@/lib/collector';
 import { CardGrid } from '@/components/CardGrid';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
-import { ApiErrorState } from '@/components/ApiErrorState';
 import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
 import { formatEurRounded, formatPercent } from '@/lib/format';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
 import { siteUrlOrLocal } from '@/lib/site';
 
-// BEWUSST KEIN generateStaticParams: Schlägt die TCG-API während des Builds fehl,
-// würden existierende Sets als 404 fest ins CDN gebacken (siehe karten/[id]).
-// On-Demand + ISR (24h) + Loading-Skeleton ist robuster.
+// generateStaticParams MIT LEERER LISTE (seit v6.8.5, wie karten/[id]).
+// Ohne die Funktion ist das Segment in Next 16 dynamisch, `revalidate` wirkt
+// nicht — gemessen bis 14 Sekunden je Aufruf, jedes Mal. Die leere Liste backt
+// beim Build nichts ein (der alte 404-Vorfall kann nicht wiederkehren) und
+// macht jede Set-Seite nach dem ersten Aufruf zur gecachten Seite.
+// Ein Ausfall wirft deshalb (`error.tsx`), statt eine Fehlerseite zu rendern,
+// die sonst 24 Stunden lang im Cache stuende.
+export async function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 86400;
+
+// Metadaten und Seite brauchen dieselben Karten. `fetchCardsBySet` nutzt axios,
+// das Next NICHT zusammenfasst (Stolperstelle 49) — ohne `cache()` lief jeder
+// Aufruf zweimal zur Quelle.
+const setLaden = cache(fetchCardsBySet);
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -35,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // selbst zeigt den Fehlerzustand.
   let cards;
   try {
-    cards = await fetchCardsBySet(setCode);
+    cards = await setLaden(setCode);
   } catch {
     return { title: 'Set-Analyse', robots: { index: false } };
   }
@@ -53,14 +66,9 @@ export default async function SetDetailPage({ params }: Props) {
   const { setCode } = await params;
   if (!isValidSetCode(setCode)) notFound();
 
-  // API-Fehler ≠ "Set existiert nicht": Fehler-UI statt 404 (sonst wird ein
-  // existierendes Set bei Rate-Limits als 404 gecacht).
-  let cards;
-  try {
-    cards = await fetchCardsBySet(setCode);
-  } catch {
-    return <ApiErrorState backHref="/sets" backLabel="Alle Sets" />;
-  }
+  // API-Fehler ≠ "Set existiert nicht": Ein Ausfall wirft (nie gecacht, siehe
+  // oben), nur eine echte leere Antwort ist ein 404.
+  const cards = await setLaden(setCode);
   if (cards.length === 0) notFound();
 
   const setName = cards[0].set;

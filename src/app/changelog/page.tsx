@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.5',
+    date: '27. September 2026',
+    label: 'Kartenseiten mit Preisen vom Vortag, sofort geladen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Kartenseiten und Portfolio zeigen den Cardmarket-Stand vom Vortag (TCGdex), wenn die Karte sicher zugeordnet ist' },
+      { type: 'changed', text: 'Karten- und Set-Seiten werden gecacht — vorher bei jedem Aufruf neu gerendert (2–14 s)' },
+      { type: 'changed', text: 'Suchvorschläge mit harter Zeitgrenze; Fehlerseiten werden nie gecacht' },
+      { type: 'fixed', text: 'Preisverläufe speicherten Monate alte Werte täglich mit heutigem Datum — nur noch Quellstände bis 3 Tage' },
+      { type: 'fixed', text: 'Frischpreis-Zuordnung erkennt Stern-, LV.X- und Holo-Nummern-Karten' },
+    ],
+  },
+  {
     version: '6.8.4',
     date: '27. September 2026',
     label: 'Frischpreise nennen den Grund, wenn eine Karte fehlt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Der Frischpreis-Lauf meldet je nicht zugeordneter Karte den Grund und Beispiele' },
       { type: 'changed', text: 'Abrufe bei TCGdex tragen eine eindeutige Kennung' },

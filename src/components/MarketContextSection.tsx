@@ -49,6 +49,13 @@ export function MarketContextSkeleton() {
  * ein fehlender Vergleich ist kein Fehler der Seite.
  */
 export async function MarketContextSection({ card }: { card: PokemonCard }) {
+  // KEIN VERGLEICH ZWISCHEN VERSCHIEDENEN DATENSTAENDEN (wie v6.8.2 bei
+  // Instagram). Traegt die Karte den frischen Cardmarket-Stand von TCGdex,
+  // Set und Index aber noch den Monate alten von pokemontcg.io, waere „Karte
+  // gegen Markt" ein Vergleich von heute mit dem Fruehjahr. Der Abschnitt
+  // entfaellt dann, bis beide auf derselben Grundlage stehen.
+  if (card.cmPrices?.quelle === 'tcgdex') return null;
+
   const [setBenchmark, marktBenchmark] = await Promise.all([
     card.setCode ? getSetBenchmark(card.setCode) : Promise.resolve(null),
     getMarketBenchmark(),

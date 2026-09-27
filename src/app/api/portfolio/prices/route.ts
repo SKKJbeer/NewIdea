@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchCardById } from '@/lib/pokemon-api';
+import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex, cardIndexStand } from '@/lib/card-index';
 import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
 import { PriceDataPoint, PokemonCard } from '@/types';
@@ -108,7 +109,10 @@ export async function POST(request: Request) {
       // Marktpreis geladen". Bei einer Quelle, die auf etwa jede dritte
       // Anfrage mit einem Fehler antwortet, traf das regelmaessig die Haelfte
       // eines Portfolios.
-      const live = await withTimeout(fetchCardById(c.id));
+      const roh = await withTimeout(fetchCardById(c.id));
+      // Frischer Cardmarket-Stand (TCGdex, Vortag) — wirft nie, faellt still
+      // auf den alten Stand zurueck (siehe frischpreis-karte.ts).
+      const live = roh ? await karteMitFrischpreis(roh) : null;
       const card = live ?? ausIndex.get(c.id) ?? null;
       if (!card) return null;
       const quelle: 'live' | 'index' = live ? 'live' : 'index';

@@ -541,7 +541,10 @@ describe('Ein Ausfall der Quelle ist keine Aussage ueber den Bestand', () => {
     const seite = lies('src/app/sets/[setCode]/page.tsx');
     // Der Fehlerfall in generateMetadata darf NICHT „Set nicht gefunden" heissen.
     expect(seite).toMatch(/catch \{\s*\n\s*return \{ title: 'Set-Analyse'/);
-    // Und die Seite selbst zeigt den Fehlerzustand statt eines 404.
-    expect(seite).toContain('<ApiErrorState');
+    // Und die Seite selbst wirft bei einem Ausfall (error.tsx, nie gecacht)
+    // statt eines 404 — eine gerenderte Fehlerseite waere 24 h im ISR-Cache.
+    expect(seite).not.toContain('<ApiErrorState');
+    expect(seite).toMatch(/export async function generateStaticParams\(\) \{\s*return \[\];/);
+    expect(seite).toContain('cache(fetchCardsBySet)');
   });
 });

@@ -102,8 +102,10 @@ describe('robots.txt sperrt die internen Seiten wirklich', () => {
 describe('Kartenseiten fragen die Kartendatenbank einmal, nicht zweimal', () => {
   it('Metadaten und Seite teilen sich einen Abruf', () => {
     const seite = ohneKommentare(lies('src/app/karten/[id]/page.tsx'));
-    expect(seite).toMatch(/const karteLaden = cache\(fetchCardById\)/);
-    expect(seite).not.toMatch(/await fetchCardById\(/);
+    // Seit v6.8.5 legt der geteilte Abruf auch den Frischpreis ueber.
+    expect(seite).toMatch(/const karteLaden = cache\(async \(id: string\)/);
+    // Genau EIN Abruf im ganzen Quelltext — der innerhalb von cache().
+    expect(seite.match(/fetchCardById\(/g) ?? []).toHaveLength(1);
   });
 });
 

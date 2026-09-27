@@ -12,7 +12,6 @@ import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
 import { ambientFor } from '@/lib/collector';
-import { ApiErrorState } from '@/components/ApiErrorState';
 import type { Metadata } from 'next';
 import { formatEur } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
@@ -21,6 +20,7 @@ import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/
 import { Suspense, cache } from 'react';
 import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
+import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -28,10 +28,23 @@ const SITE_URL = siteUrlOrLocal();
 // Reduziert TCG-API-Last (429-Risiko) und redundante Preis-Snapshots — der `after()`-Hook
 // schreibt dann höchstens einmal pro Stunde pro Karte statt bei jedem Aufruf.
 //
-// BEWUSST KEIN generateStaticParams: Das Build-Vorrendern (v2.12.0) hat bei
-// TCG-API-Ausfällen während des Builds 404-Seiten fest ins CDN gebacken —
-// existierende Karten waren dann eine Stunde lang "nicht gefunden".
-// On-Demand + ISR + Loading-Skeleton ist robuster.
+// generateStaticParams MIT LEERER LISTE — das ist der Schalter fuer den Cache.
+//
+// Bis v6.8.4 fehlte die Funktion ganz (nach einem Vorfall in v2.12.0, bei dem
+// das Vorrendern beim Build 404-Seiten fest einbackte). Ohne sie ist ein
+// dynamisches Segment in Next 16 aber DYNAMISCH: `revalidate` wirkt nicht,
+// jede Anfrage rendert neu — gemessen 2 bis 6 Sekunden je Kartenaufruf, auch
+// beim zweiten und dritten Mal. Eine LEERE Liste backt beim Build nichts ein
+// (der alte Vorfall kann nicht wieder auftreten) und macht jede Kartenseite
+// beim ersten Aufruf zu einer gecachten Seite.
+//
+// Ein Datenbank-Aussetzer wirft deshalb, statt eine Fehlerseite zu rendern:
+// Eine gerenderte Fehlerseite waere jetzt eine Stunde lang gecacht, ein Wurf
+// dagegen nie — beim naechsten Aufruf wird neu versucht (`error.tsx`).
+export async function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 3600;
 
 // EIN ABRUF PRO ANFRAGE, nicht zwei.
@@ -42,7 +55,13 @@ export const revalidate = 3600;
 // stehen alle ~20.000 Kartenseiten in der Sitemap; wenn Google sie abarbeitet,
 // haette das die Last verdoppelt. `cache()` teilt das Ergebnis innerhalb
 // derselben Anfrage.
-const karteLaden = cache(fetchCardById);
+//
+// Der frische Preis (TCGdex, Stand Vortag) wird hier EINMAL uebergelegt —
+// Metadaten, Seite und Preis-Snapshot sehen dieselbe Zahl.
+const karteLaden = cache(async (id: string) => {
+  const karte = await fetchCardById(id);
+  return karte ? karteMitFrischpreis(karte) : null;
+});
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -87,12 +106,8 @@ export default async function CardDetailPage({ params }: Props) {
 
   // API-Fehler (Timeout/Rate-Limit) ≠ "Karte existiert nicht": Fehler-UI statt 404.
   // notFound() nur bei echtem 404 der Datenbank (fetchCardById liefert dann null).
-  let card;
-  try {
-    card = await karteLaden(id);
-  } catch {
-    return <ApiErrorState />;
-  }
+  // Wirft bei Aussetzern — siehe generateStaticParams oben.
+  const card = await karteLaden(id);
   if (!card) notFound();
 
   const price = card.prices.market || card.prices.holofoil?.market || 0;
@@ -133,7 +148,7 @@ export default async function CardDetailPage({ params }: Props) {
       const days = Math.floor((Date.now() - parsed.getTime()) / 86400000);
       cmDataAge = days > 45
         ? ` Datenstand: ${label} — kann veraltet sein, aktuelle Preise bitte auf Cardmarket prüfen.`
-        : ` Datenstand: ${label}.`;
+        : ` Datenstand Cardmarket: ${label}.`;
     }
   }
 

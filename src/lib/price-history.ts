@@ -9,11 +9,31 @@ function cardPrice(card: PokemonCard): number {
   return card.prices.market || card.prices.holofoil?.market || 0;
 }
 
+/** Hoechstalter des Quellstands, damit ein Preis als Tageswert gespeichert wird. */
+export const SNAPSHOT_MAX_QUELLALTER_TAGE = 3;
+
+/**
+ * DARF DIESER PREIS ALS „PREIS VON HEUTE" IN DIE HISTORIE?
+ *
+ * Nur, wenn die QUELLE einen jungen Stand hat. pokemontcg.io liefert
+ * Cardmarket-Werte, die 3 bis 10 Monate alt sind (gemessen 27.09.2026). Bis
+ * v6.8.4 wurden sie trotzdem jeden Tag mit HEUTIGEM Datum gespeichert — die
+ * Tageskurve bestand damit aus demselben alten Wert, taeglich neu datiert, und
+ * sah aus wie ein stabiler Markt (Stolperstelle 53).
+ */
+export function snapshotTauglich(card: PokemonCard, jetzt = Date.now()): boolean {
+  const stand = card.cmPrices?.updatedAt;
+  if (!stand) return false;
+  const t = Date.parse(stand.replace(/\//g, '-'));
+  if (!Number.isFinite(t)) return false;
+  return jetzt - t <= SNAPSHOT_MAX_QUELLALTER_TAGE * 86400_000;
+}
+
 // Speichert den heutigen Preis einer einzelnen Karte (idempotent pro Tag).
 export async function recordPriceSnapshot(card: PokemonCard): Promise<boolean> {
   const sb = getSupabase();
   const price = cardPrice(card);
-  if (!sb || !(price > 0)) return false;
+  if (!sb || !(price > 0) || !snapshotTauglich(card)) return false;
 
   const { error } = await sb.from('price_snapshots').upsert(
     {
@@ -35,6 +55,7 @@ export async function recordPriceSnapshots(cards: PokemonCard[]): Promise<number
 
   const captured_on = today();
   const rows = cards
+    .filter((c) => snapshotTauglich(c))
     .map((c) => ({
       card_id: c.id,
       card_name: c.name,
