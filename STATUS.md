@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.8.3` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.8.4` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.8.4 | Frischpreis-Lauf meldet Gründe für nicht zugeordnete Karten |
 | v6.8.3 | Search-Console-/Bing-Nachweis per Umgebungsvariable; neue Schlüssel im Monitoring |
 | v6.8.2 | Kein „pp zum Markt“ bei Frischpreisen (Index noch auf alten Werten) |
 | v6.8.1 | Bewegungen nur mit Bestätigung durch Ø 7 Tage (Band ⅓–3×); mehrdeutige Zuordnungen verworfen; Reel = Karussell-Maßstab |

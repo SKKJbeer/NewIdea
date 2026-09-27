@@ -1,5 +1,5 @@
 import { getSupabase } from './supabase';
-import { ladeDexSets, holeFrischenPreis, bewegung } from './tcgdex';
+import { ladeDexSets, pruefeFrischenPreis, bewegung, type Fehlgrund } from './tcgdex';
 import { schreibeJson, leseJson } from './social-speicher';
 
 // FRISCHPREISE — tagesaktuelle Cardmarket-Werte der wertvollsten Karten.
@@ -55,6 +55,10 @@ export interface FrischErgebnis {
   frisch: number;
   nichtZuordenbar: number;
   veraltet: number;
+  /** Warum Karten nicht zugeordnet wurden — Anzahl je Grund. */
+  gruende: Partial<Record<Fehlgrund, number>>;
+  /** Bis zu 40 Beispiele fuer die Diagnose. */
+  beispiele: string[];
   /** Zwei Karten mit identischen Preisdaten — nicht eindeutig zugeordnet, beide verworfen. */
   mehrdeutig: number;
   /** Davon mit plausibler, durch die Verkaeufe bestaetigter Bewegung. */
@@ -126,6 +130,7 @@ export async function erfasseFrischpreise(anzahl = FRISCH_ANZAHL, jetzt = new Da
   const datum = jetzt.toISOString().slice(0, 10);
   const erg: FrischErgebnis = {
     datum, geprueft: 0, frisch: 0, nichtZuordenbar: 0, veraltet: 0, mehrdeutig: 0, bestaetigt: 0,
+    gruende: {}, beispiele: [],
     fehler: 0, ersterFehler: null, dauerMs: 0,
   };
 
@@ -153,11 +158,17 @@ export async function erfasseFrischpreise(anzahl = FRISCH_ANZAHL, jetzt = new Da
       const z = zeilen[naechster++];
       erg.geprueft++;
       try {
-        const p = await holeFrischenPreis(
+        const e = await pruefeFrischenPreis(
           { name: z.name, setCode: z.set_code, set: z.set_name, number: z.number ?? undefined },
           dexSets,
         );
-        if (!p) { erg.nichtZuordenbar++; continue; }
+        if (!e.ok) {
+          erg.nichtZuordenbar++;
+          erg.gruende[e.grund] = (erg.gruende[e.grund] ?? 0) + 1;
+          if (erg.beispiele.length < 40) erg.beispiele.push(`${e.grund}: ${z.id} — ${e.detail}`);
+          continue;
+        }
+        const p = e.preis;
         const t = Date.parse(p.updated);
         // Stolperstelle 46: eine Altersgrenze, die bei NaN durchwinkt, ist keine.
         if (!Number.isFinite(t) || t < grenze) { erg.veraltet++; continue; }

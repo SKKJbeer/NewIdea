@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.4',
+    date: '27. September 2026',
+    label: 'Frischpreise nennen den Grund, wenn eine Karte fehlt',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Der Frischpreis-Lauf meldet je nicht zugeordneter Karte den Grund und Beispiele' },
+      { type: 'changed', text: 'Abrufe bei TCGdex tragen eine eindeutige Kennung' },
+    ],
+  },
+  {
     version: '6.8.3',
     date: '27. September 2026',
     label: 'Anmeldung bei Search Console und Bing vorbereitet',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Eigentumsnachweis für Google Search Console und Bing über Umgebungsvariablen — ohne Code-Änderung' },
       { type: 'changed', text: 'Monitoring listet die Schlüssel für Instagram, Search Console und Bing' },

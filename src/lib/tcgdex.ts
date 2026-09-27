@@ -64,7 +64,7 @@ export function normiere(text: string): string {
 }
 
 export async function ladeDexSets(): Promise<DexSet[]> {
-  const res = await fetch(`${BASIS}/sets`, { signal: AbortSignal.timeout(ZEITLIMIT_MS) });
+  const res = await fetch(`${BASIS}/sets`, { headers: KOPF, signal: AbortSignal.timeout(ZEITLIMIT_MS) });
   if (!res.ok) throw new Error(`TCGdex-Sets: HTTP ${res.status}`);
   const daten = (await res.json()) as Array<{ id: string; name: string }>;
   return daten.map((s) => ({ id: s.id, name: s.name }));
@@ -110,30 +110,49 @@ interface DexKarte {
 
 const zahl = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null);
 
+/** Warum eine Karte keinen frischen Preis bekam — fuer die Diagnose im Monitoring. */
+export type Fehlgrund = 'keine-nummer' | 'set-unbekannt' | 'nicht-gefunden' | 'name-abweichend' | 'kein-cardmarket' | 'kein-trend';
+
+export type PreisErgebnis =
+  | { ok: true; preis: FrischerPreis }
+  | { ok: false; grund: Fehlgrund; detail: string };
+
+/** Hoefliche Kennung gegenueber einer freien Schnittstelle. */
+const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://new-idea-livid.vercel.app)' };
+
 /**
- * Frischer Cardmarket-Preis einer Karte. `null` bei: nicht zuordenbar,
- * Name weicht ab, kein Cardmarket-Eintrag, keine EUR-Angabe, kein Trend.
+ * Frischer Cardmarket-Preis einer Karte — mit Begruendung, wenn es keinen gibt.
+ * Wirft nur bei Netz- und Serverfehlern (die sollen sichtbar sein, nicht als
+ * „kein Preis" durchgehen).
  */
-export async function holeFrischenPreis(
+export async function pruefeFrischenPreis(
   karte: { name: string; setCode: string; set: string; number?: string },
   dexSets: DexSet[],
-): Promise<FrischerPreis | null> {
-  if (!karte.number) return null;
+  zeitlimitMs = ZEITLIMIT_MS,
+): Promise<PreisErgebnis> {
+  if (!karte.number) return { ok: false, grund: 'keine-nummer', detail: karte.setCode };
   const dexSet = dexSetFuer(karte.setCode, karte.set, dexSets);
-  if (!dexSet) return null;
+  if (!dexSet) return { ok: false, grund: 'set-unbekannt', detail: `${karte.setCode} (${karte.set})` };
 
   for (const id of dexKandidaten(dexSet, karte.number)) {
-    const res = await fetch(`${BASIS}/cards/${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(ZEITLIMIT_MS) });
+    const res = await fetch(`${BASIS}/cards/${encodeURIComponent(id)}`, {
+      headers: KOPF,
+      signal: AbortSignal.timeout(zeitlimitMs),
+    });
     if (res.status === 404) continue;
     if (!res.ok) throw new Error(`TCGdex ${id}: HTTP ${res.status}`);
     const d = (await res.json()) as DexKarte;
     // Namensprobe: Die Zuordnung ist nur so gut wie diese Zeile.
-    if (!d.name || normiere(d.name) !== normiere(karte.name)) return null;
+    if (!d.name || !namenGleich(d.name, karte.name)) {
+      return { ok: false, grund: 'name-abweichend', detail: `${id}: "${d.name}" statt "${karte.name}"` };
+    }
     const cm = d.pricing?.cardmarket;
-    if (!cm || (cm.unit && cm.unit !== 'EUR') || !cm.updated) return null;
+    if (!cm || (cm.unit && cm.unit !== 'EUR') || !cm.updated) {
+      return { ok: false, grund: 'kein-cardmarket', detail: id };
+    }
     const trend = zahl(cm.trend);
-    if (trend === null) return null;
-    return {
+    if (trend === null) return { ok: false, grund: 'kein-trend', detail: id };
+    return { ok: true, preis: {
       trend,
       avg30: zahl(cm.avg30),
       avg7: zahl(cm.avg7),
@@ -142,9 +161,28 @@ export async function holeFrischenPreis(
       avg: zahl(cm.avg),
       updated: cm.updated,
       dexId: d.id ?? id,
-    };
+    } };
   }
-  return null;
+  return { ok: false, grund: 'nicht-gefunden', detail: dexKandidaten(dexSet, karte.number).join(' | ') };
+}
+
+/** Wie `pruefeFrischenPreis`, nur das Ergebnis — `null`, wenn es keinen frischen Preis gibt. */
+export async function holeFrischenPreis(
+  karte: { name: string; setCode: string; set: string; number?: string },
+  dexSets: DexSet[],
+  zeitlimitMs = ZEITLIMIT_MS,
+): Promise<FrischerPreis | null> {
+  const e = await pruefeFrischenPreis(karte, dexSets, zeitlimitMs);
+  return e.ok ? e.preis : null;
+}
+
+/**
+ * Namensgleichheit fuer die Zuordnungsprobe. Vorerst streng: normierte
+ * Zeichenfolgen muessen gleich sein. Erweiterungen nur mit Beleg aus der
+ * Diagnose (`name-abweichend` mit Beispielen).
+ */
+export function namenGleich(a: string, b: string): boolean {
+  return normiere(a) === normiere(b);
 }
 
 /** Bewegung wie auf der ganzen Seite: aktueller Preistrend gegen den 30-Tage-Schnitt, in Prozent. */

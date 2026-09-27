@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.4] - 27. September 2026 · Frischpreise nennen den Grund, wenn eine Karte fehlt
+
+### Geändert
+- **Der tägliche Frischpreis-Lauf meldet je nicht zugeordneter Karte den Grund** (Set unbekannt, Karte nicht gefunden, Name weicht ab, kein Cardmarket-Preis) und bis zu 40 Beispiele. Grundlage, um die Abdeckung gezielt zu erhöhen statt zu raten
+- Abrufe bei TCGdex tragen eine eindeutige Kennung (User-Agent)
+
+---
+
 ## [6.8.3] - 27. September 2026 · Anmeldung bei Search Console und Bing vorbereitet
 
 ### Neu
