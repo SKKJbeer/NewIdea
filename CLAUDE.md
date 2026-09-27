@@ -851,6 +851,11 @@ Verkehr in der Reichweitenmessung unter „ohne Verweis".
   (öffentlich, kein Geheimnis). Täglich im Daily-Cron (eigener try/catch),
   Vollmeldung einmalig per `POST /api/studio/indexnow`.
 - **Google nimmt an IndexNow nicht teil** — dort bleibt Search Console + Sitemap.
+- **Sitemaps und robots.txt sind `force-dynamic`.** Beim Build erzeugt, blieb ein
+  Aussetzer der Datenquellen bis zum nächsten Deploy stehen (Teil 1 leer, 0 Sets).
+  Bei Datenbankfehler WERFEN statt `[]` — eine leere Sitemap sagt Google „nichts da".
+- **Guide-Warteschlange nie leer laufen lassen** (`guide-topics.ts`). Sie war vom
+  08.09. bis 27.09. leer, ohne dass es auffiel — `pendingTopics: 0` im Monitoring.
 
 ---
 

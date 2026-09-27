@@ -45,15 +45,20 @@ export async function kartenAnzahl(): Promise<number | null> {
   return count ?? null;
 }
 
-export async function kartenTeil(teil: number): Promise<KartenEintrag[]> {
+/**
+ * Eine Seite mit bis zu drei Versuchen — und danach ein FEHLER, keine leere
+ * Liste.
+ *
+ * BEFUND auf Produktion (27.09.2026): Teil-Sitemap 1 hatte 0 statt 5.000
+ * Adressen, die anderen drei stimmten. Ein Aussetzer beim Bauen wurde als
+ * leeres Ergebnis gespeichert. Fuer Google ist eine leere Sitemap mit Status
+ * 200 die Aussage „hier gibt es nichts"; einen 500er fragt es spaeter erneut ab.
+ */
+async function seiteMitWiederholung(von: number, bis: number, teil: number): Promise<KartenEintrag[]> {
   const sb = getSupabase();
   if (!sb) return [];
-  const start = teil * KARTEN_JE_TEIL;
-  const ende = start + KARTEN_JE_TEIL; // exklusiv
-  const alle: KartenEintrag[] = [];
-
-  for (let von = start; von < ende; von += SEITE) {
-    const bis = Math.min(von + SEITE, ende) - 1;
+  let letzter = '';
+  for (let versuch = 0; versuch < 3; versuch++) {
     const { data, error } = await sb
       .from('cards_index')
       .select('id, updated_at')
@@ -63,11 +68,23 @@ export async function kartenTeil(teil: number): Promise<KartenEintrag[]> {
       .order('price', { ascending: false })
       .order('id', { ascending: true })
       .range(von, bis);
-    if (error) {
-      console.warn(`[sitemap-karten] Teil ${teil} ab ${von}:`, error.message);
-      break;
-    }
-    const zeilen = (data ?? []) as KartenEintrag[];
+    if (!error) return (data ?? []) as KartenEintrag[];
+    letzter = error.message;
+    await new Promise((r) => setTimeout(r, 400 * 2 ** versuch));
+  }
+  throw new Error(`[sitemap-karten] Teil ${teil} ab ${von} nicht lesbar: ${letzter}`);
+}
+
+export async function kartenTeil(teil: number): Promise<KartenEintrag[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const start = teil * KARTEN_JE_TEIL;
+  const ende = start + KARTEN_JE_TEIL; // exklusiv
+  const alle: KartenEintrag[] = [];
+
+  for (let von = start; von < ende; von += SEITE) {
+    const bis = Math.min(von + SEITE, ende) - 1;
+    const zeilen = await seiteMitWiederholung(von, bis, teil);
     alle.push(...zeilen);
     if (zeilen.length < bis - von + 1) break; // Ende der Tabelle
   }

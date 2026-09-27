@@ -5,8 +5,10 @@ import { kartenAnzahl, teileFuer } from '@/lib/sitemap-karten';
 // Keine geratene Adresse — siehe site.ts.
 const BASE_URL = siteUrlOrLocal();
 
-// Einmal am Tag neu, damit neu hinzugekommene Karten-Teilsitemaps gemeldet werden.
-export const revalidate = 86400;
+// Bei Abruf erzeugt: Die Zahl der Teil-Sitemaps haengt vom Kartenindex ab. Beim
+// Bauen berechnet, haette ein Aussetzer die Zahl bis zum naechsten Deploy auf 1
+// gesetzt.
+export const dynamic = 'force-dynamic';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const teile = teileFuer(await kartenAnzahl());

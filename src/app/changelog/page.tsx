@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.7.0',
+    date: '27. September 2026',
+    label: '20 neue Guide-Themen, Sitemaps ohne leere Stände',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: '20 neue Guide-Themen nach deutschen Suchanfragen — die Warteschlange war seit dem 08.09. leer' },
+      { type: 'fixed', text: 'Eine Teil-Sitemap war leer und die Hauptsitemap ohne Set-Seiten — beim Bauen entstanden, bis zum nächsten Deploy stehen geblieben' },
+      { type: 'changed', text: 'Sitemaps und robots.txt entstehen bei Abruf; bei einem Datenbankfehler antworten sie mit einem Fehler statt leer' },
+    ],
+  },
+  {
     version: '6.6.3',
     date: '27. September 2026',
     label: 'Die Preiserfassung stand 53 Tage still',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Der Preisdurchlauf startete vom 05.08. bis 27.09. nie automatisch — der Anstoß aus dem Tages-Cron kam nicht an. Jetzt ein eigener Cron um 06:10 UTC' },
       { type: 'fixed', text: 'Selbstaufrufe gehen an die öffentliche Produktionsadresse statt an die möglicherweise gesperrte Adresse des Deployments' },

@@ -10,6 +10,11 @@ import { siteUrlOrLocal } from '@/lib/site';
 // Keine geratene Adresse — siehe site.ts.
 const BASE_URL = siteUrlOrLocal();
 
+// Bei Abruf erzeugt, nicht beim Bauen. BEFUND auf Produktion (27.09.2026): Die
+// Sitemap enthielt 0 Set-Seiten, weil die Kartendatenbank genau waehrend des
+// Builds ausfiel — und der leere Stand blieb bis zum naechsten Deploy stehen.
+export const dynamic = 'force-dynamic';
+
 // Erzeugt die letzten `count` Publish-Daten (nur Sonntag + Donnerstag), neuester zuerst.
 // Rein lokal berechnet — kein Netzwerk-Fetch in der Sitemap-Generierung.
 function recentPublishDates(count = 26): string[] {

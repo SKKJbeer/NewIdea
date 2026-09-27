@@ -5,8 +5,14 @@ import { kartenAnzahl, kartenTeil, teileFuer } from '@/lib/sitemap-karten';
 // ALLE KARTENSEITEN — aufgeteilt in /karten/sitemap/0.xml, 1.xml, …
 // Die Teile werden in robots.txt gemeldet. Siehe `sitemap-karten.ts`.
 
-// Einmal am Tag neu: Der Kartenindex waechst mit jedem Tagesdurchlauf.
-export const revalidate = 86400;
+// BEI ABRUF ERZEUGT, NICHT BEIM BAUEN.
+//
+// Beim Bauen erzeugt, blieb ein Aussetzer bis zum naechsten Deploy stehen —
+// genau so war Teil 1 auf Produktion leer. Google holt Sitemaps nur wenige Male
+// am Tag; die Last ist vernachlaessigbar, und ein Fehler betrifft nur diesen
+// einen Abruf. Scheitert die Datenbank, antwortet der Abruf mit einem Fehler
+// statt mit einer leeren Liste (siehe `kartenTeil`).
+export const dynamic = 'force-dynamic';
 
 export async function generateSitemaps() {
   const teile = teileFuer(await kartenAnzahl());

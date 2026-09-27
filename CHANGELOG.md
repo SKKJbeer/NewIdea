@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.7.0] - 27. September 2026 · 20 neue Guide-Themen, Sitemaps ohne leere Stände
+
+### Neu
+- **20 neue Themen in der Guide-Warteschlange.** Sie war seit dem 08.09. leer; seitdem entstand kein Guide mehr. Guides sind die Einstiege aus der Google-Suche, und die gesamte KI-Erzeugung kostete zuletzt 1,44 $ im Monat. Die Themen folgen deutschen Suchanfragen (Fälschungen erkennen, Kartennummer lesen, Reverse Holo, Pull Rates, Massenkarten verkaufen, Serien-Reihenfolge u. a.). Jede Themenvorgabe verbietet erfundene Zahlen ausdrücklich — Druckraten sind nicht offiziell veröffentlicht und werden auch nicht behauptet
+
+### Behoben
+- **Teil-Sitemap 1 war leer** (0 statt 5.000 Kartenseiten) und die Hauptsitemap enthielt **keine einzige Set-Seite**. Beides entstand beim Bauen, als die Datenquellen kurz aussetzten, und blieb bis zum nächsten Deploy stehen. Sitemaps und robots.txt entstehen jetzt bei Abruf; ein Aussetzer betrifft nur diesen einen Abruf
+- Teil-Sitemaps antworten bei einem Datenbankfehler nach drei Versuchen mit einem Fehler statt mit einer leeren Liste — eine leere Sitemap ist für Google die Aussage „hier gibt es nichts", einen Fehler fragt es später erneut ab
+
+---
+
 ## [6.6.3] - 27. September 2026 · Die Preiserfassung stand 53 Tage still
 
 ### Behoben

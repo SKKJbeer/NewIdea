@@ -12,6 +12,8 @@ function ohneKommentare(src: string): string {
 // — wie PostgREST mit `max-rows`, egal was `range` verlangt.
 const GESAMT = 12_345;
 const bereiche: Array<[number, number]> = [];
+/** Wenn gesetzt: jede `range`-Abfrage scheitert (Datenbank-Aussetzer). */
+const stoerung = { aktiv: false };
 vi.mock('@/lib/supabase', () => {
   const kette = {
     _von: 0, _bis: 0,
@@ -20,6 +22,7 @@ vi.mock('@/lib/supabase', () => {
     limit() { return Promise.resolve({ count: GESAMT, error: null, data: [{ id: 'x' }] }); },
     range(von: number, bis: number) {
       bereiche.push([von, bis]);
+      if (stoerung.aktiv) return Promise.resolve({ data: null, error: { message: 'statement timeout' } });
       const ende = Math.min(bis, von + 999, GESAMT - 1);
       const data = [];
       for (let i = von; i <= ende; i++) data.push({ id: `k-${i}`, updated_at: '2026-09-27T08:00:00Z' });
@@ -131,5 +134,29 @@ describe('IndexNow', () => {
 
   it('die Vollmeldung ist nur aus dem Studio erreichbar', () => {
     expect(lies('src/app/api/studio/indexnow/route.ts')).toMatch(/isStudioAuthedFromRequest/);
+  });
+});
+
+describe('Ein Aussetzer wird nicht als leere Sitemap gespeichert', () => {
+  // BEFUND auf Produktion: Teil 1 hatte 0 statt 5.000 Adressen, die
+  // Hauptsitemap 0 Set-Seiten — beides beim Bauen erzeugt und bis zum naechsten
+  // Deploy stehen geblieben.
+  it('wirft nach drei Versuchen, statt eine leere Liste zu liefern', async () => {
+    stoerung.aktiv = true;
+    bereiche.length = 0;
+    try {
+      await expect(kartenTeil(1)).rejects.toThrow(/nicht lesbar/);
+      expect(bereiche.length).toBe(3);
+    } finally {
+      stoerung.aktiv = false;
+    }
+  }, 10_000);
+
+  it('Sitemaps und robots.txt entstehen bei Abruf, nicht beim Bauen', () => {
+    for (const d of ['src/app/sitemap.ts', 'src/app/karten/sitemap.ts', 'src/app/robots.ts']) {
+      const src = ohneKommentare(lies(d));
+      expect(src, d).toMatch(/export const dynamic = 'force-dynamic'/);
+      expect(src, d).not.toMatch(/export const revalidate/);
+    }
   });
 });
