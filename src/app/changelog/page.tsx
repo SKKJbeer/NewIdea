@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.1',
+    date: '27. September 2026',
+    label: 'Nur Bewegungen, die die Verkäufe tragen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Scheinbewegungen wie „+1.459 %" bei Karten mit wenigen Verkäufen — eine Bewegung zählt nur noch, wenn der 7-Tage-Verkaufsschnitt sie bestätigt' },
+      { type: 'fixed', text: 'Karten mit identischen Preisdaten (zwei Karten auf einer Cardmarket-Seite) werden verworfen' },
+      { type: 'fixed', text: 'Reel und Karussell nutzen dieselbe Bereinigung' },
+    ],
+  },
+  {
     version: '6.8.0',
     date: '27. September 2026',
     label: 'Tagesaktuelle Cardmarket-Preise für Instagram',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Befund: Die Cardmarket-Preise der bisherigen Quelle sind drei bis zehn Monate alt, neue Sets haben dort keine' },
       { type: 'new', text: 'Täglicher Frischpreis-Lauf über TCGdex für die ~400 wertvollsten Karten — Cardmarket-Stand vom Vortag, jede Zuordnung über den Namen geprüft' },

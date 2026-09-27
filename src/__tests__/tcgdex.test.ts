@@ -114,3 +114,44 @@ describe('Frischpreise: Ablage und Verwendung', () => {
     expect(fn.indexOf('leseFrischpreise')).toBeLessThan(fn.indexOf('wertvollsteAusIndex'));
   });
 });
+
+describe('Nur Bewegungen, die die Verkaeufe tragen', () => {
+  // Rohwerte vom 27.09.2026, TCGdex.
+  it('verwirft Dark Dragoran (+1.459 %): Trend 15× ueber dem Schnitt, Ø 7 Tage zeigt nach unten', async () => {
+    const { bestaetigteBewegung } = await import('@/lib/frischpreise');
+    expect(bestaetigteBewegung({ trend: 2133.07, avg30: 136.81, avg7: 99.91 })).toBeNull();
+  });
+
+  it('verwirft Shining Celebi (+217 %): Ø 7 Tage widerspricht', async () => {
+    const { bestaetigteBewegung } = await import('@/lib/frischpreise');
+    expect(bestaetigteBewegung({ trend: 965.47, avg30: 304.19, avg7: 251.55 })).toBeNull();
+  });
+
+  it('verwirft Sceptile EX (+51 %): Trend steigt, Verkaeufe fallen', async () => {
+    const { bestaetigteBewegung } = await import('@/lib/frischpreise');
+    expect(bestaetigteBewegung({ trend: 18.21, avg30: 12.03, avg7: 8.83 })).toBeNull();
+  });
+
+  it('behaelt M Sceptile EX (+59 %): Ø 7 Tage bestaetigt — und zeigt die Kennzahl der Seite', async () => {
+    const { bestaetigteBewegung } = await import('@/lib/frischpreise');
+    const b = bestaetigteBewegung({ trend: 43.15, avg30: 27.16, avg7: 45.64 });
+    expect(b).toBeCloseTo(((43.15 - 27.16) / 27.16) * 100, 5);
+  });
+
+  it('ohne 30-Tage-Wert oder 7-Tage-Wert keine Bewegung', async () => {
+    const { bestaetigteBewegung } = await import('@/lib/frischpreise');
+    expect(bestaetigteBewegung({ trend: 10, avg30: null, avg7: 9 })).toBeNull();
+    expect(bestaetigteBewegung({ trend: 10, avg30: 9, avg7: null })).toBeNull();
+  });
+
+  it('wirft Karten mit identischen Preisdaten beide heraus (Holo/Nicht-Holo auf einer Cardmarket-Seite)', async () => {
+    const { ohneMehrdeutige } = await import('@/lib/frischpreise');
+    const e = (id: string, preis: number) => ({ id, preis, avg30: 136.81, avg7: 99.91, low: 29.99 });
+    expect(ohneMehrdeutige([e('base5-5', 2133.07), e('base5-22', 2133.07), e('x-1', 10)]).map((k) => k.id)).toEqual(['x-1']);
+  });
+
+  it('das Reel bekommt dieselbe Bereinigung wie das Karussell', () => {
+    const lib = readFileSync(join(process.cwd(), 'src/lib/instagram-autopilot.ts'), 'utf8');
+    expect(lib).toMatch(/buildStory\(validateMarketData\(basis\.karten\)\.clean/);
+  });
+});

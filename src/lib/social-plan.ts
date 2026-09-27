@@ -107,7 +107,7 @@ export function karussellCaption(lage: Marktlage, siteUrl: string): string {
   if (r) zeilen.push(`Stärkster Rückgang: ${r.name} (${r.set}) ${formatPercent(r.trend)}`);
   zeilen.push(
     '',
-    'Gemessen: aktueller Preistrend gegen den 30-Tage-Schnitt. Ein einzelner Stand schwankt — der Verlauf über mehrere Wochen sagt mehr.',
+    'Gemessen: aktueller Preistrend gegen den 30-Tage-Schnitt — gezählt nur, wenn die Verkäufe der letzten sieben Tage in dieselbe Richtung zeigen.',
     '',
     'Alle Preise und Verläufe kostenlos — Link in der Bio',
     kampagnenLink(siteUrl, 'post', 'bewegungen'),

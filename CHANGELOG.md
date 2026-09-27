@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.1] - 27. September 2026 · Nur Bewegungen, die die Verkäufe tragen
+
+### Behoben
+- **Ein Reel hätte „Dark Dragoran +1.459,1 %" gezeigt.** Rohwerte: Trend 2.133 €, aber Ø 30 Tage 137 €, Ø 7 Tage 100 €, Ø gestern 175 € — kein Verkaufsschnitt stützt den Trend, der 7-Tage-Schnitt zeigt sogar nach unten. Cardmarkets Trendwert reagiert bei Karten mit wenigen Verkäufen auf einzelne Angebote. Eine Bewegung zählt jetzt nur, wenn Trend und Ø 7 Tage im Band ⅓–3× des 30-Tage-Schnitts liegen (dieselbe Ausreißer-Grenze, die die Seite für Ø 1 Tag verwendet) und der 7-Tage-Schnitt in dieselbe Richtung zeigt. Die gezeigte Zahl bleibt die Kennzahl der Seite
+- **Karten mit identischen Preisdaten fallen heraus.** TCGdex legt teils zwei Karten auf eine Cardmarket-Seite (gemessen: Dark Dragoran Holo und Nicht-Holo) — eine der Zahlen ist dann falsch, welche, lässt sich nicht sagen
+- **Reel und Karussell hatten verschiedene Maßstäbe.** Das Reel bekam die ungefilterte Liste und zeigte eine Karte, die das Karussell desselben Tages aussortiert hatte
+
+---
+
 ## [6.8.0] - 27. September 2026 · Tagesaktuelle Cardmarket-Preise für Instagram
 
 ### Befund

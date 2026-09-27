@@ -1,5 +1,6 @@
 import sharp from 'sharp';
 import { buildStory } from '@/lib/reel-concepts';
+import { validateMarketData } from '@/lib/market-metrics';
 import { renderStory } from '@/lib/reel-generator';
 import { ladeMarktlage, ladeMarktkarten, rendereBewegung, type Marktlage } from '@/lib/marktbilder';
 import { siteUrlOrLocal } from '@/lib/site';
@@ -172,7 +173,10 @@ async function bereiteReelVor(datum: string, siteUrl: string, rotation: number):
   const basis = await ladeMarktkarten();
   const einwand = datenTaugen(basis.quelle, basis.datenTag, datum);
   if (einwand) throw new Error(einwand);
-  const story = buildStory(basis.karten, siteUrl, { rotation });
+  // Dieselbe Bereinigung wie Karussell und Story. Vorher bekam das Reel die
+  // Rohliste — und zeigte eine Karte, die das Karussell desselben Tages
+  // aussortiert hatte. Zwei Beitraege, zwei Massstaebe.
+  const story = buildStory(validateMarketData(basis.karten).clean, siteUrl, { rotation });
   if (!story) throw new Error('Keine ausreichenden Marktdaten fuer ein Reel');
 
   const mp4 = await renderStory(story);
