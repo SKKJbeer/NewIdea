@@ -322,6 +322,19 @@ export async function cardsFromIndex(ids: string[]): Promise<Map<string, IndexTr
 }
 
 /**
+ * Alle Karten eines Sets aus dem Index, teuerste zuerst — Rueckfall fuer die
+ * Set-Seite, wenn pokemontcg.io aussetzt. Ein Set hat hoechstens einige hundert
+ * Karten; die 1.000er-Grenze von PostgREST wird nicht erreicht.
+ */
+export async function setAusIndex(setCode: string): Promise<IndexTreffer[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb.from('cards_index').select('*').eq('set_code', setCode).order('price', { ascending: false }).limit(1000);
+  if (error) throw new Error(`Kartenindex Set ${setCode}: ${error.message}`);
+  return ((data as unknown as IndexZeile[]) ?? []).map(zuKarte);
+}
+
+/**
  * Die wertvollsten gemessenen Karten aus dem Index — Grundlage fuer alles,
  * was nach aussen geht (Instagram, Marktbilder).
  *

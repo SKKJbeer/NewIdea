@@ -113,3 +113,11 @@ describe('Set-Seite und Vorschlaege antworten schnell', () => {
     expect(src).toContain('mitGrenze(Promise.all(');
   });
 });
+
+describe('Kartenseite ueberlebt einen Ausfall der Kartendatenbank', () => {
+  it('faellt auf den eigenen Index zurueck, bevor sie wirft', () => {
+    const seite = lies('src/app/karten/[id]/page.tsx');
+    const block = seite.slice(seite.indexOf('const karteLaden'));
+    expect(block).toMatch(/catch \(err\) \{[\s\S]*cardsFromIndex\(\[id\]\)[\s\S]*if \(!ersatz\) throw err;/);
+  });
+});

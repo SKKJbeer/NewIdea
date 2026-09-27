@@ -545,6 +545,7 @@ describe('Ein Ausfall der Quelle ist keine Aussage ueber den Bestand', () => {
     // statt eines 404 — eine gerenderte Fehlerseite waere 24 h im ISR-Cache.
     expect(seite).not.toContain('<ApiErrorState');
     expect(seite).toMatch(/export async function generateStaticParams\(\) \{\s*return \[\];/);
-    expect(seite).toContain('cache(fetchCardsBySet)');
+    expect(seite).toMatch(/const setLaden = cache\(async/);
+    expect(seite).toContain('setAusIndex(setCode)');
   });
 });

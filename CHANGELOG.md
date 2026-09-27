@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.8.6] - 27. September 2026 · Karten- und Set-Seiten überstehen Aussetzer der Kartendatenbank
+
+### Behoben
+- **Kartenseiten liefen bei einem Aussetzer von pokemontcg.io auf einen Fehler** (HTTP 500 der Quelle, auf Produktion direkt nachgemessen). Karten- und Set-Seite fallen jetzt auf den eigenen Kartenindex zurück; der Preis kommt weiterhin frisch von TCGdex. Nur wenn auch der Index die Karte nicht kennt, erscheint die Fehlerseite
+
+---
+
 ## [6.8.5] - 27. September 2026 · Kartenseiten mit Preisen vom Vortag, sofort geladen
 
 ### Neu

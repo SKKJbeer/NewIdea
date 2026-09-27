@@ -21,6 +21,7 @@ import { Suspense, cache } from 'react';
 import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
 import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
+import { cardsFromIndex } from '@/lib/card-index';
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -58,8 +59,23 @@ export const revalidate = 3600;
 //
 // Der frische Preis (TCGdex, Stand Vortag) wird hier EINMAL uebergelegt —
 // Metadaten, Seite und Preis-Snapshot sehen dieselbe Zahl.
+//
+// RUECKFALL AUF DEN EIGENEN KARTENINDEX: pokemontcg.io antwortet messbar oft
+// mit HTTP 500 (27.09.2026 direkt nachgemessen, auch nach der Wiederholung
+// in `fetchCardById`). Ohne Rueckfall war das jedes Mal eine Fehlerseite.
+// Der Index hat Name, Set, Nummer, Bild und Preis — genug fuer die Seite, und
+// der frische Preis kommt ohnehin von TCGdex. Nur wenn auch der Index die
+// Karte nicht kennt, wird geworfen.
 const karteLaden = cache(async (id: string) => {
-  const karte = await fetchCardById(id);
+  let karte;
+  try {
+    karte = await fetchCardById(id);
+  } catch (err) {
+    const ersatz = (await cardsFromIndex([id]).catch(() => null))?.get(id);
+    if (!ersatz) throw err;
+    console.warn(`[karte] ${id}: Kartendatenbank ausgefallen, Rueckfall auf den Index`);
+    karte = ersatz;
+  }
   return karte ? karteMitFrischpreis(karte) : null;
 });
 

@@ -8,6 +8,7 @@ import { CardGrid } from '@/components/CardGrid';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { ArrowLeft, Package, ShoppingCart, ExternalLink } from 'lucide-react';
 import { fetchCardsBySet, isValidSetCode, displayPrice } from '@/lib/pokemon-api';
+import { setAusIndex } from '@/lib/card-index';
 import { formatEurRounded, formatPercent } from '@/lib/format';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
@@ -29,7 +30,19 @@ export const revalidate = 86400;
 // Metadaten und Seite brauchen dieselben Karten. `fetchCardsBySet` nutzt axios,
 // das Next NICHT zusammenfasst (Stolperstelle 49) — ohne `cache()` lief jeder
 // Aufruf zweimal zur Quelle.
-const setLaden = cache(fetchCardsBySet);
+//
+// Rueckfall auf den eigenen Index, wenn die Quelle aussetzt (wie karten/[id]).
+// Nur wenn auch der Index nichts kennt, wird geworfen.
+const setLaden = cache(async (setCode: string) => {
+  try {
+    return await fetchCardsBySet(setCode);
+  } catch (err) {
+    const ersatz = await setAusIndex(setCode).catch(() => []);
+    if (ersatz.length === 0) throw err;
+    console.warn(`[set] ${setCode}: Kartendatenbank ausgefallen, Rueckfall auf den Index`);
+    return ersatz;
+  }
+});
 
 const SITE_URL = siteUrlOrLocal();
 

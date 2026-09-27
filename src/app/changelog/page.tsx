@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.8.6',
+    date: '27. September 2026',
+    label: 'Karten- und Set-Seiten überstehen Aussetzer der Kartendatenbank',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Karten- und Set-Seiten fallen bei einem Ausfall von pokemontcg.io auf den eigenen Kartenindex zurück statt auf eine Fehlerseite' },
+    ],
+  },
+  {
     version: '6.8.5',
     date: '27. September 2026',
     label: 'Kartenseiten mit Preisen vom Vortag, sofort geladen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Kartenseiten und Portfolio zeigen den Cardmarket-Stand vom Vortag (TCGdex), wenn die Karte sicher zugeordnet ist' },
       { type: 'changed', text: 'Karten- und Set-Seiten werden gecacht — vorher bei jedem Aufruf neu gerendert (2–14 s)' },
