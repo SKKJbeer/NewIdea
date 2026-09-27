@@ -163,6 +163,28 @@ export async function warteAufContainer(
   throw new GraphFehler(`Container nicht fertig nach ${Math.round(maxMs / 1000)} s (zuletzt ${letzter})`, null, null);
 }
 
+/**
+ * Wie `warteAufContainer`, aber mit fester Frist und OHNE Fehler bei Ablauf:
+ * `true` = fertig, `false` = Meta arbeitet noch. `ERROR` wirft weiterhin.
+ * Fuer den Autopiloten, der bei Ablauf den Container fuer den Nachhol-Lauf
+ * vormerkt, statt ihn verloren zu geben.
+ */
+export async function containerFertigBis(
+  k: IgKonfig,
+  containerId: string,
+  fristMs: number,
+  intervallMs = 5_000,
+): Promise<boolean> {
+  if (fristMs <= 0) return false;
+  try {
+    await warteAufContainer(k, containerId, fristMs, intervallMs);
+    return true;
+  } catch (err) {
+    if (err instanceof GraphFehler && /nicht fertig nach/.test(err.message)) return false;
+    throw err;
+  }
+}
+
 export async function veroeffentliche(k: IgKonfig, containerId: string): Promise<string> {
   const r = await graph<{ id: string }>(`${k.konto}/media_publish`, k.token, {
     method: 'POST',

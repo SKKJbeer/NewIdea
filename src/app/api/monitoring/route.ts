@@ -103,6 +103,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Instagram-Nachholen',
+      endpoint: '/api/cron/social/nachholen',
+      schedule: '40 17 * * *',
+      scheduleLabel: 'Täglich 17:40 UTC',
+      description:
+        'Veröffentlicht Reels, die Meta beim Hauptlauf noch nicht fertig verarbeitet hatte — sonst wären sie fertig, aber nie erschienen',
+      active: cronActive && !!process.env.INSTAGRAM_ACCESS_TOKEN && !!process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Newsletter-Versand',
       endpoint: '/api/newsletter',
       schedule: 'On Demand',

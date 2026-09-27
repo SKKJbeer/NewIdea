@@ -20,18 +20,32 @@ export interface Ablage {
   url: string;
 }
 
+// 40 MB, nicht mehr: Der kostenlose Supabase-Tarif erlaubt hoechstens 50 MB je
+// Datei, und ein Eimer mit hoeherer Grenze laesst sich gar nicht anlegen
+// („The object exceeded the maximum allowed size" — erster Lauf auf
+// Produktion). Ein Reel hat rund 3 MB.
+const EIMER_OPTIONEN = {
+  public: false,
+  fileSizeLimit: 40 * 1024 * 1024,
+  allowedMimeTypes: ['image/jpeg', 'video/mp4', 'application/json'],
+};
+
+let eimerGeprueft = false;
+
 async function eimerSicherstellen(): Promise<void> {
+  if (eimerGeprueft) return;
   const sb = getSupabase();
   if (!sb) return;
-  const { error } = await sb.storage.createBucket(EIMER, {
-    public: false,
-    fileSizeLimit: 100 * 1024 * 1024,
-    allowedMimeTypes: ['image/jpeg', 'video/mp4'],
-  });
-  // „existiert schon" ist der Normalfall und kein Fehler.
-  if (error && !/already exists|duplicate/i.test(error.message)) {
+  const { error } = await sb.storage.createBucket(EIMER, EIMER_OPTIONEN);
+  if (error && /already exists|duplicate/i.test(error.message)) {
+    // Existiert schon: Einstellungen angleichen, sonst bliebe ein frueher
+    // angelegter Eimer z. B. ohne JSON-Erlaubnis.
+    const { error: upd } = await sb.storage.updateBucket(EIMER, EIMER_OPTIONEN);
+    if (upd) console.warn('[social-speicher] Eimer-Einstellungen nicht angeglichen:', upd.message);
+  } else if (error) {
     throw new Error(`Speicher-Eimer nicht anlegbar: ${error.message}`);
   }
+  eimerGeprueft = true;
 }
 
 export async function ablegen(
@@ -78,4 +92,55 @@ export async function aufraeumen(heute: string): Promise<number> {
     else geloescht += pfade.length;
   }
   return geloescht;
+}
+
+// ── Offene Veroeffentlichung ────────────────────────────────────────────────
+//
+// Meta braucht fuer ein Reel 30 bis 170 Sekunden Verarbeitung. Zusammen mit
+// dem Rendern passt das nicht immer in die 300 s einer Funktion. Wird Meta
+// nicht rechtzeitig fertig, merkt sich der Lauf den Container hier; der
+// Nachhol-Cron eine Stunde spaeter veroeffentlicht ihn. Ein Container gilt
+// bei Meta 24 Stunden.
+//
+// Als Datei im Eimer statt als Tabellenzeile — keine neue Tabelle, die still
+// fehlen koennte (Stolperstelle 21).
+
+export interface OffeneVeroeffentlichung {
+  containerId: string;
+  art: 'reel' | 'karussell' | 'story';
+  erstellt: string;
+}
+
+const offenPfad = (datum: string) => `${ORDNER}/${datum}/offen.json`;
+
+export async function merkeOffen(datum: string, offen: OffeneVeroeffentlichung[]): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase nicht konfiguriert');
+  await eimerSicherstellen();
+  const { error } = await sb.storage
+    .from(EIMER)
+    .upload(offenPfad(datum), Buffer.from(JSON.stringify(offen)), { contentType: 'application/json', upsert: true });
+  if (error) throw new Error(`Offene Veroeffentlichung nicht gemerkt: ${error.message}`);
+}
+
+export async function leseOffen(datum: string): Promise<OffeneVeroeffentlichung[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb.storage.from(EIMER).download(offenPfad(datum));
+  // Keine Datei ist der Normalfall.
+  if (error || !data) return [];
+  try {
+    const roh = JSON.parse(await data.text()) as unknown;
+    return Array.isArray(roh) ? (roh as OffeneVeroeffentlichung[]) : [];
+  } catch (err) {
+    console.warn('[social-speicher] offen.json unlesbar:', (err as Error).message);
+    return [];
+  }
+}
+
+export async function vergissOffen(datum: string): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.storage.from(EIMER).remove([offenPfad(datum)]);
+  if (error) console.warn('[social-speicher] offen.json nicht geloescht:', error.message);
 }

@@ -219,7 +219,8 @@ describe('Der Autopilot laeuft zeitgesteuert und ist geschuetzt', () => {
   it('prueft die Bildunterschrift, bevor veroeffentlicht wird', () => {
     const lib = lies('src/lib/instagram-autopilot.ts');
     const pruefung = lib.indexOf('captionVerstoesse(');
-    const veroeffentlichung = lib.indexOf('vorbereitet.veroeffentlichen(k)');
+    const veroeffentlichung = lib.indexOf('vorbereitet.veroeffentlichen(');
+    expect(veroeffentlichung).toBeGreaterThan(0);
     expect(pruefung).toBeGreaterThan(0);
     expect(pruefung).toBeLessThan(veroeffentlichung);
   });

@@ -11,13 +11,14 @@ import {
   KARUSSELL_VORLAGEN,
   type Beitragsart,
 } from '@/lib/social-plan';
-import { ablegen, aufraeumen } from '@/lib/social-speicher';
+import { ablegen, aufraeumen, merkeOffen, leseOffen, vergissOffen, type OffeneVeroeffentlichung } from '@/lib/social-speicher';
 import {
   igKonfig,
   bildContainer,
   karussellContainer,
   reelContainer,
   warteAufContainer,
+  containerFertigBis,
   veroeffentliche,
   letzteBeitraege,
   aktiveStories,
@@ -52,7 +53,8 @@ import {
 const BUDGET_MS = 280_000;
 
 export interface Teilergebnis {
-  status: 'veroeffentlicht' | 'trocken' | 'uebersprungen' | 'fehler';
+  /** `wartet`: Container bei Meta angelegt, aber noch nicht fertig — der Nachhol-Lauf veroeffentlicht ihn. */
+  status: 'veroeffentlicht' | 'trocken' | 'uebersprungen' | 'fehler' | 'wartet';
   grund?: string;
   mediaId?: string;
   dateien?: string[];
@@ -67,6 +69,8 @@ export interface AutopilotErgebnis {
   story: Teilergebnis;
   caption?: string;
   aufgeraeumt?: number;
+  /** Anzahl vorgemerkter Beitraege, die dieser Lauf nachtraeglich veroeffentlicht hat. */
+  nachgeholt?: number;
   dauerMs: number;
 }
 
@@ -91,10 +95,14 @@ function meldung(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
+/** Ergebnis einer Veroeffentlichung: fertig, oder Container fuer den Nachhol-Lauf. */
+type Veroeffentlicht = { mediaId: string } | { offen: string };
+
 interface Vorbereitet {
   caption: string;
   dateien: string[];
-  veroeffentlichen: (k: IgKonfig) => Promise<string>;
+  /** `fristMs`: wie lange auf Meta gewartet werden darf, bevor vorgemerkt wird. */
+  veroeffentlichen: (k: IgKonfig, fristMs: number) => Promise<Veroeffentlicht>;
 }
 
 async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorbereitet> {
@@ -114,13 +122,14 @@ async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorb
   return {
     caption,
     dateien: urls,
-    async veroeffentlichen(k) {
+    async veroeffentlichen(k, fristMs) {
       const kinder: string[] = [];
       for (const url of urls) kinder.push(await bildContainer(k, url, { karussellElement: true }));
+      // Bilder sind bei Meta fast sofort fertig — hier genuegt kurzes Warten.
       for (const kind of kinder) await warteAufContainer(k, kind, 60_000, 3_000);
       const container = await karussellContainer(k, kinder, caption);
-      await warteAufContainer(k, container, 60_000, 3_000);
-      return veroeffentliche(k, container);
+      if (!(await containerFertigBis(k, container, fristMs, 3_000))) return { offen: container };
+      return { mediaId: await veroeffentliche(k, container) };
     },
   };
 }
@@ -137,12 +146,51 @@ async function bereiteReelVor(datum: string, siteUrl: string, rotation: number):
   return {
     caption: story.caption,
     dateien: [ablage.url],
-    async veroeffentlichen(k) {
+    async veroeffentlichen(k, fristMs) {
       const container = await reelContainer(k, ablage.url, story.caption);
-      await warteAufContainer(k, container, 170_000, 6_000);
-      return veroeffentliche(k, container);
+      if (!(await containerFertigBis(k, container, fristMs, 6_000))) return { offen: container };
+      return { mediaId: await veroeffentliche(k, container) };
     },
   };
+}
+
+export interface NachholErgebnis {
+  veroeffentlicht: Array<{ art: string; mediaId: string }>;
+  weiterOffen: number;
+  verworfen: Array<{ art: string; grund: string }>;
+}
+
+/**
+ * Veroeffentlicht vorgemerkte Container von heute und gestern.
+ *
+ * Gestern mit, weil ein Container bei Meta 24 Stunden gilt: Ein Reel, das
+ * kurz vor Mitternacht vorgemerkt wurde, soll nicht verloren gehen.
+ */
+export async function holeNach(k: IgKonfig, jetzt: Date = new Date()): Promise<NachholErgebnis> {
+  const ergebnis: NachholErgebnis = { veroeffentlicht: [], weiterOffen: 0, verworfen: [] };
+  const tage = [berlinerDatum(jetzt), berlinerDatum(new Date(jetzt.getTime() - 86_400_000))];
+  for (const datum of tage) {
+    const offen = await leseOffen(datum);
+    if (offen.length === 0) continue;
+    const bleibt: OffeneVeroeffentlichung[] = [];
+    for (const o of offen) {
+      try {
+        if (await containerFertigBis(k, o.containerId, 20_000, 4_000)) {
+          const mediaId = await veroeffentliche(k, o.containerId);
+          ergebnis.veroeffentlicht.push({ art: o.art, mediaId });
+        } else {
+          bleibt.push(o);
+        }
+      } catch (err) {
+        // ERROR/EXPIRED oder abgelaufen: nicht endlos weiter versuchen.
+        ergebnis.verworfen.push({ art: o.art, grund: meldung(err) });
+      }
+    }
+    ergebnis.weiterOffen += bleibt.length;
+    if (bleibt.length > 0) await merkeOffen(datum, bleibt);
+    else await vergissOffen(datum);
+  }
+  return ergebnis;
 }
 
 export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<AutopilotErgebnis> {
@@ -175,12 +223,20 @@ export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<A
 
   // ── FEED ──────────────────────────────────────────────────────────────────
   try {
-    let schonDa = false;
-    if (k && !opt.erzwingen && !trocken) {
-      schonDa = heuteSchonGepostet(await letzteBeitraege(k, 10), datum);
+    let schonDa: string | null = null;
+    if (k && !trocken) {
+      // Zuerst Liegengebliebenes veroeffentlichen. Ein heute vorgemerkter
+      // Feed-Beitrag zaehlt als „schon da" — sonst entstuende ein zweiter.
+      const nach = await holeNach(k, jetzt);
+      if (nach.veroeffentlicht.length > 0) ergebnis.nachgeholt = nach.veroeffentlicht.length;
+      const heuteOffen = (await leseOffen(datum)).some((o) => o.art !== 'story');
+      if (heuteOffen) schonDa = `Am ${datum} wartet bereits ein Feed-Beitrag auf Meta`;
+      else if (!opt.erzwingen && heuteSchonGepostet(await letzteBeitraege(k, 10), datum)) {
+        schonDa = `Am ${datum} gibt es bereits einen Feed-Beitrag`;
+      }
     }
     if (schonDa) {
-      ergebnis.feed = { status: 'uebersprungen', grund: `Am ${datum} gibt es bereits einen Feed-Beitrag` };
+      ergebnis.feed = { status: 'uebersprungen', grund: schonDa };
     } else {
       const vorbereitet =
         art === 'reel'
@@ -198,8 +254,22 @@ export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<A
       } else if (trocken || !k) {
         ergebnis.feed = { status: 'trocken', dateien: vorbereitet.dateien };
       } else {
-        const mediaId = await vorbereitet.veroeffentlichen(k);
-        ergebnis.feed = { status: 'veroeffentlicht', mediaId, dateien: vorbereitet.dateien };
+        // Frist: Restbudget minus Reserve fuer Story und Antwort. Reicht sie
+        // nicht, wird der Container fuer den Nachhol-Lauf vorgemerkt statt
+        // verloren zu gehen.
+        const frist = BUDGET_MS - (Date.now() - start) - 40_000;
+        const r = await vorbereitet.veroeffentlichen(k, frist);
+        if ('mediaId' in r) {
+          ergebnis.feed = { status: 'veroeffentlicht', mediaId: r.mediaId, dateien: vorbereitet.dateien };
+        } else {
+          const vorher = await leseOffen(datum);
+          await merkeOffen(datum, [...vorher, { containerId: r.offen, art, erstellt: new Date().toISOString() }]);
+          ergebnis.feed = {
+            status: 'wartet',
+            grund: 'Meta verarbeitet noch — der Nachhol-Lauf veroeffentlicht den Beitrag',
+            dateien: vorbereitet.dateien,
+          };
+        }
       }
     }
   } catch (err) {

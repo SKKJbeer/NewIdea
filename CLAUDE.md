@@ -830,6 +830,9 @@ Eimer `social` (signierte Adressen, 14 Tage Aufbewahrung).
 | Stumme AAC-Spur im Reel | Instagram lehnt Videos ohne Audiostrom teils ab |
 | Bilder als JPEG (`sharp`) | Instagram nimmt kein PNG |
 | Texte nennen den gemessenen Zeitraum (30-Tage-Schnitt), NIE „diese Woche" | `trendPercent` ist Preis gegen Ø 30 Tage |
+| Frist statt fester Wartezeit; unfertiger Container → `offen.json` → Nachhol-Cron 17:40 UTC | Rendern (~95 s auf Vercel) + Meta (bis 170 s) passt nicht immer in 300 s |
+| Speicher-Eimer ≤ 40 MB | Kostenloser Supabase-Tarif: max. 50 MB je Datei, sonst lässt sich der Eimer nicht anlegen |
+| Reels mit 24 fps, x264 `veryfast` | Vercel = EIN Kern. Immer mit `taskset -c 0` messen, nicht auf dem Entwicklungsrechner |
 
 **Zugang (nur der Nutzer):** Instagram-Business-Konto mit Facebook-Seite →
 Meta-App → Graph-API-Explorer-Token → Studio → Reels → „Zugang einrichten" →
@@ -1098,6 +1101,8 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 49. **axios wird von Next NICHT dedupliziert** → `generateMetadata` und Seite riefen `fetchCardById` je einmal ab: zwei TCG-Aufrufe pro Kartenseite. Nur `fetch` wird innerhalb einer Anfrage zusammengefasst. **Regel:** Wird dieselbe axios-Abfrage in Metadaten UND Seite gebraucht, mit `cache()` aus React umhüllen.
 
 50. **Wächter-Tests, die auf Zeichenfolgen prüfen, müssen neue Schutzfunktionen kennen** → Nach Einführung von `isCronAuthedFromRequest` meldete der KI-Kostenwächter vier geschützte Routen als ungeschützt, weil er nur `CRON_SECRET` suchte. Umgekehrt prüfte ein Test „Bearer ${CRON_SECRET}" im Quelltext — das stand aber auch im Header, mit dem sich die Route SELBST weiterreicht; der Test wäre ohne jede Eingangsprüfung grün gewesen. **Regel:** Beim Einführen einer gemeinsamen Schutzfunktion alle Wächter auf sie umstellen und prüfen, dass sie die PRÜFUNG finden, nicht nur ein Vorkommen der Zeichenfolge.
+
+51. **Vercel-Funktionen haben EINEN Kern — lokale Messungen täuschen um den Faktor 2 bis 3** → Das Reel renderte lokal in 55 s und auf Vercel in ~140 s. Der Entwicklungsrechner hat vier Kerne, x264 nutzt sie alle. **Regel:** Rechenlastige Schritte lokal mit `taskset -c 0 …` messen, bevor man ein Zeitbudget festlegt.
 
 ---
 

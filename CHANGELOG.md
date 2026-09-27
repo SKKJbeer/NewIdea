@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.6.1] - 27. September 2026 · Reel-Autopilot nach dem ersten Produktionslauf abgesichert
+
+### Behoben
+- **Speicher-Eimer ließ sich nicht anlegen.** „The object exceeded the maximum allowed size" — die Dateigrenze stand auf 100 MB, der kostenlose Supabase-Tarif erlaubt höchstens 50. Jetzt 40 MB; ein Reel hat rund 3 MB
+- **Das Rendern dauerte auf Vercel ~140 s** (lokal 55 s — Vercel gibt einer Funktion einen Kern, lokal sind es vier). Auf einem Kern nachgemessen: 113 s. Mit 24 statt 30 Bildern pro Sekunde und x264 `veryfast` statt `fast`: 75 s. Bei den langsamen Kamerafahrten ist der Unterschied nicht zu sehen
+
+### Neu
+- **Nachhol-Lauf** (`/api/cron/social/nachholen`, täglich 17:40 UTC). Meta braucht für ein Reel bis zu drei Minuten. Passt das zusammen mit dem Rendern nicht in die 300 s einer Funktion, merkt sich der Hauptlauf den Container, und der Nachhol-Lauf veröffentlicht ihn, sobald Meta fertig ist. Vorher wäre das Reel bei Meta fertig gewesen — und nie erschienen. Vorgemerkt wird als Datei im Speicher-Eimer, nicht in einer neuen Tabelle
+- Ein vorgemerkter Beitrag zählt als „heute schon da", damit kein zweiter entsteht; kaputte Container werden verworfen statt täglich neu versucht
+
+---
+
 ## [6.6.0] - 27. September 2026 · Instagram-Autopilot, alle Kartenseiten bei Suchmaschinen
 
 ### Neu

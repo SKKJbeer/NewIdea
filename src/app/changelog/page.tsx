@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.6.1',
+    date: '27. September 2026',
+    label: 'Reel-Autopilot nach dem ersten Produktionslauf abgesichert',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Speicher-Eimer ließ sich nicht anlegen — Dateigrenze über dem Maximum des kostenlosen Supabase-Tarifs' },
+      { type: 'fixed', text: 'Rendern auf einem Kern von 113 s auf 75 s: 24 statt 30 Bilder pro Sekunde, schnellere Encoder-Stufe' },
+      { type: 'new', text: 'Nachhol-Lauf eine Stunde später: Reels, die Meta beim Hauptlauf noch nicht fertig hatte, erscheinen trotzdem' },
+    ],
+  },
+  {
     version: '6.6.0',
     date: '27. September 2026',
     label: 'Instagram-Autopilot, alle Kartenseiten bei Suchmaschinen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Instagram-Autopilot: jeden Abend ein Reel oder Karussell aus echten Marktdaten, dazu täglich eine Story — nie zweimal am selben Tag, jede Bildunterschrift durch die Inhaltsschranke' },
       { type: 'new', text: 'Probelauf und Einrichtungshelfer im Studio: Beiträge vorher ansehen, dauerhaften Zugang aus dem Graph-Explorer-Token erzeugen' },

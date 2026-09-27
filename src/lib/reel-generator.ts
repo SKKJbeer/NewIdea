@@ -25,7 +25,12 @@ ensureFfmpeg();
 
 const W = 1080;
 const H = 1920;
-const FPS = 30;
+// 24 statt 30 Bilder pro Sekunde, und x264 `veryfast` statt `fast`:
+// Vercel gibt einer Funktion EINEN Kern. Gemessen auf einem Kern: 113 s → 75 s
+// fuer dasselbe 24-s-Reel. Bei den langsamen Kamerafahrten hier ist der
+// Unterschied nicht zu sehen — die gesparte Zeit entscheidet aber, ob Rendern
+// plus Verarbeitung bei Meta in die 300 s einer Funktion passen.
+const FPS = 24;
 // Weiche Blende zwischen den Abschnitten — professionelles Tempo statt Hartschnitt.
 const FADE_SECONDS = 0.28;
 // Die Dauer jeder Szene kommt aus reel-concepts.ts, nicht von hier: Ein Quiz
@@ -150,7 +155,7 @@ async function frameToSegment(
 
   cmd
     .videoCodec('libx264')
-    .outputOptions(['-t', String(seconds), '-crf 21', '-preset fast', '-pix_fmt yuv420p', '-an']);
+    .outputOptions(['-t', String(seconds), '-crf 21', '-preset veryfast', '-pix_fmt yuv420p', '-an']);
   await run(cmd, outPath);
 }
 
