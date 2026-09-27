@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.6.1` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.6.2` · **Stand:** 27. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.6.2 | Instagram-Inhalte aus datiertem Index-Tagesstand statt schwankender Live-Stichprobe; Kennzahlen passen sich der Breite an; SAR 1:1 |
 | v6.6.1 | Speicher-Eimer unter 50-MB-Grenze; Reel-Rendern auf einem Kern 113 → 75 s; Nachhol-Lauf für Reels, die Meta nicht rechtzeitig fertig hatte |
 | v6.6.0 | Instagram-Autopilot (Reel/Karussell/Story täglich, Dedupe, Inhaltsschranke, Probelauf, Einrichtungshelfer); Reel-Rendering auf Produktion repariert (/ROOT-Pfad); alle ~20.000 Karten + alle Sets in der Sitemap; IndexNow; Cron-Auth zeitkonstant |
 | v6.5.0 | Eigene Reichweitenmessung: Aufrufe, Weg und Herkunft im Monitoring — verdichtet, ohne Cookie und ohne Kennzeichen |

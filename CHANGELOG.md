@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.6.2] - 27. September 2026 · Instagram-Beiträge aus einem datierten Tagesstand
+
+### Behoben
+- **Zwei Beiträge am selben Tag hätten sich widersprochen.** Zwei Probeläufe in derselben Minute zeigten Marktbreite 32 % „Abkühlend" und 61 % „Anziehend", mit verschiedenen Top-Karten. Ursache: Die Marktbilder kamen aus dem Live-Abruf der Startseite, der mehrere TCG-Abfragen bündelt — scheitern einzelne, entsteht jedes Mal eine andere Stichprobe. Im Rückfall wäre sogar das heutige Datum über Zahlen aus dem letzten Wochenbericht gestanden
+- **Jetzt aus dem eigenen Kartenindex**, dem Tagesstand des Preisdurchlaufs — dieselbe Grundlage wie der CardBeacon Index. Auf dem Bild steht das Datum der Daten, nicht des Renderns. Der Autopilot veröffentlicht nur, wenn der Stand höchstens zwei Tage alt ist; aus einer Stichprobe veröffentlicht er nichts
+- **„+156,2 %" lief rechts aus dem Bild.** Die Schriftgröße großer Kennzahlen richtet sich jetzt nach der Textbreite — berechnet aus den Zeichenmaßen der mitgelieferten Schrift, nicht geschätzt
+- **Verzerrte Pixel im Reel** (`SAR 3215:3212`): Verschieden große Kartenbilder hinterließen krumme Seitenverhältnisse. Jetzt `setsar=1` in jedem Segment
+
+---
+
 ## [6.6.1] - 27. September 2026 · Reel-Autopilot nach dem ersten Produktionslauf abgesichert
 
 ### Behoben

@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.6.2',
+    date: '27. September 2026',
+    label: 'Instagram-Beiträge aus einem datierten Tagesstand',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Zwei Beiträge am selben Tag hätten sich widersprochen — die Live-Stichprobe setzt sich bei Teilausfällen jedes Mal anders zusammen' },
+      { type: 'changed', text: 'Marktbilder und Reels kommen aus dem Tagesstand des Kartenindex; auf dem Bild steht das Datum der Daten, veröffentlicht wird nur bei höchstens zwei Tage altem Stand' },
+      { type: 'fixed', text: 'Große Kennzahlen passen sich der Breite an — „+156,2 %" lief aus dem Bild' },
+      { type: 'fixed', text: 'Quadratische Pixel im Reel erzwungen' },
+    ],
+  },
+  {
     version: '6.6.1',
     date: '27. September 2026',
     label: 'Reel-Autopilot nach dem ersten Produktionslauf abgesichert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Speicher-Eimer ließ sich nicht anlegen — Dateigrenze über dem Maximum des kostenlosen Supabase-Tarifs' },
       { type: 'fixed', text: 'Rendern auf einem Kern von 113 s auf 75 s: 24 statt 30 Bilder pro Sekunde, schnellere Encoder-Stufe' },

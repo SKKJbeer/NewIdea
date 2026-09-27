@@ -1,8 +1,7 @@
 import sharp from 'sharp';
-import { getHomepageCards } from '@/lib/homepage-data';
 import { buildStory } from '@/lib/reel-concepts';
 import { renderStory } from '@/lib/reel-generator';
-import { ladeMarktlage, rendereMarktbild } from '@/lib/marktbilder';
+import { ladeMarktlage, ladeMarktkarten, rendereMarktbild } from '@/lib/marktbilder';
 import { siteUrlOrLocal } from '@/lib/site';
 import {
   planFuer,
@@ -105,9 +104,36 @@ interface Vorbereitet {
   veroeffentlichen: (k: IgKonfig, fristMs: number) => Promise<Veroeffentlicht>;
 }
 
+/** Wie alt die Daten hoechstens sein duerfen, damit ein Beitrag erscheint. */
+export const MAX_DATENALTER_TAGE = 2;
+
+/**
+ * Veroeffentlicht wird nur aus dem Tagesstand des Kartenindex, und nur wenn er
+ * frisch ist.
+ *
+ * Die Stichprobe (Live-Abruf) liefert bei Teilausfaellen jedes Mal andere
+ * Karten — zwei Beitraege am selben Tag koennten sich widersprechen. Und ein
+ * Beitrag aus einem tagealten Stand wuerde als neue Marktlage erscheinen,
+ * obwohl der Preisdurchlauf stillsteht. In beiden Faellen: kein Beitrag.
+ * Lieber ein Tag Pause als eine Aussage, die sich nicht halten laesst.
+ */
+export function datenTaugen(quelle: 'index' | 'stichprobe', datenTag: string | null, heute: string): string | null {
+  if (quelle !== 'index') return 'Kartenindex nicht verfuegbar — aus einer Zufallsstichprobe wird nichts veroeffentlicht';
+  if (!datenTag) return 'Datenstand des Kartenindex unbekannt';
+  const alter = (Date.parse(`${heute}T00:00:00Z`) - Date.parse(`${datenTag.slice(0, 10)}T00:00:00Z`)) / 86_400_000;
+  // Stolperstelle 46: Eine Altersgrenze, die bei NaN durchwinkt, ist keine.
+  if (!Number.isFinite(alter)) return `Datenstand unlesbar (${datenTag})`;
+  if (alter > MAX_DATENALTER_TAGE) {
+    return `Kartenindex ist ${alter} Tage alt (Stand ${datenTag}) — Preisdurchlauf pruefen`;
+  }
+  return null;
+}
+
 async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorbereitet> {
   const lage = await ladeMarktlage();
   if (!lage) throw new Error('Zu wenig Marktdaten fuer ein Karussell');
+  const einwand = datenTaugen(lage.quelle, lage.datenTag, datum);
+  if (einwand) throw new Error(einwand);
 
   const urls: string[] = [];
   for (const vorlage of KARUSSELL_VORLAGEN) {
@@ -137,8 +163,10 @@ async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorb
 async function bereiteReelVor(datum: string, siteUrl: string, rotation: number): Promise<Vorbereitet> {
   // Dieselbe Grundlage wie die Startseite — mit Rueckfall auf den letzten
   // gespeicherten Marktbericht, wenn die Kartendatenbank gerade nicht antwortet.
-  const karten = await getHomepageCards(250);
-  const story = buildStory(karten, siteUrl, { rotation });
+  const basis = await ladeMarktkarten();
+  const einwand = datenTaugen(basis.quelle, basis.datenTag, datum);
+  if (einwand) throw new Error(einwand);
+  const story = buildStory(basis.karten, siteUrl, { rotation });
   if (!story) throw new Error('Keine ausreichenden Marktdaten fuer ein Reel');
 
   const mp4 = await renderStory(story);
@@ -290,6 +318,8 @@ export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<A
     } else {
       const lage = await ladeMarktlage();
       if (!lage) throw new Error('Zu wenig Marktdaten fuer eine Story');
+      const einwand = datenTaugen(lage.quelle, lage.datenTag, datum);
+      if (einwand) throw new Error(einwand);
       // Im Wechsel: die Karte mit der staerksten Bewegung (mit Kartenbild —
       // im Hochformat das staerkste Motiv) und die Marktlage. Hat die Karte
       // heute keine Grundlage, springt die Marktlage ein.

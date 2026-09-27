@@ -833,6 +833,8 @@ Eimer `social` (signierte Adressen, 14 Tage Aufbewahrung).
 | Frist statt fester Wartezeit; unfertiger Container → `offen.json` → Nachhol-Cron 17:40 UTC | Rendern (~95 s auf Vercel) + Meta (bis 170 s) passt nicht immer in 300 s |
 | Speicher-Eimer ≤ 40 MB | Kostenloser Supabase-Tarif: max. 50 MB je Datei, sonst lässt sich der Eimer nicht anlegen |
 | Reels mit 24 fps, x264 `veryfast` | Vercel = EIN Kern. Immer mit `taskset -c 0` messen, nicht auf dem Entwicklungsrechner |
+| Daten NUR aus `wertvollsteAusIndex()` (Tagesstand), max. 2 Tage alt (`datenTaugen`) | Die Live-Stichprobe (`getHomepageCards`) schwankt bei Teilausfällen: 32 % vs. 61 % Marktbreite in derselben Minute |
+| Große Kennzahlen über `heldGroesse()` | Zeichenmaße aus der Schriftdatei; „+156,2 %" lief bei fester Größe aus dem Bild |
 
 **Zugang (nur der Nutzer):** Instagram-Business-Konto mit Facebook-Seite →
 Meta-App → Graph-API-Explorer-Token → Studio → Reels → „Zugang einrichten" →

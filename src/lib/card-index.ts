@@ -321,6 +321,47 @@ export async function cardsFromIndex(ids: string[]): Promise<Map<string, IndexTr
   return treffer;
 }
 
+/**
+ * Die wertvollsten gemessenen Karten aus dem Index — Grundlage fuer alles,
+ * was nach aussen geht (Instagram, Marktbilder).
+ *
+ * WARUM NICHT `getHomepageCards`: Die fragt die TCG-API live mit mehreren
+ * Abfragen ab und faellt bei Ausfall auf den letzten WOCHENBERICHT zurueck.
+ * Scheitern einzelne Abfragen, entsteht jedes Mal eine andere Stichprobe.
+ * Gemessen am 27.09.: zwei Laeufe in derselben Minute zeigten Marktbreite
+ * 32 % „Abkuehlend" und 61 % „Anziehend", mit verschiedenen Top-Karten — und im
+ * Rueckfall haette das heutige Datum ueber Zahlen von letzter Woche gestanden.
+ *
+ * Der Index ist ein Tagesstand: einmal am Tag vom Durchlauf geschrieben,
+ * dieselbe Grundlage wie der CardBeacon Index. Er liefert seinen Stand mit,
+ * damit auf einem Bild das Datum der DATEN steht, nicht das des Renderns.
+ */
+export async function wertvollsteAusIndex(
+  anzahl = 250,
+): Promise<{ karten: IndexTreffer[]; stand: string | null }> {
+  const sb = getSupabase();
+  if (!sb) return { karten: [], stand: null };
+  const { data, error } = await sb
+    .from('cards_index')
+    .select('*')
+    .eq('real_data', true)
+    .gt('price', 0)
+    .order('price', { ascending: false })
+    .order('id', { ascending: true })
+    .limit(Math.min(anzahl, 1000));
+  if (error) {
+    console.warn('[Kartenindex] wertvollste Karten nicht lesbar:', error.message);
+    return { karten: [], stand: null };
+  }
+  const karten = ((data ?? []) as IndexZeile[]).map(zuKarte);
+  // Stand = juengster Eintrag. Datumsteil gekuerzt (Stolperstelle 46).
+  const stand = karten.reduce<string | null>((m, k) => {
+    const t = k.indexStand?.slice(0, 10) ?? null;
+    return t && (!m || t > m) ? t : m;
+  }, null);
+  return { karten, stand };
+}
+
 /** Zeilenzahl und Datenstand — für das Monitoring. */
 export async function cardIndexStand(): Promise<{ zeilen: number; stand: string | null }> {
   const sb = getSupabase();

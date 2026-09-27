@@ -1,4 +1,6 @@
 import { getHomepageCards } from '@/lib/homepage-data';
+import { wertvollsteAusIndex } from '@/lib/card-index';
+import type { PokemonCard } from '@/types';
 import {
   computePmi,
   computeFearGreed,
@@ -39,6 +41,14 @@ export function istVorlage(v: string): v is Vorlage {
 }
 
 export interface Marktlage {
+  /**
+   * `index`: Tagesstand aus dem eigenen Kartenindex — deterministisch, datiert.
+   * `stichprobe`: Rueckfall auf den Live-Abruf der Startseite. Der Autopilot
+   * veroeffentlicht daraus NICHTS (siehe `wertvollsteAusIndex`).
+   */
+  quelle: 'index' | 'stichprobe';
+  /** Datum der Daten (YYYY-MM-DD), nicht des Renderns. `null` = unbekannt. */
+  datenTag: string | null;
   cbi: { value: number; cardCount: number; setCount: number };
   mover: MoverDaten | null;
   setsSortiert: Array<{ name: string; avgTrend: number }>;
@@ -69,8 +79,25 @@ async function bildAlsDataUri(url: string): Promise<string | null> {
 }
 
 /** `null`, wenn die Datenlage keine Marktaussage traegt — dann entsteht kein Bild. */
+/** Karten fuer Marktbilder und Reels: Index zuerst, Stichprobe nur als Rueckfall. */
+export async function ladeMarktkarten(): Promise<{ karten: PokemonCard[]; quelle: Marktlage['quelle']; datenTag: string | null }> {
+  const ausIndex = await wertvollsteAusIndex(250).catch(() => ({ karten: [], stand: null }));
+  // 100 als Schwelle: Darunter ist der Index offensichtlich unvollstaendig
+  // (Durchlauf abgebrochen) — dann lieber die Stichprobe, klar gekennzeichnet.
+  if (ausIndex.karten.length >= 100) {
+    return { karten: ausIndex.karten, quelle: 'index', datenTag: ausIndex.stand };
+  }
+  return { karten: await getHomepageCards(250), quelle: 'stichprobe', datenTag: null };
+}
+
+function datumDeutsch(tag: string): string {
+  const [j, m, t] = tag.split('-');
+  return `${t}.${m}.${j}`;
+}
+
 export async function ladeMarktlage(): Promise<Marktlage | null> {
-  const cards = validateMarketData(await getHomepageCards(250)).clean;
+  const basis = await ladeMarktkarten();
+  const cards = validateMarketData(basis.karten).clean;
   const berechnet = computePmi(cards);
 
   // Der Indexwert kommt aus dem gespeicherten Tagesstand — dieselbe Zahl wie
@@ -106,12 +133,18 @@ export async function ladeMarktlage(): Promise<Marktlage | null> {
   const temperatur = computeFearGreed(cards);
 
   return {
+    quelle: basis.quelle,
+    datenTag: basis.datenTag,
     cbi,
     mover,
     setsSortiert,
     breitePct: marketBreadth(cards).pct,
     temperatur: temperatur.sufficient ? fearGreedLabel(temperatur.value) : '—',
-    datenstand: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    // Das Datum der DATEN. Nur wenn es unbekannt ist (Stichprobe), das heutige —
+    // die Stichprobe ist ein Live-Abruf, also tatsaechlich von heute.
+    datenstand: basis.datenTag
+      ? datumDeutsch(basis.datenTag)
+      : new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
   };
 }
 

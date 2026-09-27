@@ -88,6 +88,8 @@ describe('Nie zweimal am selben Tag', () => {
 
 describe('Bildunterschriften', () => {
   const lage: Marktlage = {
+    quelle: 'index',
+    datenTag: '2026-09-28',
     cbi: { value: 3.5, cardCount: 14985, setCount: 155 },
     mover: { name: 'Meloetta ex', set: 'Black Bolt', trend: 55.7, preis: 50.02, gegenMarkt: 52.2 },
     setsSortiert: [
@@ -270,5 +272,69 @@ describe('Cron-Pruefung: zeitkonstant und fail-closed', () => {
     ]) {
       expect(lies(d), d).not.toMatch(/!==\s*`Bearer/);
     }
+  });
+});
+
+describe('Veroeffentlicht wird nur aus einem frischen, datierten Tagesstand', () => {
+  // BEFUND auf Produktion: zwei Laeufe in derselben Minute zeigten Marktbreite
+  // 32 % „Abkuehlend" und 61 % „Anziehend" — die Live-Stichprobe setzt sich bei
+  // Teilausfaellen jedes Mal anders zusammen.
+  it('lehnt die Stichprobe ab', async () => {
+    const { datenTaugen } = await import('@/lib/instagram-autopilot');
+    expect(datenTaugen('stichprobe', '2026-09-28', '2026-09-28')).toMatch(/stichprobe/i);
+  });
+
+  it('lehnt einen alten oder unlesbaren Stand ab — auch bei NaN (Stolperstelle 46)', async () => {
+    const { datenTaugen, MAX_DATENALTER_TAGE } = await import('@/lib/instagram-autopilot');
+    expect(datenTaugen('index', '2026-09-28', '2026-09-28')).toBeNull();
+    expect(datenTaugen('index', '2026-09-26', '2026-09-28')).toBeNull();
+    expect(MAX_DATENALTER_TAGE).toBe(2);
+    expect(datenTaugen('index', '2026-09-25', '2026-09-28')).toMatch(/3 Tage alt/);
+    expect(datenTaugen('index', 'kaputt', '2026-09-28')).toMatch(/unlesbar/);
+    expect(datenTaugen('index', null, '2026-09-28')).toMatch(/unbekannt/);
+    // Zeitstempel statt Datum wird gekuerzt, nicht zu NaN.
+    expect(datenTaugen('index', '2026-09-28T08:12:00+00:00', '2026-09-28')).toBeNull();
+  });
+
+  it('Karussell, Reel und Story pruefen alle drei', () => {
+    const lib = lies('src/lib/instagram-autopilot.ts');
+    expect(lib.match(/const einwand = datenTaugen\(/g)?.length).toBe(3);
+  });
+
+  it('das Bild traegt das Datum der Daten, nicht des Renderns', () => {
+    const lib = lies('src/lib/marktbilder.tsx');
+    expect(lib).toMatch(/datenstand: basis\.datenTag/);
+  });
+
+  it('der Index liefert seinen Stand mit und sortiert stabil', () => {
+    const idx = lies('src/lib/card-index.ts');
+    const fn = idx.slice(idx.indexOf('export async function wertvollsteAusIndex'));
+    expect(fn).toMatch(/\.eq\('real_data', true\)/);
+    expect(fn).toMatch(/\.order\('price'[\s\S]*?\.order\('id'/);
+    expect(fn).toMatch(/slice\(0, 10\)/);
+  });
+});
+
+describe('Grosse Kennzahlen passen in die Flaeche', () => {
+  it('„+156,2 %" wird verkleinert, „+3,5 %" nicht', async () => {
+    const { heldGroesse } = await import('@/lib/story-frames');
+    // Nutzbreite 904 px (1080 − 2 × 88).
+    expect(heldGroesse('+3,5 %', 260, 904)).toBe(260);
+    const g = heldGroesse('+156,2 %', 260, 904);
+    expect(g).toBeLessThan(260);
+    // Breite nach den Schriftmassen: 4,253 em.
+    expect(g * 4.253).toBeLessThanOrEqual(904);
+  });
+
+  it('beide Vorlagen mit Riesenzahl nutzen die Berechnung', () => {
+    const f = lies('src/lib/story-frames.tsx');
+    expect(f.match(/fontSize: heldGroesse\(/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('Das Reel hat quadratische Pixel', () => {
+  // BEFUND auf Produktion: SAR 3215:3212 — Instagram haette verzerrt.
+  it('erzwingt setsar=1 in jedem Segment', () => {
+    expect(lies('src/lib/reel-generator.ts')).toMatch(/'setsar=1'/);
   });
 });

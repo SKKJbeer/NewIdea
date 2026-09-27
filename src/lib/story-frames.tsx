@@ -42,6 +42,37 @@ const UP = '#34d399';
 const DOWN = '#fb7185';
 const VIOLET = '#a78bfa';
 
+/**
+ * Vorschubbreiten der mitgelieferten Schrift (Liberation Sans Bold) in em —
+ * aus der Datei gelesen (hmtx/cmap), nicht geschaetzt. Nur die Zeichen, die in
+ * den grossen Kennzahlen vorkommen; alles andere zaehlt vorsichtig breit.
+ */
+const ZEICHENBREITE: Record<string, number> = {
+  '0': 0.556, '1': 0.556, '2': 0.556, '3': 0.556, '4': 0.556,
+  '5': 0.556, '6': 0.556, '7': 0.556, '8': 0.556, '9': 0.556,
+  '+': 0.584, '-': 0.333, '\u2212': 0.584, ',': 0.278, '.': 0.278,
+  '%': 0.889, ' ': 0.278, '\u00a0': 0.278, p: 0.611,
+};
+
+/**
+ * Schriftgroesse der grossen Kennzahl, damit sie in die Flaeche passt.
+ *
+ * BEFUND auf Produktion: „+156,2 %" lief bei 260 px rechts aus dem Bild — das
+ * Prozentzeichen war abgeschnitten. Bei 260 px ist die Zahl 1.106 px breit,
+ * verfuegbar sind 904. Die Groesse wird deshalb aus der Textbreite berechnet,
+ * nie groesser als die Grundgroesse, mit 4 % Reserve.
+ */
+export function heldGroesse(text: string, basis: number, verfuegbar: number): number {
+  const em = [...text].reduce((n, c) => n + (ZEICHENBREITE[c] ?? 0.72), 0);
+  if (em <= 0) return basis;
+  return Math.min(basis, Math.floor((verfuegbar * 0.96) / em));
+}
+
+/** Nutzbare Breite einer Buehne (Formatbreite minus Innenabstand links und rechts). */
+function nutzbreite(format: StoryFormat): number {
+  return STORY_FORMATE[format].width - (format === 'og' ? 128 : 176);
+}
+
 function ton(wert: number | null): string {
   if (wert === null || !Number.isFinite(wert)) return MUTED;
   return wert > 0 ? UP : wert < 0 ? DOWN : HELL;
@@ -163,7 +194,7 @@ export function BigMover({ karte, format, datenstand }: { karte: MoverDaten; for
       <div
         style={{
           display: 'flex',
-          fontSize: kompakt ? 150 : 260,
+          fontSize: heldGroesse(formatPercent(karte.trend), kompakt ? 150 : 260, nutzbreite(format)),
           lineHeight: 1,
           marginTop: kompakt ? 24 : 56,
           color: ton(karte.trend),
@@ -257,7 +288,7 @@ export function MarketState({ markt, format, datenstand }: { markt: MarktDaten; 
       <div
         style={{
           display: 'flex',
-          fontSize: kompakt ? 150 : 260,
+          fontSize: heldGroesse(formatPercent(markt.cbi), kompakt ? 150 : 260, nutzbreite(format)),
           lineHeight: 1,
           marginTop: kompakt ? 24 : 56,
           color: ton(markt.cbi),

@@ -100,6 +100,12 @@ function finishFilters(seconds: number): string[] {
   // toFixed erlaubt: FFmpeg-Filterwert, muss einen Punkt als Trennzeichen haben
   const fadeOutStart = Math.max(0, seconds - FADE_SECONDS).toFixed(2);
   return [
+    // Quadratische Pixel erzwingen. BEFUND auf Produktion: `SAR 3215:3212` —
+    // das Skalieren verschieden grosser Kartenbilder hinterliess krumme
+    // Pixel-Seitenverhaeltnisse, und beim Zusammenfuegen uebernimmt FFmpeg
+    // den Wert des ersten Segments. Instagram haette das Reel minimal
+    // verzerrt dargestellt.
+    'setsar=1',
     // Dezente Randabdunklung — lenkt den Blick zur Mitte (Terminal-Anmutung).
     'vignette=PI/5',
     `fade=t=in:st=0:d=${FADE_SECONDS}`,
