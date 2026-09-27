@@ -6,7 +6,7 @@ import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
 import { meldeAnIndexNow } from '@/lib/indexnow';
-import { siteUrl } from '@/lib/site';
+import { siteUrl, oeffentlicheBasis } from '@/lib/site';
 import { kartenTeil } from '@/lib/sitemap-karten';
 import { generateNextGuide } from '@/lib/guide-generator';
 import { getHomepageCards } from '@/lib/homepage-data';
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
   // Eigene Adresse statt NEXT_PUBLIC_SITE_URL — dort steht die kuenftige
   // Domain, die noch nicht verbunden ist (siehe price-sweep/route.ts).
   if (isSupabaseConfigured()) {
-    const basis = new URL(request.url).origin;
+    const basis = oeffentlicheBasis(request);
     try {
       const antwort = await fetch(`${basis}/api/cron/price-sweep?chain=0`, {
         headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },

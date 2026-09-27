@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.6.3] - 27. September 2026 · Die Preiserfassung stand 53 Tage still
+
+### Behoben
+- **Der Preisdurchlauf ist vom 05.08. bis 27.09. kein einziges Mal automatisch gestartet.** Aufgefallen ist es, weil der Instagram-Autopilot aus einem 53 Tage alten Kartenindex nichts veröffentlichen wollte. Der tägliche Cron lief die ganze Zeit — nur sein Anstoß des Durchlaufs kam nie an. Aus dem Studio gestartet lief der Durchlauf sofort. Der Unterschied: Beide riefen die Adresse der eingehenden Anfrage auf. Beim Studio ist das die öffentliche Domain, beim Cron möglicherweise die deployment-eigene Vercel-Adresse, die Vercel standardmäßig sperrt
+- **Eigener Cron für den Durchlauf** (06:10 UTC). Vercel wartet auf ihn; es braucht keinen Anstoß mit Drei-Sekunden-Abbruch mehr. Der Tages-Cron stößt weiterhin als Rückfall an — ein zweiter Start am selben Tag tut nichts
+- **Selbstaufrufe gehen in Produktion immer an die Produktionsadresse**, die Vercel selbst setzt und die öffentlich ist
+- **Der Marktindex wurde 53 Tage lang aus Preisen vom 05.08. gerechnet und mit heutigem Datum gespeichert.** Ist der Kartenindex älter als zwei Tage, gilt er jetzt nicht als Tagesgrundlage; dann rechnet die Stichprobe, die tatsächlich von heute ist
+
+---
+
 ## [6.6.2] - 27. September 2026 · Instagram-Beiträge aus einem datierten Tagesstand
 
 ### Behoben

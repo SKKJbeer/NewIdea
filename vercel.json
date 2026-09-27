@@ -2,6 +2,10 @@
   "buildCommand": "next build",
   "crons": [
     {
+      "path": "/api/cron/price-sweep",
+      "schedule": "10 6 * * *"
+    },
+    {
       "path": "/api/cron",
       "schedule": "0 7 * * 1"
     },

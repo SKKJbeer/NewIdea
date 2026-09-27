@@ -362,6 +362,26 @@ export async function wertvollsteAusIndex(
   return { karten, stand };
 }
 
+/**
+ * Tag des juengsten Index-Eintrags (YYYY-MM-DD). `null` = unbekannt.
+ * Mit Antwortkoerper statt HEAD (Stolperstelle 45), gekuerzt (Stolperstelle 46).
+ */
+export async function indexStandTag(): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data, error } = await sb
+    .from('cards_index')
+    .select('updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (error) {
+    console.warn('[Kartenindex] Stand nicht lesbar:', error.message);
+    return null;
+  }
+  const roh = (data?.[0] as { updated_at?: string } | undefined)?.updated_at;
+  return roh ? roh.slice(0, 10) : null;
+}
+
 /** Zeilenzahl und Datenstand — für das Monitoring. */
 export async function cardIndexStand(): Promise<{ zeilen: number; stand: string | null }> {
   const sb = getSupabase();

@@ -66,12 +66,15 @@ function getWorkflows(cronActive: boolean) {
     {
       name: 'Flächendeckende Preiserfassung',
       endpoint: '/api/cron/price-sweep',
-      schedule: 'Kette',
-      scheduleLabel: 'Reicht sich selbst weiter, bis der Tag fertig ist',
+      // Seit v6.6.3 ein eigener Cron. Vorher stiess nur der Tages-Cron den
+      // Durchlauf per Selbstaufruf an — und das kam vom 05.08. bis 27.09.
+      // kein einziges Mal an.
+      schedule: '10 6 * * *',
+      scheduleLabel: 'Täglich 06:10 UTC, reicht sich danach selbst weiter',
       description:
         'Holt alle ~20.500 Karten seitenweise, schreibt Messpunkte und den Kartenindex fort. Der Fortschritt steht im Betriebszustand',
       active: cronActive,
-      trigger: 'Täglicher Cron',
+      trigger: 'Vercel Cron (+ Tages-Cron als Rückfall)',
     },
     {
       name: 'Artikel (Sonntag + Donnerstag)',

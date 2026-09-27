@@ -48,3 +48,25 @@ export function siteUrl(): string | null {
 export function siteUrlOrLocal(): string {
   return siteUrl() ?? 'http://localhost:3000';
 }
+
+/**
+ * Adresse fuer Aufrufe der Seite an SICH SELBST (Cron-Ketten, Anstoesse).
+ *
+ * BEFUND (27.09.2026): Der Preisdurchlauf ist vom 05.08. bis 27.09. kein
+ * einziges Mal automatisch gestartet, obwohl der taegliche Cron jeden Tag
+ * lief. Von Hand aus dem Studio gestartet lief er sofort. Der Unterschied:
+ * Beide riefen `new URL(request.url).origin` auf — beim Studio ist das die
+ * oeffentliche Domain, beim Cron moeglicherweise die deployment-eigene
+ * Vercel-Adresse, und die sperrt Vercel standardmaessig („Deployment
+ * Protection") mit 401.
+ *
+ * In Produktion deshalb immer die Produktionsadresse, die Vercel selbst setzt
+ * und die per Definition oeffentlich ist. Sonst (Vorschau, lokal) die eigene.
+ */
+export function oeffentlicheBasis(request: Request): string {
+  if (process.env.VERCEL_ENV === 'production') {
+    const prod = normalisieren(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+    if (prod) return prod;
+  }
+  return new URL(request.url).origin;
+}

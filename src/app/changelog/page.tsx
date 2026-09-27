@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.6.3',
+    date: '27. September 2026',
+    label: 'Die Preiserfassung stand 53 Tage still',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Der Preisdurchlauf startete vom 05.08. bis 27.09. nie automatisch — der Anstoß aus dem Tages-Cron kam nicht an. Jetzt ein eigener Cron um 06:10 UTC' },
+      { type: 'fixed', text: 'Selbstaufrufe gehen an die öffentliche Produktionsadresse statt an die möglicherweise gesperrte Adresse des Deployments' },
+      { type: 'fixed', text: 'Der Marktindex wurde aus 53 Tage alten Preisen mit heutigem Datum gerechnet — ein veralteter Kartenindex gilt nicht mehr als Tagesgrundlage' },
+    ],
+  },
+  {
     version: '6.6.2',
     date: '27. September 2026',
     label: 'Instagram-Beiträge aus einem datierten Tagesstand',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Zwei Beiträge am selben Tag hätten sich widersprochen — die Live-Stichprobe setzt sich bei Teilausfällen jedes Mal anders zusammen' },
       { type: 'changed', text: 'Marktbilder und Reels kommen aus dem Tagesstand des Kartenindex; auf dem Bild steht das Datum der Daten, veröffentlicht wird nur bei höchstens zwei Tage altem Stand' },

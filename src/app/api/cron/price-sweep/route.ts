@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { oeffentlicheBasis } from '@/lib/site';
 import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { sweepChunk, markChainError, loadSweepState } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -84,7 +85,7 @@ export async function GET(request: Request) {
   // ein gescheiterter Anstoß bewusst abgefangen wird. Die eigene Adresse ist
   // die einzige, die garantiert erreichbar ist: Sie hat diese Anfrage
   // schließlich gerade beantwortet.
-  const basis = url.origin;
+  const basis = oeffentlicheBasis(request);
 
   async function runde() {
     const progress = await sweepChunk({ budgetMs: BUDGET_MS });

@@ -1106,6 +1106,8 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 
 51. **Vercel-Funktionen haben EINEN Kern — lokale Messungen täuschen um den Faktor 2 bis 3** → Das Reel renderte lokal in 55 s und auf Vercel in ~140 s. Der Entwicklungsrechner hat vier Kerne, x264 nutzt sie alle. **Regel:** Rechenlastige Schritte lokal mit `taskset -c 0 …` messen, bevor man ein Zeitbudget festlegt.
 
+52. **Ein Anstoß, den niemand nachprüft, kann 53 Tage lang ins Leere gehen** → Der tägliche Cron stieß den Preisdurchlauf per Selbstaufruf an `new URL(request.url).origin` an, mit 3-Sekunden-Abbruch und ohne Kontrolle, ob er ankam. Vom 05.08. bis 27.09. startete der Durchlauf kein einziges Mal; aus dem Studio gestartet lief er sofort. Wahrscheinliche Ursache: Beim Cron ist `request.url` die deployment-eigene Adresse, und die sperrt Vercel standardmäßig. Das Monitoring zeigte „Kartenindex veraltet" — aber niemand sah hin, und der Marktindex wurde weiter täglich mit HEUTIGEM Datum aus den alten Preisen gespeichert. **Regeln:** (a) Was täglich laufen muss, bekommt einen EIGENEN Vercel-Cron, keinen Anstoß über einen anderen; (b) Selbstaufrufe nur über `oeffentlicheBasis(request)`; (c) jede abgeleitete Tageszahl prüft das Alter ihrer Grundlage (`MAX_BESTANDSALTER_TAGE` in `market-basis.ts`); (d) ein Ausfall, der nur im Monitoring steht, ist nicht gemeldet — gefunden hat ihn erst die Datenschranke des Instagram-Autopiloten.
+
 ---
 
 ## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)

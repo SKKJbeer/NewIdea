@@ -146,7 +146,13 @@ describe('Der Durchlauf ist gegen die bekannten Fallen gesichert', () => {
     // nicht verbunden ist. Der Durchlauf blieb nach acht von 82 Seiten stehen.
     // Nur die tatsächliche Verwendung prüfen — die Kommentare nennen die alte
     // Variable absichtlich, damit der Grund am Code steht.
-    expect(route).toContain('const basis = url.origin;');
+    // Seit v6.6.3 ueber `oeffentlicheBasis` (Produktionsadresse von Vercel,
+    // sonst die eigene) — der Grund dieses Tests gilt weiter: NIE die Adresse
+    // aus NEXT_PUBLIC_SITE_URL.
+    expect(route).toContain('const basis = oeffentlicheBasis(request);');
+    const site = lies('src/lib/site.ts');
+    const fn = site.slice(site.indexOf('export function oeffentlicheBasis'));
+    expect(fn).not.toContain('NEXT_PUBLIC_SITE_URL');
     for (const datei of [
       'src/app/api/cron/price-sweep/route.ts',
       'src/app/api/studio/price-sweep/route.ts',

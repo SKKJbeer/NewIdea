@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { oeffentlicheBasis } from '@/lib/site';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { loadSweepState, sweepChunk, seitenGesamt, heute, markChainError } from '@/lib/price-sweep';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
   // Die eigene Adresse, nicht NEXT_PUBLIC_SITE_URL: Dort steht die künftige
   // Domain, die noch nicht verbunden ist — der Folgeaufruf lief damit ins Leere
   // und der Durchlauf blieb nach wenigen Seiten stehen.
-  const basis = new URL(request.url).origin;
+  const basis = oeffentlicheBasis(request);
 
   // Erst eine Runde selbst arbeiten, danach an die Kette übergeben. So ist
   // schon nach dem ersten Klick sichtbar, dass wirklich etwas passiert —
