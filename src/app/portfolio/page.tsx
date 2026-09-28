@@ -17,6 +17,7 @@ import {
 } from '@/lib/portfolio';
 import { cachedImg } from '@/lib/cached-image';
 import { formatPercent } from '@/lib/format';
+import { kartenAusVorschlaegen } from '@/lib/such-relevanz';
 import { AccountBar } from '@/components/AccountBar';
 import { mergeHoldings } from '@/lib/portfolio-sync';
 import { PortfolioInsights, MarketComparison } from '@/components/PortfolioInsights';
@@ -800,6 +801,7 @@ function AddCardModal({
   const [query,         setQuery]         = useState('');
   const [suggestions,   setSuggestions]   = useState<Suggestion[]>([]);
   const [searching,     setSearching]     = useState(false);
+  const [suchFehler,    setSuchFehler]    = useState(false);
   const [selected,      setSelected]      = useState<Suggestion | null>(null);
   const [qty,           setQty]           = useState(1);
   const [purchasePrice, setPurchasePrice] = useState('');
@@ -807,17 +809,27 @@ function AddCardModal({
   const [language,      setLanguage]      = useState<CardLanguage>('EN');
 
   useEffect(() => {
-    if (query.length < 2) { setSuggestions([]); return; }
+    if (query.length < 2) { setSuggestions([]); setSuchFehler(false); return; }
+    let abgebrochen = false;
     const t = setTimeout(async () => {
       setSearching(true);
+      setSuchFehler(false);
       try {
-        const r = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}`);
+        const r = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}&n=20`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const data = await r.json();
-        setSuggestions(Array.isArray(data) ? data : []);
-      } catch { setSuggestions([]); }
-      setSearching(false);
+        // Die Schnittstelle liefert seit v5.8.0 `{ cards, sets }`. Hier stand
+        // noch eine Pruefung auf eine reine Liste — jede Antwort wurde damit
+        // verworfen, und die Portfolio-Suche fand keine einzige Karte
+        // (Nutzer-Befund 28.09.2026). `kartenAusVorschlaegen` kennt beide Formen.
+        if (!abgebrochen) setSuggestions(kartenAusVorschlaegen<Suggestion>(data));
+      } catch (err) {
+        console.warn('Portfolio-Suche fehlgeschlagen:', err);
+        if (!abgebrochen) { setSuggestions([]); setSuchFehler(true); }
+      }
+      if (!abgebrochen) setSearching(false);
     }, 320);
-    return () => clearTimeout(t);
+    return () => { abgebrochen = true; clearTimeout(t); };
   }, [query]);
 
   function selectCard(s: Suggestion) {
@@ -956,7 +968,13 @@ function AddCardModal({
           )}
 
           {/* Leer-Zustände */}
-          {!selected && query.length >= 2 && !searching && suggestions.length === 0 && (
+          {!selected && query.length >= 2 && !searching && suchFehler && (
+            <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+              <p className="text-sm font-semibold text-amber-400/80">Suche gerade nicht erreichbar</p>
+              <p className="text-xs text-slate-600 mt-1">Bitte in einem Moment erneut versuchen</p>
+            </div>
+          )}
+          {!selected && query.length >= 2 && !searching && !suchFehler && suggestions.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
               <p className="text-sm font-semibold text-slate-400">Keine Ergebnisse</p>
               <p className="text-xs text-slate-600 mt-1">Versuche einen anderen Suchbegriff</p>

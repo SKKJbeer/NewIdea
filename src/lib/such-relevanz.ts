@@ -124,3 +124,15 @@ export function nachRelevanz<T>(
     return trefferRang(ra.name, ra.nameDe, q) - trefferRang(rb.name, rb.nameDe, q);
   });
 }
+
+/**
+ * Karten aus einer Antwort von `/api/search/suggestions`. Seit v5.8.0 ist das
+ * `{ cards, sets }`; ältere Stände lieferten eine reine Liste. Das Portfolio
+ * erwartete weiter die Liste und verwarf dadurch JEDE Antwort (28.09.2026) —
+ * deshalb eine gemeinsame Stelle, die beide Formen kennt.
+ */
+export function kartenAusVorschlaegen<T>(antwort: unknown): T[] {
+  if (Array.isArray(antwort)) return antwort as T[];
+  const karten = (antwort as { cards?: unknown } | null)?.cards;
+  return Array.isArray(karten) ? (karten as T[]) : [];
+}

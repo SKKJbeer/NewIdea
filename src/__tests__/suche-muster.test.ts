@@ -21,3 +21,21 @@ describe('Suche: Trenner sind egal (Befund 27.09.2026)', () => {
     expect(suchMuster('a')).toBeNull();
   });
 });
+
+describe('Portfolio-Suche liest die Vorschlags-Antwort richtig (Befund 28.09.2026)', () => {
+  it('versteht { cards, sets } und die alte reine Liste', async () => {
+    const { kartenAusVorschlaegen } = await import('@/lib/such-relevanz');
+    expect(kartenAusVorschlaegen({ cards: [{ id: 'a' }], sets: [] })).toEqual([{ id: 'a' }]);
+    expect(kartenAusVorschlaegen([{ id: 'b' }])).toEqual([{ id: 'b' }]);
+    expect(kartenAusVorschlaegen(null)).toEqual([]);
+    expect(kartenAusVorschlaegen({ error: 'rate_limited' })).toEqual([]);
+  });
+  it('das Portfolio nutzt sie und zeigt einen Fehler statt „Keine Ergebnisse"', async () => {
+    const { readFileSync } = await import('fs');
+    const src = readFileSync('src/app/portfolio/page.tsx', 'utf8');
+    expect(src).toContain('kartenAusVorschlaegen<Suggestion>(data)');
+    expect(src).not.toMatch(/Array\.isArray\(data\) \? data : \[\]/);
+    expect(src).toMatch(/if \(!r\.ok\) throw/);
+    expect(src).toContain('setSuchFehler(true)');
+  });
+});

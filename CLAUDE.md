@@ -1260,6 +1260,8 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 70. **`pkill -f` in einer zusammengesetzten Shell-Zeile beendet die eigene Shell** (Exit 144), wenn das Muster in der Befehlszeile selbst vorkommt — alle folgenden Befehle laufen nicht. Prozesse über die PID beenden oder `pkill` allein ausführen.
 
 71. **Quellen einer Seite nie nacheinander abfragen, wenn sie unabhängig sind** → Erster Aufruf einer Kartenseite 0,8–11 s (28.09.2026, zwölf Alpollo-Karten). pokemontcg.io lieferte bei jeder zweiten Karte 502, `fetchCardById` wiederholte bis 8 s, DANACH erst Index, DANACH TCGdex. **Regel:** Index sofort (eigene DB, schnell), Tagespreis mit Set/Nummer aus dem Index parallel starten, Stammdaten höchstens `STAMMDATEN_WARTEN_MS` (1,5 s; gesunde Antwort ~0,35 s) abwarten, wenn der Index die Karte kennt. `kartenseite-frisch.test.ts` prüft die Reihenfolge. Messung: `curl -w ttfb` auf noch nicht gecachte Karten (`x-vercel-cache: MISS`).
+
+72. **Ändert sich das Format einer eigenen Schnittstelle, ALLE Aufrufer suchen** → `/api/search/suggestions` lieferte ab v5.8.0 `{ cards, sets }`. Die Suchleiste wurde angepasst, das Portfolio nicht: `Array.isArray(data) ? data : []` verwarf jede Antwort, die Portfolio-Suche fand wochenlang keine Karte — und ein stummes `catch` zeigte es als „Keine Ergebnisse". **Regeln:** (a) Beim Formatwechsel `grep -rn "<pfad>" src` über alle Aufrufer; (b) Antworten über EINE gemeinsame Lesefunktion (`kartenAusVorschlaegen` in `such-relevanz.ts`); (c) Ausfall ≠ leeres Ergebnis — eigener Fehlerzustand (Code-Regel 9).
 ---
 
 ## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)

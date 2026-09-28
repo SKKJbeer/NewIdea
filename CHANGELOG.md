@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.5] - 28. September 2026 · Portfolio-Suche findet wieder Karten
+
+### Behoben
+- **Beim Hinzufügen einer Karte zum Portfolio fand die Suche keine einzige Karte.** Die Vorschlagsschnittstelle liefert seit v5.8.0 Karten und Sets getrennt; das Portfolio erwartete noch das alte Format und verwarf jede Antwort. Beide Stellen lesen die Antwort jetzt über dieselbe Funktion
+- Ein Ausfall der Suche erscheint im Portfolio als „Suche gerade nicht erreichbar" statt als „Keine Ergebnisse"
+- Die Portfolio-Suche zeigt bis zu 20 Treffer
+
+---
+
 ## [6.12.4] - 28. September 2026 · Kürzere Wartezeit auf die Kartendatenbank
 
 ### Geändert
