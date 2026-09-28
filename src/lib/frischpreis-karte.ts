@@ -73,12 +73,15 @@ export function standFrisch(updated: string, jetzt = Date.now(), maxTage = KARTE
 }
 
 /**
- * Karte mit frischem Preis, wenn einer sicher zuzuordnen ist — sonst die Karte
- * unveraendert. Wirft nie: Ein Ausfall bei TCGdex darf keine Kartenseite
- * kosten, er laesst nur den alten, als alt gekennzeichneten Stand stehen.
+ * Nur der frische Cardmarket-Stand einer Karte (oder null). Braucht lediglich
+ * Name, Set und Nummer — damit kann die Kartenseite ihn PARALLEL zum
+ * Stammdatenabruf holen, sobald die Indexzeile da ist. Wirft nie.
  */
-export async function karteMitFrischpreis(card: PokemonCard, zeitlimitMs = KARTE_FRISCH_ZEITLIMIT_MS): Promise<PokemonCard> {
-  if (!card.number) return card;
+export async function frischPreisFuer(
+  card: Pick<PokemonCard, 'id' | 'name' | 'setCode' | 'set' | 'number'>,
+  zeitlimitMs = KARTE_FRISCH_ZEITLIMIT_MS,
+): Promise<FrischerPreis | null> {
+  if (!card.number) return null;
   try {
     const sets = await dexSetsVorgehalten();
     const e = await pruefeFrischenPreis(
@@ -86,12 +89,21 @@ export async function karteMitFrischpreis(card: PokemonCard, zeitlimitMs = KARTE
       sets,
       zeitlimitMs,
     );
-    if (!e.ok || !standFrisch(e.preis.updated)) return card;
-    return mitFrischpreis(card, e.preis);
+    return e.ok && standFrisch(e.preis.updated) ? e.preis : null;
   } catch (err) {
     console.warn(`[frischpreis-karte] ${card.id}:`, err instanceof Error ? err.message : err);
-    return card;
+    return null;
   }
+}
+
+/**
+ * Karte mit frischem Preis, wenn einer sicher zuzuordnen ist — sonst die Karte
+ * unveraendert. Wirft nie: Ein Ausfall bei TCGdex darf keine Kartenseite
+ * kosten, er laesst nur den alten, als alt gekennzeichneten Stand stehen.
+ */
+export async function karteMitFrischpreis(card: PokemonCard, zeitlimitMs = KARTE_FRISCH_ZEITLIMIT_MS): Promise<PokemonCard> {
+  const p = await frischPreisFuer(card, zeitlimitMs);
+  return p ? mitFrischpreis(card, p) : card;
 }
 
 /**

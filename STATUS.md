@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.12.2` · **Stand:** 28. September 2026 · **Branch:** `main`
+**Version:** `v6.12.3` · **Stand:** 28. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.12.3 | Kartenseite: Quellen parallel statt nacheinander (erster Aufruf vorher bis 11 s) |
 | v6.12.2 | Sprachwahl gilt für die ganze Preisspalte: JP/KR-Aufschlüsselung, EN/DE-Kennzahlen gekennzeichnet |
 | v6.12.1 | Telefon-Darstellung: kein iOS-Zoom mehr (Eingabefelder 16 px), Vorschläge verdecken keine Treffer, Preis in mobiler Trefferliste, dunkler Grund; ältere Geräte ab iOS 15.4 / Chrome 99 |
 | v6.12.0 | Preise japanischer (5.679 Paare) und koreanischer (186) Ausgaben aus dem Cardmarket-Preisverzeichnis, exakte Zuordnung, täglicher Cron mit Schranke |

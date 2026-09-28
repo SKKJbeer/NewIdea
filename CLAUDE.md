@@ -1258,6 +1258,8 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 69. **Browser-Ziele stehen in `package.json` → `browserslist`** (seit v6.12.1: Safari/iOS ≥ 15.4, Chrome ≥ 99). Next 16 zielt sonst nur auf Safari 16.4 / Chrome 111. Die Untergrenze 15.4 ist nicht willkürlich: Darunter fehlt `@layer`, und ohne das greift KEINE Tailwind-Klasse. Browser-Code (Client-Komponenten) darf nichts nutzen, was Safari 15.4 nicht kennt — Lookbehind in regulären Ausdrücken (`(?<=`) erst ab 16.4, deshalb nur serverseitig (`accessory-mentions.ts`).
 
 70. **`pkill -f` in einer zusammengesetzten Shell-Zeile beendet die eigene Shell** (Exit 144), wenn das Muster in der Befehlszeile selbst vorkommt — alle folgenden Befehle laufen nicht. Prozesse über die PID beenden oder `pkill` allein ausführen.
+
+71. **Quellen einer Seite nie nacheinander abfragen, wenn sie unabhängig sind** → Erster Aufruf einer Kartenseite 0,8–11 s (28.09.2026, zwölf Alpollo-Karten). pokemontcg.io lieferte bei jeder zweiten Karte 502, `fetchCardById` wiederholte bis 8 s, DANACH erst Index, DANACH TCGdex. **Regel:** Index sofort (eigene DB, schnell), Tagespreis mit Set/Nummer aus dem Index parallel starten, Stammdaten höchstens `STAMMDATEN_WARTEN_MS` (2,5 s) abwarten, wenn der Index die Karte kennt. `kartenseite-frisch.test.ts` prüft die Reihenfolge. Messung: `curl -w ttfb` auf noch nicht gecachte Karten (`x-vercel-cache: MISS`).
 ---
 
 ## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)

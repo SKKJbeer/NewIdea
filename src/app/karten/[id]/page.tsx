@@ -14,6 +14,7 @@ import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
 import { ambientFor } from '@/lib/collector';
 import type { Metadata } from 'next';
+import type { PokemonCard } from '@/types';
 import { formatEur, formatPercent } from '@/lib/format';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
@@ -21,7 +22,7 @@ import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/
 import { Suspense, cache } from 'react';
 import { MarketContextSection, MarketContextSkeleton } from '@/components/MarketContextSection';
 import { siteUrlOrLocal } from '@/lib/site';
-import { karteMitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
+import { frischPreisFuer, mitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex } from '@/lib/card-index';
 import { sprachpreiseFuerKarte } from '@/lib/sprachpreise';
 
@@ -68,23 +69,42 @@ export const revalidate = 3600;
 // Der Index hat Name, Set, Nummer, Bild und Preis — genug fuer die Seite, und
 // der frische Preis kommt ohnehin von TCGdex. Nur wenn auch der Index die
 // Karte nicht kennt, wird geworfen.
+//
+// PARALLEL STATT NACHEINANDER (v6.12.3). Gemessen 28.09.2026 an zwölf
+// Alpollo-Karten beim ersten Aufruf: 0,8 bis 11 s. pokemontcg.io antwortete bei
+// jeder zweiten Karte mit 502; `fetchCardById` wiederholte bis zum Budget von
+// 8 s, erst DANACH kam der Index und erst danach der Tagespreis von TCGdex —
+// alles hintereinander. Jetzt: Index (schnell, eigene Datenbank) sofort; mit
+// Set und Nummer daraus startet der Tagespreis sofort parallel. Die
+// Stammdaten bekommen höchstens `STAMMDATEN_WARTEN_MS` — kennt der Index die
+// Karte, baut die Seite sonst aus ihm auf. Nur eine Karte, die der Index
+// nicht kennt, wartet das volle Budget ab (und wirft danach → error.tsx).
 const KARTE_BUDGET_MS = 8_000;
-const karteLaden = cache(async (id: string) => {
-  let karte;
-  try {
-    karte = await fetchCardById(id, { gesamtMs: KARTE_BUDGET_MS });
-  } catch (err) {
-    const ersatz = (await cardsFromIndex([id]).catch(() => null))?.get(id);
-    if (!ersatz) throw err;
-    console.warn(`[karte] ${id}: Kartendatenbank ausgefallen, Rueckfall auf den Index`);
-    karte = ersatz;
+const STAMMDATEN_WARTEN_MS = 2_500;
+const warte = (ms: number) => new Promise<null>((r) => setTimeout(() => r(null), ms));
+const karteLaden = cache(async (id: string): Promise<PokemonCard | null> => {
+  const rohLaden = fetchCardById(id, { gesamtMs: KARTE_BUDGET_MS });
+  rohLaden.catch(() => {}); // Fehler wird unten ausgewertet, nicht verschluckt
+  const ausIndex = (await cardsFromIndex([id]).catch(() => null))?.get(id) ?? null;
+  const preisLaden = ausIndex
+    ? frischPreisFuer(ausIndex)
+    : rohLaden.then((r) => (r ? frischPreisFuer(r) : null), () => null);
+
+  let karte: PokemonCard | null;
+  if (ausIndex) {
+    karte = await Promise.race([rohLaden.catch(() => null), warte(STAMMDATEN_WARTEN_MS)]);
+    if (!karte) {
+      console.warn(`[karte] ${id}: Stammdaten nicht rechtzeitig, Aufbau aus dem Index`);
+      karte = ausIndex;
+    }
+  } else {
+    karte = await rohLaden; // wirft bei Ausfall → error.tsx; null = echte 404
   }
   if (!karte) return null;
-  const frisch = await karteMitFrischpreis(karte);
-  if (frisch.cmPrices?.quelle === 'tcgdex') return frisch;
+  const frisch = await preisLaden;
+  if (frisch) return mitFrischpreis(karte, frisch);
   // Live-Abruf gescheitert: frischer Preis aus dem eigenen Index (Stand Vortag).
-  const t = (await cardsFromIndex([id]).catch(() => null))?.get(id);
-  return t ? mitIndexPreis(frisch, t) : frisch;
+  return ausIndex ? mitIndexPreis(karte, ausIndex) : karte;
 });
 
 interface Props {
@@ -131,6 +151,9 @@ export default async function CardDetailPage({ params }: Props) {
   // API-Fehler (Timeout/Rate-Limit) ≠ "Karte existiert nicht": Fehler-UI statt 404.
   // notFound() nur bei echtem 404 der Datenbank (fetchCardById liefert dann null).
   // Wirft bei Aussetzern — siehe generateStaticParams oben.
+  // Verlauf aus der eigenen Datenbank hängt nicht an der Karte — parallel starten.
+  const verlaufLaden = getStoredPriceHistory(id, 90);
+  verlaufLaden.catch(() => {});
   const card = await karteLaden(id);
   if (!card) notFound();
 
@@ -148,7 +171,7 @@ export default async function CardDetailPage({ params }: Props) {
   // Sprachausgaben (JP/KR) laufen parallel zum Verlauf — wirft nie, hoechstens
   // 2 s (Dateien je Instanz 30 min vorgehalten, sprachpreise.ts).
   const sprachenLaden = sprachpreiseFuerKarte(card, 2_000);
-  const stored = await getStoredPriceHistory(id, 90);
+  const stored = await verlaufLaden;
   const sprachen = await sprachenLaden;
   const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
   // Zusammenführung liegt zentral in price-history.ts — dieselbe Funktion nutzt

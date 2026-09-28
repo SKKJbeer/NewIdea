@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.3] - 28. September 2026 · Kartenseiten laden beim ersten Aufruf schneller
+
+### Behoben
+- **Erster Aufruf einer Kartenseite dauerte bis zu 11 Sekunden** (gemessen an zwölf Alpollo-Karten: 0,8–11 s). Die Kartendatenbank antwortete bei jeder zweiten Karte mit einem Fehler; die Seite wartete bis zu 8 Sekunden auf Wiederholungen und holte erst danach Index und Tagespreis — alles nacheinander. Jetzt laufen eigener Kartenindex, Stammdaten, Tagespreis und Preisverlauf parallel; kennt der Index die Karte, wartet die Seite höchstens 2,5 Sekunden auf die Stammdaten
+
+---
+
 ## [6.12.2] - 28. September 2026 · Sprachwahl gilt für die ganze Preisspalte
 
 ### Geändert

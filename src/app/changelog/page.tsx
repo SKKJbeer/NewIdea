@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.3',
+    date: '28. September 2026',
+    label: 'Kartenseiten laden beim ersten Aufruf schneller',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Erster Aufruf einer Kartenseite dauerte bis zu 11 s — Index, Stammdaten, Tagespreis und Verlauf laufen jetzt parallel, Stammdaten höchstens 2,5 s' },
+    ],
+  },
+  {
     version: '6.12.2',
     date: '28. September 2026',
     label: 'Sprachwahl gilt für die ganze Preisspalte',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Die Aufschlüsselung „Cardmarket-Preise" folgt der gewählten Sprache — bei JP/KR Trend, ab, Ø Verkauf, Ø 7/30 Tage der japanischen bzw. koreanischen Ausgabe' },
       { type: 'changed', text: 'Marktkontext, Kennzahlen und Preis-Historie bei JP/KR als Werte der englisch/deutschen Ausgabe gekennzeichnet' },

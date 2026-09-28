@@ -95,7 +95,7 @@ describe('Kartenseite wird gecacht', () => {
 
   it('legt den frischen Preis einmal fuer Metadaten und Seite ueber', () => {
     expect(seite).toMatch(/cache\(async \(id: string\)/);
-    expect(seite).toContain('karteMitFrischpreis(karte)');
+    expect(seite).toMatch(/frischPreisFuer\(ausIndex\)/);
   });
 
   it('vergleicht nur frische Kartenpreise mit dem (frischen) Markt', () => {
@@ -122,7 +122,19 @@ describe('Kartenseite ueberlebt einen Ausfall der Kartendatenbank', () => {
   it('faellt auf den eigenen Index zurueck, bevor sie wirft', () => {
     const seite = lies('src/app/karten/[id]/page.tsx');
     const block = seite.slice(seite.indexOf('const karteLaden'));
-    expect(block).toMatch(/catch \(err\) \{[\s\S]*cardsFromIndex\(\[id\]\)[\s\S]*if \(!ersatz\) throw err;/);
+    // Kennt der Index die Karte, wartet die Seite nicht auf pokemontcg.io
+    expect(block).toMatch(/if \(ausIndex\) \{[\s\S]*Promise\.race\(\[rohLaden\.catch\(\(\) => null\), warte\(STAMMDATEN_WARTEN_MS\)\]\)[\s\S]*karte = ausIndex;/);
+  });
+
+  it('laedt Index, Stammdaten und Tagespreis PARALLEL (gemessen: bis 11 s nacheinander)', () => {
+    const seite = lies('src/app/karten/[id]/page.tsx');
+    const block = seite.slice(seite.indexOf('const karteLaden'), seite.indexOf('interface Props'));
+    // Stammdaten werden gestartet, BEVOR auf irgendetwas gewartet wird
+    expect(block.indexOf('fetchCardById(id')).toBeLessThan(block.indexOf('await'));
+    // Der Tagespreis startet mit den Indexdaten, nicht erst nach den Stammdaten
+    expect(block.indexOf('frischPreisFuer(ausIndex)')).toBeLessThan(block.indexOf('Promise.race'));
+    const warten = Number(/STAMMDATEN_WARTEN_MS = ([\d_]+)/.exec(seite)?.[1].replace(/_/g, ''));
+    expect(warten).toBeLessThanOrEqual(3000);
   });
 });
 
