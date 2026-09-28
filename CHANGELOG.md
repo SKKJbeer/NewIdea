@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.15.2] - 28. September 2026 · Richtige Kalenderwoche, richtige Kartenbilder
+
+### Behoben
+- **Kalenderwoche lag 2026 durchgehend eine Woche zurück:** Der Bericht vom 28.09. hieß „KW 39" statt KW 40. Berechnung jetzt nach ISO 8601; auch ältere Berichte zeigen die richtige Woche
+- **Artikelbilder zeigten teils eine andere Karte gleichen Namens:** Ein Artikel über Mew aus der Classic Collection zeigte Mew aus Southern Islands. Jetzt gilt: exakter Name vor Namensteil, und die Karte aus dem im Text genannten Set
+
+### Neu
+- Studio: Marktbericht der laufenden Woche neu erzeugen (derselbe Ablauf und dieselbe Qualitätsschranke wie der Montags-Lauf)
+
+---
+
 ## [6.15.1] - 28. September 2026 · Befunde aus dem Probelauf
 
 ### Behoben

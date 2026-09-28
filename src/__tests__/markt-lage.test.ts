@@ -9,6 +9,7 @@ import {
 } from '@/lib/markt-lage';
 import { ohneUeberschriften } from '@/lib/ai-generator';
 import { zuletztGezeigt } from '@/lib/instagram-autopilot';
+import { besteKarte } from '@/lib/article-generator';
 import { Prose } from '@/components/Prose';
 import type { PokemonCard } from '@/types';
 import type { NeuheitenDatei } from '@/lib/neuheiten';
@@ -224,5 +225,24 @@ describe('Instagram: Relevanz und Gedächtnis', () => {
     const q = lies('src/lib/instagram-autopilot.ts');
     const pos = q.indexOf('await merkeGezeigt(datum');
     expect(pos).toBeGreaterThan(q.indexOf('const r = await vorbereitet.veroeffentlichen(k, frist)'));
+  });
+});
+
+describe('Artikelbilder: die gemeinte Karte (Probelauf: Mew Classic Collection ≠ Mew Southern Islands)', () => {
+  const pool = [
+    karte('si-1', 'Mew', 'Southern Islands', 193.5),
+    karte('me55c-20', 'Mew', '30th Celebration: Classic Collection', -5),
+    karte('base-10', 'Mewtwo', 'Base', 3),
+    karte('me55c-21', 'Mew-VMAX', '30th Celebration: Classic Collection', -12),
+  ];
+  it('Set im Artikel entscheidet bei gleichem Namen (auch als Kurzform)', () => {
+    expect(besteKarte('Mew', pool, 'Die Classic Collection bringt Mew und Glurak zurück')?.id).toBe('me55c-20');
+    expect(besteKarte('Mew', pool, 'Mew aus Southern Islands steht bei +193 %')?.id).toBe('si-1');
+  });
+  it('exakter Name schlägt Teilstring (kein Mewtwo für „Mew")', () => {
+    expect(besteKarte('Mew', [pool[2], pool[0]], '')?.id).toBe('si-1');
+  });
+  it('bereits verwendete Karten werden übersprungen', () => {
+    expect(besteKarte('Mew', pool, 'Classic Collection', new Set(['me55c-20']))?.id).toBe('si-1');
   });
 });

@@ -536,9 +536,35 @@ export function matchCardsFromText(texts: string[], trendingCards: PokemonCard[]
   return matched;
 }
 
+/**
+ * Beste Karte zu einem genannten Namen. Probelauf 28.09.2026: Der Set-Artikel
+ * schrieb über Mew aus der Classic Collection — gezeigt wurde Mew aus Southern
+ * Islands, weil „mew" in beiden (und in „Mewtwo") steckt und der Klassiker im
+ * Pool vorn stand. Deshalb: exakter Name vor Teilstring, und eine Karte, deren
+ * Set im Artikel genannt wird, vor einer, deren Set nicht vorkommt.
+ */
+export function besteKarte(name: string, pool: PokemonCard[], artikelText = '', used: ReadonlySet<string> = new Set()): PokemonCard | undefined {
+  const lower = name.toLowerCase().trim();
+  const text = artikelText.toLowerCase();
+  let beste: { c: PokemonCard; punkte: number } | undefined;
+  for (const c of pool) {
+    if (used.has(c.id)) continue;
+    const n = c.name.toLowerCase();
+    const exakt = n === lower || (c.nameDe?.toLowerCase() ?? '') === lower;
+    if (!exakt && !n.includes(lower) && !lower.includes(n)) continue;
+    const setGenannt = Boolean(c.set) && (text.includes(c.set.toLowerCase()) || lower.includes(c.set.toLowerCase()) ||
+      // Kurzform: „Classic Collection" für „30th Celebration: Classic Collection"
+      (c.set.includes(':') && text.includes(c.set.split(':').pop()!.trim().toLowerCase())));
+    const punkte = (exakt ? 2 : 0) + (setGenannt ? 1 : 0);
+    if (!beste || punkte > beste.punkte) beste = { c, punkte };
+  }
+  return beste?.c;
+}
+
 export function matchFeaturedCards(
   aiNames: Array<{ name: string }>,
   trendingCards: PokemonCard[],
+  artikelText = '',
 ): FeaturedCard[] {
   // KI-genannte Kartennamen gegen echte Kartendaten matchen.
   // KEIN Auffüllen mit unpassenden Trending-Karten — nur Karten, die der Artikel nennt.
@@ -546,10 +572,7 @@ export function matchFeaturedCards(
   const used = new Set<string>();
 
   for (const { name } of aiNames) {
-    const lower = name.toLowerCase();
-    const found = trendingCards.find(
-      (c) => !used.has(c.id) && (c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase())),
-    );
+    const found = besteKarte(name, trendingCards, artikelText, used);
     if (found) {
       used.add(found.id);
       matched.push(toFeaturedCard(found));
@@ -565,10 +588,8 @@ function matchSectionHighlights(
 ): Article['sections'] {
   return sections.map((s) => {
     if (!s.cardRef) return { heading: s.heading, content: s.content };
-    const lower = s.cardRef.toLowerCase();
-    const found = trendingCards.find(
-      (c) => c.name.toLowerCase().includes(lower) || lower.includes(c.name.toLowerCase()),
-    );
+    // Das Set muss im SELBEN Abschnitt stehen — dort ist die Karte gemeint.
+    const found = besteKarte(s.cardRef, trendingCards, `${s.heading} ${s.content}`);
     if (!found || !found.imageUrl) return { heading: s.heading, content: s.content };
     return {
       heading: s.heading,
@@ -807,7 +828,11 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       title: data.title,
       level,
       intro: data.intro || '',
-      featuredCards: matchFeaturedCards(data.featuredCards || [], bilder),
+      featuredCards: matchFeaturedCards(
+        data.featuredCards || [],
+        bilder,
+        [data.title, data.intro, ...(data.sections || []).map((x) => `${x.heading} ${x.content}`)].join(' '),
+      ),
       sections: matchSectionHighlights(data.sections || [], bilder),
       keyPoints: data.keyPoints || [],
       tags: data.tags || [],

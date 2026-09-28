@@ -1,5 +1,6 @@
 import { getSupabase } from './supabase';
 import type { PokemonCard } from '@/types';
+import { isoKalenderwoche } from './kalenderwoche';
 
 export interface StoredMarketReport {
   weekStart: string;
@@ -19,7 +20,9 @@ export interface MarketReportMeta {
 function rowToReport(data: Record<string, unknown>): StoredMarketReport {
   return {
     weekStart: String(data.week_start),
-    weekNumber: Number(data.week_number),
+    // Aus dem Wochenbeginn abgeleitet, nicht gespeichert: Bis v6.15.1 lag die
+    // gespeicherte Nummer eine Woche daneben (kalenderwoche.ts).
+    weekNumber: isoKalenderwoche(String(data.week_start)),
     reportText: String(data.report_text),
     topGainers: (data.top_gainers as PokemonCard[]) || [],
     topValue: (data.top_value as PokemonCard[]) || [],
@@ -111,7 +114,7 @@ export async function listMarketReportMeta(): Promise<MarketReportMeta[]> {
     .filter((r) => isPublishableReport(r.report_text as string))
     .map((r) => ({
       weekStart: String(r.week_start),
-      weekNumber: Number(r.week_number),
+      weekNumber: isoKalenderwoche(String(r.week_start)),
       createdAt: String(r.created_at),
     }));
 }

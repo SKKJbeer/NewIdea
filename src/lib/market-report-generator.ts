@@ -7,6 +7,7 @@
 
 import { generateMarketSummary } from './ai-generator';
 import { saveMarketReport } from './market-report-storage';
+import { isoKalenderwoche } from './kalenderwoche';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
 import type { PokemonCard, MarketSummary } from '@/types';
@@ -40,9 +41,7 @@ export function currentWeek(now: Date = new Date()): { weekStart: string; weekNu
   const monday = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7)),
   );
-  const jan1 = new Date(Date.UTC(monday.getUTCFullYear(), 0, 1));
-  const weekNumber = Math.ceil(((monday.getTime() - jan1.getTime()) / 86400000 + 1) / 7);
-  return { weekStart: monday.toISOString().split('T')[0], weekNumber };
+  return { weekStart: monday.toISOString().split('T')[0], weekNumber: isoKalenderwoche(monday) };
 }
 
 /** Wertvollste Karten nach Marktpreis. */

@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.15.2',
+    date: '28. September 2026',
+    label: 'Richtige Kalenderwoche, richtige Kartenbilder',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kalenderwoche lag 2026 eine Woche zurück (Bericht vom 28.09. hieß KW 39) — jetzt ISO 8601, auch rückwirkend' },
+      { type: 'fixed', text: 'Artikelbilder zeigen die gemeinte Karte, nicht eine gleichnamige aus einem anderen Set' },
+      { type: 'new', text: 'Studio: Marktbericht der laufenden Woche neu erzeugen' },
+    ],
+  },
+  {
     version: '6.15.1',
     date: '28. September 2026',
     label: 'Befunde aus dem Probelauf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Artikel über Karten der Marktlage hatten keine Kartenbilder' },
       { type: 'fixed', text: 'Kein Titel oder Einstieg mehr auf dünn gehandelten Ausreißern' },
