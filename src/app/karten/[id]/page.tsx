@@ -80,7 +80,7 @@ export const revalidate = 3600;
 // Karte, baut die Seite sonst aus ihm auf. Nur eine Karte, die der Index
 // nicht kennt, wartet das volle Budget ab (und wirft danach → error.tsx).
 const KARTE_BUDGET_MS = 8_000;
-const STAMMDATEN_WARTEN_MS = 2_500;
+const STAMMDATEN_WARTEN_MS = 1_500;
 const warte = (ms: number) => new Promise<null>((r) => setTimeout(() => r(null), ms));
 const karteLaden = cache(async (id: string): Promise<PokemonCard | null> => {
   const rohLaden = fetchCardById(id, { gesamtMs: KARTE_BUDGET_MS });

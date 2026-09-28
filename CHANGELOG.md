@@ -7,10 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.4] - 28. September 2026 · Kürzere Wartezeit auf die Kartendatenbank
+
+### Geändert
+- Nach v6.12.3 nachgemessen (zwölf Karten ohne Cache): 0,5–3,2 s statt 0,8–11 s. Der Rest war die Wartezeit auf die Kartendatenbank, bevor die Seite auf den eigenen Index umschaltet — von 2,5 auf 1,5 Sekunden gesenkt
+
+---
+
 ## [6.12.3] - 28. September 2026 · Kartenseiten laden beim ersten Aufruf schneller
 
 ### Behoben
-- **Erster Aufruf einer Kartenseite dauerte bis zu 11 Sekunden** (gemessen an zwölf Alpollo-Karten: 0,8–11 s). Die Kartendatenbank antwortete bei jeder zweiten Karte mit einem Fehler; die Seite wartete bis zu 8 Sekunden auf Wiederholungen und holte erst danach Index und Tagespreis — alles nacheinander. Jetzt laufen eigener Kartenindex, Stammdaten, Tagespreis und Preisverlauf parallel; kennt der Index die Karte, wartet die Seite höchstens 2,5 Sekunden auf die Stammdaten
+- **Erster Aufruf einer Kartenseite dauerte bis zu 11 Sekunden** (gemessen an zwölf Alpollo-Karten: 0,8–11 s). Die Kartendatenbank antwortete bei jeder zweiten Karte mit einem Fehler; die Seite wartete bis zu 8 Sekunden auf Wiederholungen und holte erst danach Index und Tagespreis — alles nacheinander. Jetzt laufen eigener Kartenindex, Stammdaten, Tagespreis und Preisverlauf parallel; kennt der Index die Karte, wartet die Seite höchstens 1,5 Sekunden auf die Stammdaten (eine gesunde Antwort braucht rund 0,35 s)
 
 ---
 

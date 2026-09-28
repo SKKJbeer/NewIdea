@@ -10,12 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.4',
+    date: '28. September 2026',
+    label: 'Kürzere Wartezeit auf die Kartendatenbank',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Kartenseite schaltet nach 1,5 statt 2,5 s auf den eigenen Index um — erster Aufruf nachgemessen 0,5–3,2 s statt 0,8–11 s' },
+    ],
+  },
+  {
     version: '6.12.3',
     date: '28. September 2026',
     label: 'Kartenseiten laden beim ersten Aufruf schneller',
-    isLatest: true,
+    isLatest: false,
     changes: [
-      { type: 'fixed', text: 'Erster Aufruf einer Kartenseite dauerte bis zu 11 s — Index, Stammdaten, Tagespreis und Verlauf laufen jetzt parallel, Stammdaten höchstens 2,5 s' },
+      { type: 'fixed', text: 'Erster Aufruf einer Kartenseite dauerte bis zu 11 s — Index, Stammdaten, Tagespreis und Verlauf laufen jetzt parallel, Stammdaten höchstens 1,5 s' },
     ],
   },
   {
