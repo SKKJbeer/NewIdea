@@ -2,6 +2,8 @@ import sharp from 'sharp';
 import { buildStory, neuerscheinungStory } from '@/lib/reel-concepts';
 import { leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
 import { setAusIndex } from '@/lib/card-index';
+import { ohneDuenneAusreisser } from '@/lib/markt-lage';
+import { ladeSetListe } from '@/lib/set-liste';
 import { validateMarketData } from '@/lib/market-metrics';
 import { renderStory } from '@/lib/reel-generator';
 import { ladeMarktlage, ladeMarktkarten, rendereBewegung, type Marktlage } from '@/lib/marktbilder';
@@ -13,7 +15,7 @@ import {
   karussellFolien,
   type Beitragsart,
 } from '@/lib/social-plan';
-import { ablegen, aufraeumen, merkeOffen, leseOffen, vergissOffen, type OffeneVeroeffentlichung } from '@/lib/social-speicher';
+import { ablegen, aufraeumen, merkeOffen, leseOffen, vergissOffen, leseJson, schreibeJson, type OffeneVeroeffentlichung } from '@/lib/social-speicher';
 import {
   igKonfig,
   bildContainer,
@@ -105,6 +107,39 @@ interface Vorbereitet {
   dateien: string[];
   /** `fristMs`: wie lange auf Meta gewartet werden darf, bevor vorgemerkt wird. */
   veroeffentlichen: (k: IgKonfig, fristMs: number) => Promise<Veroeffentlicht>;
+  /** Gezeigte Karten — werden erst nach echter Veröffentlichung gemerkt. */
+  gezeigt?: string[];
+}
+
+// GEDÄCHTNIS „SCHON GEZEIGT" — gegen dieselben Karten an drei Karussell-Tagen
+// derselben Woche. 30-Tage-Bewegungen ändern sich langsam; ohne Gedächtnis
+// zeigte jedes Karussell die Spitze derselben Rangliste. Gemerkt wird nur,
+// was wirklich veröffentlicht wurde (ein Probelauf verbraucht nichts).
+const PFAD_GEZEIGT = 'instagram/gezeigt.json';
+export const GEZEIGT_TAGE = 6;
+export interface GezeigtDatei { eintraege: Array<{ datum: string; ids: string[] }> }
+
+/** Karten, die in den letzten `GEZEIGT_TAGE` Tagen vor `datum` gezeigt wurden. Rein. */
+export function zuletztGezeigt(d: GezeigtDatei | null, datum: string): Set<string> {
+  const heute = Date.parse(datum);
+  const ids = new Set<string>();
+  for (const e of d?.eintraege ?? []) {
+    const tage = (heute - Date.parse(e.datum)) / 86_400_000;
+    if (tage >= 0 && tage <= GEZEIGT_TAGE) for (const id of e.ids) ids.add(id);
+  }
+  return ids;
+}
+
+async function merkeGezeigt(datum: string, ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  try {
+    const alt = await leseJson<GezeigtDatei>(PFAD_GEZEIGT).catch(() => null);
+    const behalten = (alt?.eintraege ?? []).filter((e) => (Date.parse(datum) - Date.parse(e.datum)) / 86_400_000 <= GEZEIGT_TAGE * 2);
+    await schreibeJson(PFAD_GEZEIGT, { eintraege: [...behalten, { datum, ids }] } satisfies GezeigtDatei);
+  } catch (err) {
+    // Kür, nicht Pflicht: ohne Gedächtnis droht nur eine Wiederholung.
+    console.warn('[autopilot] Gezeigte Karten nicht gemerkt:', err instanceof Error ? err.message : err);
+  }
 }
 
 /** Wie alt die Daten hoechstens sein duerfen, damit ein Beitrag erscheint. */
@@ -137,7 +172,8 @@ export function datenTaugen(quelle: Marktlage['quelle'], datenTag: string | null
 }
 
 async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorbereitet> {
-  const lage = await ladeMarktlage();
+  const gezeigtDatei = await leseJson<GezeigtDatei>(PFAD_GEZEIGT).catch(() => null);
+  const lage = await ladeMarktlage({ ausschliessen: zuletztGezeigt(gezeigtDatei, datum) });
   if (!lage) throw new Error('Zu wenig Marktdaten fuer ein Karussell');
   const einwand = datenTaugen(lage.quelle, lage.datenTag, datum);
   if (einwand) throw new Error(einwand);
@@ -157,6 +193,7 @@ async function bereiteKarussellVor(datum: string, siteUrl: string): Promise<Vorb
   return {
     caption,
     dateien: urls,
+    gezeigt: folien.map((f) => f.mover.id).filter((id): id is string => Boolean(id)),
     async veroeffentlichen(k, fristMs) {
       const kinder: string[] = [];
       for (const url of urls) kinder.push(await bildContainer(k, url, { karussellElement: true }));
@@ -202,7 +239,11 @@ async function bereiteReelVor(datum: string, siteUrl: string, rotation: number):
       console.warn('[autopilot] Neuerscheinung nicht möglich:', err instanceof Error ? err.message : err);
     }
   }
-  const story = neu ?? buildStory(validateMarketData(basis.karten).clean, siteUrl, { rotation });
+  // Ohne dünn gehandelte Klassiker-Ausreißer — sonst eröffnet „Top-Mover"
+  // jede Woche mit derselben Karte, die drei Verkäufe bewegt haben.
+  const setListe = await ladeSetListe(250).catch(() => null);
+  const setDatum = new Map<string, string>((setListe?.sets ?? []).map((s) => [s.id, s.releaseDate]));
+  const story = neu ?? buildStory(ohneDuenneAusreisser(validateMarketData(basis.karten).clean, setDatum), siteUrl, { rotation });
   if (!story) throw new Error('Keine ausreichenden Marktdaten fuer ein Reel');
 
   const mp4 = await renderStory(story);
@@ -323,6 +364,8 @@ export async function fuehreAutopilotAus(opt: AutopilotOptionen = {}): Promise<A
         // verloren zu gehen.
         const frist = BUDGET_MS - (Date.now() - start) - 40_000;
         const r = await vorbereitet.veroeffentlichen(k, frist);
+        // Veröffentlicht oder bei Meta vorgemerkt — beides erscheint.
+        await merkeGezeigt(datum, vorbereitet.gezeigt ?? []);
         if ('mediaId' in r) {
           ergebnis.feed = { status: 'veroeffentlicht', mediaId: r.mediaId, dateien: vorbereitet.dateien };
         } else {

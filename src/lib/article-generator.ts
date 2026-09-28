@@ -657,6 +657,11 @@ export async function generateArticle(
 
   // 3. Fetch live market data only when we actually need to generate.
   let trendingCards: PokemonCard[] = [];
+  // BILDER-POOL ≠ THEMEN-KANDIDATEN: Der Text darf über jede Karte der
+  // MARKTLAGE schreiben. Bilder kamen aber nur aus den sechs Kandidaten —
+  // der Ausblick-Probelauf (28.09.2026) hatte deshalb KEIN einziges Bild.
+  // Angezeigt wird trotzdem nur, was im Text namentlich vorkommt.
+  let bildPool: PokemonCard[] = [];
   let lage: MarktLage | null = null;
   let cardSummary = 'Keine aktuellen Daten verfügbar';
   try {
@@ -668,6 +673,7 @@ export async function generateArticle(
     // die Karten aus sv3pt5 … sv8 mit Monate alten Preisen.
     lage = await ladeMarktLage();
     trendingCards = trendKarten(lage, 40);
+    bildPool = trendKarten(lage, 150);
     if (trendingCards.length === 0) trendingCards = await fetchTrendingCards(30);
   } catch (err) {
     // Nie stumm: Ohne Kartendaten wird der Artikel dünner, und genau das
@@ -716,6 +722,7 @@ export async function generateArticle(
         .slice(0, NEUHEITEN_KARTEN_IM_POOL);
       const bekannt = new Set(trendingCards.map((c) => c.id));
       trendingCards = [...trendingCards, ...neuKarten.filter((c) => !bekannt.has(c.id))];
+      bildPool = [...bildPool, ...neuKarten];
       if (neuKarten.length > 0) cardSummary += `
 Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join(', ')}`;
     }
@@ -724,13 +731,15 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
   }
 
   options.onDaten?.(cardSummary);
+  // Kandidaten zuerst (sie bestimmen bei Namensgleichheit das Bild), dann der Rest.
+  const bilder = [...trendingCards, ...bildPool.filter((b) => !trendingCards.some((t) => t.id === b.id))];
 
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
     fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
-      trendingCards,
+      bilder,
     );
     // Persistieren, damit nicht bei jedem Aufruf neu erzeugt wird (kein Regenerieren pro Besuch).
     const gesichert = await speichern(fallback);
@@ -782,7 +791,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       const fallback = fallbackArticle(type, dateLabel, cardSummary);
       fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
-      trendingCards,
+      bilder,
     );
       const gesichert = await speichern(fallback);
     if (!gesichert.ok) console.error(`Artikel ${date} nicht gespeichert: ${gesichert.error}`);
@@ -798,8 +807,8 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       title: data.title,
       level,
       intro: data.intro || '',
-      featuredCards: matchFeaturedCards(data.featuredCards || [], trendingCards),
-      sections: matchSectionHighlights(data.sections || [], trendingCards),
+      featuredCards: matchFeaturedCards(data.featuredCards || [], bilder),
+      sections: matchSectionHighlights(data.sections || [], bilder),
       keyPoints: data.keyPoints || [],
       tags: data.tags || [],
       sources: data.sources || [],
@@ -829,7 +838,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
     fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
-      trendingCards,
+      bilder,
     );
     const fallbackGespeichert = await speichern(fallback);
     if (!fallbackGespeichert.ok) {

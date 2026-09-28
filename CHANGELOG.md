@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.15.1] - 28. September 2026 · Befunde aus dem Probelauf
+
+### Behoben
+- Artikel über Karten aus der Marktlage hatten keine Kartenbilder — Bilder kommen jetzt aus der ganzen Marktlage (angezeigt wird weiterhin nur, was im Text vorkommt)
+- Ein Artikel eröffnete mit „Mew explodiert +193,5 %" — obwohl genau diese Bewegung als dünn gehandelt markiert war. Titel und Einstieg dürfen darauf nicht mehr aufbauen
+- Eingestreute Zubehör-Hinweise in Markt- und Ausblick-Abschnitten
+- Instagram-Karussell und Top-Mover-Reel zeigten Tag für Tag dieselben dünn gehandelten Klassiker — jetzt moderne Karten zuerst, Ausreißer raus, und was in den letzten sechs Tagen gezeigt wurde, kommt nicht erneut
+
+### Geändert
+- Set-Bewegung getrennt nach modernen und älteren Sets; Sets unter 30 Tagen tragen den Hinweis, dass ihr 30-Tage-Schnitt die Starttage enthält
+- Spitzenkarte eines Sets nur bis ±150 % (darüber ist die unbestätigte Index-Bewegung ein Einzelverkauf)
+- Karussell-Folien heißen „Aufwärts" / „Abwärts" statt „Stärkster …" — die Auswahl ist nach Relevanz gewichtet
+
+---
+
 ## [6.15.0] - 28. September 2026 · Trends mit Relevanz statt Ausreißern
 
 ### Geändert

@@ -39,10 +39,12 @@ export const WOCHENPLAN: Readonly<Record<number, Beitragsart>> = {
 export function karussellFolien(lage: Marktlage): Array<{ mover: MoverDaten; titel: string }> {
   const folien: Array<{ mover: MoverDaten; titel: string }> = [];
   lage.gewinner.forEach((m, i) => {
-    if (m.bild) folien.push({ mover: m, titel: i === 0 ? 'Stärkster Anstieg · 30 Tage' : `Anstieg Nr. ${i + 1} · 30 Tage` });
+    // Nicht „Stärkster": Die Auswahl gewichtet nach Relevanz (moderne Sets
+    // zuerst, dünn gehandelte Ausreißer und kürzlich Gezeigtes raus).
+    if (m.bild) folien.push({ mover: m, titel: i === 0 ? 'Aufwärts · 30 Tage' : `Aufwärts Nr. ${i + 1} · 30 Tage` });
   });
   const r = lage.verlierer[0];
-  if (r?.bild) folien.push({ mover: r, titel: 'Stärkster Rückgang · 30 Tage' });
+  if (r?.bild) folien.push({ mover: r, titel: 'Abwärts · 30 Tage' });
   return folien;
 }
 
@@ -99,12 +101,12 @@ export function kampagnenLink(siteUrl: string, medium: 'reel' | 'post' | 'story'
 
 export function karussellCaption(lage: Marktlage, siteUrl: string): string {
   const zeilen: string[] = [
-    `Die stärksten Bewegungen unter den wertvollsten Pokémon-Karten — Cardmarket-Stand ${lage.datenstand}`,
+    `Bestätigte Bewegungen unter den wertvollsten Pokémon-Karten, Schwerpunkt aktuelle Sets — Cardmarket-Stand ${lage.datenstand}`,
     '',
   ];
   for (const m of lage.gewinner) zeilen.push(`${m.name} (${m.set}): ${formatPercent(m.trend)}`);
   const r = lage.verlierer[0];
-  if (r) zeilen.push(`Stärkster Rückgang: ${r.name} (${r.set}) ${formatPercent(r.trend)}`);
+  if (r) zeilen.push(`Abwärts: ${r.name} (${r.set}) ${formatPercent(r.trend)}`);
   zeilen.push(
     '',
     'Gemessen: aktueller Preistrend gegen den 30-Tage-Schnitt — gezählt nur, wenn die Verkäufe der letzten sieben Tage in dieselbe Richtung zeigen.',

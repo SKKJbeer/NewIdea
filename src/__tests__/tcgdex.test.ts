@@ -152,7 +152,8 @@ describe('Nur Bewegungen, die die Verkaeufe tragen', () => {
 
   it('das Reel bekommt dieselbe Bereinigung wie das Karussell', () => {
     const lib = readFileSync(join(process.cwd(), 'src/lib/instagram-autopilot.ts'), 'utf8');
-    expect(lib).toMatch(/buildStory\(validateMarketData\(basis\.karten\)\.clean/);
+    // Seit v6.15.0 zusätzlich ohne dünn gehandelte Klassiker-Ausreißer.
+    expect(lib).toMatch(/buildStory\(ohneDuenneAusreisser\(validateMarketData\(basis\.karten\)\.clean/);
   });
 });
 

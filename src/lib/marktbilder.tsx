@@ -1,6 +1,8 @@
 import { getHomepageCards } from '@/lib/homepage-data';
 import { wertvollsteAusIndex, cardsFromIndex } from '@/lib/card-index';
 import { leseFrischpreise } from '@/lib/frischpreise';
+import { relevanteBewegungen } from '@/lib/markt-lage';
+import { ladeSetListe } from '@/lib/set-liste';
 import type { PokemonCard } from '@/types';
 import {
   computePmi,
@@ -142,7 +144,7 @@ function datumDeutsch(tag: string): string {
   return `${t}.${m}.${j}`;
 }
 
-export async function ladeMarktlage(): Promise<Marktlage | null> {
+export async function ladeMarktlage(opt: { ausschliessen?: ReadonlySet<string> } = {}): Promise<Marktlage | null> {
   const basis = await ladeMarktkarten();
   const cards = validateMarketData(basis.karten).clean;
   const berechnet = computePmi(cards);
@@ -159,8 +161,15 @@ export async function ladeMarktlage(): Promise<Marktlage | null> {
     setCount: gespeichert?.setCount ?? berechnet.setCount,
   };
 
-  const { gainers, losers } = splitMovers(cards, 3);
+  // Relevanz statt Größe (markt-lage.ts): moderne Karten zuerst, dünn
+  // gehandelte Klassiker-Ausschläge raus, kürzlich Gezeigtes ausgenommen.
+  const setListe = await ladeSetListe(250).catch(() => null);
+  const setDatum = new Map<string, string>((setListe?.sets ?? []).map((s) => [s.id, s.releaseDate]));
+  const relevant = relevanteBewegungen(cards, setDatum, opt.ausschliessen);
+  const gainers = relevant.gainers.length > 0 ? relevant.gainers : splitMovers(cards, 3).gainers;
+  const losers = relevant.losers.length > 0 ? relevant.losers : splitMovers(cards, 3).losers;
   const alsMover = async (k: PokemonCard): Promise<MoverDaten> => ({
+    id: k.id,
     name: k.nameDe ?? k.name,
     set: k.set,
     trend: k.trendPercent as number,

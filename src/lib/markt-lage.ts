@@ -47,6 +47,8 @@ export const AUSREISSER_PROZENT = 100;
 export const SET_MIN_KARTEN = 20;
 /** Karten darunter zählen für die Set-Bewegung nicht (ein Verkauf = ±50 %). */
 export const SET_MIN_PREIS = 0.5;
+/** Spitzenkarte eines Sets nur bis zu diesem Ausschlag (Index-Trend ist unbestätigt). */
+export const SPITZE_MAX_PROZENT = 150;
 
 export interface BestaetigteBewegung {
   karte: PokemonCard;
@@ -62,6 +64,8 @@ export interface SetBewegung {
   name: string;
   /** Erscheinungsjahr, soweit bekannt. */
   jahr: string | null;
+  /** Erscheinungsdatum (YYYY-MM-DD), soweit bekannt. */
+  datum: string | null;
   karten: number;
   /** Median der 30-Tage-Bewegung der Karten des Sets. */
   median: number;
@@ -91,14 +95,16 @@ export const LEERE_LAGE: MarktLage = {
 // ── rein, getestet ──────────────────────────────────────────────────────────
 
 /** Set-Bewegung aus dem Bestand: echter Median, Mindestmenge, ohne Pfennigkarten. */
-export function setBewegungen(zeilen: BestandZeile[], setJahr: ReadonlyMap<string, string>): SetBewegung[] {
+export function setBewegungen(zeilen: BestandZeile[], setDatum: ReadonlyMap<string, string>): SetBewegung[] {
   const jeSet = new Map<string, { name: string; trends: number[]; spitze: { name: string; trend: number } | null }>();
   for (const z of zeilen) {
     if (!(z.preis >= SET_MIN_PREIS) || !Number.isFinite(z.trend)) continue;
     const e = jeSet.get(z.setCode) ?? { name: z.setName || z.setCode, trends: [], spitze: null };
     e.trends.push(z.trend);
     // Spitzenkarte nur ab MIN_TREND_PREIS — sonst gewinnt immer eine 60-Cent-Karte.
-    if (z.preis >= MIN_TREND_PREIS && (!e.spitze || Math.abs(z.trend) > Math.abs(e.spitze.trend))) {
+    // Und nur bis SPITZE_MAX_PROZENT: Die Index-Bewegung ist UNBESTÄTIGT —
+    // „Poliwrath +892,9 %" (Probelauf) war ein Einzelverkauf, kein Signal.
+    if (z.preis >= MIN_TREND_PREIS && Math.abs(z.trend) <= SPITZE_MAX_PROZENT && (!e.spitze || Math.abs(z.trend) > Math.abs(e.spitze.trend))) {
       e.spitze = { name: z.name, trend: z.trend };
     }
     jeSet.set(z.setCode, e);
@@ -108,7 +114,8 @@ export function setBewegungen(zeilen: BestandZeile[], setJahr: ReadonlyMap<strin
     .map(([setCode, e]) => ({
       setCode,
       name: e.name,
-      jahr: setJahr.get(setCode) ?? null,
+      jahr: setDatum.get(setCode)?.slice(0, 4) ?? null,
+      datum: setDatum.get(setCode)?.replace(/\//g, '-').slice(0, 10) ?? null,
       karten: e.trends.length,
       median: median(e.trends) ?? 0,
       spitze: e.spitze,
@@ -142,6 +149,39 @@ export function wertVorWoche(punkte: Array<{ date: string; value: number }>): { 
   return kandidat ? { wert: kandidat.value, datum: kandidat.date.slice(0, 10) } : null;
 }
 
+/**
+ * Bewegungen für Bilder und Beiträge, nach RELEVANZ statt nach Größe:
+ * moderne Karten zuerst, Klassiker nur bis `AUSREISSER_PROZENT` (darüber
+ * bestimmen wenige Verkäufe den Wert), bereits gezeigte Karten ausgenommen.
+ * Befund 28.09.2026: Das Karussell nahm schlicht die drei größten Ausschläge —
+ * Tag für Tag dieselben dünn gehandelten Klassiker (Mew Southern Islands +193 %).
+ */
+export function relevanteBewegungen(
+  karten: PokemonCard[],
+  setDatum: ReadonlyMap<string, string>,
+  ausschliessen: ReadonlySet<string> = new Set(),
+  jetzt = Date.now(),
+): { gainers: PokemonCard[]; losers: PokemonCard[] } {
+  const bewertet = karten
+    .filter((k) => k.realData && typeof k.trendPercent === 'number' && Math.abs(k.trendPercent) >= MIN_TREND_BEWEGUNG)
+    .filter((k) => !ausschliessen.has(k.id))
+    .map((k) => ({ k, t: k.trendPercent as number, modern: istModern(k.setCode, setDatum, jetzt) === true }))
+    .filter((x) => x.modern || Math.abs(x.t) <= AUSREISSER_PROZENT);
+  const ordnen = (liste: typeof bewertet, richtung: 1 | -1) =>
+    liste
+      .filter((x) => x.t * richtung > 0)
+      .sort((a, b) => Number(b.modern) - Number(a.modern) || (b.t - a.t) * richtung)
+      .map((x) => x.k);
+  return { gainers: ordnen(bewertet, 1), losers: ordnen(bewertet, -1) };
+}
+
+/** Entfernt Klassiker mit Ausschlag über `AUSREISSER_PROZENT` (wenige Verkäufe). Für Reels. */
+export function ohneDuenneAusreisser(karten: PokemonCard[], setDatum: ReadonlyMap<string, string>, jetzt = Date.now()): PokemonCard[] {
+  return karten.filter(
+    (k) => typeof k.trendPercent !== 'number' || Math.abs(k.trendPercent) <= AUSREISSER_PROZENT || istModern(k.setCode, setDatum, jetzt) === true,
+  );
+}
+
 // ── laden ───────────────────────────────────────────────────────────────────
 
 /** Lädt die Marktlage. Wirft nie — fehlende Teile bleiben leer und fehlen im Text. */
@@ -162,7 +202,6 @@ export async function ladeMarktLage(jetzt = Date.now()): Promise<MarktLage> {
   const lage: MarktLage = { ...LEERE_LAGE, pool, neuheiten: neuheitenAktuell(neuheiten) ? neuheiten : null };
 
   const setDatum = new Map<string, string>((setListe?.sets ?? []).map((s) => [s.id, s.releaseDate]));
-  const setJahr = new Map<string, string>([...setDatum].map(([k, d]) => [k, d.slice(0, 4)]));
 
   if (basis && basis.quelle === 'index') {
     const sauber = validateMarketData(basis.karten).clean;
@@ -173,7 +212,7 @@ export async function ladeMarktLage(jetzt = Date.now()): Promise<MarktLage> {
     lage.stand = basis.stand ?? null;
   }
   lage.vorwoche = wertVorWoche(verlauf);
-  lage.sets = setBewegungen(bestand, setJahr);
+  lage.sets = setBewegungen(bestand, setDatum);
 
   if (bericht?.reportText) {
     lage.letzterBericht = { woche: bericht.weekNumber, anfang: bericht.reportText.split(/\n\n+/)[0].slice(0, 500) };
@@ -278,12 +317,28 @@ export function marktLageText(lage: MarktLage, opt: TextOptionen): string {
   if (kHoch.length) z.push(`- Klassiker (ältere Sets), bestätigte Aufwärtsbewegungen: ${kHoch.map(kZeile).join('; ')}`);
   if (kRunter.length) z.push(`- Klassiker, bestätigte Abwärtsbewegungen: ${kRunter.map(kZeile).join('; ')}`);
 
-  const setZeile = (s: SetBewegung) =>
-    `${s.name}${s.jahr ? ` (${s.jahr})` : ''} ${pz(s.median)} über ${s.karten} Karten${s.spitze ? `, stärkste Karte ${s.spitze.name} ${pz(s.spitze.trend)}` : ''}`;
-  const setsHoch = lage.sets.filter((s) => s.median > 0).sort((a, b) => b.median - a.median).slice(0, 4);
-  const setsRunter = lage.sets.filter((s) => s.median < 0).sort((a, b) => a.median - b.median).slice(0, 3);
-  if (setsHoch.length) z.push(`- Sets mit der stärksten 30-Tage-Bewegung (Median aller Karten ohne Pfennigkarten unter 50 Cent, mind. ${SET_MIN_KARTEN} Karten): ${setsHoch.map(setZeile).join('; ')}`);
-  if (setsRunter.length) z.push(`- Sets mit der schwächsten 30-Tage-Bewegung (gleiche Messung): ${setsRunter.map(setZeile).join('; ')}`);
+  const setZeile = (s: SetBewegung) => {
+    const alter = s.datum ? tageSeit(s.datum, jetzt) : null;
+    // Ein Set unter 30 Tagen hat keinen echten 30-Tage-Schnitt — er enthält
+    // die ersten Verkaufstage (Probelauf: „30th Celebration -41 %" nach 12 Tagen).
+    const jung = alter !== null && alter < 30 ? ` [erst ${alter} Tage im Handel — der 30-Tage-Schnitt enthält die ersten Verkaufstage, die Bewegung ist vor allem die Normalisierung nach dem Start]` : '';
+    return `${s.name}${s.jahr ? ` (${s.jahr})` : ''} ${pz(s.median)} über ${s.karten} Karten${s.spitze ? `, stärkste Karte ${s.spitze.name} ${pz(s.spitze.trend)}` : ''}${jung}`;
+  };
+  const setModern = (s: SetBewegung) => s.datum !== null && jetzt - Date.parse(s.datum) <= MODERN_TAGE * 86_400_000;
+  const nachMedian = (liste: SetBewegung[], richtung: 1 | -1, max: number) =>
+    liste.filter((s) => s.median * richtung > 0).sort((a, b) => (b.median - a.median) * richtung).slice(0, max);
+  const mSets = lage.sets.filter(setModern);
+  const kSets = lage.sets.filter((s) => !setModern(s));
+  const MESSUNG = `Median aller Karten ohne Pfennigkarten unter 50 Cent, mind. ${SET_MIN_KARTEN} Karten`;
+  const msHoch = nachMedian(mSets, 1, 4);
+  const msRunter = nachMedian(mSets, -1, 4);
+  if (msHoch.length) z.push(`- Moderne Sets mit der stärksten 30-Tage-Bewegung (${MESSUNG}): ${msHoch.map(setZeile).join('; ')}`);
+  if (msRunter.length) z.push(`- Moderne Sets mit der schwächsten 30-Tage-Bewegung (gleiche Messung): ${msRunter.map(setZeile).join('; ')}`);
+  const ksHoch = nachMedian(kSets, 1, 2);
+  const ksRunter = nachMedian(kSets, -1, 1);
+  if (ksHoch.length || ksRunter.length) {
+    z.push(`- Ältere Sets, auffälligste Bewegung (gleiche Messung, oft dünner Handel): ${[...ksHoch, ...ksRunter].map(setZeile).join('; ')}`);
+  }
 
   const n = lage.neuheiten;
   const neu: string[] = [];
@@ -326,4 +381,6 @@ export const AUSBLICK_REGELN = `TRENDS UND AUSBLICK — Pflicht, wenn die MARKTL
 - Ordne ein, WARUM — nur mit belegbaren Gründen aus den Fakten: Set-Alter (neu erschienen / seit Jahren im Umlauf), Jubiläum, versiegelte Produkte, japanischer Vorlauf, Gegenbewegung eines ganzen Sets.
 - Ausblick: Was in den nächsten Wochen Beobachtung verdient — ausschließlich abgeleitet aus den Fakten (Sets kurz nach Erscheinen, in Japan bereits erschienene Sets, angekündigte Sets, laufende Bewegungen) und aus allgemein belegten Marktmustern (z. B. „Preise neuer Sets finden ihren Boden historisch einige Wochen nach Erscheinen").
 - VERBOTEN im Ausblick: Preisprognosen („wird steigen", Zielpreise), erfundene Erscheinungstermine oder Ankündigungen, Kaufempfehlungen. Neutrale Formulierungen: „verdient Beobachtung", „historisch folgte darauf", „bleibt abzuwarten".
+- Titel und Einstieg NIE mit einem als „dünn gehandelt" markierten Ausschlag — das ist kein Trend, und ein Aufhänger darauf wäre irreführend. Aufhänger kommen aus den modernen Sets, den Set-Bewegungen oder den Neuheiten.
+- Kein Zubehör (Sleeves, Toploader, Sammelalbum …) in Markt-, Trend-, Neuheiten- oder Ausblick-Abschnitten — dort ist es Werbung, keine Analyse.
 - Ein Zeitraum heißt nur so, wie er gemessen ist: „gegen den 30-Tage-Schnitt", nie „diese Woche". Einen echten Wochenvergleich gibt es nur beim Marktindex, wenn der Wert der Vorwoche genannt ist.`;

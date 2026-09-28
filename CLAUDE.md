@@ -214,6 +214,8 @@ S6a, ohne Nummer nicht unterscheidbar).
 - `marktLageText(lage, { preise })` = Faktenblock im Prompt. Artikel `preise: false` (keine € im Fließtext), Marktbericht/Newsletter `true`. `AUSBLICK_REGELN` in jedem Prompt mit Marktbezug.
 - `trendKarten()` / `aktuelleTrendKarten()` ersetzen `fetchTrendingCards` (feste Set-Liste 2023/24, alte Preise). `markt-lage.test.ts` bricht den Build, wenn ein neuer Aufrufer die alte Funktion nutzt.
 - Relevanz (v6.15.0, nach Probelauf): Bewegungen getrennt `modern` (Set ≤ 3 Jahre, `istModern`) / Klassiker; Klassiker > 100 % = „dünn gehandelt". Set-Bewegung aus `bestandFuerSets()` (ganzer frischer Bestand, echter Median, ≥ 20 Karten, ≥ 0,50 €) — NICHT `rankSets` (dessen `avgTrend` ist ein Mittelwert über wenige Top-Karten). Gedächtnis: `vorwoche` (Index 6–9 Tage zuvor) und `letzterBericht` (nur Marktbericht, `gedaechtnis: true`).
+- **Instagram (v6.15.1):** Karussell über `relevanteBewegungen()` (modern zuerst, Klassiker ≤ 100 %, ohne `zuletztGezeigt` — Gedächtnis `social/instagram/gezeigt.json`, 6 Tage, NUR nach echter Veröffentlichung gemerkt). Reel über `ohneDuenneAusreisser()`. Folien heißen „Aufwärts/Abwärts", nie „Stärkster" (Auswahl ist gewichtet).
+- **Artikel-Bilder:** Themen-Kandidaten (6) ≠ Bilder-Pool (`bildPool`, ganze Marktlage) — Bilder nur für im Text genannte Karten.
 - **Probelauf:** `GET /api/studio/probe?art=marktbericht` bzw. `?art=artikel&typ=ausblick` (Studio-Cookie) — erzeugt, zeigt `daten` + Text, speichert NICHTS (`generateArticle(..., { probe: true })`). Vor jeder Prompt-Änderung damit prüfen.
 - Marktbericht: Abschnitte `## Marktlage / ## Trends / ## Neuheiten / ## Ausblick`; `<Prose>` rendert `## ` als Zwischenüberschrift, Klartext (E-Mail, Auszüge) über `ohneUeberschriften()`.
 

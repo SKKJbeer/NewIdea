@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.15.1',
+    date: '28. September 2026',
+    label: 'Befunde aus dem Probelauf',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Artikel über Karten der Marktlage hatten keine Kartenbilder' },
+      { type: 'fixed', text: 'Kein Titel oder Einstieg mehr auf dünn gehandelten Ausreißern' },
+      { type: 'fixed', text: 'Keine eingestreuten Zubehör-Hinweise in Marktabschnitten' },
+      { type: 'fixed', text: 'Instagram zeigte täglich dieselben Klassiker-Ausreißer — jetzt nach Relevanz, mit 6-Tage-Gedächtnis' },
+      { type: 'changed', text: 'Set-Bewegung getrennt nach modernen und älteren Sets, junge Sets gekennzeichnet' },
+    ],
+  },
+  {
     version: '6.15.0',
     date: '28. September 2026',
     label: 'Trends mit Relevanz statt Ausreißern',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Moderne Sets und Klassiker getrennt; dünn gehandelte Ausschläge gekennzeichnet' },
       { type: 'changed', text: 'Set-Bewegung aus dem ganzen Bestand: echter Median, mindestens 20 Karten, mit Erscheinungsjahr' },

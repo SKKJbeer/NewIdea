@@ -5,9 +5,10 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   marktLageText, trendKarten, AUSBLICK_REGELN, LEERE_LAGE, setBewegungen, istModern, versiegeltFuerText, wertVorWoche,
-  SET_MIN_KARTEN, type MarktLage,
+  SET_MIN_KARTEN, relevanteBewegungen, ohneDuenneAusreisser, type MarktLage,
 } from '@/lib/markt-lage';
 import { ohneUeberschriften } from '@/lib/ai-generator';
+import { zuletztGezeigt } from '@/lib/instagram-autopilot';
 import { Prose } from '@/components/Prose';
 import type { PokemonCard } from '@/types';
 import type { NeuheitenDatei } from '@/lib/neuheiten';
@@ -45,8 +46,10 @@ const LAGE: MarktLage = {
     { karte: karte('sv8-238', 'Pikachu ex', 'Surging Sparks', -12.1, 310), bewegung: -12.1, preis: 310, modern: true },
   ],
   sets: [
-    { setCode: 'me5', name: 'Pitch Black', jahr: '2026', karten: 88, median: 9.5, spitze: { name: 'Crushing Hammer', trend: 21 } },
-    { setCode: 'sv1', name: 'Scarlet & Violet', jahr: '2023', karten: 140, median: -4.2, spitze: null },
+    { setCode: 'me5', name: 'Pitch Black', jahr: '2026', datum: '2026-07-17', karten: 88, median: 9.5, spitze: { name: 'Crushing Hammer', trend: 21 } },
+    { setCode: 'sv1', name: 'Scarlet & Violet', jahr: '2023', datum: '2023-12-31', karten: 140, median: -4.2, spitze: null },
+    { setCode: 'me55', name: '30th Celebration', jahr: '2026', datum: '2026-09-16', karten: 28, median: -41, spitze: null },
+    { setCode: 'xy0', name: 'Kalos Starter Set', jahr: '2013', datum: '2013-11-08', karten: 29, median: 49, spitze: null },
   ],
   cbi: { wert: 3.5, karten: 14985 },
   vorwoche: { wert: 1.2, datum: '2026-09-21' },
@@ -65,8 +68,13 @@ describe('Marktlage als Prompt-Block', () => {
     expect(mitPreis).toMatch(/Moderne Sets.*bestätigte Aufwärtsbewegungen.*Charizard \(30th Celebration: Classic Collection\) \+18,4 %/);
     expect(mitPreis).toMatch(/Moderne Sets, bestätigte Abwärtsbewegungen.*Pikachu ex.*-12,1 %/);
     expect(mitPreis).toContain('eine Woche zuvor (2026-09-21) stand er bei +1,2 %');
-    expect(mitPreis).toMatch(/stärksten 30-Tage-Bewegung.*Pitch Black \(2026\) \+9,5 % über 88 Karten/);
-    expect(mitPreis).toMatch(/schwächsten 30-Tage-Bewegung.*Scarlet & Violet \(2023\) -4,2 %/);
+    expect(mitPreis).toMatch(/Moderne Sets mit der stärksten 30-Tage-Bewegung.*Pitch Black \(2026\) \+9,5 % über 88 Karten/);
+    expect(mitPreis).toMatch(/Moderne Sets mit der schwächsten 30-Tage-Bewegung.*Scarlet & Violet \(2023\) -4,2 %/);
+    // Junges Set: Hinweis, dass der 30-Tage-Schnitt die Starttage enthält
+    expect(mitPreis).toMatch(/30th Celebration \(2026\) -41,0 % über 28 Karten \[erst 12 Tage im Handel/);
+    // Alte Sets getrennt und nicht unter „Moderne Sets"
+    expect(mitPreis).toMatch(/Ältere Sets, auffälligste Bewegung.*Kalos Starter Set \(2013\) \+49,0/);
+    expect(mitPreis).not.toMatch(/Moderne Sets mit der stärksten[^\n]*Kalos/);
   });
 
   it('nennt Neuheiten, Japan-Vorlauf und ehrlich „keine angekündigten Sets"', () => {
@@ -110,13 +118,15 @@ describe('Relevanz statt Ausreißer (Probelauf 28.09.2026)', () => {
       ...Array.from({ length: SET_MIN_KARTEN }, (_, i) => ({ setCode: 'a', setName: 'A', name: `k${i}`, preis: 5, trend: i < 11 ? 10 : -10 })),
       { setCode: 'a', setName: 'A', name: 'penny', preis: 0.2, trend: 900 },
       { setCode: 'a', setName: 'A', name: 'billig', preis: 1, trend: 60 },
+      { setCode: 'a', setName: 'A', name: 'einzelverkauf', preis: 30, trend: 892.9 },
       ...Array.from({ length: SET_MIN_KARTEN - 1 }, (_, i) => ({ setCode: 'b', setName: 'B', name: `b${i}`, preis: 5, trend: 50 })),
     ];
-    const r = setBewegungen(zeilen, new Map([['a', '2024']]));
+    const r = setBewegungen(zeilen, new Map([['a', '2024/05/24']]));
     expect(r).toHaveLength(1); // B hat zu wenig Karten
-    expect(r[0]).toMatchObject({ setCode: 'a', jahr: '2024', karten: SET_MIN_KARTEN + 1, median: 10 });
+    expect(r[0]).toMatchObject({ setCode: 'a', jahr: '2024', datum: '2024-05-24', karten: SET_MIN_KARTEN + 2, median: 10 });
     expect(r[0].spitze?.name).not.toBe('penny');
     expect(r[0].spitze?.name).not.toBe('billig');
+    expect(r[0].spitze?.name).not.toBe('einzelverkauf'); // unbestätigte +892,9 % sind keine Spitze
   });
   it('modern = Set höchstens drei Jahre alt; unbekannt bleibt unbekannt', () => {
     const d = new Map([['neu', '2025/03/28'], ['alt', '2002/09/15']]);
@@ -186,5 +196,33 @@ describe('Zwischenüberschriften im Bericht', () => {
   it('Klartext (E-Mail, Auszüge) ohne Überschriften-Zeichen', () => {
     expect(ohneUeberschriften(text)).not.toContain('#');
     expect(ohneUeberschriften(text)).toContain('Neue Sets verdienen Beobachtung.');
+  });
+});
+
+describe('Instagram: Relevanz und Gedächtnis', () => {
+  const d = new Map([['sv8', '2024/11/08'], ['si', '2001/07/31']]);
+  const k = (id: string, set: string, t: number) => ({ ...karte(id, id, set, t), setCode: set });
+  const karten = [k('mew', 'si', 193.5), k('alt', 'si', 40), k('pika', 'sv8', 12), k('flare', 'sv8', 29.7), k('lucario', 'sv8', -16.6), k('rauschen', 'sv8', 2)];
+
+  it('moderne Karten zuerst, dünn gehandelte Klassiker-Ausreißer raus, Rauschen raus', () => {
+    const r = relevanteBewegungen(karten, d, new Set(), JETZT);
+    expect(r.gainers.map((c) => c.id)).toEqual(['flare', 'pika', 'alt']);
+    expect(r.losers.map((c) => c.id)).toEqual(['lucario']);
+  });
+  it('Reel: Klassiker-Ausreißer raus, alles andere bleibt', () => {
+    expect(ohneDuenneAusreisser(karten, d, JETZT).map((c) => c.id)).toEqual(['alt', 'pika', 'flare', 'lucario', 'rauschen']);
+  });
+  it('kürzlich Gezeigtes wird ausgelassen', () => {
+    expect(relevanteBewegungen(karten, d, new Set(['flare']), JETZT).gainers[0].id).toBe('pika');
+  });
+  it('Gedächtnis umfasst sechs Tage', () => {
+    const datei = { eintraege: [{ datum: '2026-09-20', ids: ['alt'] }, { datum: '2026-09-24', ids: ['flare'] }] };
+    expect([...zuletztGezeigt(datei, '2026-09-28')]).toEqual(['flare']);
+    expect(zuletztGezeigt(null, '2026-09-28').size).toBe(0);
+  });
+  it('gemerkt wird erst nach echter Veröffentlichung', () => {
+    const q = lies('src/lib/instagram-autopilot.ts');
+    const pos = q.indexOf('await merkeGezeigt(datum');
+    expect(pos).toBeGreaterThan(q.indexOf('const r = await vorbereitet.veroeffentlichen(k, frist)'));
   });
 });

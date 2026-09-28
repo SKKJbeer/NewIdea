@@ -159,6 +159,8 @@ function Fuss({ kompakt, datenstand }: { kompakt: boolean; datenstand: string })
 }
 
 export interface MoverDaten {
+  /** Karten-ID — für das Gedächtnis „schon gezeigt" (Instagram). */
+  id?: string;
   name: string;
   set: string;
   trend: number;

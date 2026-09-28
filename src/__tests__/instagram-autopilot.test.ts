@@ -71,8 +71,9 @@ describe('Der Wochenplan', () => {
       verlierer: [m('D', -20, 'data:x')],
     } as never);
     expect(folien.map((f) => f.mover.name)).toEqual(['A', 'C', 'D']);
-    expect(folien[0].titel).toMatch(/Stärkster Anstieg/);
-    expect(folien[folien.length - 1].titel).toMatch(/Stärkster Rückgang/);
+    // Nicht „Stärkster": die Auswahl ist nach Relevanz gewichtet (v6.15.0).
+    expect(folien[0].titel).toMatch(/^Aufwärts · 30 Tage$/);
+    expect(folien[folien.length - 1].titel).toMatch(/^Abwärts · 30 Tage$/);
     expect(folien.length).toBeLessThanOrEqual(10);
   });
 });
@@ -130,7 +131,8 @@ describe('Bildunterschriften', () => {
     expect(text).not.toMatch(/CardBeacon Index/);
     expect(text).toMatch(/Cardmarket-Stand 28\.09\.2026/);
     expect(text).toMatch(/Meloetta ex/);
-    expect(text).toMatch(/Stärkster Rückgang: Reshiram ex/);
+    expect(text).toMatch(/Abwärts: Reshiram ex/);
+    expect(text).not.toMatch(/stärksten|Stärkster/);
   });
 
   it('besteht die eigene Inhaltsschranke', () => {
