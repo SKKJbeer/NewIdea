@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.1] - 28. September 2026 · Darstellung auf Telefonen und älteren Geräten
+
+### Behoben
+- **iPhone zoomte nach einer Suche hinein** und die Ergebnisse waren erst nach Herauszoomen vollständig zu sehen: Das Suchfeld hatte 14 px Schrift, iOS Safari vergrößert bei Eingabefeldern unter 16 px automatisch. Auf Telefonen jetzt 16 px, zusätzlich als Regel für jedes Eingabefeld
+- Die Vorschlagsliste klappte auf der Ergebnisseite beim Laden von selbst auf und verdeckte die ersten Treffer — sie öffnet sich jetzt erst beim Tippen
+- Auf dem Telefon wurde der Preis in der Trefferliste bei langen Set-Namen abgeschnitten — er steht jetzt rechts über der 30-Tage-Bewegung
+- Weißer Seitengrund blitzte beim Über-den-Rand-Ziehen und Herauszoomen durch — Grundfläche und Browserleiste sind jetzt dunkel
+- Zu kleine Tippflächen („Alle anzeigen", Filter „Alle") vergrößert
+
+### Geändert
+- Unterstützt jetzt auch ältere Geräte ab iOS/Safari 15.4 und Chrome 99 (vorher Safari 16.4 / Chrome 111) — u. a. iPhone 6s, 7 und SE (1. Gen.)
+
+---
+
 ## [6.12.0] - 28. September 2026 · Preise japanischer und koreanischer Ausgaben
 
 ### Neu

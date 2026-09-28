@@ -130,7 +130,7 @@ export default async function MarktberichtPage() {
                 <Archive size={15} className="text-violet-400" />
                 <p className="text-sm font-bold text-slate-200">Frühere Berichte</p>
               </div>
-              <Link href="/marktbericht/archiv" className="text-xs font-semibold text-violet-400 hover:text-violet-300">
+              <Link href="/marktbericht/archiv" className="-my-2 inline-flex min-h-[40px] items-center text-xs font-semibold text-violet-400 hover:text-violet-300">
                 Alle anzeigen →
               </Link>
             </div>

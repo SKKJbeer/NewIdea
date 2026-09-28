@@ -145,6 +145,10 @@ export function SearchBox({
   const [sets, setSets] = useState<SetVorschlag[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [open, setOpen] = useState(false);
+  // Die Liste oeffnet sich erst, wenn jemand TIPPT. Auf der Ergebnisseite
+  // steht die Suchanfrage schon im Feld — vorher klappte die Liste dort beim
+  // Laden von selbst auf und verdeckte die ersten Ergebnisse (v6.12.1).
+  const beruehrt = useRef(false);
   const [aktiv, setAktiv] = useState(-1);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abbruchRef = useRef<AbortController | null>(null);
@@ -192,7 +196,7 @@ export function SearchBox({
     if (sofort) {
       setSuggestions(sofort.treffer);
       setSets(sofort.sets);
-      setOpen(sofort.treffer.length > 0 || sofort.sets.length > 0);
+      setOpen(beruehrt.current && (sofort.treffer.length > 0 || sofort.sets.length > 0));
       setAktiv(-1);
     }
     // Ein exakter, noch gültiger Treffer im Speicher ist die vollständige
@@ -225,7 +229,7 @@ export function SearchBox({
         merken(q, data, gefundeneSets);
         setSuggestions(data);
         setSets(gefundeneSets);
-        setOpen(data.length > 0 || gefundeneSets.length > 0);
+        setOpen(beruehrt.current && (data.length > 0 || gefundeneSets.length > 0));
         setAktiv(-1);
       } catch (err) {
         // catch erlaubt: Ein abgebrochener Abruf ist der Normalfall beim
@@ -291,10 +295,14 @@ export function SearchBox({
         ) : (
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
         )}
+        {/* 16 px auf dem Telefon: iOS Safari zoomt bei jedem Eingabefeld unter
+            16 px beim Antippen hinein und bleibt nach dem Absenden gezoomt —
+            die Ergebnisliste war dann nur nach Herauszoomen ganz zu sehen
+            (gemeldet auf einem iPhone 15). */}
         <input
           type="search"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => { beruehrt.current = true; setValue(e.target.value); }}
           onFocus={() => (suggestions.length > 0 || sets.length > 0) && setOpen(true)}
           onKeyDown={onKeyDown}
           autoFocus={autoFocus}
@@ -305,7 +313,7 @@ export function SearchBox({
           aria-expanded={open}
           aria-controls="suche-vorschlaege"
           aria-activedescendant={aktiv >= 0 ? `suche-vorschlag-${aktiv}` : undefined}
-          className="w-full appearance-none rounded-full border border-[#2a2a3a] bg-[#13131e] py-3 pl-11 pr-28 text-sm text-slate-200 shadow-sm placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+          className="w-full appearance-none rounded-full border border-[#2a2a3a] bg-[#13131e] py-3 pl-11 pr-28 text-[16px] sm:text-sm text-slate-200 shadow-sm placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
         />
         {/* EIGENES LEEREN-ZEICHEN statt des eingebauten.
             `type="search"` zeichnet in Safari und Chrome ein graues Kreuz in

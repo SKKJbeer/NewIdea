@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -13,6 +13,20 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 // Keine geratene Adresse — siehe site.ts.
 const SITE_URL = siteUrlOrLocal();
 const SITE_NAME = 'CardBeacon';
+
+// BILDSCHIRM: Breite = Geraet, dunkle Browserleiste (Safari/Chrome faerben
+// Statusleiste und Adressfeld danach). Bewusst OHNE `viewport-fit=cover`:
+// Das legt Inhalte im Querformat unter die Notch, und dafuer ist nicht jede
+// Flaeche mit Seitenabstaenden ausgestattet.
+// KEIN `maximumScale`/`userScalable: false`: Zoomen ist eine Bedienhilfe und
+// bleibt erlaubt — das Hineinzoomen beim Tippen verhindert die 16-px-Regel
+// in globals.css, nicht ein Zoomverbot.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#070810',
+  colorScheme: 'dark',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

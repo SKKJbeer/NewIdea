@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.1',
+    date: '28. September 2026',
+    label: 'Darstellung auf Telefonen und älteren Geräten',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'iPhone zoomte nach einer Suche hinein — Suchfeld auf Telefonen jetzt 16 px (iOS vergrößert kleinere Felder automatisch)' },
+      { type: 'fixed', text: 'Vorschlagsliste verdeckte auf der Ergebnisseite die ersten Treffer — öffnet sich erst beim Tippen' },
+      { type: 'fixed', text: 'Preis in der mobilen Trefferliste wurde abgeschnitten — steht jetzt rechts über der Bewegung' },
+      { type: 'fixed', text: 'Weißer Seitengrund beim Über-den-Rand-Ziehen, zu kleine Tippflächen' },
+      { type: 'changed', text: 'Unterstützung älterer Geräte ab iOS/Safari 15.4 und Chrome 99' },
+    ],
+  },
+  {
     version: '6.12.0',
     date: '28. September 2026',
     label: 'Preise japanischer und koreanischer Ausgaben',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Eigene Cardmarket-Preise für japanische und koreanische Ausgaben auf Kartenseite, Portfolio und Suche — aus dem offiziellen Cardmarket-Preisverzeichnis, mit Stand und zugeordneter Ausgabe' },
       { type: 'new', text: 'Exakte Zuordnung (Metakarte, Illustrator, Set-Paar, Seltenheit, genau ein Kandidat in beide Richtungen): 5.679 japanische, 186 koreanische Paare — sonst kein Preis' },

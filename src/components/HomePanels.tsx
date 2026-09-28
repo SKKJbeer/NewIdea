@@ -37,7 +37,7 @@ function Panel({
       <div className="flex items-center justify-between gap-4 px-6 pt-6 sm:px-7 sm:pt-7">
         <h3 className="text-[10.5px] font-medium uppercase tracking-[0.2em] text-slate-400/80">{titel}</h3>
         {aktion && aktionHref && (
-          <Link prefetch={false} href={aktionHref} className="shrink-0 text-[11px] text-violet-400 transition-colors hover:text-violet-300">
+          <Link prefetch={false} href={aktionHref} className="-my-2 inline-flex min-h-[40px] shrink-0 items-center px-1 text-[11px] text-violet-400 transition-colors hover:text-violet-300">
             {aktion}
           </Link>
         )}

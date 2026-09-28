@@ -51,7 +51,7 @@ export function SearchResultRows({
         <span className="w-10" />
         <span>Karte</span>
         <span className="hidden w-24 text-right sm:block">Preis</span>
-        <span className="w-[72px] text-right tabular-nums">30 T</span>
+        <span className="min-w-[72px] text-right tabular-nums"><span className="sm:hidden">Preis · </span>30 T</span>
         <span className="hidden w-[80px] text-right sm:block">vs. Markt</span>
       </div>
 
@@ -92,8 +92,7 @@ export function SearchResultRows({
                 {card.set}
                 {card.number ? ` · ${card.number}` : ''}
                 {card.rarity && card.rarity !== 'Unknown' ? ` · ${card.rarity}` : ''}
-                {/* Auf dem Telefon gibt es keine eigene Preisspalte. */}
-                <span className="sm:hidden"> · {preis > 0 ? formatEur(preis) : '—'}</span>
+
               </span>
             </span>
 
@@ -107,8 +106,14 @@ export function SearchResultRows({
               )}
             </span>
 
-            <span className={`${NUM.row} w-[72px] text-right font-semibold ${toneClass(trend)}`}>
-              {trend === null ? '—' : formatPercent(trend)}
+            {/* Telefon: Preis UND Bewegung rechts untereinander. Vorher stand der
+                Preis am Ende der grauen Unterzeile und wurde bei langen
+                Set-Namen abgeschnitten („Rare Holo · 31…"). */}
+            <span className={`${NUM.row} min-w-[72px] text-right font-semibold ${toneClass(trend)}`}>
+              <span className="block whitespace-nowrap text-[13px] font-semibold text-slate-200 sm:hidden">
+                {preis > 0 ? formatEur(preis) : '—'}
+              </span>
+              <span className="block">{trend === null ? '—' : formatPercent(trend)}</span>
             </span>
 
             <span

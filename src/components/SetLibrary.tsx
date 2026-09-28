@@ -101,7 +101,7 @@ export function SetLibrary({ sets }: { sets: SetEintrag[] }) {
           <button
             type="button"
             onClick={() => setEpoche('alle')}
-            className={`min-h-[32px] text-[12px] transition-colors ${
+            className={`min-h-[32px] min-w-[32px] px-1 text-[12px] transition-colors ${
               epoche === 'alle' ? 'text-slate-100 underline underline-offset-4' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
@@ -112,7 +112,7 @@ export function SetLibrary({ sets }: { sets: SetEintrag[] }) {
               key={name}
               type="button"
               onClick={() => setEpoche(name)}
-              className={`min-h-[32px] text-[12px] transition-colors ${
+              className={`min-h-[32px] min-w-[32px] px-1 text-[12px] transition-colors ${
                 epoche === name ? 'text-slate-100 underline underline-offset-4' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -128,7 +128,7 @@ export function SetLibrary({ sets }: { sets: SetEintrag[] }) {
               key={wert}
               type="button"
               onClick={() => setSortierung(wert)}
-              className={`min-h-[32px] text-[12px] transition-colors ${
+              className={`min-h-[32px] min-w-[32px] px-1 text-[12px] transition-colors ${
                 sortierung === wert ? 'text-slate-100 underline underline-offset-4' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
