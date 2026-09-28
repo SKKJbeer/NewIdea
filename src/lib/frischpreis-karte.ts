@@ -59,6 +59,7 @@ export function mitFrischpreis(card: PokemonCard, p: FrischerPreis): PokemonCard
       avg30: p.avg30 ?? undefined,
       updatedAt: p.updated,
       quelle: 'tcgdex',
+      produkt: p.produkt ?? undefined,
     },
   };
   neu.investmentScore = calculateInvestmentScore(neu);

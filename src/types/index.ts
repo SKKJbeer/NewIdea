@@ -39,6 +39,8 @@ export interface PokemonCard {
     updatedAt?: string;
     /** Woher der Stand kommt: `tcgdex` = Cardmarket vom Vortag, sonst pokemontcg.io (oft Monate alt). */
     quelle?: 'tcgdex' | 'pokemontcg';
+    /** Cardmarket-Produkt (nur bei `quelle: 'tcgdex'`) — Gegenprobe der Sprachzuordnung. */
+    produkt?: number;
   };
 }
 

@@ -100,7 +100,10 @@ export function SearchResultRows({
             <span className={`${NUM.row} hidden w-24 text-right text-slate-300 sm:block`}>
               {preis > 0 ? formatEur(preis) : '—'}
               {priceLanguage !== 'EN' && (
-                <span className="ml-1 text-[9px] text-violet-400">{priceLanguage}</span>
+                // Beschriftet wird die Sprache, in der der Preis WIRKLICH notiert ist.
+                <span className={`ml-1 text-[9px] ${priceOverrides[card.id] !== undefined ? 'text-violet-400' : 'text-slate-600'}`}>
+                  {priceOverrides[card.id] !== undefined || priceLanguage === 'DE' ? priceLanguage : 'EN'}
+                </span>
               )}
             </span>
 

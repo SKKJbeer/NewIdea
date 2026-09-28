@@ -51,6 +51,8 @@ export interface FrischerPreis {
   updated: string;
   /** Zugeordnete TCGdex-Karten-ID — fuer die Nachvollziehbarkeit. */
   dexId: string;
+  /** Cardmarket-Produkt — fuer die Gegenprobe der Sprachzuordnung (`sprachpreise.ts`). */
+  produkt?: number | null;
 }
 
 /** Klein, ohne Akzente, nur Buchstaben und Ziffern — fuer Namens- und Set-Vergleiche. */
@@ -104,6 +106,7 @@ interface DexKarte {
     cardmarket?: {
       updated?: string;
       unit?: string;
+      idProduct?: number;
       trend?: number | null;
       avg?: number | null;
       low?: number | null;
@@ -167,6 +170,7 @@ export async function pruefeFrischenPreis(
       avg: zahl(cm.avg),
       updated: cm.updated,
       dexId: d.id ?? id,
+      produkt: typeof cm.idProduct === 'number' && cm.idProduct > 0 ? cm.idProduct : null,
     } };
   }
   return { ok: false, grund: 'nicht-gefunden', detail: dexKandidaten(dexSet, karte.number).join(' | ') };

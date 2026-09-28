@@ -11,11 +11,16 @@ import type { PokemonCard } from '@/types';
 const fetchCardById = vi.fn();
 const fetchCMLanguagePrice = vi.fn();
 
-vi.mock('@/lib/pokemon-api', () => ({
+vi.mock('@/lib/pokemon-api', async (original) => ({
+  buildCardmarketHistory: (await original<typeof import('@/lib/pokemon-api')>()).buildCardmarketHistory,
   fetchCardById: (...args: unknown[]) => fetchCardById(...args),
 }));
 vi.mock('@/lib/cardmarket-api', () => ({
   fetchCMLanguagePrice: (...args: unknown[]) => fetchCMLanguagePrice(...args),
+}));
+const sprachpreiseFuerKarte = vi.fn();
+vi.mock('@/lib/sprachpreise', () => ({
+  sprachpreiseFuerKarte: (...args: unknown[]) => sprachpreiseFuerKarte(...args),
 }));
 
 // Die Route schreibt die Preise der Portfolio-Karten nach der Antwort mit —
@@ -64,6 +69,11 @@ function post(body: unknown): Request {
 beforeEach(() => {
   fetchCardById.mockReset();
   fetchCMLanguagePrice.mockReset();
+  sprachpreiseFuerKarte.mockReset();
+  sprachpreiseFuerKarte.mockResolvedValue([
+    { sprache: 'JP', ok: false, grund: 'keine-zuordnung' },
+    { sprache: 'KR', ok: false, grund: 'keine-zuordnung' },
+  ]);
 });
 
 describe('POST /api/portfolio/prices — Normalfall', () => {
@@ -100,40 +110,61 @@ describe('POST /api/portfolio/prices — Normalfall', () => {
 });
 
 describe('POST /api/portfolio/prices — Sprachpreise', () => {
-  it('nimmt den sprachspezifischen Cardmarket-Preis, wenn er vorliegt', async () => {
-    fetchCardById.mockImplementation(async (id: string) => card(id, 100));
+  const mitProdukt = (id: string, market = 100) => ({ ...card(id, market), cmPrices: { trend: market, quelle: 'tcgdex', produkt: 733794 } }) as PokemonCard;
+
+  it('DE: fragt Cardmarket mit der GENAUEN Produktnummer, nie per Name', async () => {
+    fetchCardById.mockImplementation(async (id: string) => mitProdukt(id, 100));
     fetchCMLanguagePrice.mockResolvedValue(145);
 
     const res = await POST(post({ cards: [{ id: 'a-1', language: 'DE', name: 'Glurak ex' }] }));
     const data = await res.json();
     expect(data['a-1'].price).toBe(145);
     expect(data['a-1'].priceLanguage).toBe('DE');
-    expect(fetchCMLanguagePrice).toHaveBeenCalledWith('Glurak ex', 'DE');
+    expect(fetchCMLanguagePrice).toHaveBeenCalledWith(733794, 'DE');
   });
 
-  it('fällt auf den englischen Preis zurück, wenn kein Sprachpreis kommt', async () => {
-    // Ohne konfigurierte Cardmarket-Schlüssel ist das der Normalfall — der
-    // Nutzer muss trotzdem einen Preis sehen, nur eben als EN gekennzeichnet.
+  it('DE ohne bekannte Produktnummer: keine Anfrage, EN-Notierung', async () => {
     fetchCardById.mockImplementation(async (id: string) => card(id, 100));
-    fetchCMLanguagePrice.mockResolvedValue(null);
+    const res = await POST(post({ cards: [{ id: 'a-1', language: 'DE', name: 'Glurak ex' }] }));
+    const data = await res.json();
+    expect(fetchCMLanguagePrice).not.toHaveBeenCalled();
+    expect(data['a-1'].priceLanguage).toBe('EN');
+  });
 
+  it('JP mit eindeutiger Zuordnung: Preis UND Verlauf der japanischen Ausgabe', async () => {
+    fetchCardById.mockImplementation(async (id: string) => card(id, 100));
+    sprachpreiseFuerKarte.mockResolvedValue([
+      {
+        sprache: 'JP', ok: true, stand: '2026-09-28T00:47:59.000Z',
+        preis: { trend: 350.45, avg: 382.53, low: 224.9, avg7: 348.64, avg30: 397.08 },
+        gegenstueck: { id: 'SV2a-201', name: 'リザードンex', set: 'SV2a', setName: 'ポケモンカード151', produkt: 719654 },
+      },
+    ]);
+    const res = await POST(post({ cards: [{ id: 'a-1', language: 'JP' }] }));
+    const data = await res.json();
+    expect(data['a-1'].price).toBe(350.45);
+    expect(data['a-1'].priceLanguage).toBe('JP');
+    expect(data['a-1'].gegenstueck.id).toBe('SV2a-201');
+    expect(data['a-1'].dailyPoints).toBe(0);
+    // Kein Punkt aus der englischen Reihe (dort 95) in der JP-Kurve
+    expect(data['a-1'].priceHistory.map((p: { price: number }) => p.price)).not.toContain(95);
+    expect(data['a-1'].priceHistory.at(-1).price).toBe(350.45);
+  });
+
+  it('JP ohne Zuordnung: EN-Notierung, als solche gekennzeichnet, mit Grund', async () => {
+    fetchCardById.mockImplementation(async (id: string) => card(id, 100));
     const res = await POST(post({ cards: [{ id: 'a-1', language: 'JP', name: 'Karte' }] }));
     const data = await res.json();
     expect(data['a-1'].price).toBe(100);
     expect(data['a-1'].priceLanguage).toBe('EN');
+    expect(data['a-1'].sprachGrund).toBe('keine-zuordnung');
   });
 
-  it('fragt für englische Karten gar nicht erst bei Cardmarket an', async () => {
+  it('fragt für englische Karten gar nicht erst nach Sprachpreisen', async () => {
     fetchCardById.mockImplementation(async (id: string) => card(id));
     await POST(post({ cards: [{ id: 'a-1', language: 'EN' }] }));
     expect(fetchCMLanguagePrice).not.toHaveBeenCalled();
-  });
-
-  it('nutzt den Kartennamen aus der API, wenn keiner mitgeschickt wurde', async () => {
-    fetchCardById.mockImplementation(async (id: string) => card(id));
-    fetchCMLanguagePrice.mockResolvedValue(80);
-    await POST(post({ cards: [{ id: 'a-1', language: 'DE' }] }));
-    expect(fetchCMLanguagePrice).toHaveBeenCalledWith('Card a-1', 'DE');
+    expect(sprachpreiseFuerKarte).not.toHaveBeenCalled();
   });
 });
 
@@ -201,7 +232,7 @@ describe('POST /api/portfolio/prices — Ausfälle einzelner Karten', () => {
   });
 
   it('bricht die Antwort nicht ab, wenn der Sprachpreis wirft', async () => {
-    fetchCardById.mockImplementation(async (id: string) => card(id, 90));
+    fetchCardById.mockImplementation(async (id: string) => ({ ...card(id, 90), cmPrices: { produkt: 1 } }) as PokemonCard);
     fetchCMLanguagePrice.mockRejectedValue(new Error('Cardmarket down'));
     const res = await POST(post({ cards: [{ id: 'a-1', language: 'DE' }, { id: 'a-2' }] }));
     const data = await res.json();

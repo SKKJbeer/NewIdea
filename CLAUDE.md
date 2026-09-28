@@ -149,6 +149,47 @@ täglich bei uns gespeichert und aktualisiert werden. Das ist das Wichtigste bei
 
 ---
 
+## ⛔ Sprachpreise JP/KR (seit v6.12.0 — nie raten)
+
+**Nutzer-Auftrag (28.09.2026):** „die preise der unterschiedlichen sprachen … das wichtigste ist,
+dass die preise korrekt sein müssen und nie erfunden oder geraten“.
+
+**Fakten zu Cardmarket (nicht verhandelbar):**
+- EN, DE, FR, IT, ES, PT = EIN Produkt. Der Preis-Trend fasst alle zusammen. Einen reinen
+  DE-Wert veröffentlicht Cardmarket nicht (nur Angebote über die OAuth-API, Schlüssel fehlen).
+  Die Seite sagt das so — NIE einen „DE-Preis“ vortäuschen.
+- JP und KR = EIGENE Produkte in eigenen Erweiterungen mit eigenem Preis.
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| Zuordnungsregeln (rein, getestet) | `src/lib/sprach-zuordnung.ts` | `bauZuordnung()` — sechs Schranken, siehe Kopf der Datei |
+| Ablauf + Abfrage | `src/lib/sprachpreise.ts` | Katalog etappenweise (TCGdex en/ja/ko), Zuordnung, Preise aus `price_guide_6.json`, `sprachpreiseFuerKarte()` |
+| Cron | `/api/cron/sprachen` 01:35 UTC | 500 bei verletzter Schranke; `?nur=stand` = Diagnose |
+| Ablage | Eimer `social`: `sprachen/zuordnung.json`, `sprachen/preise.json`, `sprachen/aufbau.json` (nur während Neuaufbau) | |
+
+**Die sechs Schranken (alle müssen halten, sonst KEIN Preis):** Produkt in seiner Sprache eindeutig ·
+gleiche Cardmarket-Metakarte · gleicher Illustrator (beidseitig angegeben) · Set-Paar belegt
+(≥ 3 Karten, ≥ 20 % beider Seiten, JP-Set −400 … +60 Tage zum EN-Set) · Seltenheit widerspricht
+nicht (Gold ↔ Common) · genau ein Kandidat UND Bijektion. Lückenhaft eingelesene Sets sperren ihr
+EN-Set. Belegte Fehlfälle ohne diese Schranken: Neo-Despotar → Champion-Road-Despotar (2018),
+Ho-Oh GX → späterer Nachdruck, Gold-Crushing-Hammer → normale Karte.
+
+**Gemessen 28.09.2026:** 5.679 JP-Paare, 186 KR-Paare (TCGdex führt nur ~240 KR-Karten). Grenzen der
+Quelle: 2.431 JP-Karten ohne Cardmarket-Produkt bei TCGdex (z. B. S6a-095 Umbreon VMAX SA) — die
+bekommen keinen Preis, auch wenn es das Produkt bei Cardmarket gibt (drei Umbreon-VMAX-Produkte in
+S6a, ohne Nummer nicht unterscheidbar).
+
+**Regeln:**
+- JP/KR ohne eindeutige Zuordnung: Preisfeld „—“ mit Grund. Im Portfolio EN-Notierung, aber
+  sichtbar als „Wert: EN-Notierung“ gekennzeichnet. NIE den EN-Preis unter JP-Beschriftung.
+- JP-Verlauf im Portfolio nur aus den JP-Schnitten (Ø 30/7 + Trend), nie aus EN-Tageswerten.
+- Set-NAMEN von TCGdex (ja) nicht anzeigen — SV4a heißt dort „レイジングサーフ“ (falsch). Code + Nummer zeigen.
+- Neuaufbau mit < `MIN_JP_PAARE` (3.000) ersetzt die alte Zuordnung NICHT.
+- `fetchCMLanguagePrice(idProduct, …)` NUR mit genauer Produktnummer — die frühere Namenssuche
+  (`products/find`, erster Treffer) war geraten und ist entfernt.
+
+---
+
 ## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
@@ -787,7 +828,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `ELEVENLABS_API_KEY` | KI-Stimme für Videos | Video-Cron aktiv |
 | `YOUTUBE_ACCESS_TOKEN` | Videos automatisch hochladen | Video-Cron aktiv |
 | `BUFFER_ACCESS_TOKEN` | Social-Media-Posts planen | Social-Cron aktiv |
-| `CARDMARKET_APP_TOKEN` | ⭐ Cardmarket OAuth App-Token | Sprachspezifische Preise (DE/JP/KR) im Portfolio |
+| `CARDMARKET_APP_TOKEN` | Cardmarket OAuth App-Token | Nur noch für DE-Angebotsmedian im Portfolio — JP/KR kommen seit v6.12.0 ohne Schlüssel aus dem Preisverzeichnis |
 | `CARDMARKET_APP_SECRET` | Cardmarket OAuth App-Secret | HMAC-SHA1-Signierung aller API-Requests |
 | `CARDMARKET_USER_TOKEN` | Cardmarket OAuth User-Token | Vom eigenen Cardmarket-Account: API → Anwendungen |
 | `CARDMARKET_USER_SECRET` | Cardmarket OAuth User-Secret | Alle 4 nötig — fehlt eine, Fallback auf EN-Preis |

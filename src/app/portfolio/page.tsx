@@ -581,6 +581,22 @@ export default function PortfolioPage() {
                         {lang}
                       </span>
                     </div>
+                    {/* Sprache des WERTES offenlegen: Eine JP-Karte ohne eindeutig
+                        zugeordnete japanische Ausgabe wird mit der EN-Notierung
+                        bewertet — das muss dastehen, sonst liest es sich als JP-Preis. */}
+                    {lang !== 'EN' && liveData[h.cardId] && (
+                      <p className="text-[10px] mt-0.5 truncate text-slate-600">
+                        {liveData[h.cardId].priceLanguage === lang
+                          ? liveData[h.cardId].gegenstueck
+                            ? `Wert: Cardmarket ${lang} · ${liveData[h.cardId].gegenstueck!.id}`
+                            : `Wert: Cardmarket ${lang}`
+                          : lang === 'DE'
+                            ? 'Wert: Cardmarket EN/DE (ein Produkt)'
+                            : liveData[h.cardId].sprachGrund === 'keine-zuordnung'
+                              ? `Wert: EN-Notierung — ${lang}-Ausgabe nicht eindeutig zugeordnet`
+                              : `Wert: EN-Notierung — ${lang}-Preis derzeit nicht verfügbar`}
+                      </p>
+                    )}
                     <p className="text-[10px] text-slate-600 mt-0.5 tabular-nums truncate">
                       {h.quantity}× · {formatEur(h.purchasePrice)}
                       {h.purchaseDate

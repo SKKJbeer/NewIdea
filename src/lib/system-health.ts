@@ -15,6 +15,7 @@ import { getSupabase, isSupabaseConfigured } from './supabase';
 import { loadSweepState, heute, seitenGesamt as seitenTotal } from '@/lib/price-sweep';
 import { GUIDE_TOPICS } from './guide-topics';
 import { leseDurchlaufStand, preisGate, type PreisGate, type DurchlaufStand } from './preis-durchlauf';
+import { leseSprachStand, sprachpreisGate, type SprachGate } from './sprachpreise';
 import { GUIDES } from './guides';
 
 /** Postgres-Fehlercode für „Tabelle existiert nicht". */
@@ -60,6 +61,8 @@ export interface SystemHealth {
    * auffrischt. `null`, wenn nicht lesbar.
    */
   preise: { gate: PreisGate; stand: DurchlaufStand | null } | null;
+  /** Schranke der JP/KR-Preise (sprachpreise.ts). `null`, wenn nicht lesbar. */
+  sprachpreise: SprachGate | null;
   problems: string[];
   checkedAt: string;
 }
@@ -402,6 +405,7 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
       },
       sweep: null,
       preise: null,
+      sprachpreise: null,
       problems: ['Supabase ist nicht konfiguriert — es werden keine Daten gespeichert'],
       checkedAt,
     };
@@ -533,5 +537,16 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
     problems.unshift(`PREISE NICHT PRÜFBAR: ${err instanceof Error ? err.message : 'unbekannt'}`);
   }
 
-  return { configured: true, tables, guidePipeline, sweep, preise, problems, checkedAt };
+  // Sprachpreise (JP/KR): Faellt die Schranke, zeigen Kartenseiten schlicht
+  // keinen JP-Preis — das saehe aus wie „nicht zugeordnet". Deshalb hier.
+  let sprachpreise: SystemHealth['sprachpreise'] = null;
+  try {
+    const { zuordnung, preise: sp } = await leseSprachStand();
+    sprachpreise = sprachpreisGate(zuordnung, sp);
+    if (!sprachpreise.ok) problems.push(`Sprachpreise (JP/KR) nicht aktuell: ${sprachpreise.befund}`);
+  } catch (err) {
+    problems.push(`Sprachpreise nicht prüfbar: ${err instanceof Error ? err.message : 'unbekannt'}`);
+  }
+
+  return { configured: true, tables, guidePipeline, sweep, preise, sprachpreise, problems, checkedAt };
 }

@@ -22,6 +22,7 @@ import { MarketContextSection, MarketContextSkeleton } from '@/components/Market
 import { siteUrlOrLocal } from '@/lib/site';
 import { karteMitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex } from '@/lib/card-index';
+import { sprachpreiseFuerKarte } from '@/lib/sprachpreise';
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -143,7 +144,11 @@ export default async function CardDetailPage({ params }: Props) {
   // - echte Tages-Snapshots aus Supabase (record-on-view, wächst mit der Zeit)
   // - Cardmarket-Ankerpunkte (Ø 30/7/1 Tage + Trend) als reale Referenz
   // Bei Datumskollision gewinnt IMMER der echte Snapshot. Keine erfundenen Punkte.
+  // Sprachausgaben (JP/KR) laufen parallel zum Verlauf — wirft nie, hoechstens
+  // 2 s (Dateien je Instanz 30 min vorgehalten, sprachpreise.ts).
+  const sprachenLaden = sprachpreiseFuerKarte(card, 2_000);
   const stored = await getStoredPriceHistory(id, 90);
+  const sprachen = await sprachenLaden;
   const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
   // Zusammenführung liegt zentral in price-history.ts — dieselbe Funktion nutzt
   // das Portfolio (Code-Regel 10: keine zweite Umsetzung derselben Logik).
@@ -377,8 +382,7 @@ export default async function CardDetailPage({ params }: Props) {
               </p>
               <div className="mt-4">
                 <CardLangPrice
-                  cardId={card.id}
-                  cardName={card.name}
+                  sprachen={sprachen}
                   defaultPrice={price}
                   trendPercent={displayTrend}
                   realData={realData}

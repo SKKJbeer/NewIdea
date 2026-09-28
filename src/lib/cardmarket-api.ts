@@ -63,37 +63,22 @@ function oauthHeader(method: string, baseUrl: string, queryParams: Record<string
   );
 }
 
-async function findCMProductId(cardName: string): Promise<number | null> {
-  const BASE = 'https://api.cardmarket.com/ws/v2.0/output.json/products/find';
-  const query = { search: cardName, exact: 'false', onlyExact: 'false', idGame: '3' };
-  const auth = oauthHeader('GET', BASE, query);
-  const url = `${BASE}?${new URLSearchParams(query).toString()}`;
-
-  const res = await fetch(url, {
-    headers: { Authorization: auth },
-    // Ohne Zeitlimit blockiert eine hängende Cardmarket-API die Portfolio-Route
-    // bis zum Vercel-Hardlimit.
-    signal: AbortSignal.timeout(8000),
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) return null;
-
-  const data = (await res.json()) as { product?: Array<{ idProduct: number }> };
-  return data.product?.[0]?.idProduct ?? null;
-}
-
-// Returns the median price (EX+ condition) for the given language from Cardmarket.
-// Returns null when not configured or no listings found.
+// Median-Angebotspreis (ab EX) einer Sprache fuer ein GENAU bekanntes Produkt.
+//
+// Frueher suchte diese Funktion das Produkt ueber den Kartennamen und nahm den
+// ersten Treffer — bei „Charizard ex" eines von Dutzenden Produkten, also
+// geraten. Jetzt nur noch mit der Produktnummer, die TCGdex fuer genau diese
+// Karte fuehrt (`cmPrices.produkt`). Ohne sie: kein Sprachpreis.
+// Liefert null, wenn die Cardmarket-Schluessel fehlen oder nichts gelistet ist.
 export async function fetchCMLanguagePrice(
-  cardName: string,
+  idProduct: number,
   language: CardLanguage,
 ): Promise<number | null> {
   if (!cmConfigured()) return null;
+  if (!Number.isInteger(idProduct) || idProduct <= 0) return null;
 
   try {
-    const productId = await findCMProductId(cardName);
-    if (!productId) return null;
-
+    const productId = idProduct;
     const langId = CM_LANGUAGE_IDS[language];
     const BASE = `https://api.cardmarket.com/ws/v2.0/output.json/articles/${productId}`;
     const query = { language: String(langId), minCondition: 'EX', maxResults: '20' };
@@ -121,7 +106,7 @@ export async function fetchCMLanguagePrice(
   } catch (err) {
     // Nicht stumm: Ein dauerhaft fehlschlagender Sprachpreis sieht im
     // Portfolio wie „kein Cardmarket-Zugang" aus und bliebe sonst unbemerkt.
-    console.warn(`Cardmarket-Sprachpreis für "${cardName}" (${language}) fehlgeschlagen:`, err);
+    console.warn(`Cardmarket-Sprachpreis für Produkt ${idProduct} (${language}) fehlgeschlagen:`, err);
     return null;
   }
 }

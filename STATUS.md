@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.11.3` · **Stand:** 27. September 2026 · **Branch:** `main`
+**Version:** `v6.12.0` · **Stand:** 28. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -22,7 +22,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
 | Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth (timing-safe, fail-closed), 3 Tabs |
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
-| Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR |
+| Portfolio `/portfolio` | ✅ Fertig | Finance-App-Style, localStorage, SVG-Chart, Live-Preise, P&L an Zeitraum gekoppelt, EN/DE/JP/KR — JP/KR mit eigener Cardmarket-Notierung bei eindeutiger Zuordnung (v6.12.0) |
 | Reels Studio | ✅ Funktioniert | Auto-Reel lokal verifiziert (1080x1920, 23s, echte Marktdaten). Instagram-Auto-Publish wartet auf INSTAGRAM_ACCESS_TOKEN |
 | Sicherheit | ✅ Durchgesehen | v2.35.0: 9 Befunde behoben, Sicherheits-Kopfzeilen (CSP, kein Einbetten), 74 Prüfungen halten sie geschlossen |
 | Design-System | ✅ Fertig | Einheitlicher Dark Mode über alle Seiten, in CLAUDE.md verankert |
@@ -166,6 +166,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.12.0 | Preise japanischer (5.679 Paare) und koreanischer (186) Ausgaben aus dem Cardmarket-Preisverzeichnis, exakte Zuordnung, täglicher Cron mit Schranke |
 | v6.11.3 | Globale Anmeldegrenze (100 Fehlversuche / 15 min) |
 | v6.11.2 | Diagnose der Anmeldesperre im Studio-Status |
 | v6.11.1 | Anmeldesperre instanzübergreifend (Speicher-Eimer) |

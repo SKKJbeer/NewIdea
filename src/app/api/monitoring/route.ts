@@ -64,6 +64,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Sprachpreise JP/KR',
+      endpoint: '/api/cron/sprachen',
+      schedule: '35 1 * * *',
+      scheduleLabel: 'Täglich 01:35 UTC',
+      description:
+        'Preise japanischer und koreanischer Ausgaben aus dem offiziellen Cardmarket-Preisverzeichnis — nur für eindeutig zugeordnete Karten. Liest wöchentlich den Katalog (TCGdex en/ja/ko) neu ein; meldet 500, wenn die Schranke nicht hält. Diagnose: ?nur=stand',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Tagespreise aller Karten — Etappe 1',
       endpoint: '/api/cron/preise?etappe=1',
       schedule: '5 2 * * *',

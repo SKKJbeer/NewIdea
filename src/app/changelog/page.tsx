@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.0',
+    date: '28. September 2026',
+    label: 'Preise japanischer und koreanischer Ausgaben',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Eigene Cardmarket-Preise für japanische und koreanische Ausgaben auf Kartenseite, Portfolio und Suche — aus dem offiziellen Cardmarket-Preisverzeichnis, mit Stand und zugeordneter Ausgabe' },
+      { type: 'new', text: 'Exakte Zuordnung (Metakarte, Illustrator, Set-Paar, Seltenheit, genau ein Kandidat in beide Richtungen): 5.679 japanische, 186 koreanische Paare — sonst kein Preis' },
+      { type: 'new', text: 'Täglicher Cron mit Qualitätsschranke und Monitoring-Eintrag' },
+      { type: 'changed', text: 'Deutsche Ausgaben: Hinweis, dass Cardmarket DE und EN als ein Produkt führt; Cardmarket-API nur noch mit genauer Produktnummer' },
+      { type: 'fixed', text: 'JP/KR-Auswahl zeigte den englischen Preis unter JP-/KR-Beschriftung' },
+    ],
+  },
+  {
     version: '6.11.3',
     date: '27. September 2026',
     label: 'Globale Anmeldegrenze',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Sperre je Adresse ließ sich mit wechselnden Adressen umgehen — zusätzlich globale Grenze von 100 Fehlversuchen in 15 Minuten' },
     ],

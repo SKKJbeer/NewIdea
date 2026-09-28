@@ -39,6 +39,12 @@ export interface LiveCardData {
   quelle?: 'live' | 'index';
   /** Datenstand des Index — nur bei `quelle: 'index'`. */
   indexStand?: string | null;
+  /** In welcher Sprache der Preis tatsaechlich notiert ist. */
+  priceLanguage?: CardLanguage;
+  /** JP/KR: zugeordnete Ausgabe und Stand des Preisverzeichnisses. */
+  gegenstueck?: { id: string; name: string; setName: string };
+  sprachStand?: string;
+  sprachGrund?: string;
 }
 
 export interface ChartPoint {

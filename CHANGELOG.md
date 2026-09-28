@@ -7,6 +7,23 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.0] - 28. September 2026 · Preise japanischer und koreanischer Ausgaben
+
+### Neu
+- **Eigene Cardmarket-Preise für japanische und koreanische Ausgaben** — auf der Kartenseite, im Portfolio und in der Suche. Quelle ist das offizielle Cardmarket-Preisverzeichnis (täglich), mit Stand-Datum und zugeordneter Ausgabe (Kartenname, Set-Code, Nummer)
+- **Exakte Zuordnung statt Namenssuche:** Eine japanische oder koreanische Ausgabe gilt nur als Gegenstück, wenn Cardmarket-Metakarte und Illustrator übereinstimmen, die Sets nachweislich zusammengehören (Erscheinungsfenster), die Seltenheit nicht widerspricht und es genau einen Kandidaten gibt — in beide Richtungen. Gemessen: 5.679 japanische und 186 koreanische Paare. Alles andere bekommt keinen Preis
+- Täglicher Cron `/api/cron/sprachen` mit Qualitätsschranke (HTTP 500 bei fehlender Zuordnung oder Preisstand älter als drei Tage) und Eintrag im Monitoring
+
+### Geändert
+- Deutsche Ausgaben: Die Seite sagt jetzt, was stimmt — Cardmarket führt deutsche und englische Karten als ein Produkt, der Preis-Trend gilt für beide
+- Die Anfrage an die Cardmarket-API (falls Zugang eingerichtet) nutzt nur noch die genaue Produktnummer statt des ersten Treffers einer Namenssuche
+
+### Behoben
+- Bei der Sprachwahl JP/KR zeigten Kartenseite und Suche den englischen Preis unter der Beschriftung „JP" bzw. „KR"
+- Im Portfolio steht bei nicht englischen Karten, in welcher Sprache der Wert tatsächlich notiert ist
+
+---
+
 ## [6.11.3] - 27. September 2026 · Globale Anmeldegrenze
 
 ### Sicherheit

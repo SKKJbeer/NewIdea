@@ -5,6 +5,8 @@ import { cardsFromIndex, cardIndexStand } from '@/lib/card-index';
 import { fetchCMLanguagePrice, type CardLanguage } from '@/lib/cardmarket-api';
 import { PriceDataPoint, PokemonCard } from '@/types';
 import { getStoredPriceHistories, mergePriceHistory, recordPriceSnapshots } from '@/lib/price-history';
+import { buildCardmarketHistory } from '@/lib/pokemon-api';
+import { sprachpreiseFuerKarte, type SprachGrund } from '@/lib/sprachpreise';
 import { after } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
 
@@ -53,6 +55,11 @@ interface LiveCardData {
   quelle: 'live' | 'index';
   /** Datenstand des Index — nur bei `quelle: 'index'` gesetzt. */
   indexStand?: string | null;
+  /** JP/KR: Stand des Cardmarket-Preisverzeichnisses und die zugeordnete Ausgabe. */
+  sprachStand?: string;
+  gegenstueck?: { id: string; name: string; setName: string };
+  /** JP/KR ohne eigenen Preis: warum (dann steht `price` fuer die EN-Notierung). */
+  sprachGrund?: SprachGrund;
 }
 
 export async function POST(request: Request) {
@@ -137,28 +144,57 @@ export async function POST(request: Request) {
       let price = card.prices.market || card.prices.holofoil?.market || 0;
       let priceLanguage: CardLanguage = 'EN';
 
-      if (c.language !== 'EN') {
-        const langPrice = await withTimeout(fetchCMLanguagePrice(c.name || card.name, c.language));
-        if (langPrice !== null) {
-          price = langPrice;
-          priceLanguage = c.language;
-        }
-        // If CM not configured or no result, fall back to English Cardmarket price
-      }
-
       const stored = storedByCard[c.id] ?? [];
       // Ohne `realData`-Bedingung: `priceHistory` wird ohnehin nur gesetzt,
       // wenn echte Cardmarket-Daten vorliegen — eine zusätzliche Prüfung würde
       // hier nur bestehendes Verhalten verengen.
       const anchors = card.priceHistory ?? [];
+      let priceHistory = mergePriceHistory(anchors, stored);
+      let dailyPoints = stored.length;
+      let sprach: Pick<LiveCardData, 'sprachStand' | 'gegenstueck' | 'sprachGrund'> = {};
+
+      if (c.language === 'JP' || c.language === 'KR') {
+        // Eigene Notierung der japanischen/koreanischen Ausgabe — nur bei
+        // EINDEUTIGER Zuordnung (sprach-zuordnung.ts). Verlauf dann aus
+        // DEREN Cardmarket-Schnitten, nie aus den englischen Tageswerten:
+        // Eine Kurve aus EN-Preisen mit einem JP-Endpunkt waere erfunden.
+        const angabe = (await withTimeout(sprachpreiseFuerKarte(card)))?.find((a) => a.sprache === c.language);
+        if (angabe?.ok) {
+          price = angabe.preis.trend;
+          priceLanguage = c.language;
+          priceHistory = buildCardmarketHistory({
+            trendPrice: angabe.preis.trend,
+            averageSellPrice: angabe.preis.avg ?? 0,
+            avg7: angabe.preis.avg7 ?? 0,
+            avg30: angabe.preis.avg30 ?? 0,
+            avg1: 0,
+          });
+          dailyPoints = 0;
+          sprach = {
+            sprachStand: angabe.stand,
+            gegenstueck: { id: angabe.gegenstueck.id, name: angabe.gegenstueck.name, setName: angabe.gegenstueck.setName },
+          };
+        } else {
+          sprach = { sprachGrund: angabe && !angabe.ok ? angabe.grund : 'nicht-geladen' };
+        }
+      } else if (c.language === 'DE' && card.cmPrices?.produkt) {
+        // Deutsch: dasselbe Cardmarket-Produkt wie Englisch. Einen reinen
+        // DE-Wert gibt es nur ueber die Cardmarket-API — und nur mit der
+        // GENAUEN Produktnummer, nie per Namenssuche.
+        const langPrice = await withTimeout(fetchCMLanguagePrice(card.cmPrices.produkt, 'DE'));
+        if (langPrice !== null) {
+          price = langPrice;
+          priceLanguage = 'DE';
+        }
+      }
 
       return {
         id: c.id,
         card,
         data: {
           price,
-          priceHistory: mergePriceHistory(anchors, stored),
-          dailyPoints: stored.length,
+          priceHistory,
+          dailyPoints,
           name: card.name,
           set: card.set,
           setCode: card.setCode,
@@ -166,6 +202,7 @@ export async function POST(request: Request) {
           priceLanguage,
           quelle,
           indexStand: quelle === 'index' ? indexStand : undefined,
+          ...sprach,
         } satisfies LiveCardData,
       };
     }),

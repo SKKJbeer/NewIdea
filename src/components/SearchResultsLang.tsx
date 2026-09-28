@@ -45,7 +45,10 @@ export function SearchResultsLang({ cards, query, cbi = null }: SearchResultsLan
         const overrides: Record<string, number> = {};
         const langs: Record<string, CardLanguage> = {};
         for (const [id, d] of Object.entries(data)) {
-          if (d.price > 0) overrides[id] = d.price;
+          // Nur echte Sprachpreise ersetzen den angezeigten Wert. Vorher
+          // stand hier jeder Preis — auch der englische, dann mit „JP"
+          // beschriftet.
+          if (d.price > 0 && d.priceLanguage === language) overrides[id] = d.price;
           langs[id] = d.priceLanguage;
         }
         setPriceOverrides(overrides);
@@ -55,11 +58,8 @@ export function SearchResultsLang({ cards, query, cbi = null }: SearchResultsLan
       .finally(() => setLoading(false));
   }, [language, cards]);
 
-  const hasAnyResult = Object.keys(actualLanguages).length > 0;
-  const cmFallback =
-    language !== 'EN' &&
-    hasAnyResult &&
-    Object.values(actualLanguages).every((l) => l === 'EN');
+  const ergebnisse = Object.values(actualLanguages);
+  const mitSprachpreis = ergebnisse.filter((l) => l === language).length;
 
   return (
     <div>
@@ -74,16 +74,17 @@ export function SearchResultsLang({ cards, query, cbi = null }: SearchResultsLan
         </div>
       </div>
 
-      {cmFallback && (
-        <div className="mb-5 rounded-md border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-400/80">
-          <strong className="text-amber-400">Sprachspezifische Preise nicht verfügbar:</strong>{' '}
-          Die Cardmarket OAuth API ist noch nicht konfiguriert — EN-Preise werden angezeigt.
+      {language === 'DE' && (
+        <div className="mb-4 rounded-md border border-[#2a2a3a] bg-[#13131e] px-4 py-2.5 text-xs text-slate-400">
+          Cardmarket führt deutsche und englische Ausgaben als ein Produkt — die Preise gelten für beide.
         </div>
       )}
 
-      {language !== 'EN' && !loading && !cmFallback && hasAnyResult && (
-        <div className="mb-4 flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-4 py-2 text-xs text-emerald-400">
-          ✓ Cardmarket-Preise für {language === 'DE' ? 'deutsche' : language === 'JP' ? 'japanische' : 'koreanische'} Ausgaben
+      {(language === 'JP' || language === 'KR') && !loading && ergebnisse.length > 0 && (
+        <div className="mb-4 rounded-md border border-[#2a2a3a] bg-[#13131e] px-4 py-2.5 text-xs text-slate-400">
+          <span className="font-semibold text-slate-200">{mitSprachpreis}</span> von {ergebnisse.length} Karten mit
+          eigener {language}-Notierung auf Cardmarket. Die übrigen zeigen die EN-Notierung (markiert) — ihre{' '}
+          {language === 'JP' ? 'japanische' : 'koreanische'} Ausgabe ist nicht eindeutig zugeordnet.
         </div>
       )}
 
