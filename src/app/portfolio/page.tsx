@@ -912,7 +912,7 @@ function AddCardModal({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kartenname — z. B. Charizard"
-                className="w-full pl-10 pr-10 py-3 text-[16px] sm:text-sm border border-[#2a2a3a] rounded-xl bg-[#1a1a28] text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20 transition-all"
+                className="w-full appearance-none pl-10 pr-10 py-3 text-[16px] sm:text-sm [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none border border-[#2a2a3a] rounded-xl bg-[#1a1a28] text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20 transition-all"
               />
               {searching
                 ? <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 animate-spin" />

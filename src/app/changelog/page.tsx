@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.6',
+    date: '28. September 2026',
+    label: 'Ein Löschen-Kreuz in der Portfolio-Suche',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Zwei Löschen-Kreuze im Suchfeld „Karte hinzufügen" — das des Browsers ist ausgeblendet' },
+    ],
+  },
+  {
     version: '6.12.5',
     date: '28. September 2026',
     label: 'Portfolio-Suche findet wieder Karten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Portfolio-Suche fand keine Karten — sie erwartete noch das alte Antwortformat der Vorschlagsschnittstelle' },
       { type: 'fixed', text: 'Ausfall der Suche wird als solcher angezeigt, nicht als „Keine Ergebnisse"' },

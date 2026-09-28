@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.6] - 28. September 2026 · Ein Löschen-Kreuz in der Portfolio-Suche
+
+### Behoben
+- Im Suchfeld „Karte hinzufügen" standen zwei Löschen-Kreuze nebeneinander (das des Browsers und das eigene) — das des Browsers ist ausgeblendet, wie in der Hauptsuche
+
+---
+
 ## [6.12.5] - 28. September 2026 · Portfolio-Suche findet wieder Karten
 
 ### Behoben
