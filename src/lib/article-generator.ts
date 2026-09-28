@@ -1,4 +1,4 @@
-import { leseNeuheiten, themenKontext } from './neuheiten';
+import { ladeMarktLage, trendKarten, marktLageText, AUSBLICK_REGELN, type MarktLage } from './markt-lage';
 import { setAusIndex } from './card-index';
 
 /** So viele Karten aus neuen Sets kommen zusätzlich in den Bildpool eines Artikels. */
@@ -449,6 +449,9 @@ const CREATOR_RULES = `ALS CONTENT-CREATOR (Text soll Lust machen, gelesen zu we
 5. KONKRETE BILDER: Nenne echte Karten aus den Daten als Anker (die kommen als Bilder in featuredCards/highlight). Beschreibe unbekannte Pokémon in Klammern, damit auch Neulinge folgen können.
 6. ANKNÜPFEN (optional): Wenn thematisch sinnvoll und in "Zuletzt erschienen" ein passender Beitrag steht, darfst du natürlich darauf verweisen ("wie schon bei der Set-Analyse zu sehen war"). Kein Zwang, nie erzwungen wirken lassen.`;
 
+/** Artikeltypen, die aktuelle Trends und einen Ausblick enthalten müssen. */
+export const MIT_TRENDS: ReadonlySet<ArticleType> = new Set(['markt', 'set', 'ausblick', 'rueckblick']);
+
 function buildPrompt(type: ArticleType, cards: string, dateLabel: string, recentTitles: string[] = []): string {
   const isRueckblick = type === 'rueckblick';
 
@@ -474,12 +477,14 @@ function buildPrompt(type: ArticleType, cards: string, dateLabel: string, recent
     karte:      `Wähle die spannendste Karte aus den Daten und analysiere sie tiefgehend (Geschichte, Artwork, Preisentwicklung). Stand: ${dateLabel}. Füge diese Karte + 2-3 vergleichbare in featuredCards ein.\n\nAktuelle Karten:\n${cards}`,
     strategie:  `Analysiere eine Strategie oder einen Ansatz im Pokémon-TCG-Markt für ${dateLabel}. Zeige Risiken und historische Muster. Karten in featuredCards eintragen.\n\nMarktdaten:\n${cards}`,
     set:        `Analysiere ein aktuell interessantes Pokémon-TCG-Set. Welche Chase-Cards stechen hervor? Sealed oder Einzelkarten — was zeigen die Preisdaten? Stand: ${dateLabel}. Die Top-Karten des Sets in featuredCards eintragen.\n\nKarten (mit Set-Info):\n${cards}`,
-    ausblick:   `Gib einen sachlichen Ausblick auf aktuelle Marktentwicklungen für das Wochenende ab ${dateLabel}. Welche Karten zeigen Bewegungen, welche Risiken gibt es? Keine persönlichen Empfehlungen. Auffällige Karten in featuredCards.\n\nAktuelle Daten:\n${cards}`,
+    ausblick:   `Gib einen sachlichen Ausblick auf die Marktentwicklung ab ${dateLabel}. Grundlage ist die MARKTLAGE unten: Welche bestätigten Bewegungen laufen, welche Sets bewegen sich, welche neuen Sets sind gerade erschienen, was ist in Japan schon erschienen, was ist angekündigt — und was davon verdient in den nächsten Wochen Beobachtung? Ein Abschnitt heißt „Was jetzt Beobachtung verdient". Keine persönlichen Empfehlungen, keine Preisprognosen. Auffällige Karten in featuredCards.\n\nAktuelle Daten:\n${cards}`,
     guide:      `Schreibe einen unterhaltsamen Guide — praktisch für Einsteiger, trotzdem interessant für Fortgeschrittene. Mit echten Karten-Beispielen. Stand: ${dateLabel}. Beispielkarten in featuredCards.\n\nKontext:\n${cards}`,
-    rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Analysiere was die GELIEFERTEN MARKTDATEN diese Woche zeigen: Welche Karte fällt auf? Welches allgemeine Marktmuster war sichtbar? Was verdient nächste Woche Beobachtung? WICHTIG: Erfinde keine Turnierergebnisse, News oder Ankündigungen — wenn du über die Pokémon-Welt schreibst, nur zeitlose, verifizierbare Fakten (z.B. dass Turniersaisons Nachfrage verschieben). Locker erzählt, Zahlen nur aus den Daten. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
+    rueckblick: `Wochenrückblick für die Woche um ${dateLabel}. Analysiere was die GELIEFERTEN MARKTDATEN diese Woche zeigen: Welche Karte fällt auf? Welches allgemeine Marktmuster war sichtbar? Welche Sets bewegen sich, was ist neu erschienen (MARKTLAGE)? Was verdient als Nächstes Beobachtung (eigener Abschnitt, nur aus den Fakten)? WICHTIG: Erfinde keine Turnierergebnisse, News oder Ankündigungen — wenn du über die Pokémon-Welt schreibst, nur zeitlose, verifizierbare Fakten (z.B. dass Turniersaisons Nachfrage verschieben). Locker erzählt, Zahlen nur aus den Daten. Die Featured Cards sind die Karte der Woche + Überraschungen.\n\nAktuelle Marktdaten:\n${cards}`,
   };
 
-  return `${persona}\n\n${contexts[type]}${continuity}`;
+  // Trends und Ausblick dort, wo sie hingehören — ein Guide braucht keinen.
+  const trendRegeln = MIT_TRENDS.has(type) ? `\n\n${AUSBLICK_REGELN}` : '';
+  return `${persona}\n\n${contexts[type]}${trendRegeln}${continuity}`;
 }
 
 function toFeaturedCard(c: PokemonCard): FeaturedCard {
@@ -644,12 +649,18 @@ export async function generateArticle(
 
   // 3. Fetch live market data only when we actually need to generate.
   let trendingCards: PokemonCard[] = [];
+  let lage: MarktLage | null = null;
   let cardSummary = 'Keine aktuellen Daten verfügbar';
   try {
     // BREITERER POOL ALS FRUEHER (30 statt 10). Aus zehn immer gleichen
     // Karten laesst sich keine Abwechslung waehlen — die wertvollsten
     // aendern sich ueber Wochen kaum.
-    trendingCards = await fetchTrendingCards(30);
+    // FRISCHE MARKTLAGE statt fester Set-Liste (seit v6.14.0): bestätigte
+    // Bewegungen zuerst, dann die wertvollsten frischen Karten. Vorher kamen
+    // die Karten aus sv3pt5 … sv8 mit Monate alten Preisen.
+    lage = await ladeMarktLage();
+    trendingCards = trendKarten(lage, 40);
+    if (trendingCards.length === 0) trendingCards = await fetchTrendingCards(30);
   } catch (err) {
     // Nie stumm: Ohne Kartendaten wird der Artikel dünner, und genau das
     // muss im Log stehen (Stolperstelle 21).
@@ -685,10 +696,12 @@ export async function generateArticle(
   // 28.09.2026: Berichte kannten das 30-jährige Jubiläum nicht. Die Karten der
   // neuen Sets kommen mit in den Pool (als Bilder), die Themen als Kontext.
   try {
-    const neuheiten = await leseNeuheiten();
-    const kontext = themenKontext(neuheiten);
-    if (kontext) {
-      cardSummary += kontext;
+    // Index, Breite, bestätigte Bewegungen, Set-Bewegung, Neuheiten, Japan,
+    // Angekündigtes — OHNE Euro-Beträge (keine Preise im Fließtext).
+    const lageText = lage ? marktLageText(lage, { preise: false }) : '';
+    if (lageText) cardSummary += `\n\n${lageText}`;
+    const neuheiten = lage?.neuheiten ?? null;
+    if (neuheiten) {
       const neuKarten = (await Promise.all((neuheiten?.sets ?? []).slice(0, 3).map((s) => setAusIndex(s.setCode).catch(() => []))))
         .flat()
         .sort((a, b) => (b.prices.market ?? 0) - (a.prices.market ?? 0))

@@ -10,7 +10,7 @@ import { saveMarketReport } from './market-report-storage';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
 import type { PokemonCard } from '@/types';
-import { getHomepageCards } from './homepage-data';
+import { ladeMarktLage, marktLageText } from './markt-lage';
 import { splitMovers } from './market-metrics';
 
 /**
@@ -70,14 +70,25 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
     // Bericht sprach damit über den Markt, sah aber nur ein einziges Set, und
     // die „wertvollsten Karten" waren sechs Karten aus ebendiesem Set. Zwei
     // Seiten, zwei Datengrundlagen, zwei Wahrheiten.
-    const cards = await getHomepageCards(250);
+    //
+    // Seit v6.14.0 dazu die ganze Marktlage (markt-lage.ts): Index, Breite,
+    // BESTÄTIGTE Bewegungen, Set-Bewegung, Neuheiten, Japan, Angekündigtes.
+    // Vorher sah der Prompt zehn Karten — und schrieb entsprechend steril.
+    const lage = await ladeMarktLage();
+    const cards = lage.pool;
     if (cards.length === 0) {
       return { status: 'no_cards', weekStart, weekNumber, error: 'Keine Kartendaten von der TCG-API erhalten' };
     }
 
     // Vorzeichen-Trennung zentral — dieselbe Regel wie auf der Startseite.
-    const { gainers, losers } = splitMovers(cards, 5);
-    const summary = await generateMarketSummary(cards, gainers, losers);
+    // Gewinner/Verlierer bevorzugt aus den BESTÄTIGTEN Bewegungen — ein
+    // Einzelangebot soll nicht als Wochengewinner auf der Seite stehen.
+    const bestaetigt = lage.bestaetigt.map((b) => b.karte);
+    const ausBestaetigt = splitMovers(bestaetigt, 5);
+    const ausPool = splitMovers(cards, 5);
+    const gainers = ausBestaetigt.gainers.length >= 3 ? ausBestaetigt.gainers : ausPool.gainers;
+    const losers = ausBestaetigt.losers.length >= 3 ? ausBestaetigt.losers : ausPool.losers;
+    const summary = await generateMarketSummary(cards, gainers, losers, marktLageText(lage, { preise: true }));
     const reportText = (summary.weeklyReport || '').trim();
 
     // Qualitätsgate: lieber kein neuer Bericht als ein Platzhalter auf der Startseite.

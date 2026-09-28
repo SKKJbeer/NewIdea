@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { getSupabase } from '@/lib/supabase';
-import { fetchTrendingCards } from '@/lib/pokemon-api';
+import { aktuelleTrendKarten } from '@/lib/markt-lage';
 import { renderStory } from '@/lib/reel-generator';
 import { buildStory, CONCEPTS } from '@/lib/reel-concepts';
 import { siteUrlOrLocal } from '@/lib/site';
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const conceptId = typeof body?.conceptId === 'string' ? body.conceptId : undefined;
 
   try {
-    const trending = await fetchTrendingCards(30);
+    const trending = await aktuelleTrendKarten(30);
     const siteUrl = siteUrlOrLocal();
     const story = buildStory(trending, siteUrl, { conceptId });
     if (!story) {

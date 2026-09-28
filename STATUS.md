@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.13.2` · **Stand:** 28. September 2026 · **Branch:** `main`
+**Version:** `v6.14.0` · **Stand:** 28. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.14.0 | Automatische Berichte mit echten Trends + Ausblick: gemeinsame Marktlage (bestätigte Bewegungen, Index, Breite, Set-Bewegung, Neuheiten, Japan, Angekündigtes); alle Generatoren auf frischem Index; Marktbericht mit Abschnitten Marktlage/Trends/Neuheiten/Ausblick |
 | v6.13.2 | Classic Collection im Kartenindex (abweichende Nummerierung der Quellen) |
 | v6.13.1 | Themen-Cron: Fehlerursache für die Studio-Sitzung sichtbar |
 | v6.13.0 | Trends & Neuheiten (`/trends`): 30 Jahre, neue Sets mit Cardmarket-Preisen ab Tag 1, versiegelte Produkte, Japan zuerst, Kommend; Set-Seiten neuer Sets ohne 404; Themen in Startseite, Bericht, Artikeln, Reels |

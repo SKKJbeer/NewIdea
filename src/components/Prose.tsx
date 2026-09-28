@@ -49,6 +49,7 @@ function emphasize(text: string, keyBase: string): ReactNode[] {
 }
 
 const LIST_LINE = /^([-•*]|\d+\.)\s/;
+const UEBERSCHRIFT = /^#{2,3}\s+/;
 
 /**
  * Einheitlicher, gut lesbarer Fließtext-Renderer für ALLE Content-Flächen
@@ -74,14 +75,31 @@ export function Prose({
   // laesst sich nur durchsetzen, wenn ueber alle Absaetze hinweg gezaehlt wird.
   const bereits = new Set<AccessoryType>();
 
+  // Zwischenüberschriften („## Trends") stehen eigenständig — auch wenn der
+  // Text danach ohne Leerzeile weitergeht. Der Marktbericht gliedert sich seit
+  // v6.14.0 so (Marktlage · Trends · Neuheiten · Ausblick).
   const blocks = text
     .split(/\n\n+/)
+    .flatMap((b) => {
+      const zeilen = b.trim().split('\n');
+      return UEBERSCHRIFT.test(zeilen[0] ?? '') ? [zeilen[0], zeilen.slice(1).join('\n')] : [b];
+    })
     .map((b) => b.trim())
     .filter(Boolean);
+  // Initial nur im ersten ECHTEN Absatz, nie auf einer Überschrift.
+  const ersterAbsatz = blocks.findIndex((b) => !UEBERSCHRIFT.test(b));
 
   return (
     <div className={`space-y-4 ${className}`}>
       {blocks.map((block, i) => {
+        if (UEBERSCHRIFT.test(block)) {
+          return (
+            <h3 key={i} className="flex items-center gap-2.5 pt-3 text-[17px] font-bold text-white">
+              <span className="h-4 w-1 shrink-0 rounded-full bg-gradient-to-b from-violet-500 to-fuchsia-500" aria-hidden />
+              {block.replace(UEBERSCHRIFT, '')}
+            </h3>
+          );
+        }
         const lines = block
           .split('\n')
           .map((l) => l.trim())
@@ -104,7 +122,7 @@ export function Prose({
           );
         }
 
-        const drop = dropcap && i === 0;
+        const drop = dropcap && i === ersterAbsatz;
         return (
           <p
             key={i}

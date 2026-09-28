@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { revalidatePath } from 'next/cache';
-import { fetchTrendingCards, fetchTopValueCards } from '@/lib/pokemon-api';
+import { fetchTopValueCards } from '@/lib/pokemon-api';
+import { aktuelleTrendKarten } from '@/lib/markt-lage';
 import { recordPriceSnapshots } from '@/lib/price-history';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
@@ -83,7 +84,7 @@ export async function GET(request: Request) {
     try {
       const [topValue, trending] = await Promise.all([
         fetchTopValueCards(40),
-        fetchTrendingCards(40),
+        aktuelleTrendKarten(40),
       ]);
       const byId = new Map<string, (typeof topValue)[number]>();
       for (const c of [...topValue, ...trending]) byId.set(c.id, c);

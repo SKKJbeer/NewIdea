@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isCronAuthedFromRequest } from '@/lib/studio-auth';
 import { revalidatePath } from 'next/cache';
-import { fetchTrendingCards } from '@/lib/pokemon-api';
+import { ladeMarktLage, trendKarten, marktLageText } from '@/lib/markt-lage';
 import { generateMarketSummary, generateNewsletterContent } from '@/lib/ai-generator';
 import { sendNewsletter } from '@/lib/newsletter';
 import { generateAndSaveMarketReport } from '@/lib/market-report-generator';
@@ -39,7 +39,8 @@ export async function GET(request: Request) {
 
   // 2. Newsletter — optional. Ein Fehler hier darf den Bericht nicht entwerten.
   try {
-    const cards = await fetchTrendingCards(20);
+    const lage = await ladeMarktLage();
+    const cards = trendKarten(lage, 20);
     // Vorzeichen-Filter über die zentrale Stelle — NICHT dieselbe Liste
     // zweimal sortieren und oben bzw. unten abschneiden. Genau das stand hier:
     // Bei nur zwei gestiegenen Karten enthielten die „Gewinner" drei gefallene,
@@ -47,7 +48,7 @@ export async function GET(request: Request) {
     // dieser Fehler seit v3.0.0 behoben — hier lief er weiter und speiste den
     // Marktbericht.
     const { gainers, losers } = splitMovers(cards, 5);
-    const summary = await generateMarketSummary(cards, gainers, losers);
+    const summary = await generateMarketSummary(cards, gainers, losers, marktLageText(lage, { preise: true }));
     const newsletter = await generateNewsletterContent(summary, cards);
     const newsletterSent = await sendNewsletter(newsletter);
     results.newsletter = newsletterSent ? 'draft_created' : 'skipped_no_key';

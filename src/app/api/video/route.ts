@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { isCronAuthedFromRequest } from '@/lib/studio-auth';
-import { fetchTrendingCards } from '@/lib/pokemon-api';
+import { aktuelleTrendKarten } from '@/lib/markt-lage';
 import { generateVideoScript } from '@/lib/ai-generator';
 import { runFullVideoPipeline } from '@/lib/video-pipeline';
 
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   if (!isCronAuthedFromRequest(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { format = 'youtube' } = await request.json().catch(() => ({}));
   try {
-    const cards = await fetchTrendingCards(10);
+    const cards = await aktuelleTrendKarten(10);
     const script = await generateVideoScript(cards, format as 'youtube' | 'shorts' | 'tiktok');
     const result = await runFullVideoPipeline(script, cards);
     return NextResponse.json({ success: result.success, script: { title: script.title, duration: script.duration, sceneCount: script.scenes.length }, pipeline: result });

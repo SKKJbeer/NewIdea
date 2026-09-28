@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.14.0] - 28. September 2026 · Berichte mit echten Trends und Ausblick
+
+### Neu
+- **Marktbericht gegliedert in Marktlage, Trends, Neuheiten und Ausblick** — mit Zwischenüberschriften auf der Seite und im Archiv
+- **Gemeinsame Marktlage für alle automatisch erzeugten Texte:** Marktindex und Marktbreite aus dem ganzen frischen Bestand, bestätigte Bewegungen (Preis-Trend gegen den 30-Tage-Schnitt, durch die Verkäufe der letzten sieben Tage gedeckt), Sets mit der stärksten und schwächsten Bewegung, neue Sets mit versiegelten Produkten, japanische Sets vor der englischen Ausgabe und angekündigte Sets
+- Ausblick-Regeln in jedem Prompt: nur aus belegten Fakten und allgemein belegten Marktmustern, keine Preisprognosen, keine erfundenen Termine, keine Kaufempfehlungen
+- Markt-, Set-, Ausblick- und Rückblick-Artikel enthalten Trends und einen Ausblick-Abschnitt
+
+### Behoben
+- Artikel, Newsletter, Studio-Texte und Reels holten ihre Karten aus einer festen Set-Liste von 2023/24 mit Monate alten Preisen — jetzt aus dem frischen Tagesindex, bestätigte Bewegungen zuerst
+- Die Wochenansicht im Marktbericht-Archiv setzt den Text wie die Hauptseite (Absätze, Kennzahlen hervorgehoben)
+
+---
+
 ## [6.13.2] - 28. September 2026 · Classic Collection mit Kartenpreisen
 
 ### Behoben

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
+import { Prose } from '@/components/Prose';
 import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap } from 'lucide-react';
 import { loadMarketReportByWeek, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
@@ -106,7 +107,7 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
             </div>
           </div>
           <div className="p-5 sm:p-6">
-            <p className="text-slate-400 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{report.reportText}</p>
+            <Prose text={report.reportText} dropcap />
           </div>
         </section>
 

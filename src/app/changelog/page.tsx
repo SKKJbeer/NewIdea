@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.14.0',
+    date: '28. September 2026',
+    label: 'Berichte mit echten Trends und Ausblick',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Marktbericht gegliedert in Marktlage, Trends, Neuheiten und Ausblick' },
+      { type: 'new', text: 'Gemeinsame Marktlage für alle erzeugten Texte: Index, Marktbreite, bestätigte Bewegungen, Set-Bewegung, neue Sets, Japan zuerst, angekündigte Sets' },
+      { type: 'new', text: 'Ausblick nur aus belegten Fakten — keine Preisprognosen, keine erfundenen Termine' },
+      { type: 'fixed', text: 'Artikel, Newsletter und Reels nutzten eine feste Set-Liste von 2023/24 mit alten Preisen — jetzt der frische Tagesindex' },
+      { type: 'fixed', text: 'Archiv-Wochenansicht des Marktberichts setzt den Text wie die Hauptseite' },
+    ],
+  },
+  {
     version: '6.13.2',
     date: '28. September 2026',
     label: 'Classic Collection mit Kartenpreisen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Karten der Classic Collection fehlten im Kartenindex — die Quellen nummerieren das Set verschieden' },
     ],

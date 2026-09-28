@@ -4,6 +4,7 @@ import { buildNewsletterHtml } from '@/lib/newsletter-template';
 import { CONTENT_RULES, STYLE_RULES } from '@/lib/article-generator';
 import { formatEur, formatPercent } from '@/lib/format';
 import { recordAiUsage, type AiPurpose } from '@/lib/ai-usage';
+import { AUSBLICK_REGELN } from '@/lib/markt-lage';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -48,10 +49,17 @@ async function track(
   });
 }
 
+/** Marktbericht ohne „## "-Zwischenüberschriften — für Klartext (E-Mail, Auszüge). */
+export function ohneUeberschriften(text: string): string {
+  return text.replace(/^#{2,3}\s+.*$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 export async function generateMarketSummary(
   cards: PokemonCard[],
   topGainers: PokemonCard[],
-  topLosers: PokemonCard[]
+  topLosers: PokemonCard[],
+  /** Faktenblock aus `marktLageText` (markt-lage.ts) — Trends, Neuheiten, Ausblick-Fakten. */
+  marktLage = '',
 ): Promise<MarketSummary> {
   const cardData = cards
     .slice(0, 10)
@@ -70,21 +78,37 @@ export async function generateMarketSummary(
     messages: [
       {
         role: 'user',
-        content: `Du bist erfahrener Marktanalyst für eine deutschsprachige Pokémon-TCG-Plattform. Schreibe den wöchentlichen Marktbericht (300-400 Wörter, in Absätze gegliedert).
+        content: `Du bist erfahrener Marktanalyst für eine deutschsprachige Pokémon-TCG-Plattform. Schreibe den wöchentlichen Marktbericht (450-650 Wörter).
 
-Aktuelle Karten-Preise:
+${marktLage || 'MARKTLAGE: keine gesicherten Zusatzdaten verfügbar.'}
+
+Wertvollste Karten (aktueller Preis-Trend, Bewegung gegen den 30-Tage-Schnitt):
 ${cardData}
 
 Top-Gewinner: ${topGainers.map((c) => c.name).join(', ')}
 Top-Verlierer: ${topLosers.map((c) => c.name).join(', ')}
 
+AUFBAU (Zwischenüberschriften exakt so, jeweils als eigene Zeile mit „## " davor, dazwischen Leerzeilen):
+## Marktlage
+(Index und Marktbreite — wie steht der Markt insgesamt)
+## Trends
+(die bestätigten Bewegungen und die Sets, die sich bewegen — mit Einordnung)
+## Neuheiten
+(nur wenn die MARKTLAGE neue Sets, versiegelte Produkte oder japanische Sets nennt — sonst diesen Abschnitt weglassen)
+## Ausblick
+(was in den nächsten Wochen Beobachtung verdient)
+
+Der erste Absatz steht OHNE Überschrift vor „## Marktlage“ und fasst in zwei Sätzen das Wichtigste der Woche zusammen — konkret, mit einer Zahl.
+
 Nutze ausschließlich Zahlen und Kartennamen aus den gelieferten Daten — erfinde nichts dazu. Erkläre, WARUM sich etwas bewegt hat (Angebot, Set-Status, Nachfrage), nicht nur DASS es sich bewegt hat. Unbekannte Pokémon beim ersten Auftreten kurz in Klammern beschreiben.
+
+${AUSBLICK_REGELN}
 
 ${CONTENT_RULES}
 
 ${STYLE_RULES}
 
-Antworte NUR mit dem Berichtstext, ohne Überschrift und ohne Vorrede.`,
+Antworte NUR mit dem Berichtstext, ohne Titel und ohne Vorrede.`,
       },
     ],
   });
@@ -170,7 +194,7 @@ Antworte NUR mit validem JSON:
     newsletterData = {
       subject: 'CardBeacon Weekly: Top Karten dieser Woche',
       preheader: 'Deine wöchentliche Marktanalyse ist da',
-      intro: summary.weeklyReport.slice(0, 300),
+      intro: ohneUeberschriften(summary.weeklyReport).slice(0, 300),
       cardHighlights: topCards.map((c) => ({
         name: c.name,
         set: c.set,
@@ -186,7 +210,7 @@ Antworte NUR mit validem JSON:
   }
 
   const htmlContent = buildNewsletterHtml(newsletterData, topCards);
-  const textContent = `${newsletterData.subject}\n\n${newsletterData.intro}\n\n${summary.weeklyReport}`;
+  const textContent = `${newsletterData.subject}\n\n${newsletterData.intro}\n\n${ohneUeberschriften(summary.weeklyReport)}`;
 
   return {
     subject: newsletterData.subject,
@@ -259,7 +283,7 @@ export async function generateSocialPosts(
     messages: [
       {
         role: 'user',
-        content: `Erstelle 3 Social-Media-Posts auf Deutsch.\n\nHighlight: ${cardInfo}\nMarkttrend: ${summary.weeklyReport.slice(0, 200)}\n\nAntworte im JSON-Format:\n[{"platform": "instagram", "caption": "...", "hashtags": [...]}, {"platform": "twitter", "caption": "...", "hashtags": [...]}, {"platform": "tiktok", "caption": "...", "hashtags": [...]}]`,
+        content: `Erstelle 3 Social-Media-Posts auf Deutsch.\n\nHighlight: ${cardInfo}\nMarkttrend: ${ohneUeberschriften(summary.weeklyReport).slice(0, 200)}\n\nAntworte im JSON-Format:\n[{"platform": "instagram", "caption": "...", "hashtags": [...]}, {"platform": "twitter", "caption": "...", "hashtags": [...]}, {"platform": "tiktok", "caption": "...", "hashtags": [...]}]`,
       },
     ],
   });

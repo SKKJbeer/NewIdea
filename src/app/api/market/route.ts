@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchTrendingCards } from '@/lib/pokemon-api';
+import { ladeMarktLage, trendKarten, marktLageText } from '@/lib/markt-lage';
 import { generateMarketSummary } from '@/lib/ai-generator';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { splitMovers } from '@/lib/market-metrics';
@@ -14,7 +14,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const cards = await fetchTrendingCards(20);
+    const lage = await ladeMarktLage();
+    const cards = trendKarten(lage, 20);
+    const lageText = marktLageText(lage, { preise: true });
     // Vorzeichen-Filter über die zentrale Stelle — NICHT dieselbe Liste
     // zweimal sortieren und oben bzw. unten abschneiden. Genau das stand hier:
     // Bei nur zwei gestiegenen Karten enthielten die „Gewinner" drei gefallene,
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     // dieser Fehler seit v3.0.0 behoben — hier lief er weiter und speiste den
     // Marktbericht.
     const { gainers, losers } = splitMovers(cards, 5);
-    const summary = await generateMarketSummary(cards, gainers, losers);
+    const summary = await generateMarketSummary(cards, gainers, losers, lageText);
     return NextResponse.json(summary);
   } catch (error) {
     console.error('Market summary error:', error);

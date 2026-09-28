@@ -227,7 +227,8 @@ describe('Gewinner und Verlierer bleiben vorzeichenrein', () => {
     // sein, sonst zeigt eine Seite mehr Bewegungen als die andere.
     const groessen = [
       'src/app/page.tsx',
-      'src/lib/market-report-generator.ts',
+      // Der Marktbericht holt seine Karten seit v6.14.0 über die Marktlage.
+      'src/lib/markt-lage.ts',
     ].map((d) => /getHomepageCards\((\d+)\)/.exec(lies(d))?.[1]);
     expect(new Set(groessen).size, `Stichproben: ${groessen.join(' / ')}`).toBe(1);
   });
@@ -236,7 +237,11 @@ describe('Gewinner und Verlierer bleiben vorzeichenrein', () => {
     // Vorher: 20 Karten aus EINER Set-Abfrage — daher „6 Karten" aus einem
     // einzigen Set als „wertvollste Karten des Marktes".
     const bericht = lies('src/lib/market-report-generator.ts');
-    expect(bericht).toContain('getHomepageCards(');
+    // Seit v6.14.0 über die Marktlage — die liest dieselbe Quelle.
+    expect(bericht).toMatch(/const cards = lage\.pool/);
+    expect(bericht).toContain('ladeMarktLage()');
+    expect(lies('src/lib/markt-lage.ts')).toMatch(/pool: PokemonCard\[\]|getHomepageCards\(250\)/);
+    expect(lies('src/lib/markt-lage.ts')).toContain('getHomepageCards(250)');
     // Nur die tatsächliche Verwendung prüfen — der Kommentar nennt den alten
     // Aufruf absichtlich, damit der Grund am Code steht.
     expect(bericht).not.toMatch(/^\s*const cards = await fetchTrendingCards/m);

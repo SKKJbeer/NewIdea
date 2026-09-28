@@ -206,6 +206,17 @@ S6a, ohne Nummer nicht unterscheidbar).
 
 ---
 
+## Marktlage für alle erzeugten Texte (seit v6.14.0)
+
+**Nutzer-Auftrag (28.09.2026):** „automatisierte Berichte auch mit Trends und Ausblicken mit wirklich aktuellen Trends".
+
+- `src/lib/markt-lage.ts` → `ladeMarktLage()` (wirft nie): Pool aus `getHomepageCards(250)`, CBI + Breite aus `getMarketBasis()` (nur Quelle `index`), BESTÄTIGTE Bewegungen aus `leseFrischpreise()` (≥ 5 %, ≥ 2 €), Set-Bewegung (`rankSets`), Neuheiten (nur aktuell).
+- `marktLageText(lage, { preise })` = Faktenblock im Prompt. Artikel `preise: false` (keine € im Fließtext), Marktbericht/Newsletter `true`. `AUSBLICK_REGELN` in jedem Prompt mit Marktbezug.
+- `trendKarten()` / `aktuelleTrendKarten()` ersetzen `fetchTrendingCards` (feste Set-Liste 2023/24, alte Preise). `markt-lage.test.ts` bricht den Build, wenn ein neuer Aufrufer die alte Funktion nutzt.
+- Marktbericht: Abschnitte `## Marktlage / ## Trends / ## Neuheiten / ## Ausblick`; `<Prose>` rendert `## ` als Zwischenüberschrift, Klartext (E-Mail, Auszüge) über `ohneUeberschriften()`.
+
+---
+
 ## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
