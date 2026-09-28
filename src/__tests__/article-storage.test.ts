@@ -49,8 +49,13 @@ describe('Der Generator wertet das Speicher-Ergebnis aus', () => {
   });
 
   it('prüft jeden Rückgabewert von saveArticle', () => {
-    const aufrufe = src.match(/await saveArticle\(/g) ?? [];
-    const geprueft = src.match(/=\s*await saveArticle\(/g) ?? [];
+    // Seit v6.15.0 laufen alle Speicherungen über `speichern()` (überspringt
+    // nur im Studio-Probelauf) — geprüft wird deshalb der Umweg UND dass er
+    // wirklich saveArticle ruft.
+    expect(src).toMatch(/const speichern = \(a: Article\) => \(options\.probe \? [\s\S]+? : saveArticle\(date, type, a\)\)/);
+    expect(src.match(/await saveArticle\(/g) ?? []).toEqual([]);
+    const aufrufe = src.match(/await speichern\(/g) ?? [];
+    const geprueft = src.match(/=\s*await speichern\(/g) ?? [];
     expect(aufrufe.length, 'mindestens ein Aufruf erwartet').toBeGreaterThan(0);
     expect(
       geprueft.length,

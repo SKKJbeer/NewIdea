@@ -3,7 +3,10 @@ import { readFileSync, globSync } from 'fs';
 import { join } from 'path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { marktLageText, trendKarten, AUSBLICK_REGELN, type MarktLage } from '@/lib/markt-lage';
+import {
+  marktLageText, trendKarten, AUSBLICK_REGELN, LEERE_LAGE, setBewegungen, istModern, versiegeltFuerText, wertVorWoche,
+  SET_MIN_KARTEN, type MarktLage,
+} from '@/lib/markt-lage';
 import { ohneUeberschriften } from '@/lib/ai-generator';
 import { Prose } from '@/components/Prose';
 import type { PokemonCard } from '@/types';
@@ -33,19 +36,23 @@ const NEU = {
 } as unknown as NeuheitenDatei;
 
 const LAGE: MarktLage = {
+  ...LEERE_LAGE,
   stand: '2026-09-27',
   pool: [karte('sv3pt5-199', 'Charizard ex', '151', 2, 90), karte('swsh7-215', 'Umbreon VMAX', 'Evolving Skies', -1, 1289)],
   bestaetigt: [
-    { karte: karte('me55c-4', 'Charizard', '30th Celebration: Classic Collection', 18.4, 158.83), bewegung: 18.4, preis: 158.83 },
-    { karte: karte('sv8-238', 'Pikachu ex', 'Surging Sparks', -12.1, 310), bewegung: -12.1, preis: 310 },
+    { karte: karte('southernislands-1', 'Mew', 'Southern Islands', 193.5, 1457.53), bewegung: 193.5, preis: 1457.53, modern: false },
+    { karte: karte('me55c-4', 'Charizard', '30th Celebration: Classic Collection', 18.4, 158.83), bewegung: 18.4, preis: 158.83, modern: true },
+    { karte: karte('sv8-238', 'Pikachu ex', 'Surging Sparks', -12.1, 310), bewegung: -12.1, preis: 310, modern: true },
   ],
   sets: [
-    { code: 'me5', name: 'Pitch Black', count: 30, medianPrice: 3, avgTrend: 9.5, topMover: { name: 'Crushing Hammer', trend: 21 } },
-    { code: 'sv1', name: 'Scarlet & Violet', count: 40, medianPrice: 1, avgTrend: -4.2, topMover: null },
+    { setCode: 'me5', name: 'Pitch Black', jahr: '2026', karten: 88, median: 9.5, spitze: { name: 'Crushing Hammer', trend: 21 } },
+    { setCode: 'sv1', name: 'Scarlet & Violet', jahr: '2023', karten: 140, median: -4.2, spitze: null },
   ],
   cbi: { wert: 3.5, karten: 14985 },
+  vorwoche: { wert: 1.2, datum: '2026-09-21' },
   breite: { steigend: 8000, fallend: 6000, gesamt: 14985 },
   neuheiten: NEU,
+  letzterBericht: { woche: 39, anfang: 'Mew aus Southern Islands trägt den Markt.' },
 };
 
 describe('Marktlage als Prompt-Block', () => {
@@ -55,10 +62,11 @@ describe('Marktlage als Prompt-Block', () => {
   it('nennt Index, Breite, bestätigte Bewegungen und Set-Bewegung mit Messgröße', () => {
     expect(mitPreis).toContain('Median der 30-Tage-Bewegung über 14985 Karten): +3,5 %');
     expect(mitPreis).toContain('53 % der Karten liegen über ihrem 30-Tage-Schnitt');
-    expect(mitPreis).toMatch(/Bestätigte Aufwärtsbewegungen.*Charizard \(30th Celebration: Classic Collection\) \+18,4 %/);
-    expect(mitPreis).toMatch(/Bestätigte Abwärtsbewegungen.*Pikachu ex.*-12,1 %/);
-    expect(mitPreis).toMatch(/stärksten 30-Tage-Bewegung.*Pitch Black \+9,5 %/);
-    expect(mitPreis).toMatch(/schwächsten 30-Tage-Bewegung.*Scarlet & Violet -4,2 %/);
+    expect(mitPreis).toMatch(/Moderne Sets.*bestätigte Aufwärtsbewegungen.*Charizard \(30th Celebration: Classic Collection\) \+18,4 %/);
+    expect(mitPreis).toMatch(/Moderne Sets, bestätigte Abwärtsbewegungen.*Pikachu ex.*-12,1 %/);
+    expect(mitPreis).toContain('eine Woche zuvor (2026-09-21) stand er bei +1,2 %');
+    expect(mitPreis).toMatch(/stärksten 30-Tage-Bewegung.*Pitch Black \(2026\) \+9,5 % über 88 Karten/);
+    expect(mitPreis).toMatch(/schwächsten 30-Tage-Bewegung.*Scarlet & Violet \(2023\) -4,2 %/);
   });
 
   it('nennt Neuheiten, Japan-Vorlauf und ehrlich „keine angekündigten Sets"', () => {
@@ -74,7 +82,7 @@ describe('Marktlage als Prompt-Block', () => {
   });
 
   it('ohne jede Quelle kein Block (nichts erfinden)', () => {
-    expect(marktLageText({ stand: null, pool: [], bestaetigt: [], sets: [], cbi: null, breite: null, neuheiten: null }, { preise: true })).toBe('');
+    expect(marktLageText(LEERE_LAGE, { preise: true })).toBe('');
   });
 
   it('Ausblick-Regeln verbieten Prognosen, erfundene Termine und Kaufempfehlungen', () => {
@@ -85,10 +93,53 @@ describe('Marktlage als Prompt-Block', () => {
   });
 });
 
+describe('Relevanz statt Ausreißer (Probelauf 28.09.2026)', () => {
+  const text = marktLageText(LAGE, { preise: true, jetzt: JETZT });
+  it('Klassiker getrennt und extreme Ausschläge als dünn gehandelt markiert', () => {
+    expect(text).toMatch(/Klassiker \(ältere Sets\), bestätigte Aufwärtsbewegungen: Mew \(Southern Islands\) \+193,5.*dünn gehandelt/);
+    expect(text).not.toMatch(/Moderne Sets[^\n]*Mew \(Southern Islands\)/);
+  });
+  it('Gedächtnis nur auf Wunsch (Marktbericht), mit Auftrag zum anderen Aufhänger', () => {
+    expect(text).not.toContain('LETZTER BERICHT');
+    const mit = marktLageText(LAGE, { preise: true, gedaechtnis: true, jetzt: JETZT });
+    expect(mit).toContain('LETZTER BERICHT (KW 39) begann so: „Mew aus Southern Islands trägt den Markt.“');
+    expect(mit).toContain('ANDEREN Aufhänger');
+  });
+  it('Set-Bewegung: echter Median, Mindestmenge, ohne Pfennigkarten, Spitze erst ab 2 €', () => {
+    const zeilen = [
+      ...Array.from({ length: SET_MIN_KARTEN }, (_, i) => ({ setCode: 'a', setName: 'A', name: `k${i}`, preis: 5, trend: i < 11 ? 10 : -10 })),
+      { setCode: 'a', setName: 'A', name: 'penny', preis: 0.2, trend: 900 },
+      { setCode: 'a', setName: 'A', name: 'billig', preis: 1, trend: 60 },
+      ...Array.from({ length: SET_MIN_KARTEN - 1 }, (_, i) => ({ setCode: 'b', setName: 'B', name: `b${i}`, preis: 5, trend: 50 })),
+    ];
+    const r = setBewegungen(zeilen, new Map([['a', '2024']]));
+    expect(r).toHaveLength(1); // B hat zu wenig Karten
+    expect(r[0]).toMatchObject({ setCode: 'a', jahr: '2024', karten: SET_MIN_KARTEN + 1, median: 10 });
+    expect(r[0].spitze?.name).not.toBe('penny');
+    expect(r[0].spitze?.name).not.toBe('billig');
+  });
+  it('modern = Set höchstens drei Jahre alt; unbekannt bleibt unbekannt', () => {
+    const d = new Map([['neu', '2025/03/28'], ['alt', '2002/09/15']]);
+    expect(istModern('neu', d, JETZT)).toBe(true);
+    expect(istModern('alt', d, JETZT)).toBe(false);
+    expect(istModern('x', d, JETZT)).toBeNull();
+  });
+  it('versiegelt ohne Cases', () => {
+    const p = (name: string) => ({ produkt: 1, name, art: null, preis: { trend: 1, avg: null, low: null, avg7: null, avg30: null } });
+    expect(versiegeltFuerText([p('X 10 Elite Trainer Box Case'), p('X Booster Box'), p('X Elite Trainer Box')]).map((x) => x.name)).toEqual(['X Booster Box', 'X Elite Trainer Box']);
+  });
+  it('Vorwoche: Wert 6–9 Tage vor dem jüngsten, sonst keiner', () => {
+    const v = [{ date: '2026-09-19', value: 0.5 }, { date: '2026-09-21', value: 1.2 }, { date: '2026-09-28', value: 3.5 }];
+    expect(wertVorWoche(v)).toEqual({ wert: 1.2, datum: '2026-09-21' });
+    expect(wertVorWoche([{ date: '2026-09-27', value: 1 }, { date: '2026-09-28', value: 2 }])).toBeNull();
+  });
+});
+
 describe('Trend-Karten', () => {
   it('bestätigte Bewegungen zuerst, dann der frische Bestand, ohne Doppelte', () => {
-    const k = trendKarten({ ...LAGE, pool: [...LAGE.pool, LAGE.bestaetigt[0].karte] }, 10).map((c) => c.id);
-    expect(k).toEqual(['me55c-4', 'sv8-238', 'sv3pt5-199', 'swsh7-215']);
+    const k = trendKarten({ ...LAGE, pool: [...LAGE.pool, LAGE.bestaetigt[1].karte] }, 10).map((c) => c.id);
+    // moderne bestätigte zuerst, dann Klassiker, dann der Bestand — ohne Doppelte
+    expect(k).toEqual(['me55c-4', 'sv8-238', 'southernislands-1', 'sv3pt5-199', 'swsh7-215']);
   });
   it('hält die Anzahl ein', () => {
     expect(trendKarten(LAGE, 1)).toHaveLength(1);
@@ -104,7 +155,7 @@ describe('Verdrahtung', () => {
     expect(treffer).toEqual([]);
   });
   it('Marktbericht und Newsletter bekommen die Marktlage', () => {
-    expect(lies('src/lib/market-report-generator.ts')).toMatch(/generateMarketSummary\([^)]*marktLageText\(lage/);
+    expect(lies('src/lib/market-report-generator.ts')).toMatch(/marktLageText\(lage, \{ preise: true, gedaechtnis: true \}\)/);
     expect(lies('src/app/api/cron/route.ts')).toMatch(/marktLageText\(lage/);
   });
   it('Marktbericht-Prompt verlangt Trends und Ausblick als Abschnitte', () => {

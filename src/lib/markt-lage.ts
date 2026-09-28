@@ -1,11 +1,15 @@
 import type { PokemonCard } from '@/types';
 import { getHomepageCards } from './homepage-data';
 import { getMarketBasis } from './market-basis';
-import { cardsFromIndex } from './card-index';
+import { cardsFromIndex, bestandFuerSets, type BestandZeile } from './card-index';
 import { leseFrischpreise } from './frischpreise';
-import { leseNeuheiten, neuheitenAktuell, type NeuheitenDatei } from './neuheiten';
+import { leseNeuheiten, neuheitenAktuell, type NeuheitenDatei, type ProduktPreis } from './neuheiten';
 import { bewegung30 } from './neuheiten-zuordnung';
-import { rankSets, computePmi, marketBreadth, validateMarketData, type SetRank } from './market-metrics';
+import { computePmi, marketBreadth, validateMarketData } from './market-metrics';
+import { median } from './portfolio';
+import { ladeSetListe } from './set-liste';
+import { loadMarketIndexHistory } from './market-index-store';
+import { loadLatestMarketReport } from './market-report-storage';
 import { fetchTrendingCards } from './pokemon-api';
 
 // MARKTLAGE — EIN Faktenblock für alle automatisch erzeugten Texte.
@@ -16,17 +20,18 @@ import { fetchTrendingCards } from './pokemon-api';
 //    mit pokemontcg.io-Preisen, die Monate alt sind (Stolperstelle 62).
 //  - Der Marktbericht hatte frische Karten, bekam im Prompt aber nur zehn
 //    davon: kein Index, keine Marktbreite, keine Set-Bewegung, keine neuen
-//    Sets, kein Japan-Vorlauf. Worüber das Modell nichts weiß, darüber
-//    schreibt es nicht — oder es füllt die Lücke mit Allgemeinplätzen.
+//    Sets, kein Japan-Vorlauf.
 //
-// Hier steht alles, was „aktueller Trend" bei uns heißen darf, mit Quelle:
-//  - BESTÄTIGTE Bewegungen aus dem Tagesstand der 400 wertvollsten Karten
-//    (Trend gegen Ø 30, durch die Verkäufe der letzten sieben Tage gedeckt —
-//    `bestaetigteBewegung`). Ein Einzelangebot macht keinen Trend.
-//  - Index (Median) und Marktbreite aus dem ganzen frischen Bestand.
-//  - Set-Bewegung (Median je Set) aus den frischen Karten.
-//  - Neuheiten, versiegelte Produkte, Japan zuerst, Angekündigtes
-//    (`themen/neuheiten.json`).
+// Zweite Runde (Probelauf 28.09.2026, v6.14.0): Der Bericht bestand fast nur
+// aus Klassikern mit +130 … +190 % (Mew Southern Islands, Pikachu δ) — dünn
+// gehandelte Karten, bei denen wenige Verkäufe den Trend drehen. Die
+// Set-Bewegung stützte sich auf 5–11 Karten je Set. Deshalb jetzt:
+//  - Bewegungen getrennt nach MODERN (Set ≤ 3 Jahre) und KLASSIKER; extreme
+//    Klassiker-Ausschläge ausdrücklich als „wenige Verkäufe" gekennzeichnet.
+//  - Set-Bewegung aus dem GANZEN frischen Bestand, echter Median, ≥ 20 Karten,
+//    Pfennigkarten ausgenommen.
+//  - Gedächtnis: Index vor 7 Tagen und der Aufhänger des letzten Berichts —
+//    damit nicht jede Woche derselbe Text entsteht.
 // Was keine Quelle belegt, steht nicht im Block — und darf deshalb auch nicht
 // im Text stehen (die Prompts sagen das ausdrücklich).
 
@@ -34,12 +39,33 @@ import { fetchTrendingCards } from './pokemon-api';
 export const MIN_TREND_BEWEGUNG = 5;
 /** Unter diesem Preis bewegt ein einzelner Verkauf den Trend um zweistellige Prozente. */
 export const MIN_TREND_PREIS = 2;
+/** Sets bis zu diesem Alter gelten als „modern" (aktuelle Ära, aktiv gesammelt). */
+export const MODERN_TAGE = 3 * 365;
+/** Klassiker-Ausschläge darüber: Hinweis auf dünnen Handel. */
+export const AUSREISSER_PROZENT = 100;
+/** Set-Bewegung nur mit genug Karten — darunter bestimmt eine Karte das Set. */
+export const SET_MIN_KARTEN = 20;
+/** Karten darunter zählen für die Set-Bewegung nicht (ein Verkauf = ±50 %). */
+export const SET_MIN_PREIS = 0.5;
 
 export interface BestaetigteBewegung {
   karte: PokemonCard;
   /** Trend gegen Ø 30 in Prozent, durch Ø 7 bestätigt. */
   bewegung: number;
   preis: number;
+  /** Set ≤ 3 Jahre alt; `null` = Erscheinungsdatum unbekannt. */
+  modern: boolean | null;
+}
+
+export interface SetBewegung {
+  setCode: string;
+  name: string;
+  /** Erscheinungsjahr, soweit bekannt. */
+  jahr: string | null;
+  karten: number;
+  /** Median der 30-Tage-Bewegung der Karten des Sets. */
+  median: number;
+  spitze: { name: string; trend: number } | null;
 }
 
 export interface MarktLage {
@@ -48,23 +74,95 @@ export interface MarktLage {
   /** Frische Karten aus dem eigenen Index (wertvollste zuerst). */
   pool: PokemonCard[];
   bestaetigt: BestaetigteBewegung[];
-  sets: SetRank[];
+  sets: SetBewegung[];
   cbi: { wert: number; karten: number } | null;
+  /** Indexwert rund eine Woche vorher (echter Wochenvergleich). */
+  vorwoche: { wert: number; datum: string } | null;
   breite: { steigend: number; fallend: number; gesamt: number } | null;
   neuheiten: NeuheitenDatei | null;
+  /** Anfang des letzten gespeicherten Berichts — gegen Wiederholung. */
+  letzterBericht: { woche: number; anfang: string } | null;
 }
 
-const LEER: MarktLage = { stand: null, pool: [], bestaetigt: [], sets: [], cbi: null, breite: null, neuheiten: null };
+export const LEERE_LAGE: MarktLage = {
+  stand: null, pool: [], bestaetigt: [], sets: [], cbi: null, vorwoche: null, breite: null, neuheiten: null, letzterBericht: null,
+};
+
+// ── rein, getestet ──────────────────────────────────────────────────────────
+
+/** Set-Bewegung aus dem Bestand: echter Median, Mindestmenge, ohne Pfennigkarten. */
+export function setBewegungen(zeilen: BestandZeile[], setJahr: ReadonlyMap<string, string>): SetBewegung[] {
+  const jeSet = new Map<string, { name: string; trends: number[]; spitze: { name: string; trend: number } | null }>();
+  for (const z of zeilen) {
+    if (!(z.preis >= SET_MIN_PREIS) || !Number.isFinite(z.trend)) continue;
+    const e = jeSet.get(z.setCode) ?? { name: z.setName || z.setCode, trends: [], spitze: null };
+    e.trends.push(z.trend);
+    // Spitzenkarte nur ab MIN_TREND_PREIS — sonst gewinnt immer eine 60-Cent-Karte.
+    if (z.preis >= MIN_TREND_PREIS && (!e.spitze || Math.abs(z.trend) > Math.abs(e.spitze.trend))) {
+      e.spitze = { name: z.name, trend: z.trend };
+    }
+    jeSet.set(z.setCode, e);
+  }
+  return [...jeSet.entries()]
+    .filter(([, e]) => e.trends.length >= SET_MIN_KARTEN)
+    .map(([setCode, e]) => ({
+      setCode,
+      name: e.name,
+      jahr: setJahr.get(setCode) ?? null,
+      karten: e.trends.length,
+      median: median(e.trends) ?? 0,
+      spitze: e.spitze,
+    }));
+}
+
+/** Modern = Set höchstens `MODERN_TAGE` alt. */
+export function istModern(setCode: string | undefined, setDatum: ReadonlyMap<string, string>, jetzt = Date.now()): boolean | null {
+  const d = setCode ? setDatum.get(setCode) : undefined;
+  if (!d) return null;
+  const t = Date.parse(d.replace(/\//g, '-'));
+  return Number.isFinite(t) ? jetzt - t <= MODERN_TAGE * 86_400_000 : null;
+}
+
+/** Versiegelte Produkte für den Text: ohne Cases (ein Karton voller Displays ist kein Marktsignal). */
+export function versiegeltFuerText(produkte: ProduktPreis[], max = 4): ProduktPreis[] {
+  return produkte.filter((p) => !/\bcase\b/i.test(p.name)).slice(0, max);
+}
+
+/** Indexwert, der 6–9 Tage vor dem jüngsten liegt. */
+export function wertVorWoche(punkte: Array<{ date: string; value: number }>): { wert: number; datum: string } | null {
+  if (punkte.length < 2) return null;
+  const sortiert = [...punkte].sort((a, b) => a.date.localeCompare(b.date));
+  const juengst = Date.parse(sortiert[sortiert.length - 1].date.slice(0, 10));
+  const kandidat = sortiert
+    .filter((p) => {
+      const tage = (juengst - Date.parse(p.date.slice(0, 10))) / 86_400_000;
+      return tage >= 6 && tage <= 9;
+    })
+    .pop();
+  return kandidat ? { wert: kandidat.value, datum: kandidat.date.slice(0, 10) } : null;
+}
+
+// ── laden ───────────────────────────────────────────────────────────────────
 
 /** Lädt die Marktlage. Wirft nie — fehlende Teile bleiben leer und fehlen im Text. */
-export async function ladeMarktLage(): Promise<MarktLage> {
-  const [pool, basis, frisch, neuheiten] = await Promise.all([
+export async function ladeMarktLage(jetzt = Date.now()): Promise<MarktLage> {
+  const [pool, basis, frisch, neuheiten, setListe, bestand, verlauf, bericht] = await Promise.all([
     getHomepageCards(250).catch(() => [] as PokemonCard[]),
     getMarketBasis().catch(() => null),
     leseFrischpreise().catch(() => null),
     leseNeuheiten().catch(() => null),
+    ladeSetListe(250).catch(() => null),
+    bestandFuerSets().catch((err) => {
+      console.warn('[Marktlage] Bestand für Set-Bewegung nicht lesbar:', err instanceof Error ? err.message : err);
+      return [] as BestandZeile[];
+    }),
+    loadMarketIndexHistory(14).catch(() => []),
+    loadLatestMarketReport().catch(() => null),
   ]);
-  const lage: MarktLage = { ...LEER, pool, neuheiten: neuheitenAktuell(neuheiten) ? neuheiten : null };
+  const lage: MarktLage = { ...LEERE_LAGE, pool, neuheiten: neuheitenAktuell(neuheiten) ? neuheiten : null };
+
+  const setDatum = new Map<string, string>((setListe?.sets ?? []).map((s) => [s.id, s.releaseDate]));
+  const setJahr = new Map<string, string>([...setDatum].map(([k, d]) => [k, d.slice(0, 4)]));
 
   if (basis && basis.quelle === 'index') {
     const sauber = validateMarketData(basis.karten).clean;
@@ -74,8 +172,12 @@ export async function ladeMarktLage(): Promise<MarktLage> {
     if (b.total > 0) lage.breite = { steigend: b.up, fallend: b.down, gesamt: b.total };
     lage.stand = basis.stand ?? null;
   }
+  lage.vorwoche = wertVorWoche(verlauf);
+  lage.sets = setBewegungen(bestand, setJahr);
 
-  lage.sets = rankSets(validateMarketData(pool).clean, 40);
+  if (bericht?.reportText) {
+    lage.letzterBericht = { woche: bericht.weekNumber, anfang: bericht.reportText.split(/\n\n+/)[0].slice(0, 500) };
+  }
 
   if (frisch) {
     lage.stand = lage.stand ?? frisch.datum;
@@ -93,7 +195,9 @@ export async function ladeMarktLage(): Promise<MarktLage> {
     lage.bestaetigt = kandidaten
       .flatMap((k) => {
         const karte = karten.get(k.id);
-        return karte ? [{ karte: { ...karte, trendPercent: k.bewegung as number, realData: true }, bewegung: k.bewegung as number, preis: k.preis }] : [];
+        if (!karte) return [];
+        const bewegung = k.bewegung as number;
+        return [{ karte: { ...karte, trendPercent: bewegung, realData: true }, bewegung, preis: k.preis, modern: istModern(karte.setCode, setDatum, jetzt) }];
       })
       .sort((a, b) => Math.abs(b.bewegung) - Math.abs(a.bewegung));
   }
@@ -101,15 +205,16 @@ export async function ladeMarktLage(): Promise<MarktLage> {
 }
 
 /**
- * Karten für Themenwahl, Newsletter, Reels: bestätigte Bewegungen zuerst,
- * danach die wertvollsten frischen Karten. Ersetzt `fetchTrendingCards`
- * (alte Set-Liste, alte Preise) — der bleibt nur Rückfall, wenn der eigene
- * Index gar nichts liefert.
+ * Karten für Themenwahl, Newsletter, Reels: bestätigte Bewegungen moderner
+ * Karten zuerst, dann Klassiker, dann die wertvollsten frischen Karten.
+ * Ersetzt `fetchTrendingCards` (alte Set-Liste, alte Preise).
  */
 export function trendKarten(lage: MarktLage, anzahl: number): PokemonCard[] {
   const aus: PokemonCard[] = [];
   const gesehen = new Set<string>();
-  for (const k of [...lage.bestaetigt.map((b) => b.karte), ...lage.pool]) {
+  const modern = lage.bestaetigt.filter((b) => b.modern === true);
+  const rest = lage.bestaetigt.filter((b) => b.modern !== true);
+  for (const k of [...modern.map((b) => b.karte), ...rest.map((b) => b.karte), ...lage.pool]) {
     if (aus.length >= anzahl) break;
     if (gesehen.has(k.id)) continue;
     gesehen.add(k.id);
@@ -129,14 +234,16 @@ export async function aktuelleTrendKarten(anzahl = 30): Promise<PokemonCard[]> {
 
 // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt (deutsches Komma trotzdem,
 // damit das Modell die Zahlen so übernimmt, wie die Seite sie schreibt).
-const pz = (v: number) => `${v > 0 ? '+' : ''}${v.toFixed(1).replace('.', ',')}\u00A0%`;
+const pz = (v: number) => `${v > 0 ? '+' : ''}${v.toFixed(1).replace('.', ',')} %`;
 // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
-const eur = (v: number) => `${v.toFixed(2).replace('.', ',')}\u00A0€`;
+const eur = (v: number) => `${v.toFixed(2).replace('.', ',')} €`;
 const tageSeit = (iso: string, jetzt: number) => Math.max(0, Math.floor((jetzt - Date.parse(iso.slice(0, 10))) / 86_400_000));
 
 export interface TextOptionen {
   /** Euro-Beträge in den Block aufnehmen. Artikel: nein (keine Preise im Fließtext). */
   preise: boolean;
+  /** Anfang des letzten Berichts mitgeben (nur Marktbericht). */
+  gedaechtnis?: boolean;
   jetzt?: number;
 }
 
@@ -149,30 +256,40 @@ export function marktLageText(lage: MarktLage, opt: TextOptionen): string {
   const z: string[] = [];
   const mitPreis = (p: number) => (opt.preise ? `, ${eur(p)}` : '');
 
-  if (lage.cbi) z.push(`- Marktindex (Median der 30-Tage-Bewegung über ${lage.cbi.karten} Karten): ${pz(lage.cbi.wert)}`);
+  if (lage.cbi) {
+    const vw = lage.vorwoche ? `; eine Woche zuvor (${lage.vorwoche.datum}) stand er bei ${pz(lage.vorwoche.wert)}` : '';
+    z.push(`- Marktindex (Median der 30-Tage-Bewegung über ${lage.cbi.karten} Karten): ${pz(lage.cbi.wert)}${vw}`);
+  }
   if (lage.breite) {
     const anteil = Math.round((lage.breite.steigend / lage.breite.gesamt) * 100);
-    z.push(`- Marktbreite: ${anteil}\u00A0% der Karten liegen über ihrem 30-Tage-Schnitt (${lage.breite.steigend} steigend, ${lage.breite.fallend} fallend)`);
+    z.push(`- Marktbreite: ${anteil} % der Karten liegen über ihrem 30-Tage-Schnitt (${lage.breite.steigend} steigend, ${lage.breite.fallend} fallend)`);
   }
 
-  const hoch = lage.bestaetigt.filter((b) => b.bewegung > 0).slice(0, 6);
-  const runter = lage.bestaetigt.filter((b) => b.bewegung < 0).slice(0, 6);
   const zeile = (b: BestaetigteBewegung) => `${b.karte.name} (${b.karte.set}) ${pz(b.bewegung)}${mitPreis(b.preis)}`;
-  if (hoch.length) z.push(`- Bestätigte Aufwärtsbewegungen (Preis-Trend gegen Ø 30 Tage, durch die Verkäufe der letzten 7 Tage gedeckt): ${hoch.map(zeile).join('; ')}`);
-  if (runter.length) z.push(`- Bestätigte Abwärtsbewegungen (gleiche Messung): ${runter.map(zeile).join('; ')}`);
+  const modern = lage.bestaetigt.filter((b) => b.modern === true);
+  const klassik = lage.bestaetigt.filter((b) => b.modern !== true);
+  const mHoch = modern.filter((b) => b.bewegung > 0).slice(0, 6);
+  const mRunter = modern.filter((b) => b.bewegung < 0).slice(0, 6);
+  if (mHoch.length) z.push(`- Moderne Sets (letzte 3 Jahre), bestätigte Aufwärtsbewegungen (Preis-Trend gegen Ø 30 Tage, durch die Verkäufe der letzten 7 Tage gedeckt): ${mHoch.map(zeile).join('; ')}`);
+  if (mRunter.length) z.push(`- Moderne Sets, bestätigte Abwärtsbewegungen (gleiche Messung): ${mRunter.map(zeile).join('; ')}`);
+  const kZeile = (b: BestaetigteBewegung) => `${zeile(b)}${Math.abs(b.bewegung) > AUSREISSER_PROZENT ? ' [dünn gehandelt — wenige Verkäufe können den Wert bestimmen]' : ''}`;
+  const kHoch = klassik.filter((b) => b.bewegung > 0).slice(0, 4);
+  const kRunter = klassik.filter((b) => b.bewegung < 0).slice(0, 3);
+  if (kHoch.length) z.push(`- Klassiker (ältere Sets), bestätigte Aufwärtsbewegungen: ${kHoch.map(kZeile).join('; ')}`);
+  if (kRunter.length) z.push(`- Klassiker, bestätigte Abwärtsbewegungen: ${kRunter.map(kZeile).join('; ')}`);
 
-  const mitTrend = lage.sets.filter((s) => s.avgTrend !== null);
-  const setsHoch = [...mitTrend].filter((s) => (s.avgTrend as number) > 0).sort((a, b) => (b.avgTrend as number) - (a.avgTrend as number)).slice(0, 4);
-  const setsRunter = [...mitTrend].filter((s) => (s.avgTrend as number) < 0).sort((a, b) => (a.avgTrend as number) - (b.avgTrend as number)).slice(0, 3);
-  const setZeile = (s: SetRank) => `${s.name} ${pz(s.avgTrend as number)} (${s.count} Karten${s.topMover ? `, stärkste Karte ${s.topMover.name} ${pz(s.topMover.trend)}` : ''})`;
-  if (setsHoch.length) z.push(`- Sets mit der stärksten 30-Tage-Bewegung (Median je Set): ${setsHoch.map(setZeile).join('; ')}`);
-  if (setsRunter.length) z.push(`- Sets mit der schwächsten 30-Tage-Bewegung: ${setsRunter.map(setZeile).join('; ')}`);
+  const setZeile = (s: SetBewegung) =>
+    `${s.name}${s.jahr ? ` (${s.jahr})` : ''} ${pz(s.median)} über ${s.karten} Karten${s.spitze ? `, stärkste Karte ${s.spitze.name} ${pz(s.spitze.trend)}` : ''}`;
+  const setsHoch = lage.sets.filter((s) => s.median > 0).sort((a, b) => b.median - a.median).slice(0, 4);
+  const setsRunter = lage.sets.filter((s) => s.median < 0).sort((a, b) => a.median - b.median).slice(0, 3);
+  if (setsHoch.length) z.push(`- Sets mit der stärksten 30-Tage-Bewegung (Median aller Karten ohne Pfennigkarten unter 50 Cent, mind. ${SET_MIN_KARTEN} Karten): ${setsHoch.map(setZeile).join('; ')}`);
+  if (setsRunter.length) z.push(`- Sets mit der schwächsten 30-Tage-Bewegung (gleiche Messung): ${setsRunter.map(setZeile).join('; ')}`);
 
   const n = lage.neuheiten;
   const neu: string[] = [];
   if (n) {
     for (const s of n.sets.slice(0, 4)) {
-      const produkte = s.versiegelt.slice(0, 4).map((p) => {
+      const produkte = versiegeltFuerText(s.versiegelt).map((p) => {
         const b = bewegung30(p.preis);
         return `${p.name}${mitPreis(p.preis.trend)}${b !== null ? ` (30 Tage ${pz(b)})` : ''}`;
       });
@@ -193,12 +310,20 @@ export function marktLageText(lage: MarktLage, opt: TextOptionen): string {
   const teile = [`MARKTLAGE (Cardmarket, Quellstand ${lage.stand ?? 'unbekannt'} — NUR diese Fakten verwenden, nichts dazu erfinden):`];
   if (z.length) teile.push(...z);
   if (neu.length) teile.push('', 'NEUHEITEN UND AUSBLICK-FAKTEN:', ...neu);
+  if (opt.gedaechtnis && lage.letzterBericht) {
+    teile.push(
+      '',
+      `LETZTER BERICHT (KW ${lage.letzterBericht.woche}) begann so: „${lage.letzterBericht.anfang}“`,
+      'Wähle einen ANDEREN Aufhänger. Laufen dieselben Bewegungen weiter, benenne das ausdrücklich als Fortsetzung — nicht als Neuigkeit.',
+    );
+  }
   return teile.join('\n');
 }
 
 /** Regeln für Trend- und Ausblick-Abschnitte — in jedem Prompt dieselben. */
 export const AUSBLICK_REGELN = `TRENDS UND AUSBLICK — Pflicht, wenn die MARKTLAGE Fakten dazu liefert:
-- Trends: Benenne die bestätigten Bewegungen und die Set-Bewegungen konkret (Kartenname, Set, Prozentwert, Messgröße „gegen den 30-Tage-Schnitt"). Ordne ein, WARUM — nur mit belegbaren Gründen aus den Fakten: Set-Alter (neu erschienen / seit Jahren im Umlauf), Jubiläum, versiegelte Produkte, japanischer Vorlauf.
+- Trends: Schwerpunkt sind die MODERNEN Sets — dort sammeln die meisten Leser. Benenne bestätigte Bewegungen und Set-Bewegungen konkret (Kartenname, Set, Prozentwert, Messgröße „gegen den 30-Tage-Schnitt"). Klassiker gehören als eigener, kurzer Punkt dazu; ist ein Ausschlag als „dünn gehandelt" markiert, sag das so — ein paar Verkäufe sind kein Markttrend.
+- Ordne ein, WARUM — nur mit belegbaren Gründen aus den Fakten: Set-Alter (neu erschienen / seit Jahren im Umlauf), Jubiläum, versiegelte Produkte, japanischer Vorlauf, Gegenbewegung eines ganzen Sets.
 - Ausblick: Was in den nächsten Wochen Beobachtung verdient — ausschließlich abgeleitet aus den Fakten (Sets kurz nach Erscheinen, in Japan bereits erschienene Sets, angekündigte Sets, laufende Bewegungen) und aus allgemein belegten Marktmustern (z. B. „Preise neuer Sets finden ihren Boden historisch einige Wochen nach Erscheinen").
 - VERBOTEN im Ausblick: Preisprognosen („wird steigen", Zielpreise), erfundene Erscheinungstermine oder Ankündigungen, Kaufempfehlungen. Neutrale Formulierungen: „verdient Beobachtung", „historisch folgte darauf", „bleibt abzuwarten".
-- Ein Zeitraum heißt nur so, wie er gemessen ist: „gegen den 30-Tage-Schnitt", nie „diese Woche".`;
+- Ein Zeitraum heißt nur so, wie er gemessen ist: „gegen den 30-Tage-Schnitt", nie „diese Woche". Einen echten Wochenvergleich gibt es nur beim Marktindex, wenn der Wert der Vorwoche genannt ist.`;

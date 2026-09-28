@@ -98,7 +98,9 @@ AUFBAU (Zwischenüberschriften exakt so, jeweils als eigene Zeile mit „## " da
 ## Ausblick
 (was in den nächsten Wochen Beobachtung verdient)
 
-Der erste Absatz steht OHNE Überschrift vor „## Marktlage“ und fasst in zwei Sätzen das Wichtigste der Woche zusammen — konkret, mit einer Zahl.
+Der erste Absatz steht OHNE Überschrift vor „## Marktlage“ und fasst in zwei Sätzen das Wichtigste zusammen — konkret, mit einer Zahl, und mit einem Aufhänger aus den MODERNEN Sets oder den Neuheiten, sofern die Fakten einen hergeben.
+
+Keine Zubehör-Hinweise (Toploader, Sleeves, Sammelalbum …) — das ist ein Marktbericht, kein Ratgeber.
 
 Nutze ausschließlich Zahlen und Kartennamen aus den gelieferten Daten — erfinde nichts dazu. Erkläre, WARUM sich etwas bewegt hat (Angebot, Set-Status, Nachfrage), nicht nur DASS es sich bewegt hat. Unbekannte Pokémon beim ersten Auftreten kurz in Klammern beschreiben.
 

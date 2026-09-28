@@ -247,6 +247,45 @@ export async function indexKartenFuerIndex(): Promise<PokemonCard[]> {
   return karten;
 }
 
+/** Eine Zeile des frischen Bestands für die Set-Bewegung (markt-lage.ts). */
+export interface BestandZeile {
+  setCode: string;
+  setName: string;
+  name: string;
+  preis: number;
+  trend: number;
+}
+
+/**
+ * Der GANZE frische Bestand mit Namen — nur für die Textgenerierung (selten),
+ * nicht für Seitenaufrufe. Set-Bewegung aus den 250 wertvollsten Karten
+ * beruhte auf 5–11 Karten je Set (Befund 28.09.2026, „Aquapolis +82,4 %").
+ */
+export async function bestandFuerSets(): Promise<BestandZeile[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const SEITE = 1000;
+  const aus: BestandZeile[] = [];
+  const frischGrenze = new Date(Date.now() - INDEX_MAX_PREISALTER_TAGE * 86_400_000).toISOString();
+  for (let seite = 0; seite < 40; seite++) {
+    const { data, error } = await sb
+      .from('cards_index')
+      .select('id,set_code,set_name,name,price,trend')
+      .eq('real_data', true)
+      .not('trend', 'is', null)
+      .gte('updated_at', frischGrenze)
+      .order('id', { ascending: true })
+      .range(seite * SEITE, seite * SEITE + SEITE - 1);
+    if (error) throw new Error(`Bestand für Sets: ${error.message}`);
+    const stapel = (data ?? []) as Array<{ set_code: string; set_name: string; name: string; price: number; trend: number }>;
+    for (const z of stapel) {
+      aus.push({ setCode: z.set_code, setName: z.set_name, name: z.name, preis: Number(z.price), trend: Number(z.trend) });
+    }
+    if (stapel.length < SEITE) break;
+  }
+  return aus;
+}
+
 export interface SetTreffer {
   setCode: string;
   setName: string;

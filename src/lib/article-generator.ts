@@ -603,6 +603,13 @@ export interface GenerateArticleOptions {
    */
   replaceFallback?: boolean;
   /**
+   * Probelauf für das Studio: erzeugt frisch, liest keinen Cache, SPEICHERT
+   * NICHTS. Zum Prüfen, was die Generierung mit den heutigen Daten schreibt.
+   */
+  probe?: boolean;
+  /** Bekommt den Datenblock, den das Modell sieht (nur zur Diagnose). */
+  onDaten?: (daten: string) => void;
+  /**
    * Wird aufgerufen, wenn die KI-Erzeugung scheitert und der Ersatztext greift.
    *
    * Ohne diesen Weg meldet der Aufrufer nur „ist ein Ersatztext" — und das sah
@@ -644,8 +651,9 @@ export async function generateArticle(
   // 2. Supabase cache — one fast DB read, previously generated articles.
   // Ein gespeicherter Fallback (isStatic) wird auf Wunsch neu erzeugt: sonst
   // bleibt ein einmal fehlgeschlagener Artikel für immer ein Evergreen-Text.
-  const cached = await loadArticle(date);
+  const cached = options.probe ? null : await loadArticle(date);
   if (cached && !(options.replaceFallback && cached.isStatic)) return cached;
+  const speichern = (a: Article) => (options.probe ? Promise.resolve({ ok: true as const, error: undefined }) : saveArticle(date, type, a));
 
   // 3. Fetch live market data only when we actually need to generate.
   let trendingCards: PokemonCard[] = [];
@@ -715,6 +723,8 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
     console.warn('Themen für die Artikel-Generierung nicht verfügbar:', err);
   }
 
+  options.onDaten?.(cardSummary);
+
   // Ohne API-Key direkt vollwertigen Fallback liefern.
   if (!process.env.ANTHROPIC_API_KEY) {
     const fallback = fallbackArticle(type, dateLabel, cardSummary);
@@ -723,7 +733,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       trendingCards,
     );
     // Persistieren, damit nicht bei jedem Aufruf neu erzeugt wird (kein Regenerieren pro Besuch).
-    const gesichert = await saveArticle(date, type, fallback);
+    const gesichert = await speichern(fallback);
     if (!gesichert.ok) console.error(`Artikel ${date} nicht gespeichert: ${gesichert.error}`);
     return fallback;
   }
@@ -774,7 +784,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
-      const gesichert = await saveArticle(date, type, fallback);
+      const gesichert = await speichern(fallback);
     if (!gesichert.ok) console.error(`Artikel ${date} nicht gespeichert: ${gesichert.error}`);
       return fallback;
     }
@@ -801,7 +811,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
     // beim nächsten Aufruf erneut erzeugt — und kostet erneut. supabase-js
     // WIRFT dabei nicht, es LIEFERT den Fehler zurück; ein `.catch()` allein
     // hätte das nie bemerkt.
-    const gespeichert = await saveArticle(date, type, article);
+    const gespeichert = await speichern(article);
     if (!gespeichert.ok) {
       console.error(`Artikel ${date} konnte nicht gespeichert werden: ${gespeichert.error}`);
       options.onSaveError?.(gespeichert.error ?? 'unbekannt');
@@ -821,7 +831,7 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],
       trendingCards,
     );
-    const fallbackGespeichert = await saveArticle(date, type, fallback);
+    const fallbackGespeichert = await speichern(fallback);
     if (!fallbackGespeichert.ok) {
       console.error(`Ersatzartikel ${date} konnte nicht gespeichert werden: ${fallbackGespeichert.error}`);
       options.onSaveError?.(fallbackGespeichert.error ?? 'unbekannt');

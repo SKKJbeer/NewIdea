@@ -9,8 +9,8 @@ import { generateMarketSummary } from './ai-generator';
 import { saveMarketReport } from './market-report-storage';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
-import type { PokemonCard } from '@/types';
-import { ladeMarktLage, marktLageText } from './markt-lage';
+import type { PokemonCard, MarketSummary } from '@/types';
+import { ladeMarktLage, marktLageText, type MarktLage } from './markt-lage';
 import { splitMovers } from './market-metrics';
 
 /**
@@ -60,6 +60,23 @@ function topValueCards(cards: PokemonCard[], max = 6): PokemonCard[] {
  * Erzeugt den Bericht der laufenden Woche und speichert ihn.
  * Wirft nicht — der Aufrufer bekommt den Status samt Klartext-Ursache.
  */
+/**
+ * Erzeugt den Berichtstext aus der Marktlage — speichert NICHTS. Gemeinsam
+ * für den Wochen-Cron und den Probelauf im Studio.
+ */
+export async function berichtErzeugen(lage: MarktLage): Promise<{ summary: MarketSummary; reportText: string; daten: string }> {
+  // Gewinner/Verlierer bevorzugt aus den BESTÄTIGTEN Bewegungen — ein
+  // Einzelangebot soll nicht als Wochengewinner auf der Seite stehen.
+  const cards = lage.pool;
+  const ausBestaetigt = splitMovers(lage.bestaetigt.map((b) => b.karte), 5);
+  const ausPool = splitMovers(cards, 5);
+  const gainers = ausBestaetigt.gainers.length >= 3 ? ausBestaetigt.gainers : ausPool.gainers;
+  const losers = ausBestaetigt.losers.length >= 3 ? ausBestaetigt.losers : ausPool.losers;
+  const daten = marktLageText(lage, { preise: true, gedaechtnis: true });
+  const summary = await generateMarketSummary(cards, gainers, losers, daten);
+  return { summary, reportText: (summary.weeklyReport || '').trim(), daten };
+}
+
 export async function generateAndSaveMarketReport(): Promise<MarketReportResult> {
   const { weekStart, weekNumber } = currentWeek();
 
@@ -81,15 +98,7 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
     }
 
     // Vorzeichen-Trennung zentral — dieselbe Regel wie auf der Startseite.
-    // Gewinner/Verlierer bevorzugt aus den BESTÄTIGTEN Bewegungen — ein
-    // Einzelangebot soll nicht als Wochengewinner auf der Seite stehen.
-    const bestaetigt = lage.bestaetigt.map((b) => b.karte);
-    const ausBestaetigt = splitMovers(bestaetigt, 5);
-    const ausPool = splitMovers(cards, 5);
-    const gainers = ausBestaetigt.gainers.length >= 3 ? ausBestaetigt.gainers : ausPool.gainers;
-    const losers = ausBestaetigt.losers.length >= 3 ? ausBestaetigt.losers : ausPool.losers;
-    const summary = await generateMarketSummary(cards, gainers, losers, marktLageText(lage, { preise: true }));
-    const reportText = (summary.weeklyReport || '').trim();
+    const { summary, reportText } = await berichtErzeugen(lage);
 
     // Qualitätsgate: lieber kein neuer Bericht als ein Platzhalter auf der Startseite.
     if (reportText.length < MIN_REPORT_CHARS) {

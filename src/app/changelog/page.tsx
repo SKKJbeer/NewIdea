@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.15.0',
+    date: '28. September 2026',
+    label: 'Trends mit Relevanz statt Ausreißern',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Moderne Sets und Klassiker getrennt; dünn gehandelte Ausschläge gekennzeichnet' },
+      { type: 'changed', text: 'Set-Bewegung aus dem ganzen Bestand: echter Median, mindestens 20 Karten, mit Erscheinungsjahr' },
+      { type: 'changed', text: 'Wochenvergleich des Marktindex und Gedächtnis gegen wiederholte Aufhänger' },
+      { type: 'changed', text: 'Versiegelte Produkte ohne Kartons; keine Zubehör-Hinweise im Marktbericht' },
+      { type: 'new', text: 'Studio-Probelauf für Marktbericht und Artikel — ohne Speichern' },
+    ],
+  },
+  {
     version: '6.14.0',
     date: '28. September 2026',
     label: 'Berichte mit echten Trends und Ausblick',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Marktbericht gegliedert in Marktlage, Trends, Neuheiten und Ausblick' },
       { type: 'new', text: 'Gemeinsame Marktlage für alle erzeugten Texte: Index, Marktbreite, bestätigte Bewegungen, Set-Bewegung, neue Sets, Japan zuerst, angekündigte Sets' },

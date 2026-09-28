@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.15.0] - 28. September 2026 · Trends mit Relevanz statt Ausreißern
+
+### Geändert
+- **Moderne Sets und Klassiker getrennt:** Bewegungen der letzten drei Jahre stehen im Vordergrund; Ausschläge über 100 % bei Klassikern sind als „dünn gehandelt" gekennzeichnet — ein paar Verkäufe sind kein Markttrend
+- **Set-Bewegung aus dem ganzen frischen Bestand:** echter Median je Set, mindestens 20 Karten, Karten unter 50 Cent ausgenommen, mit Erscheinungsjahr (vorher 5–11 der wertvollsten Karten je Set, und als Mittelwert)
+- **Wochenvergleich:** Der Bericht kennt den Marktindex der Vorwoche und den Aufhänger des letzten Berichts und wählt einen anderen
+- Versiegelte Produkte im Bericht ohne Kartons (Cases), Booster Box und Elite Trainer Box stehen vorn
+- Keine eingestreuten Zubehör-Hinweise mehr im Marktbericht
+
+### Neu
+- Studio-Probelauf `/api/studio/probe`: erzeugt Marktbericht oder Artikel mit den heutigen Daten, zeigt die Daten, die das Modell gesehen hat, und speichert nichts
+
+---
+
 ## [6.14.0] - 28. September 2026 · Berichte mit echten Trends und Ausblick
 
 ### Neu
