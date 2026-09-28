@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.13.1] - 28. September 2026 · Diagnose für den Themen-Durchlauf
+
+### Geändert
+- Scheitert der Themen-Durchlauf, nennt die Antwort der angemeldeten Studio-Sitzung die Ursache (öffentlich bleibt es bei der allgemeinen Fehlermeldung)
+
+---
+
 ## [6.13.0] - 28. September 2026 · Trends & Neuheiten: 30 Jahre, neue Sets, Japan zuerst
 
 ### Neu

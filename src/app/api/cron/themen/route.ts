@@ -33,6 +33,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, ...lauf });
   } catch (err) {
     console.error('[cron/themen] fehlgeschlagen:', err);
-    return NextResponse.json({ ok: false, error: 'internal_error' }, { status: 500 });
+    // Ursache nur für die angemeldete Studio-Sitzung (interne Diagnose,
+    // Stolperstelle 21) — öffentlich bleibt es bei der generischen Antwort.
+    const grund = isStudioAuthedFromRequest(request) && err instanceof Error ? err.message.slice(0, 300) : undefined;
+    return NextResponse.json({ ok: false, error: 'internal_error', grund }, { status: 500 });
   }
 }

@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.13.1',
+    date: '28. September 2026',
+    label: 'Diagnose für den Themen-Durchlauf',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Themen-Durchlauf nennt im Studio die Fehlerursache' },
+    ],
+  },
+  {
     version: '6.13.0',
     date: '28. September 2026',
     label: 'Trends & Neuheiten: 30 Jahre, neue Sets, Japan zuerst',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Seite /trends: 30 Jahre Pokémon TCG, Neuerscheinungen, japanische Sets vor der englischen Ausgabe, angekündigte Sets, Set-Bewegungen' },
       { type: 'new', text: 'Preise neuer Sets ab dem ersten Handelstag direkt aus dem Cardmarket-Preisverzeichnis — eindeutige Zuordnung, mehrdeutige Drucke mit allen Preisen statt geraten' },
