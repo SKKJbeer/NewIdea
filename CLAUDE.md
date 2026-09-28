@@ -183,6 +183,7 @@ S6a, ohne Nummer nicht unterscheidbar).
 - JP/KR ohne eindeutige Zuordnung: Preisfeld „—“ mit Grund. Im Portfolio EN-Notierung, aber
   sichtbar als „Wert: EN-Notierung“ gekennzeichnet. NIE den EN-Preis unter JP-Beschriftung.
 - JP-Verlauf im Portfolio nur aus den JP-Schnitten (Ø 30/7 + Trend), nie aus EN-Tageswerten.
+- Die Sprachwahl der Kartenseite gilt für die GANZE Preisspalte (`Sprachwahl.tsx`, ein Provider): Aufschlüsselung folgt der Auswahl, EN/DE-gemessene Abschnitte stehen bei JP/KR in `<NurEnDe>`. Nie eine JP-Zahl neben unbeschrifteten EN-Werten (Nutzer-Befund 28.09.).
 - Set-NAMEN von TCGdex (ja) nicht anzeigen — SV4a heißt dort „レイジングサーフ“ (falsch). Code + Nummer zeigen.
 - Neuaufbau mit < `MIN_JP_PAARE` (3.000) ersetzt die alte Zuordnung NICHT.
 - `fetchCMLanguagePrice(idProduct, …)` NUR mit genauer Produktnummer — die frühere Namenssuche

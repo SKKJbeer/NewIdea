@@ -8,6 +8,7 @@ import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@
 import { PriceChartLazy } from '@/components/PriceChartLazy';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import { CardLangPrice } from '@/components/CardLangPrice';
+import { SprachwahlProvider, CmAufschluesselung, NurEnDe } from '@/components/Sprachwahl';
 import { AmbientBackdrop } from '@/components/AmbientBackdrop';
 import { WatchButton } from '@/components/WatchButton';
 import { CardImage } from '@/components/CardImage';
@@ -284,6 +285,7 @@ export default async function CardDetailPage({ params }: Props) {
           {price > 0 && (
             <p className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-black tabular-nums text-white">{formatEur(price)}</span>
+              <span className="text-[10px] font-semibold text-slate-600">EN/DE</span>
               {displayTrend !== 0 && (
                 <span className={`text-sm font-semibold tabular-nums ${displayTrend > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {formatPercent(displayTrend)} (30 T)
@@ -293,6 +295,7 @@ export default async function CardDetailPage({ params }: Props) {
           )}
         </div>
 
+        <SprachwahlProvider>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* DIE KARTE ALS OBJEKT.
               Vorher lag das Bild in einem grauen Kasten mit dem Seitenverhältnis
@@ -391,50 +394,13 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {card.cmPrices && (card.cmPrices.trend || card.cmPrices.low) && (
-              <div className="border-t border-[#1c1c24] pt-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-bold text-slate-200">Cardmarket-Preise</h2>
-                  <a
-                    href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
-                    target="_blank" rel="noopener noreferrer sponsored"
-                    className="inline-flex min-h-[32px] items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300"
-                  >
-                    Prüfen <ExternalLink size={11} />
-                  </a>
-                </div>
-                <dl className="space-y-2 text-sm">
-                  {card.cmPrices.trend != null && (
-                    <div className="flex items-center justify-between">
-                      <dt className="text-slate-400">Preis-Trend (Marktwert)</dt>
-                      <dd className="font-bold text-white tabular-nums">{formatEur(card.cmPrices.trend)}</dd>
-                    </div>
-                  )}
-                  {card.cmPrices.low != null && (
-                    <div className="flex items-center justify-between">
-                      <dt className="text-slate-400">Günstigstes Angebot (ab)</dt>
-                      <dd className="font-semibold text-emerald-400 tabular-nums">{formatEur(card.cmPrices.low)}</dd>
-                    </div>
-                  )}
-                  {card.cmPrices.avgSell != null && (
-                    <div className="flex items-center justify-between">
-                      <dt className="text-slate-400">Ø Verkaufspreis</dt>
-                      <dd className="font-semibold text-slate-300 tabular-nums">{formatEur(card.cmPrices.avgSell)}</dd>
-                    </div>
-                  )}
-                  {card.cmPrices.avg30 != null && (
-                    <div className="flex items-center justify-between">
-                      <dt className="text-slate-400">Ø 30 Tage</dt>
-                      <dd className="font-semibold text-slate-300 tabular-nums">{formatEur(card.cmPrices.avg30)}</dd>
-                    </div>
-                  )}
-                </dl>
-                <p className="mt-3 text-[11px] leading-relaxed text-slate-600">
-                  Der angezeigte Marktpreis ist der <strong className="text-slate-500">Cardmarket-Trend</strong> (fairer Marktwert bei gutem Zustand). „Ab" ist das günstigste Einzelangebot — meist schlechterer Zustand oder andere Sprache.
-                  {cmDataAge}
-                </p>
-              </div>
-            )}
+            {/* Aufschluesselung folgt der Sprachwahl (Sprachwahl.tsx). */}
+            <CmAufschluesselung
+              kartenName={card.name}
+              en={card.cmPrices ?? null}
+              enStand={cmDataAge}
+              sprachen={sprachen}
+            />
 
             {/* MARKTKONTEXT — die eigentliche Produktaussage.
                 Steht bewusst VOR den Einzelkennzahlen: Die Frage „ist das viel?"
@@ -444,6 +410,7 @@ export default async function CardDetailPage({ params }: Props) {
                 kalt gestarteten Instanz mehrere Sekunden kostet. Vorher hing die
                 GANZE Seite daran — Kartenbild, Preis und Kaufknöpfe warteten auf
                 eine Zahl, die ganz unten steht. */}
+            <NurEnDe>
             <Suspense fallback={<MarketContextSkeleton />}>
               <MarketContextSection card={card} />
             </Suspense>
@@ -460,6 +427,7 @@ export default async function CardDetailPage({ params }: Props) {
                 Handlungsempfehlungen, die auf einer Analyseplattform nichts zu
                 suchen haben. */}
             <PmiScorePanel score={score2} />
+            </NurEnDe>
 
             {card.setCode && (
               <div className="border-t border-[#1c1c24] pt-5">
@@ -486,6 +454,7 @@ export default async function CardDetailPage({ params }: Props) {
           </div>
         </div>
 
+        <NurEnDe>
         <div className="border-t border-[#1c1c24] pt-5 mt-6">
           <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
             <h2 className="font-bold text-slate-200">Preis-Historie</h2>
@@ -517,6 +486,8 @@ export default async function CardDetailPage({ params }: Props) {
             </div>
           )}
         </div>
+        </NurEnDe>
+        </SprachwahlProvider>
 
         <p className="text-xs text-slate-700 text-center mt-6">
           Preise: Cardmarket (EUR), ohne Gewähr. Kein Anlageversprechen.

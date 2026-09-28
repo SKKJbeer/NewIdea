@@ -285,6 +285,17 @@ describe('Verankerung', () => {
     expect(src).toMatch(/price = null;/);
   });
 
+  it('die Aufschluesselung folgt der Sprachwahl — keine EN-Werte unter JP (Befund iPhone 28.09.)', () => {
+    const seite = lies('src/app/karten/[id]/page.tsx');
+    expect(seite).toContain('<SprachwahlProvider>');
+    expect(seite).toMatch(/<CmAufschluesselung[\s\S]*sprachen=\{sprachen\}/);
+    // Die frühere, fest englische Aufschlüsselung steht nicht mehr in der Seite
+    expect(seite).not.toContain('card.cmPrices.avgSell');
+    // EN-gemessene Abschnitte sind bei JP/KR gekennzeichnet
+    expect(seite.match(/<NurEnDe>/g)?.length).toBeGreaterThanOrEqual(2);
+    expect(lies('src/components/CardLangPrice.tsx')).toMatch(/useSprachwahl\(\)/);
+  });
+
   it('die Suche ersetzt Preise nur durch echte Sprachpreise', () => {
     expect(lies('src/components/SearchResultsLang.tsx')).toMatch(/d\.priceLanguage === language\) overrides/);
   });

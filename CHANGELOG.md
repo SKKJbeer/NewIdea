@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.12.2] - 28. September 2026 · Sprachwahl gilt für die ganze Preisspalte
+
+### Geändert
+- **Die Aufschlüsselung „Cardmarket-Preise" folgt jetzt der gewählten Sprache.** Vorher stand nach „JP" oben der japanische Preis, darunter weiter die Werte der englisch/deutschen Ausgabe — ohne Kennzeichnung. Jetzt: bei JP/KR Trend, günstigstes Angebot, Ø Verkauf, Ø 7 und Ø 30 Tage der japanischen bzw. koreanischen Ausgabe, mit Set-Code, Nummer und Stand; bei EN/DE der ausdrückliche Hinweis, dass Cardmarket beide als ein Produkt führt
+- Marktkontext, Verlaufskennzahlen und Preis-Historie sind nur für die englisch/deutsche Ausgabe gemessen — bei JP/KR stehen sie unter einem klaren Hinweis
+- Die Kurzfassung oben auf dem Telefon nennt die Ausgabe ihres Preises (EN/DE)
+
+### Behoben
+- Grammatik im Sprachhinweis („der japanischen Ausgabe")
+
+---
+
 ## [6.12.1] - 28. September 2026 · Darstellung auf Telefonen und älteren Geräten
 
 ### Behoben

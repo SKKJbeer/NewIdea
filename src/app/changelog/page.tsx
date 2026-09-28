@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.12.2',
+    date: '28. September 2026',
+    label: 'Sprachwahl gilt für die ganze Preisspalte',
+    isLatest: true,
+    changes: [
+      { type: 'changed', text: 'Die Aufschlüsselung „Cardmarket-Preise" folgt der gewählten Sprache — bei JP/KR Trend, ab, Ø Verkauf, Ø 7/30 Tage der japanischen bzw. koreanischen Ausgabe' },
+      { type: 'changed', text: 'Marktkontext, Kennzahlen und Preis-Historie bei JP/KR als Werte der englisch/deutschen Ausgabe gekennzeichnet' },
+      { type: 'fixed', text: 'Grammatik im Sprachhinweis' },
+    ],
+  },
+  {
     version: '6.12.1',
     date: '28. September 2026',
     label: 'Darstellung auf Telefonen und älteren Geräten',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'iPhone zoomte nach einer Suche hinein — Suchfeld auf Telefonen jetzt 16 px (iOS vergrößert kleinere Felder automatisch)' },
       { type: 'fixed', text: 'Vorschlagsliste verdeckte auf der Ergebnisseite die ersten Treffer — öffnet sich erst beim Tippen' },

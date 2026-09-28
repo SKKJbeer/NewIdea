@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { LangPicker } from './LangPicker';
-import type { CardLanguage } from '@/lib/portfolio';
 import type { SprachAngabe } from '@/lib/sprachpreise';
 import { formatEur, formatPercent } from '@/lib/format';
+import { useSprachwahl, AUSGABE, tagDe } from './Sprachwahl';
 
 // PREIS JE KARTENSPRACHE — nur, was Cardmarket wirklich veroeffentlicht.
 //
@@ -17,13 +16,6 @@ import { formatEur, formatPercent } from '@/lib/format';
 //   Ausgabe EINDEUTIG zugeordnet ist (sprach-zuordnung.ts). Sonst kein Preis,
 //   und der Grund steht dabei. Vorher zeigte diese Stelle den englischen
 //   Preis unter der Beschriftung „JP".
-
-const SPRACHE_LANG: Record<'JP' | 'KR', string> = { JP: 'japanische', KR: 'koreanische' };
-
-const tag = (iso: string) => {
-  const [j, m, t] = iso.slice(0, 10).split('-');
-  return `${t}.${m}.${j}`;
-};
 
 const GRUND: Record<Exclude<SprachAngabe, { ok: true }>['grund'], (s: string) => string> = {
   'keine-zuordnung': (s) =>
@@ -42,7 +34,7 @@ interface CardLangPriceProps {
 }
 
 export function CardLangPrice({ defaultPrice, trendPercent, realData, priceSource, sprachen }: CardLangPriceProps) {
-  const [language, setLanguage] = useState<CardLanguage>('EN');
+  const [language, setLanguage] = useSprachwahl();
 
   const fremd = language === 'JP' || language === 'KR' ? sprachen.find((s) => s.sprache === language) ?? null : null;
 
@@ -76,21 +68,20 @@ export function CardLangPrice({ defaultPrice, trendPercent, realData, priceSourc
           </p>
         )}
         {(language === 'JP' || language === 'KR') && fremd && (
-          <p className="mt-1.5 text-[10px] leading-relaxed text-slate-600">
+          <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500">
             {fremd.ok ? (
               <>
-                Eigene Cardmarket-Notierung der {SPRACHE_LANG[language]} Ausgabe:{' '}
                 {/* Set-CODE und Nummer statt Set-Name: TCGdex fuehrt einzelne
                     japanische Set-Namen falsch (SV4a heisst dort „Raging
                     Surf"), Code und Nummer stehen dagegen auf der Karte. */}
-                <span className="text-slate-400">
+                Preis der {AUSGABE[language].dat} Ausgabe{' '}
+                <span className="text-slate-300">
                   {fremd.gegenstueck.name} · {fremd.gegenstueck.id.replace(/-(?=[^-]+$)/, '\u00A0')}
                 </span>
-                . Stand des Preisverzeichnisses {tag(fremd.stand)}
-                {fremd.preis.low ? <> · ab&nbsp;{formatEur(fremd.preis.low)}</> : null}.
+                {' '}· Stand {tagDe(fremd.stand)}
               </>
             ) : (
-              GRUND[fremd.grund](SPRACHE_LANG[language])
+              GRUND[fremd.grund](AUSGABE[language].nom)
             )}
           </p>
         )}
