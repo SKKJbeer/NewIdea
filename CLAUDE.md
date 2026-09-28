@@ -191,6 +191,21 @@ S6a, ohne Nummer nicht unterscheidbar).
 
 ---
 
+## Trends & Neuheiten (seit v6.13.0)
+
+**Nutzer-Auftrag (28.09.2026):** Berichte/Trends „zu steril" — echte Hypes (30 Jahre), Neuerscheinungen, „upcoming".
+
+| Baustein | Datei | Aufgabe |
+|---|---|---|
+| Zuordnung (rein, getestet) | `src/lib/neuheiten-zuordnung.ts` | Erweiterung über versiegelte Produktnamen OHNE Sprachzusatz (genau eine), Karte über `Name [Fähigkeit \| Attacke]` eindeutig auf beiden Seiten |
+| Lauf | `src/lib/neuheiten.ts` → `neuheitenLauf()` | Neue Sets (≤ 120 T), Japan zuerst (≤ 240 T, ohne EN-Paar), Kommend (pokemontcg Datum > heute) → `social/themen/neuheiten.json` |
+| Cron | `/api/cron/themen` 01:50 UTC | nach `/api/cron/sprachen` (braucht deren Zuordnung für „Japan zuerst") |
+| Anzeige | `/trends`, `ThemenTeaser` (Startseite, Marktbericht), Set-Seite (versiegelt, mehrdeutig, `SetImAufbau`) | Datei älter 3 Tage → nicht zeigen |
+
+**Regeln:** Mehrdeutige Drucke (normal + SIR mit gleichen Attacken) bekommen KEINEN Einzelpreis, sondern alle Preise nebeneinander. In den Kartenindex wird nur geschrieben, wenn kein frischerer Preis dort steht UND pokemontcg.io die Karte mit gleicher Nummer + Namen führt. Artikel-Kontext (`themenKontext`) enthält NIE Preiszahlen. „Kommend" leer = ehrlicher Leerzustand, keine Gerüchte.
+
+---
+
 ## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.
@@ -1262,6 +1277,7 @@ Cardmarket zeigt mehrere Preise; der Nutzer sieht oft die „ab X €" (günstig
 71. **Quellen einer Seite nie nacheinander abfragen, wenn sie unabhängig sind** → Erster Aufruf einer Kartenseite 0,8–11 s (28.09.2026, zwölf Alpollo-Karten). pokemontcg.io lieferte bei jeder zweiten Karte 502, `fetchCardById` wiederholte bis 8 s, DANACH erst Index, DANACH TCGdex. **Regel:** Index sofort (eigene DB, schnell), Tagespreis mit Set/Nummer aus dem Index parallel starten, Stammdaten höchstens `STAMMDATEN_WARTEN_MS` (1,5 s; gesunde Antwort ~0,35 s) abwarten, wenn der Index die Karte kennt. `kartenseite-frisch.test.ts` prüft die Reihenfolge. Messung: `curl -w ttfb` auf noch nicht gecachte Karten (`x-vercel-cache: MISS`).
 
 72. **Ändert sich das Format einer eigenen Schnittstelle, ALLE Aufrufer suchen** → `/api/search/suggestions` lieferte ab v5.8.0 `{ cards, sets }`. Die Suchleiste wurde angepasst, das Portfolio nicht: `Array.isArray(data) ? data : []` verwarf jede Antwort, die Portfolio-Suche fand wochenlang keine Karte — und ein stummes `catch` zeigte es als „Keine Ergebnisse". **Regeln:** (a) Beim Formatwechsel `grep -rn "<pfad>" src` über alle Aufrufer; (b) Antworten über EINE gemeinsame Lesefunktion (`kartenAusVorschlaegen` in `such-relevanz.ts`); (c) Ausfall ≠ leeres Ergebnis — eigener Fehlerzustand (Code-Regel 9).
+73. **Neue Sets haben in den ersten Wochen bei pokemontcg.io UND TCGdex keinen Preis** → 30th Celebration (16.09.2026) war zwölf Tage später bei beiden ohne einen Preis, die Set-Seite meldete 404, Trends kannten das Jubiläum nicht — Cardmarket führte die Preise längst. **Regel:** Neue Sets über die Cardmarket-Kataloge zuordnen (`neuheiten-zuordnung.ts`), Set-Seiten ohne Preise nie als 404, sondern „im Aufbau". Die Sprache einer Cardmarket-Erweiterung steht nur in den Namen der versiegelten Produkte (`… JP Booster`).
 ---
 
 ## Arbeitsverzeichnis springt zurück (Umgebungs-Abbild vom 30.07.)

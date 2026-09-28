@@ -1,3 +1,8 @@
+import { leseNeuheiten, themenKontext } from './neuheiten';
+import { setAusIndex } from './card-index';
+
+/** So viele Karten aus neuen Sets kommen zusätzlich in den Bildpool eines Artikels. */
+const NEUHEITEN_KARTEN_IM_POOL = 6;
 import Anthropic from '@anthropic-ai/sdk';
 import { fetchTrendingCards } from './pokemon-api';
 import { STATIC_ARTICLES } from './static-articles';
@@ -674,6 +679,27 @@ export async function generateArticle(
     // Die angezeigten Karten sind die gewaehlten, nicht der ganze Pool —
     // sonst zeigt der Beitrag Karten, ueber die er nicht schreibt.
     trendingCards = wahl.kandidaten;
+  }
+
+  // AKTUELLE THEMEN (Neuheiten, Jubiläum, Japan zuerst) — Nutzer-Befund
+  // 28.09.2026: Berichte kannten das 30-jährige Jubiläum nicht. Die Karten der
+  // neuen Sets kommen mit in den Pool (als Bilder), die Themen als Kontext.
+  try {
+    const neuheiten = await leseNeuheiten();
+    const kontext = themenKontext(neuheiten);
+    if (kontext) {
+      cardSummary += kontext;
+      const neuKarten = (await Promise.all((neuheiten?.sets ?? []).slice(0, 3).map((s) => setAusIndex(s.setCode).catch(() => []))))
+        .flat()
+        .sort((a, b) => (b.prices.market ?? 0) - (a.prices.market ?? 0))
+        .slice(0, NEUHEITEN_KARTEN_IM_POOL);
+      const bekannt = new Set(trendingCards.map((c) => c.id));
+      trendingCards = [...trendingCards, ...neuKarten.filter((c) => !bekannt.has(c.id))];
+      if (neuKarten.length > 0) cardSummary += `
+Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join(', ')}`;
+    }
+  } catch (err) {
+    console.warn('Themen für die Artikel-Generierung nicht verfügbar:', err);
   }
 
   // Ohne API-Key direkt vollwertigen Fallback liefern.

@@ -55,7 +55,10 @@ describe('Navigation ordnet, statt aufzuzählen', () => {
     // Merkliste und Portfolio gleichrangig nebeneinander. Acht Punkte sind
     // keine Ordnung, sondern ein Inhaltsverzeichnis — und bei 768 px ragte die
     // Leiste über den Rand.
-    const eintraege = [...nav.matchAll(/\{ href: '[^']+', label: '[^']+' \}/g)];
+    // Gezählt wird die LEISTE (`NAV`). Das aufklappbare Menü darf mehr führen —
+    // dort stehen die Punkte untereinander und können nicht überlaufen.
+    const leiste = nav.slice(nav.indexOf('const NAV = ['), nav.indexOf('] as const', nav.indexOf('const NAV = [')));
+    const eintraege = [...leiste.matchAll(/\{ href: '[^']+', label: '[^']+' \}/g)];
     expect(eintraege).toHaveLength(5);
   });
 

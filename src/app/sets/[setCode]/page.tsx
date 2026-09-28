@@ -13,6 +13,8 @@ import { formatEurRounded, formatPercent } from '@/lib/format';
 import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
 import { siteUrlOrLocal } from '@/lib/site';
+import { leseNeuheiten, neuheitenAktuell, type NeuSet } from '@/lib/neuheiten';
+import { VersiegeltListe, MehrdeutigListe, tagDe } from '@/components/Themen';
 
 // generateStaticParams MIT LEERER LISTE (seit v6.8.5, wie karten/[id]).
 // Ohne die Funktion ist das Segment in Next 16 dynamisch, `revalidate` wirkt
@@ -64,7 +66,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch {
     return { title: 'Set-Analyse', robots: { index: false } };
   }
-  if (cards.length === 0) return { title: 'Set nicht gefunden', robots: { index: false } };
+  if (cards.length === 0) {
+    const n = await leseNeuheiten().catch(() => null);
+    const neu = neuheitenAktuell(n) ? n!.sets.find((x) => x.setCode === setCode) : undefined;
+    if (neu) return { title: `${neu.name} — neues Set, Cardmarket-Preise`, alternates: { canonical: `${SITE_URL}/sets/${setCode}` } };
+    return { title: 'Set nicht gefunden', robots: { index: false } };
+  }
 
   const setName = cards[0].set;
   return {
@@ -80,7 +87,15 @@ export default async function SetDetailPage({ params }: Props) {
 
   // API-Fehler ≠ "Set existiert nicht": Ein Ausfall wirft (nie gecacht, siehe
   // oben), nur eine echte leere Antwort ist ein 404.
-  const cards = await setLaden(setCode);
+  const [cards, neuheitenRoh] = await Promise.all([setLaden(setCode), leseNeuheiten().catch(() => null)]);
+  const neu: NeuSet | null = neuheitenAktuell(neuheitenRoh)
+    ? neuheitenRoh!.sets.find((x) => x.setCode === setCode) ?? null
+    : null;
+  // NEUES SET OHNE EINZELPREIS: Das Set existiert (Quelle mit Erscheinungs-
+  // datum), nur die Einzelkarten sind noch keinem Cardmarket-Produkt sicher
+  // zugeordnet. Vorher stand hier „Set nicht gefunden" — beim Jubiläumsset
+  // zwei Wochen lang (28.09.2026).
+  if (cards.length === 0 && neu) return <SetImAufbau set={neu} />;
   if (cards.length === 0) notFound();
 
   const setName = cards[0].set;
@@ -169,7 +184,14 @@ export default async function SetDetailPage({ params }: Props) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-10 pb-16 space-y-8">
-        <CardGrid cards={cards} title={`Alle Karten aus ${setName} — nach Marktwert sortiert`} />
+        {neu && neu.versiegelt.length > 0 && (
+          <section>
+            <p className={`${SECTION_LABEL} mb-3`}>Versiegelte Produkte · Cardmarket</p>
+            <VersiegeltListe produkte={neu.versiegelt} max={8} />
+          </section>
+        )}
+                <CardGrid cards={cards} title={`Alle Karten aus ${setName} — nach Marktwert sortiert`} />
+        {neu && neu.mehrdeutig.length > 0 && <MehrdeutigListe eintraege={neu.mehrdeutig} />}
 
         <footer className="border-t border-[#1e1e30] pt-5 space-y-3">
           <div className="rounded-md border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
@@ -179,6 +201,42 @@ export default async function SetDetailPage({ params }: Props) {
             </p>
           </div>
         </footer>
+      </main>
+    </div>
+  );
+}
+
+/** Neues Set, dessen Einzelkarten noch keinen sicher zugeordneten Preis haben. */
+function SetImAufbau({ set }: { set: NeuSet }) {
+  return (
+    <div className="min-h-screen bg-[#070810] text-slate-200">
+      <header className="border-b border-[#1c1c24]">
+        <div className="max-w-4xl mx-auto px-4 pt-8 pb-12">
+          <Link href="/trends" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-violet-400 text-xs mb-6 transition-colors">
+            <ArrowLeft size={12} /> Trends &amp; Neuheiten
+          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <BoosterPackImage setCode={set.setCode} setName={set.name} className="h-32 w-auto object-contain drop-shadow-xl shrink-0" />
+            <div className="text-center sm:text-left">
+              <p className={SECTION_LABEL}>Neues Set · Pokémon</p>
+              <h1 className="mt-3 text-2xl sm:text-4xl font-semibold tracking-tight text-slate-100">{set.name}</h1>
+              <p className="text-slate-500 text-sm mt-2">Erschienen am {tagDe(set.datum)} · {set.gesamt} Karten</p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main className="max-w-4xl mx-auto px-4 py-10 space-y-8">
+        <p className="rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-[13px] leading-relaxed text-amber-400/80">
+          Für die Einzelkarten dieses Sets ist noch kein Cardmarket-Preis sicher zugeordnet. Sobald die Zuordnung eindeutig
+          ist, erscheinen die Karten hier mit Preis — geschätzte Werte zeigt CardBeacon nicht.
+        </p>
+        {set.versiegelt.length > 0 && (
+          <section>
+            <p className={`${SECTION_LABEL} mb-3`}>Versiegelte Produkte · Cardmarket</p>
+            <VersiegeltListe produkte={set.versiegelt} max={10} />
+          </section>
+        )}
+        <MehrdeutigListe eintraege={set.mehrdeutig} />
       </main>
     </div>
   );

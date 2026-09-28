@@ -34,6 +34,7 @@ const GRUPPEN: Array<{ label: string; links: Array<{ href: string; label: string
   {
     label: 'Research',
     links: [
+      { href: '/trends', label: 'Trends & Neuheiten' },
       { href: '/marktbericht', label: 'Marktbericht' },
       { href: '/artikel', label: 'Analysen' },
       { href: '/guides', label: 'Guides' },

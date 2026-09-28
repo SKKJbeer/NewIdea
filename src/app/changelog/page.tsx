@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.13.0',
+    date: '28. September 2026',
+    label: 'Trends & Neuheiten: 30 Jahre, neue Sets, Japan zuerst',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Seite /trends: 30 Jahre Pokémon TCG, Neuerscheinungen, japanische Sets vor der englischen Ausgabe, angekündigte Sets, Set-Bewegungen' },
+      { type: 'new', text: 'Preise neuer Sets ab dem ersten Handelstag direkt aus dem Cardmarket-Preisverzeichnis — eindeutige Zuordnung, mehrdeutige Drucke mit allen Preisen statt geraten' },
+      { type: 'new', text: 'Versiegelte Produkte (Booster, Elite Trainer Box, Display) mit Preis-Trend' },
+      { type: 'new', text: 'Kurzfassung der Themen auf Startseite und im Marktbericht; Artikel und Instagram-Reels greifen Neuerscheinungen auf' },
+      { type: 'fixed', text: 'Set-Seiten neuer Sets meldeten „nicht gefunden"' },
+    ],
+  },
+  {
     version: '6.12.6',
     date: '28. September 2026',
     label: 'Ein Löschen-Kreuz in der Portfolio-Suche',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Zwei Löschen-Kreuze im Suchfeld „Karte hinzufügen" — das des Browsers ist ausgeblendet' },
     ],

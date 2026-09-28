@@ -34,6 +34,13 @@ const NAV = [
   { href: '/research', label: 'Research' },
 ] as const;
 
+/**
+ * Nur im aufklappbaren Menü (untereinander, kann nicht überlaufen) — die
+ * Leiste bleibt bei fünf Zielen. Trends steht dort ganz oben: Neuheiten und
+ * Jubiläum sind der Grund, warum viele gerade kommen (28.09.2026).
+ */
+const MENUE_ZUSATZ = [{ href: '/trends', label: 'Trends & Neuheiten' }] as const;
+
 /** Research fasst mehrere Pfade zusammen — alle zählen als aktiv. */
 const RESEARCH_PFADE = ['/research', '/marktbericht', '/artikel', '/guides', '/methodik'];
 
@@ -119,7 +126,7 @@ export function NavBar() {
 
       {offen && (
         <nav className="border-t border-[#1c1c24] md:hidden" aria-label="Navigation">
-          {NAV.map(({ href, label }) => (
+          {[...MENUE_ZUSATZ, ...NAV].map(({ href, label }) => (
             <Link prefetch={false}
               key={href}
               href={href}

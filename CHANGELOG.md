@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.13.0] - 28. September 2026 · Trends & Neuheiten: 30 Jahre, neue Sets, Japan zuerst
+
+### Neu
+- **Seite `/trends` („Was den Markt gerade bewegt")**: 30 Jahre Pokémon TCG (30th Celebration + Classic Collection) mit versiegelten Produkten und den teuersten Einzelkarten, Neuerscheinungen der letzten Monate, japanische Sets vor der englischen Ausgabe, angekündigte Sets und die Sets mit der stärksten 30-Tage-Bewegung
+- **Preise neuer Sets ab dem ersten Handelstag** direkt aus dem Cardmarket-Preisverzeichnis. Die Erweiterung wird über die Namen der versiegelten Produkte belegt (international vs. JP/Chinesisch), jede Karte über Name + Attacken eindeutig zugeordnet. Mehrere Drucke mit identischen Attacken bekommen keinen geratenen Einzelpreis — dort stehen alle Preise nebeneinander
+- Versiegelte Produkte (Booster, Elite Trainer Box, Display …) mit Preis-Trend auf Set-Seiten und `/trends`
+- Täglicher Cron `/api/cron/themen` (01:50 UTC)
+- Kurzfassung „Was den Markt gerade bewegt" auf Startseite und im Marktbericht
+- Artikel greifen aktuelle Themen auf (ohne Preise im Text), Instagram bekommt das Reel-Format „Neuerscheinung"
+
+### Behoben
+- Set-Seiten neuer Sets (z. B. 30th Celebration) meldeten „nicht gefunden", weil keine Quelle Preise hatte — jetzt Set-Seite mit Produkten bzw. Hinweis „im Aufbau"
+
+---
+
 ## [6.12.6] - 28. September 2026 · Ein Löschen-Kreuz in der Portfolio-Suche
 
 ### Behoben

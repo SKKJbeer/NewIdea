@@ -10,6 +10,8 @@ import { Prose } from '@/components/Prose';
 import { ArticleStats } from '@/components/ArticleStats';
 import { PriceBars, TrendBars, type BarItem } from '@/components/DataBars';
 import { displayPrice } from '@/lib/pokemon-api';
+import { ThemenTeaser } from '@/components/Themen';
+import { leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -29,10 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MarktberichtPage() {
-  const [report, allMeta] = await Promise.all([
+  const [report, allMeta, neuheitenRoh] = await Promise.all([
     loadLatestMarketReport().catch(() => null),
     listMarketReportMeta().catch(() => []),
+    leseNeuheiten().catch(() => null),
   ]);
+  // Themen der Gegenwart (Neuheiten, Jubiläum, Japan zuerst) — der Wochenbericht
+  // allein hing dem Markt hinterher (Nutzer-Befund 28.09.2026).
+  const neuheiten = neuheitenAktuell(neuheitenRoh) ? neuheitenRoh : null;
 
   const hasContent = !!report;
   const previousReports = allMeta.slice(1);
@@ -73,6 +79,11 @@ export default async function MarktberichtPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 pb-16 space-y-8 -mt-6">
+        {neuheiten && (
+          <Reveal>
+            <ThemenTeaser neuheiten={neuheiten} />
+          </Reveal>
+        )}
         {!hasContent && (
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-amber-400 flex items-start gap-3">
             <CalendarDays size={20} className="shrink-0 mt-0.5" />

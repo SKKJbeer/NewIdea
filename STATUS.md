@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.12.6` · **Stand:** 28. September 2026 · **Branch:** `main`
+**Version:** `v6.13.0` · **Stand:** 28. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -13,6 +13,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Bereich | Status | Details |
 |---|---|---|
 | Startseite `/` | ✅ Fertig | CBI (Median, ganzer Bestand), Marktbreite, Markttemperatur, Bewegungen, Set-Markt · ISR 1h · keine Vorabrufe mehr (v6.2.0) |
+| Trends `/trends` | ✅ Neu (v6.13.0) | Themen-Cron 01:50 UTC → `social/themen/neuheiten.json`; neue Sets per Cardmarket-Katalog zugeordnet, Kartenindex nur ohne frischeren Preis |
 | Suche `/suche` | ✅ Fertig | Karten UND Sets, nach Passgenauigkeit sortiert (v5.8.0), Autocomplete 140 ms, laufende Abfragen abgebrochen, 8 Zeilen mit Deckel, Tastaturbedienung · live 0,20–0,38 s |
 | Marktbericht `/marktbericht` | ✅ Fertig | Geprueft 05.08.: KW 31 live, 3 Berichte gespeichert, Wochen-Cron laeuft (letzter 03.08.) |
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
@@ -166,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.13.0 | Trends & Neuheiten (`/trends`): 30 Jahre, neue Sets mit Cardmarket-Preisen ab Tag 1, versiegelte Produkte, Japan zuerst, Kommend; Set-Seiten neuer Sets ohne 404; Themen in Startseite, Bericht, Artikeln, Reels |
 | v6.12.6 | Portfolio-Suchfeld: doppeltes Löschen-Kreuz entfernt |
 | v6.12.5 | Portfolio-Suche fand keine Karten (altes Antwortformat) — behoben, Fehlerzustand sichtbar |
 | v6.12.4 | Wartezeit auf Stammdaten 1,5 s (erster Aufruf 0,5–3,2 s statt bis 11 s) |

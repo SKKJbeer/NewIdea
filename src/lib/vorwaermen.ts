@@ -13,7 +13,7 @@ import { wertvollsteAusIndex } from './card-index';
 
 /** Adressen, in Reihenfolge der Wichtigkeit. Rein, testbar. */
 export function vorwaermListe(kartenIds: string[], setCodes: string[]): string[] {
-  const feste = ['/', '/suche', '/sets', '/marktbericht', '/artikel', '/guides'];
+  const feste = ['/', '/trends', '/suche', '/sets', '/marktbericht', '/artikel', '/guides'];
   return [
     ...feste,
     ...kartenIds.map((id) => `/karten/${encodeURIComponent(id)}`),

@@ -19,6 +19,8 @@ const PROXY_HOSTS = new Set([
   'images.pokemontcg.io',
   'assets.pokemon.com',
   'images.scrydex.com',
+  // Neue Sets: Bilder gibt es anfangs nur bei TCGdex (neuheiten.ts, 28.09.2026).
+  'assets.tcgdex.net',
 ]);
 
 export function cachedImg(url: string | undefined | null): string {

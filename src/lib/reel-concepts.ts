@@ -237,6 +237,61 @@ function teuersteImSet(cards: PokemonCard[], siteUrl: string): ReelStory | null 
   };
 }
 
+// ── Konzept 5: Neuerscheinung ──────────────────────────────────────────────
+//
+// Kein Eintrag in CONCEPTS: Es braucht Daten, die im Kartenpool nicht stehen
+// (Erscheinungsdatum, versiegelte Produkte). Der Autopilot ruft es direkt auf,
+// solange ein Set jung ist (instagram-autopilot.ts). Nutzer-Befund 28.09.2026:
+// Das 30-jährige Jubiläum kam in keinem Beitrag vor.
+
+export interface NeuerscheinungDaten {
+  setName: string;
+  tageSeitErscheinen: number;
+  karten: PokemonCard[];
+  /** Versiegelte Produkte mit Cardmarket-Preis-Trend, teuerste zuerst. */
+  versiegelt: Array<{ name: string; trend: number }>;
+}
+
+export function neuerscheinungStory(d: NeuerscheinungDaten, siteUrl: string): ReelStory | null {
+  const top = usable(d.karten).sort((a, b) => displayPrice(b) - displayPrice(a)).slice(0, 4);
+  if (top.length < 3) return null;
+  const booster = d.versiegelt.find((v) => / Booster$/.test(v.name) && !/Box|Case|Bundle/.test(v.name));
+  const etb = d.versiegelt.find((v) => / Elite Trainer Box$/.test(v.name) && !/Pokémon Center|Case/.test(v.name));
+  const scenes: ReelScene[] = [
+    {
+      kind: 'hook',
+      seconds: 2.0,
+      headline: `${d.setName}: die teuersten Karten`,
+      sub: d.tageSeitErscheinen <= 1 ? 'Neu im Handel' : `Seit ${d.tageSeitErscheinen} Tagen im Handel`,
+      accent: 'violet',
+    },
+  ];
+  top.forEach((c, i) =>
+    scenes.push({ kind: 'card', seconds: 3.0, card: toSceneCard(c), rank: i + 1, total: top.length, label: d.setName.toUpperCase(), metric: 'price' }),
+  );
+  if (booster || etb) {
+    scenes.push({
+      kind: 'insight',
+      seconds: 3.4,
+      headline: 'Und versiegelt?',
+      body: [booster && `Booster: ${formatEur(booster.trend)}`, etb && `Elite Trainer Box: ${formatEur(etb.trend)}`].filter(Boolean).join(' · ') +
+        '. Neue Sets schwanken in den ersten Wochen besonders stark.',
+    });
+  }
+  scenes.push({ kind: 'outro', seconds: 2.6, line: 'Alle Neuheiten auf der Seite' });
+  return {
+    conceptId: 'neuerscheinung',
+    title: `Neuerscheinung: ${d.setName}`,
+    scenes,
+    caption:
+      `${d.setName} — die teuersten Karten nach aktuellem Cardmarket-Preis-Trend.\n\n` +
+      top.slice(0, 3).map((c, i) => `${i + 1}. ${c.nameDe ?? c.name} — ${formatEur(displayPrice(c))}`).join('\n') +
+      (booster || etb ? `\n\nVersiegelt: ${[booster && `Booster ${formatEur(booster.trend)}`, etb && `Elite Trainer Box ${formatEur(etb.trend)}`].filter(Boolean).join(' · ')}` : '') +
+      '\n\nNeue Sets schwanken in den ersten Wochen besonders stark.\n\n' +
+      captionFooter(siteUrl, 'neuerscheinung'),
+  };
+}
+
 // ── Konzept 4: 30 Tage ──────────────────────────────────────────────────────
 // Vergleich aktueller Trendpreis gegen den echten 30-Tage-Durchschnitt.
 // Nutzt ausschließlich reale Cardmarket-Felder — keine erfundene Kurve.

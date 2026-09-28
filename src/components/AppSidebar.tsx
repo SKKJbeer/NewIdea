@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Layers, LineChart, LayoutGrid, Briefcase, FileText, FlaskConical } from 'lucide-react';
+import { Home, Layers, LineChart, LayoutGrid, Briefcase, FileText, FlaskConical, Flame } from 'lucide-react';
 import { Wordmark } from '@/components/Wordmark';
 import { DESCRIPTOR_EN } from '@/lib/brand';
 
@@ -20,6 +20,7 @@ import { DESCRIPTOR_EN } from '@/lib/brand';
 
 const PUNKTE = [
   { href: '/', icon: Home, label: 'Übersicht' },
+  { href: '/trends', icon: Flame, label: 'Trends & Neuheiten' },
   { href: '/sets', icon: Layers, label: 'Sets' },
   { href: '/marktbericht', icon: LineChart, label: 'Marktbericht' },
   { href: '/suche', icon: LayoutGrid, label: 'Karten' },

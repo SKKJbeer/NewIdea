@@ -17,7 +17,7 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.pokemontcg.io https://assets.pokemon.com",
+  "img-src 'self' data: blob: https://images.pokemontcg.io https://assets.pokemon.com https://assets.tcgdex.net",
   "font-src 'self' data:",
   // Supabase (Anmeldung + Daten) und die eigene Domain.
   "connect-src 'self' https://*.supabase.co",
@@ -61,6 +61,7 @@ const nextConfig: NextConfig = {
       // Die Inhaltsrichtlinie bleibt unberuehrt: Optimierte Bilder kommen von
       // der eigenen Adresse.
       { protocol: 'https', hostname: 'images.scrydex.com' },
+      { protocol: 'https', hostname: 'assets.tcgdex.net' },
     ],
     formats: ['image/avif', 'image/webp'],
     // Optimierte Bilder 31 Tage im Vercel-Cache behalten — reduziert

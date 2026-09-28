@@ -64,6 +64,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Trends & Neuheiten',
+      endpoint: '/api/cron/themen',
+      schedule: '50 1 * * *',
+      scheduleLabel: 'Täglich 01:50 UTC',
+      description:
+        'Neue Sets (≤ 120 Tage): Cardmarket-Erweiterung über Booster/ETB-Namen, eindeutige Karten-Zuordnung, Preise + Tageswerte in den Index. Dazu versiegelte Produkte, japanische Sets vor der englischen Ausgabe und angekündigte Sets. Diagnose: ?nur=stand',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Sprachpreise JP/KR',
       endpoint: '/api/cron/sprachen',
       schedule: '35 1 * * *',

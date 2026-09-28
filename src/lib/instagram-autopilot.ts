@@ -1,5 +1,7 @@
 import sharp from 'sharp';
-import { buildStory } from '@/lib/reel-concepts';
+import { buildStory, neuerscheinungStory } from '@/lib/reel-concepts';
+import { leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
+import { setAusIndex } from '@/lib/card-index';
 import { validateMarketData } from '@/lib/market-metrics';
 import { renderStory } from '@/lib/reel-generator';
 import { ladeMarktlage, ladeMarktkarten, rendereBewegung, type Marktlage } from '@/lib/marktbilder';
@@ -176,7 +178,31 @@ async function bereiteReelVor(datum: string, siteUrl: string, rotation: number):
   // Dieselbe Bereinigung wie Karussell und Story. Vorher bekam das Reel die
   // Rohliste — und zeigte eine Karte, die das Karussell desselben Tages
   // aussortiert hatte. Zwei Beitraege, zwei Massstaebe.
-  const story = buildStory(validateMarketData(basis.karten).clean, siteUrl, { rotation });
+  // NEUERSCHEINUNG an jedem zweiten Reel-Tag, solange ein Set jünger als 30
+  // Tage ist und genug frisch bepreiste Karten hat — sonst die Rotation.
+  let neu = null as ReturnType<typeof neuerscheinungStory>;
+  if (rotation % 2 === 0) {
+    try {
+      const n = await leseNeuheiten();
+      const jung = neuheitenAktuell(n)
+        ? n!.sets.find((s) => (Date.now() - Date.parse(s.datum)) / 86_400_000 <= 30)
+        : undefined;
+      if (jung) {
+        const heute = Date.now();
+        const karten = (await setAusIndex(jung.setCode)).filter((k) => k.indexStand && heute - Date.parse(k.indexStand) <= 2 * 86_400_000);
+        const versiegelt = n!.sets.filter((s) => s.erweiterung === jung.erweiterung).flatMap((s) => s.versiegelt);
+        neu = neuerscheinungStory({
+          setName: jung.name,
+          tageSeitErscheinen: Math.floor((heute - Date.parse(jung.datum)) / 86_400_000),
+          karten: validateMarketData(karten).clean,
+          versiegelt: versiegelt.map((v) => ({ name: v.name, trend: v.preis.trend })),
+        }, siteUrl);
+      }
+    } catch (err) {
+      console.warn('[autopilot] Neuerscheinung nicht möglich:', err instanceof Error ? err.message : err);
+    }
+  }
+  const story = neu ?? buildStory(validateMarketData(basis.karten).clean, siteUrl, { rotation });
   if (!story) throw new Error('Keine ausreichenden Marktdaten fuer ein Reel');
 
   const mp4 = await renderStory(story);

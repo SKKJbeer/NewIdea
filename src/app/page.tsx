@@ -10,6 +10,8 @@ import { MetricCards } from '@/components/MetricCards';
 import { DistributionBands } from '@/components/DistributionBands';
 import { MoversPanel, SetMarketPanel, ReportPromo, QuickActions } from '@/components/HomePanels';
 import { MarketBriefBlock, SectionHead } from '@/components/MarketModules';
+import { ThemenTeaser } from '@/components/Themen';
+import { leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
 
 import { getHomepageCards } from '@/lib/homepage-data';
 import { getMarketBasis } from '@/lib/market-basis';
@@ -94,6 +96,9 @@ export default async function MarketPage() {
   const stimmung = computeFearGreed(marktKarten);
   const sets = rankSets(geprueft, 8);
   const { gainers, losers } = splitMovers(geprueft, 6);
+  // Themen (Neuheiten, Jubiläum, Japan zuerst) — nur mit aktuellem Stand.
+  const neuheitenRoh = await leseNeuheiten().catch(() => null);
+  const neuheiten = neuheitenAktuell(neuheitenRoh) ? neuheitenRoh : null;
   const [abdeckung, verlauf] = await Promise.all([
     getDataCoverage().catch(() => null),
     // Der Verlauf fuer die Kurve im CBI-Panel. Faellt der Abruf aus, zeigt das
@@ -228,6 +233,15 @@ export default async function MarketPage() {
           <div className="pt-4">
             <MetricCards breite={breite} stimmung={stimmung} abdeckung={abdeckung} cbi={cbi} />
           </div>
+
+          {/* ══ WAS DEN MARKT BEWEGT ═════════════════════════════════════
+              Neuerscheinungen, Jubiläum, Japan zuerst — aus dem
+              Cardmarket-Preisverzeichnis (neuheiten.ts). */}
+          {neuheiten && (
+            <div className="mt-5">
+              <ThemenTeaser neuheiten={neuheiten} />
+            </div>
+          )}
 
           {/* ══ DREI PANELS ═════════════════════════════════════════════ */}
           <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">

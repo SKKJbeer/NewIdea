@@ -229,6 +229,24 @@ export async function fetchCardsBySet(setCode: string): Promise<PokemonCard[]> {
   return mapAndFilter(data).sort(byPriceDesc);
 }
 
+/**
+ * ALLE Karten eines Sets, auch ohne Preis — für neue Sets, deren Preise erst
+ * aus dem Cardmarket-Verzeichnis kommen (neuheiten.ts). Wirft bei Ausfall.
+ */
+export async function fetchSetKartenRoh(setCode: string): Promise<PokemonCard[]> {
+  if (!isValidSetCode(setCode)) return [];
+  const alle: PokemonCard[] = [];
+  for (let page = 1; page <= 4; page++) {
+    const data = await tcgList(
+      { q: `set.id:${setCode}`, pageSize: 250, page },
+      { retries: 3, timeout: 12000, beiAusfall: page === 1 ? 'werfen' : 'leer' },
+    );
+    alle.push(...(data as Array<Record<string, unknown>>).map(mapApiCardToCard));
+    if (data.length < 250) break;
+  }
+  return alle;
+}
+
 export async function fetchTopValueCards(limit = 10): Promise<PokemonCard[]> {
   const queries = [
     '(rarity:"Special Illustration Rare" OR rarity:"Hyper Rare")',
