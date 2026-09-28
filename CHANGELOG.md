@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.13.2] - 28. September 2026 · Classic Collection mit Kartenpreisen
+
+### Behoben
+- Die Karten der „30th Celebration: Classic Collection" bekamen trotz eindeutiger Cardmarket-Zuordnung keinen Eintrag im Kartenindex: Die Quellen nummerieren das Set verschieden (Glurak = 4 bzw. 001). Kommt der Name im Set auf beiden Seiten genau einmal vor, gilt die Karte jetzt als dieselbe
+
+---
+
 ## [6.13.1] - 28. September 2026 · Diagnose für den Themen-Durchlauf
 
 ### Geändert

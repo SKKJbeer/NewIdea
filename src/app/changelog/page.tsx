@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.13.2',
+    date: '28. September 2026',
+    label: 'Classic Collection mit Kartenpreisen',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Karten der Classic Collection fehlten im Kartenindex — die Quellen nummerieren das Set verschieden' },
+    ],
+  },
+  {
     version: '6.13.1',
     date: '28. September 2026',
     label: 'Diagnose für den Themen-Durchlauf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'changed', text: 'Themen-Durchlauf nennt im Studio die Fehlerursache' },
     ],

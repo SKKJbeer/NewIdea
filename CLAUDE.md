@@ -202,7 +202,7 @@ S6a, ohne Nummer nicht unterscheidbar).
 | Cron | `/api/cron/themen` 01:50 UTC | nach `/api/cron/sprachen` (braucht deren Zuordnung für „Japan zuerst") |
 | Anzeige | `/trends`, `ThemenTeaser` (Startseite, Marktbericht), Set-Seite (versiegelt, mehrdeutig, `SetImAufbau`) | Datei älter 3 Tage → nicht zeigen |
 
-**Regeln:** Mehrdeutige Drucke (normal + SIR mit gleichen Attacken) bekommen KEINEN Einzelpreis, sondern alle Preise nebeneinander. In den Kartenindex wird nur geschrieben, wenn kein frischerer Preis dort steht UND pokemontcg.io die Karte mit gleicher Nummer + Namen führt. Artikel-Kontext (`themenKontext`) enthält NIE Preiszahlen. „Kommend" leer = ehrlicher Leerzustand, keine Gerüchte.
+**Regeln:** Mehrdeutige Drucke (normal + SIR mit gleichen Attacken) bekommen KEINEN Einzelpreis, sondern alle Preise nebeneinander. In den Kartenindex wird nur geschrieben, wenn kein frischerer Preis dort steht UND pokemontcg.io die Karte mit gleicher Nummer + Namen führt (abweichende Nummerierung, z. B. Classic Collection: Name im Set auf beiden Seiten genau einmal). Artikel-Kontext (`themenKontext`) enthält NIE Preiszahlen. „Kommend" leer = ehrlicher Leerzustand, keine Gerüchte.
 
 ---
 

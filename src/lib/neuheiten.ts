@@ -303,14 +303,25 @@ export async function neuheitenLauf(): Promise<NeuheitenLauf> {
         .sort((a, b) => b.preise[b.preise.length - 1] - a.preise[a.preise.length - 1])
         .slice(0, 12);
 
-      // In den Index — nur Karten, die pokemontcg.io unter Nummer UND Namen führt.
+      // In den Index — nur Karten, die pokemontcg.io unter Nummer UND Namen führt
+      // (bzw. unter einem im Set beidseitig einmaligen Namen, siehe unten).
       try {
         const pt = await fetchSetKartenRoh(v.pt.id);
         const zeilen: IndexZeile[] = [];
         const deNamen = await parallel(paare, 10, (p) =>
           holeJson<{ name?: string }>(`${DEX}/de/cards/${encodeURIComponent(p.karte.id)}`).catch(() => null));
+        // Zweiter Weg, nur wenn die Nummern nicht passen: Der Name kommt im Set
+        // auf BEIDEN Seiten genau einmal vor. Nötig für Sets, die die Quellen
+        // verschieden nummerieren (Classic Collection: pokemontcg.io nach der
+        // Originalkarte, Glurak = 4; TCGdex fortlaufend, Glurak = 001).
+        const dexKarten = v.karten;
         paare.forEach((p, i) => {
-          const treffer = pt.filter((c) => c.number && nummernGleich(c.number, p.karte.localId) && namenGleich(c.name, p.karte.name));
+          let treffer = pt.filter((c) => c.number && nummernGleich(c.number, p.karte.localId) && namenGleich(c.name, p.karte.name));
+          if (treffer.length === 0) {
+            const gleichnamigDex = dexKarten.filter((k) => namenGleich(k.name, p.karte.name));
+            const gleichnamigPt = pt.filter((c) => namenGleich(c.name, p.karte.name));
+            if (gleichnamigDex.length === 1 && gleichnamigPt.length === 1) treffer = gleichnamigPt;
+          }
           if (treffer.length !== 1) return;
           const c = treffer[0];
           const pr = preise.get(p.produkt)!;
