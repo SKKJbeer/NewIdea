@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.15.3',
+    date: '28. September 2026',
+    label: 'Teaser ohne Kartons',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Themen-Kurzfassung nennt keinen Karton mit sechs Displays mehr als teuerstes Produkt' },
+    ],
+  },
+  {
     version: '6.15.2',
     date: '28. September 2026',
     label: 'Richtige Kalenderwoche, richtige Kartenbilder',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Kalenderwoche lag 2026 eine Woche zurück (Bericht vom 28.09. hieß KW 39) — jetzt ISO 8601, auch rückwirkend' },
       { type: 'fixed', text: 'Artikelbilder zeigen die gemeinte Karte, nicht eine gleichnamige aus einem anderen Set' },

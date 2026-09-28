@@ -4,7 +4,7 @@ import { getMarketBasis } from './market-basis';
 import { cardsFromIndex, bestandFuerSets, type BestandZeile } from './card-index';
 import { leseFrischpreise } from './frischpreise';
 import { leseNeuheiten, neuheitenAktuell, type NeuheitenDatei, type ProduktPreis } from './neuheiten';
-import { bewegung30 } from './neuheiten-zuordnung';
+import { bewegung30, ohneCases } from './neuheiten-zuordnung';
 import { computePmi, marketBreadth, validateMarketData } from './market-metrics';
 import { median } from './portfolio';
 import { ladeSetListe } from './set-liste';
@@ -130,9 +130,9 @@ export function istModern(setCode: string | undefined, setDatum: ReadonlyMap<str
   return Number.isFinite(t) ? jetzt - t <= MODERN_TAGE * 86_400_000 : null;
 }
 
-/** Versiegelte Produkte für den Text: ohne Cases (ein Karton voller Displays ist kein Marktsignal). */
+/** Versiegelte Produkte für den Text: ohne Cases. */
 export function versiegeltFuerText(produkte: ProduktPreis[], max = 4): ProduktPreis[] {
-  return produkte.filter((p) => !/\bcase\b/i.test(p.name)).slice(0, max);
+  return ohneCases(produkte, max);
 }
 
 /** Indexwert, der 6–9 Tage vor dem jüngsten liegt. */

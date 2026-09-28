@@ -171,3 +171,8 @@ export function nummernGleich(a: string, b: string): boolean {
   const norm = (s: string) => s.trim().toUpperCase().replace(/^([A-Z]*)0*(\d+)$/, '$1$2');
   return norm(a) === norm(b);
 }
+
+/** Versiegelte Produkte für Texte und Teaser: ohne Kartons (Cases) — ein Karton voller Displays ist kein Marktsignal. */
+export function ohneCases<T extends { name: string }>(produkte: T[], max = 4): T[] {
+  return produkte.filter((p) => !/\bcase\b/i.test(p.name)).slice(0, max);
+}

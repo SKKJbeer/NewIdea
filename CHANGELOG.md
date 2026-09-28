@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.15.3] - 28. September 2026 · Teaser ohne Kartons
+
+### Behoben
+- „Was den Markt gerade bewegt" nannte als teuerstes Produkt eines neuen Sets einen Karton mit sechs Displays — jetzt das teuerste Produkt ohne Kartons, wie im Marktbericht
+
+---
+
 ## [6.15.2] - 28. September 2026 · Richtige Kalenderwoche, richtige Kartenbilder
 
 ### Behoben

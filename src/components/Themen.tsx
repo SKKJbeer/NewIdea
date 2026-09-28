@@ -3,7 +3,7 @@ import { Package, Sparkles, ArrowRight } from 'lucide-react';
 import { CardThumb } from './CardThumb';
 import { formatEur, formatPercent } from '@/lib/format';
 import { SECTION_LABEL, toneClass } from '@/lib/ui';
-import { bewegung30 } from '@/lib/neuheiten-zuordnung';
+import { bewegung30, ohneCases } from '@/lib/neuheiten-zuordnung';
 import type { ProduktPreis, JapanSet, NeuheitenDatei } from '@/lib/neuheiten';
 import type { IndexTreffer } from '@/lib/card-index';
 
@@ -156,9 +156,11 @@ export function ThemenTeaser({ neuheiten }: { neuheiten: NeuheitenDatei | null }
         etb ? ` · Elite Trainer Box ${formatEur(etb.preis.trend)}` : ''}${booster ? ` · Booster ${formatEur(booster.preis.trend)}` : ''}`,
     });
   }
-  const neu = neuheiten.sets.find((s) => !/30th/i.test(s.name) && s.versiegelt.length > 0);
+  const neu = neuheiten.sets.find((s) => !/30th/i.test(s.name) && ohneCases(s.versiegelt, 1).length > 0);
   if (neu) {
-    punkte.push({ titel: `Neuerscheinung: ${neu.name}`, text: `Seit ${tageSeit(neu.datum)} Tagen · teuerstes versiegeltes Produkt ${neu.versiegelt[0].name} ${formatEur(neu.versiegelt[0].preis.trend)}` });
+    // Ohne Kartons: „6 Booster Box Case" ist kein Produkt, das Leser kaufen.
+    const p = ohneCases(neu.versiegelt, 1)[0];
+    punkte.push({ titel: `Neuerscheinung: ${neu.name}`, text: `Seit ${tageSeit(neu.datum)} Tagen · teuerstes versiegeltes Produkt ${p.name} ${formatEur(p.preis.trend)}` });
   }
   const jp = neuheiten.japan[0];
   if (jp && jp.karten[0]) {
