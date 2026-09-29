@@ -85,7 +85,8 @@ describe('Alle Kartenseiten stehen in der Sitemap', () => {
   });
 
   it('meldet alle Sets, nicht nur die 24 neuesten', () => {
-    expect(lies('src/app/sitemap.ts')).toMatch(/fetchRecentSets\(250\)/);
+    // Seit v6.15.4 über die gesicherte Liste (Rückfall bei Ausfall) — weiterhin alle.
+    expect(lies('src/app/sitemap.ts')).toMatch(/ladeSetListe\(250\)/);
   });
 });
 

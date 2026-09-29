@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.15.3` · **Stand:** 28. September 2026 · **Branch:** `main`
+**Version:** `v6.15.4` · **Stand:** 28. September 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.15.4 | Daten-Audit: Preisdurchlauf holt Netzfehler nach (1.000 Karten blieben liegen), Sitemap mit echtem lastmod + Set-Rückfall, kein Sweep-Fehlalarm, Hinweis auf alte Preise in Artikeln/Berichten vor 28.09., Rückblick 27.09. neu |
 | v6.15.3 | Themen-Teaser nennt keine Kartons (Cases) mehr als teuerstes Produkt; KW-40-Bericht mit neuem Ablauf veröffentlicht |
 | v6.15.2 | Kalenderwoche nach ISO (lag 2026 eine Woche zurück, auch rückwirkend korrigiert); Artikelbilder zeigen die gemeinte Karte; Studio-Auslöser „Marktbericht der Woche neu erzeugen" |
 | v6.15.1 | Probelauf-Befunde behoben: Set-Bewegung modern/älter getrennt, junge Sets gekennzeichnet, kein Aufhänger auf Ausreißern, kein Zubehör in Marktabschnitten, Artikelbilder aus der ganzen Marktlage; Instagram-Karussell und Reel nach Relevanz + 6-Tage-Gedächtnis |

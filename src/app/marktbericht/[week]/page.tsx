@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CardGrid } from '@/components/CardGrid';
 import { Prose } from '@/components/Prose';
-import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap, TriangleAlert } from 'lucide-react';
+import { ARTIKEL_PREISE_FRISCH_AB } from '@/lib/article-generator';
 import { loadMarketReportByWeek, listMarketReportMeta } from '@/lib/market-report-storage';
 import type { Metadata } from 'next';
 
@@ -94,6 +95,17 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ w
             </Link>
           )}
         </div>
+
+        {/* Berichte vor KW 40/2026 entstanden aus Monate alten pokemontcg.io-Preisen
+            (Audit 29.09.2026) — sichtbar sagen, statt sie als aktuell stehen zu lassen. */}
+        {report.weekStart < ARTIKEL_PREISE_FRISCH_AB && (
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2.5">
+            <TriangleAlert size={15} className="text-amber-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-400/80 leading-relaxed">
+              <strong className="text-amber-400">Archiv-Bericht:</strong> Die Preisangaben stammen aus einer älteren Datenquelle und können veraltet sein — aktuelle Preise stehen auf den Kartenseiten.
+            </p>
+          </div>
+        )}
 
         {/* Report text */}
         <section className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] overflow-hidden">

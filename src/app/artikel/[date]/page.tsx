@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
 import Image from 'next/image';
-import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime } from '@/lib/article-generator';
+import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime, artikelPreiseVeraltet } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
 import { ArticleStats } from '@/components/ArticleStats';
@@ -204,11 +204,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
           </div>
         ) : (
           <>
-            {article.isStatic && (
+            {artikelPreiseVeraltet(article) && (
               <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2.5">
                 <TriangleAlert size={15} className="text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-400/80 leading-relaxed">
-                  <strong className="text-amber-400">Archiv-Beitrag:</strong> Preisangaben können veraltet sein — aktuelle Marktpreise bitte direkt auf{' '}
+                  <strong className="text-amber-400">Archiv-Beitrag:</strong> Die Preisangaben in diesem Beitrag stammen aus einer älteren Datenquelle und können veraltet sein — aktuelle Preise stehen auf den Kartenseiten oder direkt auf{' '}
                   <a href={process.env.NEXT_PUBLIC_CARDMARKET_URL || 'https://www.cardmarket.com/en/Pokemon'} target="_blank" rel="noopener noreferrer sponsored" className="underline hover:text-amber-300">Cardmarket</a>{' '}
                   prüfen.
                 </p>

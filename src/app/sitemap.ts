@@ -3,8 +3,9 @@ import { GUIDES } from '@/lib/guides';
 import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { listMarketReportMeta } from '@/lib/market-report-storage';
-import { fetchRecentSets } from '@/lib/pokemon-api';
-import { listGeneratedGuideSlugs } from '@/lib/guide-storage';
+import { ladeSetListe } from '@/lib/set-liste';
+import { listGeneratedGuideMeta } from '@/lib/guide-storage';
+import { leseDurchlaufStand } from '@/lib/preis-durchlauf';
 import { siteUrlOrLocal } from '@/lib/site';
 
 // Keine geratene Adresse — siehe site.ts.
@@ -28,67 +29,67 @@ function recentPublishDates(count = 26): string[] {
   return dates;
 }
 
+// EHRLICHES `lastmod` (Befund 29.09.2026): Vorher trug JEDER Eintrag den
+// Zeitpunkt des Abrufs. Google wertet `lastmod` nur, wenn es verlässlich ist —
+// ein Wert, der immer „jetzt" sagt, wird ignoriert, und damit auch der echte
+// Hinweis auf einen neuen Artikel. Jetzt: das Datum, an dem sich der Inhalt
+// wirklich geändert hat — oder gar keins, wenn es unbekannt ist.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
+  // Seiten mit Marktdaten ändern sich mit dem täglichen Preisdurchlauf.
+  const durchlauf = await leseDurchlaufStand().catch(() => null);
+  const preisStand = durchlauf?.fertig ? new Date(durchlauf.aktualisiert) : undefined;
+
+  const seite = (pfad: string, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'], priority: number, lastModified?: Date) =>
+    ({ url: `${BASE_URL}${pfad}`, changeFrequency, priority, ...(lastModified ? { lastModified } : {}) });
 
   const staticPages: MetadataRoute.Sitemap = [
-    { url: `${BASE_URL}/`,                  lastModified: now, changeFrequency: 'daily',   priority: 1.0 },
-    { url: `${BASE_URL}/suche`,             lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
-    { url: `${BASE_URL}/einsteiger`,        lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    seite('/', 'daily', 1.0, preisStand),
+    seite('/suche', 'weekly', 0.9),
+    seite('/einsteiger', 'monthly', 0.8),
     // Die Methodik ist ein Vertrauensdokument — sie gehört indexiert.
-    { url: `${BASE_URL}/methodik`,          lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/sets`,              lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    { url: `${BASE_URL}/artikel`,           lastModified: now, changeFrequency: 'daily',   priority: 0.8 },
-    { url: `${BASE_URL}/guides`,            lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    { url: `${BASE_URL}/trends`,            lastModified: now, changeFrequency: 'daily',   priority: 0.9 },
-    { url: `${BASE_URL}/marktbericht`,      lastModified: now, changeFrequency: 'weekly',  priority: 0.7 },
-    { url: `${BASE_URL}/marktbericht/archiv`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
-    { url: `${BASE_URL}/portfolio`,         lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${BASE_URL}/merkliste`,         lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${BASE_URL}/impressum`,         lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
-    { url: `${BASE_URL}/datenschutz`,       lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
+    seite('/methodik', 'monthly', 0.6),
+    seite('/sets', 'weekly', 0.8, preisStand),
+    seite('/artikel', 'daily', 0.8),
+    seite('/guides', 'weekly', 0.8),
+    seite('/trends', 'daily', 0.9, preisStand),
+    seite('/marktbericht', 'weekly', 0.7),
+    seite('/marktbericht/archiv', 'weekly', 0.5),
+    seite('/portfolio', 'monthly', 0.5),
+    seite('/merkliste', 'monthly', 0.4),
+    seite('/impressum', 'yearly', 0.2),
+    seite('/datenschutz', 'yearly', 0.2),
   ];
 
-  // Guides — statische (lokal, immer verfügbar) + automatisch generierte (Supabase).
-  const generatedGuides = await listGeneratedGuideSlugs().catch(() => [] as string[]);
-  const guideSlugs = [...new Set([...GUIDES.map((g) => g.slug), ...generatedGuides])];
-  const guidePages: MetadataRoute.Sitemap = guideSlugs.map((slug) => ({
-    url: `${BASE_URL}/guides/${slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.6,
-  }));
+  // Guides — statische (lokal, ohne bekanntes Datum) + generierte (mit Erstellzeit).
+  const generiert = await listGeneratedGuideMeta().catch(() => [] as Array<{ slug: string; createdAt: string | null }>);
+  const erstellt = new Map(generiert.map((g) => [g.slug, g.createdAt]));
+  const guideSlugs = [...new Set([...GUIDES.map((g) => g.slug), ...generiert.map((g) => g.slug)])];
+  const guidePages: MetadataRoute.Sitemap = guideSlugs.map((slug) => {
+    const c = erstellt.get(slug);
+    return seite(`/guides/${slug}`, 'monthly', 0.6, c ? new Date(c) : undefined);
+  });
 
-  // Artikel — vereint lokal berechnete Publish-Daten (immer da) mit den in Supabase
-  // gespeicherten Artikeln (falls DB nicht erreichbar: leerer Fallback).
+  // Artikel — lokal berechnete Publish-Daten (immer da) + gespeicherte. Datum des
+  // Artikels = Erscheinungstag (08:00 UTC, Lauf des Tages-Crons).
   const savedMeta = await listSavedArticleMeta().catch(() => [] as Awaited<ReturnType<typeof listSavedArticleMeta>>);
   const articleDates = new Set<string>([...recentPublishDates(), ...savedMeta.map((m) => m.date)]);
-  const articlePages: MetadataRoute.Sitemap = [...articleDates].map((date) => ({
-    url: `${BASE_URL}/artikel/${date}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.6,
-  }));
+  const articlePages: MetadataRoute.Sitemap = [...articleDates].map((date) =>
+    seite(`/artikel/${date}`, 'monthly', 0.6, new Date(`${date}T08:00:00Z`)),
+  );
 
-  // Wöchentliche Marktberichte aus dem Archiv (falls DB nicht erreichbar: leerer Fallback).
+  // Wöchentliche Marktberichte: Erstellzeitpunkt aus der Datenbank.
   const reportMeta = await listMarketReportMeta().catch(() => [] as Awaited<ReturnType<typeof listMarketReportMeta>>);
-  const reportPages: MetadataRoute.Sitemap = reportMeta.map((r) => ({
-    url: `${BASE_URL}/marktbericht/${r.weekStart}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.4,
-  }));
+  const reportPages: MetadataRoute.Sitemap = reportMeta.map((r) =>
+    seite(`/marktbericht/${r.weekStart}`, 'monthly', 0.4, r.createdAt ? new Date(r.createdAt) : undefined),
+  );
 
-  // Set-Landingpages — ALLE Sets, nicht nur die 24 neuesten. Aeltere Sets
-  // („base set preise", „evolving skies wert") sind gerade die gesuchten.
-  // Falls die TCG-API ausfaellt: leerer Rueckfall, die Kartensitemaps bleiben.
-  const sets = await fetchRecentSets(250).catch(() => []);
-  const setPages: MetadataRoute.Sitemap = sets.map((s) => ({
-    url: `${BASE_URL}/sets/${s.id}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
+  // Set-Landingpages — ALLE Sets, mit gesicherter Liste als Rückfall
+  // (`ladeSetListe`): Fiel pokemontcg.io aus, stand die Sitemap ohne ein
+  // einziges Set da (27.09.2026). Inhalt = Kartenpreise → Stand des Durchlaufs.
+  const setListe = await ladeSetListe(250).catch(() => null);
+  const setPages: MetadataRoute.Sitemap = (setListe?.sets ?? []).map((s) =>
+    seite(`/sets/${s.id}`, 'weekly', 0.7, preisStand),
+  );
 
   // Kartenseiten stehen NICHT hier, sondern in eigenen Teil-Sitemaps
   // (/karten/sitemap/N.xml, gemeldet in robots.txt) — alle ~20.000 statt

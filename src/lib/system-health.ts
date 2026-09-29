@@ -502,11 +502,16 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
 
     // DREI VERSCHIEDENE STOERUNGEN, drei verschiedene Saetze. Sie in einen zu
     // fassen waere bequem und wuerde die Ursache verschleiern.
-    if (stand.runDate !== heuteStr) {
+    if (stand.runDate !== heuteStr && sweepUeberfaellig(stand.runDate, new Date())) {
+      // Der Sweep nimmt seit v6.9.0 nur NEUE Karten auf — die Preise kommen
+      // aus dem Tagesdurchlauf. Und er läuft um 06:10 UTC: Vorher ist „heute
+      // nicht gestartet" kein Befund (Fehlalarm im Audit vom 29.09.2026).
       problems.push(
-        `Preiserfassung ist heute nicht gestartet — letzter Durchlauf vom ${stand.runDate}. ` +
-          `Die Kartenpreise stammen von diesem Tag.`,
+        `Aufnahme neuer Karten ist überfällig — letzter Lauf vom ${stand.runDate}. ` +
+          `Seitdem erschienene Karten fehlen in Suche und Index (Preise bestehender Karten sind nicht betroffen).`,
       );
+    } else if (stand.runDate !== heuteStr) {
+      // Planmäßig: Der heutige Lauf steht noch aus.
     } else if (!fertig && stillstandMinuten !== null && stillstandMinuten > 20) {
       problems.push(
         `Preiserfassung steht seit ${stillstandMinuten} Minuten bei Seite ${stand.nextPage} von ${seitenGesamt} ` +
@@ -549,4 +554,13 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
   }
 
   return { configured: true, tables, guidePipeline, sweep, preise, sprachpreise, problems, checkedAt };
+}
+
+/** Sweep-Lauf (06:10 UTC) überfällig? Erst nach 06:40 UTC ohne heutigen Lauf, oder älter als gestern. Rein. */
+export function sweepUeberfaellig(laufTag: string, jetzt: Date): boolean {
+  const heute = jetzt.toISOString().slice(0, 10);
+  if (laufTag >= heute) return false;
+  const gestern = new Date(jetzt.getTime() - 86_400_000).toISOString().slice(0, 10);
+  if (laufTag < gestern) return true;
+  return jetzt.getUTCHours() * 60 + jetzt.getUTCMinutes() > 6 * 60 + 40;
 }

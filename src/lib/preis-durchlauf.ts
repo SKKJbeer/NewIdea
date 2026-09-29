@@ -58,6 +58,13 @@ export interface DurchlaufStand {
   gruende: Partial<Record<Fehlgrund | 'veraltet', number>>;
   /** Netz- oder Serverfehler bei TCGdex — zaehlen NICHT als „kein Preis". */
   fehler: number;
+  /**
+   * Karten mit Netz-/Serverfehler, die spätere Etappen desselben Tages erneut
+   * prüfen. Befund 29.09.2026: 1.000 Karten fielen so aus und wurden nie
+   * nachgeholt — der Durchlauf war nach drei Minuten „fertig", die fünf
+   * übrigen Etappen des Tages taten nichts.
+   */
+  nachholen?: string[];
   schreibFehler: string | null;
   begonnen: string;
   aktualisiert: string;
@@ -184,10 +191,11 @@ export async function preisEtappe({
 
   const alt = await leseDurchlaufStand();
   const stand = alt && alt.datum === datum ? alt : neuerStand(datum, new Date(start));
-  if (stand.fertig) return stand;
+  if (stand.fertig && !stand.nachholen?.length) return stand;
   stand.etappen += 1;
 
   const dexSets = await ladeDexSets();
+  if (stand.fertig) return nachholRunde(stand, dexSets, start, budgetMs, jetzt);
 
   while (jetzt() - start < budgetMs) {
     const { data, error } = await sb
@@ -206,13 +214,16 @@ export async function preisEtappe({
       const ergebnisse = await mitBegrenzung(teil, GLEICHZEITIG, (z) => pruefe(z, dexSets, jetzt()));
 
       const frisch: Aktualisierung[] = [];
-      for (const e of ergebnisse) {
+      ergebnisse.forEach((e, k) => {
         if (e.art === 'frisch') frisch.push(e.a);
         else if (e.art === 'ohne') {
           stand.ohneFrischpreis++;
           stand.gruende[e.grund] = (stand.gruende[e.grund] ?? 0) + 1;
-        } else stand.fehler++;
-      }
+        } else {
+          stand.fehler++;
+          (stand.nachholen ??= []).push(teil[k].id);
+        }
+      });
       const sf = await schreibe(frisch);
       if (sf) {
         // Nicht weiterzaehlen: Der Schritt wird in der naechsten Etappe
@@ -233,6 +244,62 @@ export async function preisEtappe({
     if (alleVerarbeitet && zeilen.length < LESE_SEITE) { stand.fertig = true; break; }
   }
 
+  // Restzeit gleich für einen ersten Nachholversuch nutzen.
+  if (stand.fertig && stand.nachholen?.length && jetzt() - start < budgetMs) {
+    return nachholRunde(stand, dexSets, start, budgetMs, jetzt);
+  }
+  stand.aktualisiert = new Date(jetzt()).toISOString();
+  await schreibeJson(STAND_PFAD, stand);
+  return stand;
+}
+
+/**
+ * Prüft Karten mit Netz-/Serverfehler erneut. Was jetzt einen Preis (oder
+ * einen belegten Grund ohne Preis) bekommt, verlässt die Liste; echte Fehler
+ * bleiben für die nächste Etappe stehen.
+ */
+async function nachholRunde(
+  stand: DurchlaufStand,
+  dexSets: DexSet[],
+  start: number,
+  budgetMs: number,
+  jetzt: () => number,
+): Promise<DurchlaufStand> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase nicht konfiguriert');
+  const offen = [...(stand.nachholen ?? [])];
+  const bleibt: string[] = [];
+  for (let i = 0; i < offen.length; i += SCHRITT) {
+    const ids = offen.slice(i, i + SCHRITT);
+    if (jetzt() - start >= budgetMs) { bleibt.push(...ids); continue; }
+    const { data, error } = await sb.from('cards_index').select('*').in('id', ids);
+    if (error) { bleibt.push(...ids); continue; }
+    const zeilen = (data ?? []) as IndexZeile[];
+    const ergebnisse = await mitBegrenzung(zeilen, GLEICHZEITIG, (z) => pruefe(z, dexSets, jetzt()));
+    const frisch = ergebnisse.flatMap((e) => (e.art === 'frisch' ? [e.a] : []));
+    // Erst schreiben, dann verbuchen: Scheitert das Schreiben, bleibt der
+    // ganze Schritt offen und zählt unverändert als Fehler.
+    const sf = await schreibe(frisch);
+    if (sf) {
+      stand.schreibFehler = sf;
+      bleibt.push(...ids);
+      continue;
+    }
+    stand.schreibFehler = null;
+    ergebnisse.forEach((e, k) => {
+      if (e.art === 'fehler') { bleibt.push(zeilen[k].id); return; }
+      stand.fehler = Math.max(0, stand.fehler - 1);
+      if (e.art === 'frisch') stand.frisch++;
+      else {
+        stand.ohneFrischpreis++;
+        stand.gruende[e.grund] = (stand.gruende[e.grund] ?? 0) + 1;
+      }
+    });
+    // Nicht mehr im Index vorhandene Karten gelten als erledigt.
+    const gefunden = new Set(zeilen.map((z) => z.id));
+    stand.fehler = Math.max(0, stand.fehler - ids.filter((id) => !gefunden.has(id)).length);
+  }
+  stand.nachholen = bleibt;
   stand.aktualisiert = new Date(jetzt()).toISOString();
   await schreibeJson(STAND_PFAD, stand);
   return stand;

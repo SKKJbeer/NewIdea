@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.15.4',
+    date: '29. September 2026',
+    label: 'Daten-Audit',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Tagesdurchlauf holt Karten mit Netz- oder Serverfehler nach (am 29.09. blieben 1.000 Karten liegen)' },
+      { type: 'fixed', text: 'Sitemap mit echtem Änderungsdatum statt Abrufzeit; Set-Seiten auch bei Quellausfall enthalten' },
+      { type: 'fixed', text: 'Kein Fehlalarm im Monitoring vor dem geplanten Lauf' },
+      { type: 'fixed', text: 'Artikel und Berichte vor dem 28.09. mit Hinweis auf ältere Preisquelle; Rückblick vom 27.09. neu erzeugt' },
+    ],
+  },
+  {
     version: '6.15.3',
     date: '28. September 2026',
     label: 'Teaser ohne Kartons',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Themen-Kurzfassung nennt keinen Karton mit sechs Displays mehr als teuerstes Produkt' },
     ],

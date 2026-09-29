@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { date } = await request.json().catch(() => ({ date: undefined }));
+  const { date, neu } = await request.json().catch(() => ({ date: undefined, neu: false }));
   if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json({ error: 'date (YYYY-MM-DD) fehlt oder ist ungültig' }, { status: 400 });
   }
@@ -36,6 +36,9 @@ export async function POST(request: Request) {
     let saveError: string | null = null;
     const article = await generateArticle(type, date, {
       replaceFallback: true,
+      // `neu: true` ersetzt auch einen echten Artikel (z. B. einen, der noch
+      // aus veralteten Preisen entstand) — bewusster Studio-Auftrag.
+      neuErzeugen: neu === true,
       onAiError: (info) => { aiError = info; },
       onSaveError: (message) => { saveError = message; },
     });

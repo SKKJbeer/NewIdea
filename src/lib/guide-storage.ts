@@ -66,3 +66,12 @@ export async function listGeneratedGuideSlugs(): Promise<string[]> {
   if (error || !data) return [];
   return data.map((r) => String(r.slug));
 }
+
+/** Slug + Erstellzeitpunkt — für ein ehrliches `lastmod` in der Sitemap. */
+export async function listGeneratedGuideMeta(): Promise<Array<{ slug: string; createdAt: string | null }>> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb.from('generated_guides').select('slug, created_at');
+  if (error || !data) return [];
+  return data.map((r) => ({ slug: String(r.slug), createdAt: r.created_at ? String(r.created_at) : null }));
+}

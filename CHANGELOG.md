@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.15.4] - 29. September 2026 · Daten-Audit
+
+### Behoben
+- **Tagesdurchlauf der Preise:** 1.000 Karten bekamen am 29.09. wegen Netz- oder Serverfehlern bei der Quelle keinen neuen Preis und wurden nie nachgeholt — der Durchlauf galt nach drei Minuten als fertig. Solche Karten werden jetzt gemerkt und im selben Lauf sowie in den weiteren Etappen des Tages erneut geprüft
+- **Sitemap:** Jeder Eintrag trug den Zeitpunkt des Abrufs als „zuletzt geändert" — Suchmaschinen ignorieren solche Angaben. Jetzt das echte Änderungsdatum (Artikel: Erscheinungstag, Berichte und Guides: Erstellzeit, Seiten mit Preisen: Stand des Tagesdurchlaufs) oder keins. Set-Seiten stehen auch bei einem Ausfall der Kartendatenbank in der Sitemap
+- **Monitoring:** „Preiserfassung heute nicht gestartet" erschien schon vor dem geplanten Lauf um 06:10 UTC und behauptete, die Kartenpreise stammten daher — der Lauf nimmt nur neue Karten auf
+- **Artikel und Marktberichte vor dem 28.09.2026** nannten Preise aus einer Quelle, die teils Monate alt war (Beispiel: Golisopod ex 17,29 € statt 21,94 €). Sie tragen jetzt einen sichtbaren Archiv-Hinweis; der Wochenrückblick vom 27.09. ist mit aktuellen Daten neu erschienen
+
+---
+
 ## [6.15.3] - 28. September 2026 · Teaser ohne Kartons
 
 ### Behoben

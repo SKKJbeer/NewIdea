@@ -616,6 +616,18 @@ export async function readArticle(date: string): Promise<Article | null> {
   return loadArticle(date);
 }
 
+/**
+ * Ab diesem Tag stammen die Zahlen erzeugter Artikel aus dem frischen
+ * Tagesindex (v6.14.0). Davor aus pokemontcg.io — oft Monate alt.
+ */
+export const ARTIKEL_PREISE_FRISCH_AB = '2026-09-28';
+
+/** Zeigt der Artikel womöglich veraltete Preise? Ersatztext ODER vor der Umstellung erzeugt. Rein. */
+export function artikelPreiseVeraltet(a: { isStatic?: boolean; generatedAt?: string }): boolean {
+  if (a.isStatic) return true;
+  return !a.generatedAt || a.generatedAt.slice(0, 10) < ARTIKEL_PREISE_FRISCH_AB;
+}
+
 export interface GenerateArticleOptions {
   /**
    * Ersetzt einen zuvor gespeicherten Fallback-Artikel durch eine echte
@@ -628,6 +640,12 @@ export interface GenerateArticleOptions {
    * NICHTS. Zum Prüfen, was die Generierung mit den heutigen Daten schreibt.
    */
   probe?: boolean;
+  /**
+   * Gespeicherten Artikel ERSETZEN, auch wenn er kein Ersatztext ist — nur aus
+   * dem Studio. Anlass 29.09.2026: Der Rückblick vom 27.09. entstand noch aus
+   * Monate alten pokemontcg.io-Preisen und nannte sie als aktuell.
+   */
+  neuErzeugen?: boolean;
   /** Bekommt den Datenblock, den das Modell sieht (nur zur Diagnose). */
   onDaten?: (daten: string) => void;
   /**
@@ -672,7 +690,7 @@ export async function generateArticle(
   // 2. Supabase cache — one fast DB read, previously generated articles.
   // Ein gespeicherter Fallback (isStatic) wird auf Wunsch neu erzeugt: sonst
   // bleibt ein einmal fehlgeschlagener Artikel für immer ein Evergreen-Text.
-  const cached = options.probe ? null : await loadArticle(date);
+  const cached = options.probe || options.neuErzeugen ? null : await loadArticle(date);
   if (cached && !(options.replaceFallback && cached.isStatic)) return cached;
   const speichern = (a: Article) => (options.probe ? Promise.resolve({ ok: true as const, error: undefined }) : saveArticle(date, type, a));
 
