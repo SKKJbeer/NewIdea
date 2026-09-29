@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.16.0] - 29. September 2026 · Qualitätsschranken und Wiederholungen
+
+### Neu
+- **Zahlenprobe für alle erzeugten Texte:** Jede Prozent- und Euro-Angabe in Marktbericht und Artikeln muss in den Daten stehen, die der Erzeugung zugrunde lagen — keine selbst gerechneten Differenzen, keine erfundenen Werte
+- **Schranke mit Wiederholung:** Marktbericht, Artikel und Guides werden bis zu dreimal erzeugt, jeder Folgeversuch mit dem konkreten Befund des vorigen (unbelegte Zahl, fehlender Pflicht-Abschnitt, Ich-Form, Kaufempfehlung, als Tatsache behauptete Ursache). Besteht ein Text auch dann nicht, wird er nicht veröffentlicht
+- **Plausibilitätsprüfung der Tagespreise:** Ein neuer Wert, der mehr als das Dreifache von den eigenen 7- und 30-Tage-Schnitten der Quelle UND vom Vortageswert abweicht, wird nicht übernommen — der bisherige Wert bleibt stehen
+- **Tägliche Gesundheitsprüfung (12:30 UTC):** Tagespreise, Sprachpreise, Trends & Neuheiten, Frischpreise, Marktindex, Wochenbericht, Artikel und Guides werden gemeinsam geprüft — jeder Punkt erst, nachdem sein Lauf fällig war. Ein Befund erscheint im Monitoring ganz oben
+- **Selbstheilung des Wochenberichts:** Scheitert der Montags-Lauf, versucht es jeder Tageslauf erneut, bis der Bericht der Woche steht
+
+### Geändert
+- Jeder Preisabruf bekommt bei Netz- oder Serverfehlern sofort einen zweiten Versuch; der Themen-Lauf bis zu drei
+- Der Marktbericht-Prompt verlangt Zahlen wörtlich aus den Daten und Ursachen nur als gekennzeichnete Vermutung
+
+---
+
 ## [6.15.4] - 29. September 2026 · Daten-Audit
 
 ### Behoben

@@ -10,10 +10,24 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.16.0',
+    date: '29. September 2026',
+    label: 'Qualitätsschranken und Wiederholungen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Zahlenprobe: jede Prozent- und Euro-Angabe in Bericht und Artikeln muss in den zugrunde liegenden Daten stehen' },
+      { type: 'new', text: 'Bericht, Artikel und Guides bis zu dreimal erzeugt, jeweils mit konkretem Korrekturhinweis — sonst keine Veröffentlichung' },
+      { type: 'new', text: 'Plausibilitätsprüfung der Tagespreise: extreme Sprünge ohne Bestätigung werden nicht übernommen' },
+      { type: 'new', text: 'Tägliche Gesundheitsprüfung aller Datenläufe mit sichtbarem Fehlerstatus' },
+      { type: 'new', text: 'Wochenbericht heilt sich selbst: gescheiterter Montags-Lauf wird täglich nachgeholt' },
+      { type: 'changed', text: 'Wiederholungsversuche bei Preisabrufen und im Themen-Lauf' },
+    ],
+  },
+  {
     version: '6.15.4',
     date: '29. September 2026',
     label: 'Daten-Audit',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Tagesdurchlauf holt Karten mit Netz- oder Serverfehler nach (am 29.09. blieben 1.000 Karten liegen)' },
       { type: 'fixed', text: 'Sitemap mit echtem Änderungsdatum statt Abrufzeit; Set-Seiten auch bei Quellausfall enthalten' },

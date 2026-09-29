@@ -74,6 +74,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Gesundheitsprüfung aller Daten',
+      endpoint: '/api/cron/gesundheit',
+      schedule: '30 12 * * *',
+      scheduleLabel: 'Täglich 12:30 UTC',
+      description:
+        'Prüft nach dem letzten Lauf alle Schranken gemeinsam: Tagespreise, Sprachpreise, Trends & Neuheiten, Frischpreise, Marktindex, Wochenbericht, Artikel, Guides — jeweils erst, wenn der Lauf fällig war. Meldet 500 und steht im Monitoring ganz oben, wenn etwas nicht hält.',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Sprachpreise JP/KR',
       endpoint: '/api/cron/sprachen',
       schedule: '35 1 * * *',

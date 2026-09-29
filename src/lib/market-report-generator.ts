@@ -5,7 +5,8 @@
 // `false`. Vorgeschichte: Auf der Seite stand über Wochen ein Bericht, dessen
 // gesamter Inhalt das Wort „test" war, während der Cron Erfolg meldete.
 
-import { generateMarketSummary } from './ai-generator';
+import { generateMarketSummary, berichtKartenDaten } from './ai-generator';
+import { mitQualitaetsschranke, berichtVerstoesse, type Verstoss } from './qualitaet';
 import { saveMarketReport } from './market-report-storage';
 import { isoKalenderwoche } from './kalenderwoche';
 import { describeAiError } from './ai-error';
@@ -24,6 +25,7 @@ export type MarketReportStatus =
   | 'created'
   | 'no_cards'
   | 'rejected_too_short'
+  | 'rejected_quality'
   | 'save_failed'
   | 'failed';
 
@@ -33,6 +35,8 @@ export interface MarketReportResult {
   weekNumber?: number;
   reportChars?: number;
   cards?: number;
+  /** Erzeugungsversuche bis zum Bestehen (oder Aufgeben) der Qualitätsschranke. */
+  versuche?: number;
   error?: string;
 }
 
@@ -63,7 +67,9 @@ function topValueCards(cards: PokemonCard[], max = 6): PokemonCard[] {
  * Erzeugt den Berichtstext aus der Marktlage — speichert NICHTS. Gemeinsam
  * für den Wochen-Cron und den Probelauf im Studio.
  */
-export async function berichtErzeugen(lage: MarktLage): Promise<{ summary: MarketSummary; reportText: string; daten: string }> {
+export async function berichtErzeugen(
+  lage: MarktLage,
+): Promise<{ summary: MarketSummary | null; reportText: string; daten: string; verstoesse: Verstoss[]; versuche: number }> {
   // Gewinner/Verlierer bevorzugt aus den BESTÄTIGTEN Bewegungen — ein
   // Einzelangebot soll nicht als Wochengewinner auf der Seite stehen.
   const cards = lage.pool;
@@ -72,8 +78,23 @@ export async function berichtErzeugen(lage: MarktLage): Promise<{ summary: Marke
   const gainers = ausBestaetigt.gainers.length >= 3 ? ausBestaetigt.gainers : ausPool.gainers;
   const losers = ausBestaetigt.losers.length >= 3 ? ausBestaetigt.losers : ausPool.losers;
   const daten = marktLageText(lage, { preise: true, gedaechtnis: true });
-  const summary = await generateMarketSummary(cards, gainers, losers, daten);
-  return { summary, reportText: (summary.weeklyReport || '').trim(), daten };
+  // Geprüft wird gegen ALLES, was das Modell gesehen hat: Faktenblock + Kartenzeilen.
+  const belege = `${daten}\n${berichtKartenDaten(cards)}`;
+
+  // QUALITÄTSSCHRANKE mit Wiederholung (qualitaet.ts): Länge, Pflicht-
+  // Abschnitte, Inhaltsregeln und — vor allem — jede Zahl belegt. Hält sie
+  // nach drei Versuchen nicht, wird NICHT veröffentlicht.
+  const r = await mitQualitaetsschranke(
+    (hinweis) => generateMarketSummary(cards, gainers, losers, daten, hinweis),
+    (s) => berichtVerstoesse((s.weeklyReport || '').trim(), belege, MIN_REPORT_CHARS),
+  );
+  return {
+    summary: r.ergebnis,
+    reportText: (r.ergebnis?.weeklyReport || '').trim(),
+    daten: belege,
+    verstoesse: r.verstoesse,
+    versuche: r.versuche,
+  };
 }
 
 export async function generateAndSaveMarketReport(): Promise<MarketReportResult> {
@@ -97,20 +118,20 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
     }
 
     // Vorzeichen-Trennung zentral — dieselbe Regel wie auf der Startseite.
-    const { summary, reportText } = await berichtErzeugen(lage);
+    const { summary, reportText, verstoesse, versuche } = await berichtErzeugen(lage);
 
-    // Qualitätsgate: lieber kein neuer Bericht als ein Platzhalter auf der Startseite.
-    if (reportText.length < MIN_REPORT_CHARS) {
-      console.error(
-        `Marktbericht KW ${weekNumber} verworfen: nur ${reportText.length} Zeichen (Minimum ${MIN_REPORT_CHARS})`,
-      );
+    // Qualitätsgate: lieber kein neuer Bericht als ein falscher oder ein Platzhalter.
+    if (!summary || verstoesse.length > 0) {
+      const grund = verstoesse.map((v) => `${v.regel}: ${v.detail}`).join('; ');
+      console.error(`Marktbericht KW ${weekNumber} nach ${versuche} Versuchen verworfen: ${grund}`);
       return {
-        status: 'rejected_too_short',
+        status: verstoesse.some((v) => v.regel === 'zu-kurz') && verstoesse.length === 1 ? 'rejected_too_short' : 'rejected_quality',
         weekStart,
         weekNumber,
         reportChars: reportText.length,
         cards: cards.length,
-        error: `Berichtstext zu kurz (${reportText.length} Zeichen) — nicht veröffentlicht`,
+        versuche,
+        error: `Qualitätsschranke nach ${versuche} Versuchen nicht bestanden — nicht veröffentlicht (${grund.slice(0, 400)})`,
       };
     }
 

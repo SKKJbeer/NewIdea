@@ -169,8 +169,9 @@ export function alsPromptText(cards: PokemonCard[]): string {
   return cards
     .map(
       (c) =>
-        // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
-        `${c.name} (${c.set}): ${displayPrice(c).toFixed(2)}€, Trend: ${(c.trendPercent ?? 0).toFixed(1)}%`,
+        // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt. Deutsches
+        // Komma, weil die Zahlenprobe (qualitaet.ts) „12.3%" als „3 %" läse.
+        `${c.name} (${c.set}): ${displayPrice(c).toFixed(2).replace('.', ',')} €, Trend: ${(c.trendPercent ?? 0).toFixed(1).replace('.', ',')} %`,
     )
     .join('\n');
 }

@@ -222,6 +222,23 @@ S6a, ohne Nummer nicht unterscheidbar).
 
 ---
 
+## ⛔ Qualitätsschranken & Wiederholungen (seit v6.16.0 — PFLICHT für jede neue Pipeline)
+
+**Nutzer-Auftrag (29.09.2026):** „qualifying gates und retries, damit wir uns wirklich auf die Daten immer verlassen können".
+
+| Ebene | Wo | Was |
+|---|---|---|
+| Zahlenprobe | `qualitaet.ts` → `unbelegteZahlen()` | Jede %/€-Angabe im erzeugten Text muss im Faktenblock stehen (Betrag, Rundung auf die geschriebenen Stellen). Prompt-Daten deshalb IMMER im deutschen Format (`12,3 %`, nicht `12.3%`) |
+| Textschranke + Wiederholung | `mitQualitaetsschranke()` | Bericht (`berichtVerstoesse`: Länge, `## Marktlage/Trends/Ausblick`, Zahlen, Regeln), Artikel (`artikelVerstoesse`), Guides (`validateGuide`) — bis zu 3 Versuche mit `korrekturHinweis()`. Besteht es nicht → NICHT veröffentlichen (Bericht: alter bleibt; Artikel: gekennzeichneter Ersatztext; Guide: nächster Guide-Tag) |
+| Plausibilität Preise | `preis-durchlauf.ts` → `preisUnplausibel()` | Trend > 3× von Ø 7 UND Ø 30 der Quelle UND vom frischen Vortagswert → nicht schreiben, Grund `unplausibel` |
+| Abruf-Wiederholung | `mitWiederholung()` | Je TCGdex-Abruf 2 Versuche, danach Nachholliste (`stand.nachholen`); Themen-Lauf 3 Versuche |
+| Selbstheilung | `/api/cron/daily` | Fehlt der Bericht der laufenden Woche, erzeugt ihn jeder Tageslauf neu (nur wenn ≤ 150 s verbraucht) |
+| Gesamtprüfung | `gesundheit.ts`, `/api/cron/gesundheit` 12:30 UTC | Alle Pipelines, zeitbewusst (`bewerte()` prüft nur Fälliges); HTTP 500 + Monitoring ganz oben („DATEN NICHT IN ORDNUNG"); Ablage `social/gesundheit/` |
+
+**Regel für Neues:** Jede neue Datenpipeline bekommt (1) eine reine, getestete Schranke, (2) Wiederholung mit Grenze, (3) einen Punkt in `bewerte()`. Ohne alle drei ist sie nicht fertig.
+
+---
+
 ## Früherer Stand & Richtung (v2.16.0 — 19. Juli 2026)
 
 **Technischer Stand:** Plattform stabil und deployt. Bilder API-unabhängig (Caching-Proxy `/api/img`, stale-if-error 1 Jahr). SEO-Basis komplett (Canonicals pro Seite, JSON-LD Article, Sitemap inkl. Top-40-Karten). Alle Karten-IDs API-verifiziert, Emojis vollständig durch Lucide-Icons ersetzt (ContentIcon). 110 Tests grün.

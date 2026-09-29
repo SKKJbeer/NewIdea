@@ -54,18 +54,29 @@ export function ohneUeberschriften(text: string): string {
   return text.replace(/^#{2,3}\s+.*$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
 }
 
+/**
+ * Kartenzeilen des Berichts-Prompts — exportiert, damit die Zahlenprobe
+ * (qualitaet.ts) GENAU gegen das prüft, was das Modell gesehen hat.
+ * Deutsches Komma auch hier: „12.3%" würde die Probe als „3 %" lesen.
+ */
+export function berichtKartenDaten(cards: PokemonCard[]): string {
+  return cards
+    .slice(0, 10)
+    // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
+    .map((c) => `${c.name} (${c.set}): ${formatPrice(c)} | Trend: ${typeof c.trendPercent === 'number' ? `${c.trendPercent.toFixed(1).replace('.', ',')}\u00A0%` : '—'}`)
+    .join('\n');
+}
+
 export async function generateMarketSummary(
   cards: PokemonCard[],
   topGainers: PokemonCard[],
   topLosers: PokemonCard[],
   /** Faktenblock aus `marktLageText` (markt-lage.ts) — Trends, Neuheiten, Ausblick-Fakten. */
   marktLage = '',
+  /** Korrekturhinweis der Qualitätsschranke (qualitaet.ts) für einen Folgeversuch. */
+  hinweis = '',
 ): Promise<MarketSummary> {
-  const cardData = cards
-    .slice(0, 10)
-    // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
-    .map((c) => `${c.name} (${c.set}): ${formatPrice(c)} | Trend: ${c.trendPercent?.toFixed(1)}%`)
-    .join('\n');
+  const cardData = berichtKartenDaten(cards);
 
   const message = await client.messages.create({
     model: MODEL,
@@ -102,7 +113,7 @@ Der erste Absatz steht OHNE Überschrift vor „## Marktlage“ und fasst in zwe
 
 Keine Zubehör-Hinweise (Toploader, Sleeves, Sammelalbum …) — das ist ein Marktbericht, kein Ratgeber.
 
-Nutze ausschließlich Zahlen und Kartennamen aus den gelieferten Daten — erfinde nichts dazu. Erkläre, WARUM sich etwas bewegt hat (Angebot, Set-Status, Nachfrage), nicht nur DASS es sich bewegt hat. Unbekannte Pokémon beim ersten Auftreten kurz in Klammern beschreiben.
+Nutze ausschließlich Zahlen und Kartennamen aus den gelieferten Daten — WÖRTLICH, ohne eigene Berechnungen, Differenzen oder neu gerundete Werte. Ordne Bewegungen ein (Set-Alter, Jubiläum, versiegelte Produkte, japanischer Vorlauf) — eine Ursache immer als Vermutung kennzeichnen („eine mögliche Erklärung ist …"), nie als Tatsache. Unbekannte Pokémon beim ersten Auftreten kurz in Klammern beschreiben.
 
 ${AUSBLICK_REGELN}
 
@@ -110,7 +121,7 @@ ${CONTENT_RULES}
 
 ${STYLE_RULES}
 
-Antworte NUR mit dem Berichtstext, ohne Titel und ohne Vorrede.`,
+Antworte NUR mit dem Berichtstext, ohne Titel und ohne Vorrede.${hinweis}`,
       },
     ],
   });
@@ -234,7 +245,7 @@ export async function generateVideoScript(
   const topCards = cards.slice(0, isShortForm ? 3 : 5);
   const cardInfo = topCards
     // toFixed erlaubt: Prompt-Text für die KI, wird nie angezeigt
-    .map((c) => `${c.name} (${c.set}): ${formatPrice(c)}, Trend: ${c.trendPercent?.toFixed(1)}%`)
+    .map((c) => `${c.name} (${c.set}): ${formatPrice(c)}, Trend: ${(c.trendPercent ?? 0).toFixed(1).replace('.', ',')}\u00A0%`)
     .join('\n');
 
   const message = await client.messages.create({

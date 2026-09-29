@@ -6,6 +6,7 @@ import { findViolations, type ContentViolation } from './content-rules';
 import { saveGeneratedGuide, listGeneratedGuideSlugs } from './guide-storage';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
+import { mitQualitaetsschranke } from './qualitaet';
 
 // Automatisierte Guide-Generierung mit hartem Qualitäts-Gate:
 // Ein Guide, der die Content-Regeln (Wahrheitspflicht, Neutralität, Schreibstil)
@@ -122,49 +123,72 @@ export async function generateNextGuide(): Promise<GuideGenerationResult> {
 
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const message = await client.messages.create({
-      model: MODEL,
-      // Ein vollständiger Guide (Intro + 5 Abschnitte + Kernpunkte + Tips als
-      // JSON) sprengt 3000 Tokens. Zu knapp bemessen bricht die JSON-Antwort ab
-      // und der Guide scheitert am Parser statt an der Qualität.
-      max_tokens: 16000,
-      messages: [{ role: 'user', content: buildGuidePrompt(topic) }],
-    });
 
-    await recordAiUsage({ purpose: 'guide', model: MODEL, usage: message.usage as never, ok: true });
+    // Erzeugt einen Guide oder `null` (unvollständige/nicht parsebare Antwort).
+    const erzeuge = async (hinweis: string): Promise<Guide | null> => {
+      const message = await client.messages.create({
+        model: MODEL,
+        // Ein vollständiger Guide (Intro + 5 Abschnitte + Kernpunkte + Tips als
+        // JSON) sprengt 3000 Tokens. Zu knapp bemessen bricht die JSON-Antwort ab
+        // und der Guide scheitert am Parser statt an der Qualität.
+        max_tokens: 16000,
+        messages: [{ role: 'user', content: buildGuidePrompt(topic) + hinweis }],
+      });
 
-    if (message.stop_reason === 'max_tokens') {
-      console.error(`Guide ${topic.slug}: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)`);
-    }
+      await recordAiUsage({ purpose: 'guide', model: MODEL, usage: message.usage as never, ok: true });
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    const data: GeneratedGuideData = JSON.parse(jsonMatch?.[0] || '{}');
+      if (message.stop_reason === 'max_tokens') {
+        console.error(`Guide ${topic.slug}: Antwort vom Token-Limit abgeschnitten (stop_reason=max_tokens)`);
+      }
 
-    if (!data.intro || !Array.isArray(data.sections) || data.sections.length < 3 || !Array.isArray(data.keyPoints) || data.keyPoints.length === 0) {
-      return { status: 'failed', slug: topic.slug, error: 'KI-Antwort unvollständig (Intro/Sektionen/Key-Points fehlen)' };
-    }
-
-    const guide: Guide = {
-      slug: topic.slug,
-      title: topic.title,
-      metaDescription: data.metaDescription || topic.brief.slice(0, 155),
-      icon: topic.icon,
-      badge: topic.badge,
-      color: topic.color,
-      headerGradient: topic.headerGradient,
-      readingTimeMin: Math.max(4, Math.min(12, data.readingTimeMin || 6)),
-      intro: data.intro,
-      sections: data.sections.map((s) => ({ heading: s.heading, content: s.content, tip: s.tip })),
-      keyPoints: data.keyPoints.slice(0, 5),
-      tags: (data.tags || []).slice(0, 5),
+      const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      let data: GeneratedGuideData;
+      try {
+        data = JSON.parse(jsonMatch?.[0] || '{}');
+      } catch {
+        // catch erlaubt: nicht parsebar = unvollständig, die Schranke wiederholt.
+        return null;
+      }
+      if (!data.intro || !Array.isArray(data.sections) || data.sections.length < 3 || !Array.isArray(data.keyPoints) || data.keyPoints.length === 0) {
+        return null;
+      }
+      return {
+        slug: topic.slug,
+        title: topic.title,
+        metaDescription: data.metaDescription || topic.brief.slice(0, 155),
+        icon: topic.icon,
+        badge: topic.badge,
+        color: topic.color,
+        headerGradient: topic.headerGradient,
+        readingTimeMin: Math.max(4, Math.min(12, data.readingTimeMin || 6)),
+        intro: data.intro,
+        sections: data.sections.map((s) => ({ heading: s.heading, content: s.content, tip: s.tip })),
+        keyPoints: data.keyPoints.slice(0, 5),
+        tags: (data.tags || []).slice(0, 5),
+      };
     };
 
-    // QUALITÄTS-GATE: gleiche Regeln wie die Build-Tests — Verstoß = kein Publish.
-    const violations = validateGuide(guide);
-    if (violations.length > 0) {
-      console.error(`Guide "${topic.slug}" abgelehnt — ${violations.length} Regelverstöße:`, violations.slice(0, 5));
-      return { status: 'rejected_quality', slug: topic.slug, violations };
+    // QUALITÄTS-GATE mit Wiederholung (seit v6.16.0): gleiche Regeln wie die
+    // Build-Tests. Vorher hieß ein Verstoß „nächster Versuch am nächsten
+    // Guide-Tag" — drei bis vier Tage ohne Guide. Jetzt bis zu drei Versuche
+    // sofort, jeder mit dem konkreten Befund des vorigen.
+    const schranke = await mitQualitaetsschranke(erzeuge, (g) =>
+      g
+        ? validateGuide(g).map((v) => ({ regel: v.rule, detail: `${v.field}: „${v.match}"` }))
+        : [{ regel: 'unvollstaendig', detail: 'Intro, mindestens drei Abschnitte oder Kernpunkte fehlen bzw. kein gültiges JSON' }],
+    );
+    const guide = schranke.ergebnis;
+    if (!guide) {
+      const unvollstaendig = schranke.verstoesse.every((v) => v.regel === 'unvollstaendig');
+      console.error(`Guide "${topic.slug}" nach ${schranke.versuche} Versuchen abgelehnt:`, schranke.verstoesse.slice(0, 5));
+      return unvollstaendig
+        ? { status: 'failed', slug: topic.slug, error: 'KI-Antwort unvollständig (Intro/Sektionen/Key-Points fehlen)' }
+        : {
+            status: 'rejected_quality',
+            slug: topic.slug,
+            violations: schranke.verstoesse.map((v) => ({ field: v.detail.split(':')[0], rule: v.regel, match: v.detail })),
+          };
     }
 
     const saved = await saveGeneratedGuide(guide);

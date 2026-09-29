@@ -17,6 +17,7 @@ import { GUIDE_TOPICS } from './guide-topics';
 import { leseDurchlaufStand, preisGate, type PreisGate, type DurchlaufStand } from './preis-durchlauf';
 import { leseSprachStand, sprachpreisGate, type SprachGate } from './sprachpreise';
 import { GUIDES } from './guides';
+import { leseGesundheit } from './gesundheit';
 
 /** Postgres-Fehlercode für „Tabelle existiert nicht". */
 const UNDEFINED_TABLE = '42P01';
@@ -540,6 +541,22 @@ export async function collectSystemHealth(): Promise<SystemHealth> {
     if (!gate.ok) problems.unshift(`PREISE NICHT AKTUELL: ${gate.befund}`);
   } catch (err) {
     problems.unshift(`PREISE NICHT PRÜFBAR: ${err instanceof Error ? err.message : 'unbekannt'}`);
+  }
+
+  // TÄGLICHE GESUNDHEITSPRÜFUNG (gesundheit.ts, 12:30 UTC) — jeder nicht
+  // bestandene Punkt ganz oben. Eine Prüfung älter als ein Tag ist selbst ein
+  // Befund: Dann läuft der Prüf-Cron nicht.
+  try {
+    const g = await leseGesundheit();
+    if (!g) {
+      problems.push('Gesundheitsprüfung hat noch nie gelaufen (/api/cron/gesundheit, 12:30 UTC)');
+    } else if (Date.now() - Date.parse(g.geprueft) > 36 * 3_600_000) {
+      problems.unshift(`GESUNDHEITSPRÜFUNG VERALTET: letzte am ${g.geprueft.slice(0, 16).replace('T', ' ')} UTC`);
+    } else {
+      for (const p of g.punkte.filter((x) => !x.ok)) problems.unshift(`DATEN NICHT IN ORDNUNG — ${p.name}: ${p.befund}`);
+    }
+  } catch (err) {
+    problems.push(`Gesundheitsprüfung nicht lesbar: ${err instanceof Error ? err.message : 'unbekannt'}`);
   }
 
   // Sprachpreise (JP/KR): Faellt die Schranke, zeigen Kartenseiten schlicht

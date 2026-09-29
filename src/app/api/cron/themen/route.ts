@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { isCronAuthedFromRequest, isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { neuheitenLauf, leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
+import { mitWiederholung } from '@/lib/qualitaet';
 
 // THEMEN: Neuheiten, Japan zuerst, Kommend — täglich (siehe neuheiten.ts).
 // 500, wenn der Lauf scheitert oder die Datei danach nicht aktuell ist.
@@ -25,7 +26,10 @@ export async function GET(request: Request) {
     }, { status: ok ? 200 : 500 });
   }
   try {
-    const lauf = await neuheitenLauf();
+    // Wiederholung (seit v6.16.0): Der erste Lauf auf Produktion scheiterte an
+    // einem kurzen Aussetzer, die beiden direkt folgenden liefen in 19 s durch.
+    // Drei Versuche mit 5/10 s Abstand passen bequem in die 300 s.
+    const lauf = await mitWiederholung(() => neuheitenLauf(), { max: 3, warteMs: 5_000 });
     console.log('[cron/themen]', JSON.stringify(lauf));
     revalidatePath('/trends');
     revalidatePath('/');

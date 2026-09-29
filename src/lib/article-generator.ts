@@ -10,6 +10,7 @@ import { loadArticle, saveArticle, listSavedArticleMeta } from './article-storag
 import { waehleThemen, alsPromptText, SPERRFRIST } from './content-variety';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
+import { mitQualitaetsschranke, artikelVerstoesse, type Verstoss } from './qualitaet';
 
 // Zentrale Model-ID mit Env-Override (Code-Regel 7) — bei Deprecation nur
 // eine Stelle bzw. eine Variable ändern.
@@ -799,34 +800,53 @@ Karten aus den neuen Sets: ${neuKarten.map((c) => `${c.name} (${c.set})`).join('
 
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const message = await client.messages.create({
-      model: MODEL,
-      // WICHTIG: Ein vollständiger Artikel (Intro + 4-5 Abschnitte + Kernpunkte +
-      // Tags + Quellen als JSON) überschreitet 2048 Tokens deutlich. Zu knapp
-      // bemessen wird die JSON-Antwort mitten im Satz abgeschnitten, JSON.parse
-      // scheitert — und der Artikel fällt still auf den Evergreen-Fallback zurück.
-      // Genau das ist monatelang unbemerkt passiert.
-      max_tokens: 16000,
-      messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel, recentTitles) }],
-    });
 
-    // Abgeschnittene Antworten sichtbar machen statt sie als Parse-Fehler zu tarnen.
-    await recordAiUsage({ purpose: 'artikel', model: MODEL, usage: message.usage as never, ok: true });
+    // QUALITÄTSSCHRANKE mit Wiederholung (qualitaet.ts, seit v6.16.0): Die
+    // Antwort muss vollständig und parsebar sein, jede Prozent-/Euro-Angabe
+    // muss in den gelieferten Daten stehen, und die Inhaltsregeln gelten.
+    // Jeder Folgeversuch bekommt den konkreten Befund des vorigen.
+    const erzeuge = async (hinweis: string): Promise<ArticleData> => {
+      const message = await client.messages.create({
+        model: MODEL,
+        // WICHTIG: Ein vollständiger Artikel (Intro + 4-5 Abschnitte + Kernpunkte +
+        // Tags + Quellen als JSON) überschreitet 2048 Tokens deutlich. Zu knapp
+        // bemessen wird die JSON-Antwort mitten im Satz abgeschnitten, JSON.parse
+        // scheitert — und der Artikel fällt still auf den Evergreen-Fallback zurück.
+        // Genau das ist monatelang unbemerkt passiert.
+        max_tokens: 16000,
+        messages: [{ role: 'user', content: buildPrompt(type, cardSummary, dateLabel, recentTitles) + hinweis }],
+      });
 
-    if (message.stop_reason === 'max_tokens') {
-      console.error(
-        `Artikel ${date}: Antwort wurde vom Token-Limit abgeschnitten (stop_reason=max_tokens) — max_tokens erhöhen`,
-      );
-    }
+      // Abgeschnittene Antworten sichtbar machen statt sie als Parse-Fehler zu tarnen.
+      await recordAiUsage({ purpose: 'artikel', model: MODEL, usage: message.usage as never, ok: true });
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    const data: ArticleData = JSON.parse(jsonMatch?.[0] || '{}');
+      if (message.stop_reason === 'max_tokens') {
+        console.error(
+          `Artikel ${date}: Antwort wurde vom Token-Limit abgeschnitten (stop_reason=max_tokens) — max_tokens erhöhen`,
+        );
+      }
 
-    if (!data.title || !data.sections || data.sections.length === 0) {
-      console.error(
-        `Artikel ${date}: KI-Antwort unvollständig (Titel/Abschnitte fehlen) — Fallback greift`,
-      );
+      const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      try {
+        return JSON.parse(jsonMatch?.[0] || '{}') as ArticleData;
+      } catch {
+        // catch erlaubt: nicht parsebar = unvollständig, die Schranke meldet es und wiederholt.
+        return {} as ArticleData;
+      }
+    };
+    const pruefe = (d: ArticleData): Verstoss[] =>
+      !d.title || !d.sections || d.sections.length === 0
+        ? [{ regel: 'unvollstaendig', detail: 'Titel oder Abschnitte fehlen bzw. kein gültiges JSON' }]
+        : artikelVerstoesse(d, cardSummary);
+
+    const schranke = await mitQualitaetsschranke(erzeuge, pruefe);
+    const data = schranke.ergebnis;
+
+    if (!data) {
+      const grund = schranke.verstoesse.map((v) => `${v.regel}: ${v.detail}`).join('; ');
+      console.error(`Artikel ${date}: Qualitätsschranke nach ${schranke.versuche} Versuchen nicht bestanden — Ersatztext greift (${grund})`);
+      options.onAiError?.({ message: `Qualitätsschranke nicht bestanden: ${grund.slice(0, 300)}`, raw: grund });
       const fallback = fallbackArticle(type, dateLabel, cardSummary);
       fallback.featuredCards = matchCardsFromText(
       [fallback.title, fallback.intro, ...fallback.sections.map((s) => `${s.heading} ${s.content}`)],

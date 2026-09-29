@@ -2,6 +2,7 @@ import { getSupabase } from './supabase';
 import { ladeDexSets, pruefeFrischenPreis, bewegung, type DexSet, type Fehlgrund } from './tcgdex';
 import { standFrisch } from './frischpreis-karte';
 import { schreibeJson, leseJson } from './social-speicher';
+import { mitWiederholung } from './qualitaet';
 
 // TAEGLICHER PREISDURCHLAUF — ALLE KARTEN, FRISCHE QUELLE.
 //
@@ -55,7 +56,7 @@ export interface DurchlaufStand {
   frisch: number;
   /** TCGdex hat die Karte, aber keinen Preis — oder er ist aelter als die Frist. */
   ohneFrischpreis: number;
-  gruende: Partial<Record<Fehlgrund | 'veraltet', number>>;
+  gruende: Partial<Record<Fehlgrund | 'veraltet' | 'unplausibel', number>>;
   /** Netz- oder Serverfehler bei TCGdex — zaehlen NICHT als „kein Preis". */
   fehler: number;
   /**
@@ -144,18 +145,49 @@ async function mitBegrenzung<T, E>(liste: T[], n: number, f: (t: T) => Promise<E
 
 type Ergebnis =
   | { art: 'frisch'; a: Aktualisierung }
-  | { art: 'ohne'; grund: Fehlgrund | 'veraltet' }
+  | { art: 'ohne'; grund: Fehlgrund | 'veraltet' | 'unplausibel' }
   | { art: 'fehler' };
+
+/** Faktor, ab dem ein Wert gegen seinen Vergleichswert als Sprung gilt. */
+export const SPRUNG_FAKTOR = 3;
+
+const sprung = (a: number, b: number | null | undefined) =>
+  typeof b === 'number' && b > 0 && a > 0 && (a / b > SPRUNG_FAKTOR || b / a > SPRUNG_FAKTOR);
+
+/**
+ * PLAUSIBILITÄTSSCHRANKE (seit v6.16.0). Rein, getestet.
+ *
+ * Ein neuer Preis-Trend, der mehr als das Dreifache von BEIDEN eigenen
+ * Schnitten der Quelle (Ø 7 und Ø 30) abweicht, ist fast nie eine Markt-
+ * bewegung, sondern ein Datenfehler — ein Einzelangebot, eine falsch
+ * zugeordnete Variante. Steht bei uns ein frischer Vortagswert, muss der neue
+ * Wert zusätzlich auch von DEM um das Dreifache abweichen. Dann bleibt der
+ * alte Wert stehen, statt dass eine Fehlmessung Suche, Index und Verlauf
+ * verzerrt.
+ */
+export function preisUnplausibel(
+  neu: { trend: number; avg7: number | null; avg30: number | null },
+  alt: { price: number; updated_at: string } | null,
+  jetzt = Date.now(),
+): boolean {
+  if (!sprung(neu.trend, neu.avg7) || !sprung(neu.trend, neu.avg30)) return false;
+  const altFrisch = alt && alt.price > 0 && jetzt - Date.parse(alt.updated_at) <= 3 * 86_400_000;
+  return altFrisch ? sprung(neu.trend, alt.price) : true;
+}
 
 async function pruefe(z: IndexZeile, dexSets: DexSet[], jetzt: number): Promise<Ergebnis> {
   try {
-    const e = await pruefeFrischenPreis(
-      { name: z.name, setCode: z.set_code, set: z.set_name, number: z.number ?? undefined },
-      dexSets,
-      ABRUF_MS,
+    // Ein Netz-/Serverfehler bekommt SOFORT einen zweiten Versuch; erst danach
+    // landet die Karte auf der Nachholliste (Tagesfehler vom 29.09.: 1.000 Karten).
+    const e = await mitWiederholung(
+      () => pruefeFrischenPreis({ name: z.name, setCode: z.set_code, set: z.set_name, number: z.number ?? undefined }, dexSets, ABRUF_MS),
+      { max: 2, warteMs: 800 },
     );
     if (!e.ok) return { art: 'ohne', grund: e.grund };
     if (!standFrisch(e.preis.updated, jetzt)) return { art: 'ohne', grund: 'veraltet' };
+    if (preisUnplausibel(e.preis, { price: Number(z.price), updated_at: z.updated_at }, jetzt)) {
+      return { art: 'ohne', grund: 'unplausibel' };
+    }
     return { art: 'frisch', a: aktualisierung(z, e.preis) };
   } catch {
     return { art: 'fehler' };

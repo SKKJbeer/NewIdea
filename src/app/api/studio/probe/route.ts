@@ -26,13 +26,16 @@ export async function GET(request: Request) {
   try {
     if (art === 'marktbericht') {
       const lage = await ladeMarktLage();
-      const { reportText, daten, summary } = await berichtErzeugen(lage);
+      const { reportText, daten, summary, verstoesse, versuche } = await berichtErzeugen(lage);
       return NextResponse.json({
         art,
         daten,
         bestaetigt: lage.bestaetigt.length,
         pool: lage.pool.length,
-        gewinner: summary.topGainers.map((c) => `${c.name} (${c.set})`),
+        // Qualitätsschranke: leer = hätte veröffentlicht werden dürfen.
+        verstoesse,
+        versuche,
+        gewinner: summary?.topGainers.map((c) => `${c.name} (${c.set})`) ?? [],
         text: reportText,
       });
     }

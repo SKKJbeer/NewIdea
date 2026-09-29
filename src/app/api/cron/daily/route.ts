@@ -16,6 +16,8 @@ import { computePmi, validateMarketData } from '@/lib/market-metrics';
 import { saveMarketIndex } from '@/lib/market-index-store';
 import { getMarketBasis } from '@/lib/market-basis';
 import { warmSearchCache } from '@/lib/search-cache';
+import { currentWeek, generateAndSaveMarketReport } from '@/lib/market-report-generator';
+import { listMarketReportMeta } from '@/lib/market-report-storage';
 
 // Guide-Generierung: dienstags + freitags — versetzt zu den Artikel-Tagen (So/Do),
 // damit über die Woche verteilt frischer Content erscheint.
@@ -40,6 +42,7 @@ export async function GET(request: Request) {
   }
 
   const today = new Date().toISOString().split('T')[0];
+  const beginn = Date.now();
 
   const results: Record<string, unknown> = { date: today };
 
@@ -198,6 +201,30 @@ export async function GET(request: Request) {
     } else if (guideResult.status === 'failed') {
       console.error(`⛔ Guide ${guideResult.slug} fehlgeschlagen: ${guideResult.error}`);
     }
+  }
+
+  // SELBSTHEILUNG DES WOCHENBERICHTS (seit v6.16.0): Scheitert der Montags-
+  // Lauf (Qualitätsschranke, KI-Ausfall), fehlte der Bericht bisher eine ganze
+  // Woche. Jetzt versucht es jeder Tageslauf erneut, solange die laufende Woche
+  // keinen Bericht hat. Eigener try/catch — darf nichts anderes mitreißen.
+  try {
+    const soll = currentWeek().weekStart;
+    const letzter = (await listMarketReportMeta().catch(() => []))[0]?.weekStart ?? null;
+    // Bis zu drei Erzeugungsversuche à ~40 s: nur, wenn die Zeit sicher reicht.
+    if (letzter !== soll && Date.now() - beginn > 150_000) {
+      results.marktberichtNachgeholt = 'verschoben (Zeitbudget) — nächster Tageslauf';
+    } else if (letzter !== soll) {
+      const r = await generateAndSaveMarketReport();
+      results.marktberichtNachgeholt = r.status;
+      if (r.error) results.marktberichtNachholFehler = r.error;
+      if (r.status === 'created') {
+        revalidatePath('/marktbericht');
+        revalidatePath('/marktbericht/archiv');
+        revalidatePath('/');
+      }
+    }
+  } catch (err) {
+    results.marktberichtNachholFehler = err instanceof Error ? err.message : 'unbekannt';
   }
 
   // Revalidate the listing page so it shows today's article fresh
