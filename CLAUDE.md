@@ -855,7 +855,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `CRON_SECRET` | ✅ **Gesetzt** | Absicherung der Cron-Endpoints |
 | `SUPABASE_URL` | ✅ **Gesetzt** | Supabase Projekt-URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ **Gesetzt** | Supabase Schreibrecht (service role) |
-| `NEXT_PUBLIC_SITE_URL` | ✅ **Gesetzt** | Canonical URLs + Cron-Warmup |
+| `NEXT_PUBLIC_SITE_URL` | ⚠️ **NICHT gesetzt** (Monitoring 03.10.: `siteUrlMissing: true`) | Erst setzen, wenn `cardbeacon.de` im Vercel-Projekt steht — schaltet Canonicals UND die 308-Umleitung der Vercel-Adresse ein |
 | `STUDIO_PASSWORD` | ✅ **Gesetzt** | Passwort-Schutz für /studio und /monitoring |
 
 **Folge:** Der tägliche Cron (08:00 UTC) speichert echte Preisschnappschüsse in Supabase. Daten werden bereits gesammelt.
@@ -1011,6 +1011,11 @@ Verkehr in der Reichweitenmessung unter „ohne Verweis".
   08.09. bis 27.09. leer, ohne dass es auffiel — `pendingTopics: 0` im Monitoring.
 
 ---
+
+## Eigene Domain cardbeacon.de — seit v6.18.0
+
+Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudflare.yml`, Secrets `CLOUDFLARE_DOMAIN_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, aus PulseMeter übertragen), Nameserver bei netcup auf rita/rudy.ns.cloudflare.com, `A @ → 76.76.21.21`, `CNAME www → cname.vercel-dns.com` (DNS only). Offen beim Nutzer: Domain im Vercel-Projekt hinzufügen, dann `NEXT_PUBLIC_SITE_URL=https://cardbeacon.de` + Redeploy. Danach: IndexNow-Vollmeldung (`POST /api/studio/indexnow`), Search Console, Links in `docs/reichweite-posts.md` tauschen.
+**Umleitung:** `next.config.ts` → `redirects()` greift NUR, wenn `domainZiel(NEXT_PUBLIC_SITE_URL)` eine eigene Domain liefert; `/api/*` ausgenommen. Nie an „Domain existiert" koppeln — eine Umleitung auf eine nicht ausgelieferte Domain legt die Seite lahm. **Achtung DNS-Prüfung aus der Sandbox:** direkte UDP/TCP-Abfragen an Nameserver liefern hier für JEDE Domain Fehler — nur DoH (`cloudflare-dns.com/dns-query`, `dns.google/resolve`) taugt.
 
 ## Feedback-Knopf — seit v6.17.0
 

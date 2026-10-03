@@ -43,6 +43,30 @@ const SECURITY_HEADERS = [
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
 ];
 
+// EIGENE DOMAIN (seit v6.18.0): Sobald NEXT_PUBLIC_SITE_URL auf eine eigene
+// Domain zeigt, leitet die Vercel-Adresse jeden Seitenaufruf dauerhaft (308)
+// dorthin um. Sonst stünde derselbe Inhalt unter zwei Adressen, und Google
+// teilt die Bewertung auf.
+//
+// BEWUSST AN DIE VARIABLE GEKOPPELT, nicht an „Domain existiert": Eine
+// Umleitung auf eine Domain, die Vercel noch nicht ausliefert, legte die ganze
+// Seite lahm. Die Variable setzt man erst, wenn die Domain im Projekt steht.
+//
+// /api/* bleibt ausgenommen: Crons, Zähler und Formulare sollen nie über eine
+// Umleitung laufen (POST-Körper, Cron-Aufrufe an die Projektadresse).
+export const VERCEL_HOST = 'new-idea-livid.vercel.app';
+
+export function domainZiel(siteUrl: string | undefined): string | null {
+  if (!siteUrl) return null;
+  try {
+    const u = new URL(/^https?:\/\//.test(siteUrl.trim()) ? siteUrl.trim() : `https://${siteUrl.trim()}`);
+    if (u.hostname === 'localhost' || u.hostname.endsWith('.vercel.app')) return null;
+    return `https://${u.hostname}`;
+  } catch {
+    return null;
+  }
+}
+
 const nextConfig: NextConfig = {
   // Für die Video-Routen ins Function-Bundle zwingen:
   // - die ffmpeg-static-Binary (wird sonst nicht getracet → spawn ENOENT)
@@ -70,6 +94,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }];
+  },
+  async redirects() {
+    const ziel = domainZiel(process.env.NEXT_PUBLIC_SITE_URL);
+    if (!ziel) return [];
+    return [{
+      source: '/:pfad((?!api/).*)',
+      has: [{ type: 'host', value: VERCEL_HOST.replace(/\./g, '\\.') }],
+      destination: `${ziel}/:pfad`,
+      permanent: true,
+    }];
   },
 };
 

@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.18.0] - 3. Oktober 2026 · Vorbereitung eigene Domain
+
+### Neu
+- **Dauerhafte Umleitung auf die eigene Domain:** Sobald `NEXT_PUBLIC_SITE_URL` auf eine eigene Domain zeigt, leitet die Vercel-Adresse jeden Seitenaufruf mit 308 dorthin um — Pfad und Parameter bleiben erhalten. Schnittstellen unter `/api` sind ausgenommen (Crons, Zähler, Formulare)
+- Kanonische Adressen, Sitemaps und robots.txt folgen derselben Variable
+
+### Geändert
+- `cardbeacon.de` zeigt per Cloudflare auf Vercel (Nameserver umgestellt, Zone per Workflow angelegt)
+
+---
+
 ## [6.17.1] - 3. Oktober 2026 · Domain-Einrichtung per Workflow
 
 ### Neu
