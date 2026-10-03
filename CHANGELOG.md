@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.17.1] - 3. Oktober 2026 · Domain-Einrichtung per Workflow
+
+### Neu
+- **GitHub-Workflow „Domain bei Cloudflare einrichten“:** legt die Zone für die eigene Domain an und setzt die DNS-Einträge für Vercel (beide ohne Cloudflare-Proxy). Mehrfach ausführbar, ändert vorhandene Einträge nicht. Nutzt die Repository-Secrets `CLOUDFLARE_DOMAIN_TOKEN` (Rückfall `CLOUDFLARE_API_TOKEN`) und `CLOUDFLARE_ACCOUNT_ID` nur zur Laufzeit
+
+---
+
 ## [6.17.0] - 3. Oktober 2026 · Feedback-Knopf
 
 ### Neu

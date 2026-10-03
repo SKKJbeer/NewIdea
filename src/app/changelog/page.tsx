@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.17.1',
+    date: '3. Oktober 2026',
+    label: 'Domain-Einrichtung per Workflow',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'GitHub-Workflow legt die eigene Domain bei Cloudflare an und setzt die DNS-Einträge für Vercel' },
+    ],
+  },
+  {
     version: '6.17.0',
     date: '3. Oktober 2026',
     label: 'Feedback-Knopf',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Feedback-Knopf auf jeder Seite: Idee, Fehler, Lob — E-Mail freiwillig, keine IP, kein Cookie' },
       { type: 'new', text: 'Rückmeldungen im Monitoring direkt unter der Reichweite' },

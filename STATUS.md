@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.17.0` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.17.1` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.17.1 | Workflow `.github/workflows/domain-cloudflare.yml` (manuell): Zone `cardbeacon.de` bei Cloudflare + A/CNAME für Vercel, Secrets `CLOUDFLARE_DOMAIN_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (übertragen aus PulseMeter) |
 | v6.17.0 | Feedback-Knopf auf jeder Seite (`FeedbackKnopf`, `/api/feedback`, Ablage `social/feedback/<tag>/`, ohne Tabelle), Rückmeldungen im Monitoring, Datenschutz 8a, Löschung nach 365 Tagen im Daily-Cron; Post-Entwürfe `docs/reichweite-posts.md` |
 | v6.16.1 | Belege je Grund im Preisdurchlauf (`stand.beispiele`, max. 10 je Grund) — zurückgehaltene Sprünge mit Trend/Ø 7/Ø 30/bisher; Anlass: 12 → 64 zurückgehaltene Preise, nachgeprüft = Quellfehler |
 | v6.16.0 | Qualitätsschranken + Wiederholungen: Zahlenprobe (jede %/€-Angabe belegt), Struktur- und Regelschranken mit bis zu 3 Versuchen für Bericht/Artikel/Guides, Plausibilität der Tagespreise, Wiederholung je Abruf und im Themen-Lauf, Selbstheilung des Wochenberichts, tägliche Gesundheitsprüfung 12:30 UTC mit HTTP 500 |

@@ -1,0 +1,76 @@
+# Legt cardbeacon.de bei Cloudflare an und setzt die DNS-Einträge für Vercel.
+#
+# Start: GitHub → Actions → „Domain bei Cloudflare einrichten" → Run workflow.
+# Nutzt die Repository-Secrets CLOUDFLARE_DOMAIN_TOKEN (Rückfall: CLOUDFLARE_API_TOKEN)
+# und CLOUDFLARE_ACCOUNT_ID. Der Token braucht Zone:Edit und DNS:Edit.
+# Der Token wird nur hier zur Laufzeit gelesen und nie ausgegeben.
+# Mehrfach ausführbar: Vorhandene Zone und vorhandene Einträge bleiben, wie sie sind.
+name: Domain bei Cloudflare einrichten
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Domain
+        default: cardbeacon.de
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  einrichten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zone anlegen und DNS setzen
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_DOMAIN_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
+          CF_KONTO: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CF_TOKEN}" ]; then
+            echo "::error::Secret CLOUDFLARE_API_TOKEN fehlt in diesem Repository (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          api() { curl -sS -H "Authorization: Bearer ${CF_TOKEN}" -H "Content-Type: application/json" "$@"; }
+          B=https://api.cloudflare.com/client/v4
+
+          ok=$(api "$B/user/tokens/verify" | jq -r '.success')
+          [ "$ok" = "true" ] || { echo "::error::Token ungültig oder ohne Rechte."; exit 1; }
+
+          ZONE=$(api "$B/zones?name=${DOMAIN}" | jq -r '.result[0].id // empty')
+          if [ -z "$ZONE" ]; then
+            KONTO="${CF_KONTO:-$(api "$B/accounts" | jq -r '.result[0].id // empty')}"
+            [ -n "$KONTO" ] || { echo "::error::Kein Cloudflare-Konto mit diesem Token sichtbar."; exit 1; }
+            ANTWORT=$(api -X POST "$B/zones" --data "{\"name\":\"${DOMAIN}\",\"account\":{\"id\":\"${KONTO}\"},\"type\":\"full\"}")
+            echo "$ANTWORT" | jq -e '.success' >/dev/null || { echo "::error::Zone nicht angelegt: $(echo "$ANTWORT" | jq -c '.errors')"; exit 1; }
+            ZONE=$(echo "$ANTWORT" | jq -r '.result.id')
+            echo "Zone ${DOMAIN} angelegt."
+          else
+            echo "Zone ${DOMAIN} existiert bereits."
+          fi
+
+          eintrag() {  # typ name inhalt
+            local vorhanden
+            vorhanden=$(api "$B/zones/${ZONE}/dns_records?type=$1&name=$2" | jq -r '.result | length')
+            if [ "$vorhanden" = "0" ]; then
+              api -X POST "$B/zones/${ZONE}/dns_records" \
+                --data "{\"type\":\"$1\",\"name\":\"$2\",\"content\":\"$3\",\"ttl\":1,\"proxied\":false}" \
+                | jq -e '.success' >/dev/null && echo "$1 $2 → $3 gesetzt (DNS only)."
+            else
+              echo "$1 $2 existiert bereits — unverändert."
+            fi
+          }
+          eintrag A "${DOMAIN}" 76.76.21.21
+          eintrag CNAME "www.${DOMAIN}" cname.vercel-dns.com
+
+          NS=$(api "$B/zones/${ZONE}" | jq -r '.result.name_servers | join(", ")')
+          STATUS=$(api "$B/zones/${ZONE}" | jq -r '.result.status')
+          {
+            echo "## ${DOMAIN}"
+            echo "- Status bei Cloudflare: **${STATUS}**"
+            echo "- Diese Nameserver bei netcup eintragen: **${NS}**"
+            echo "- DNS: A @ → 76.76.21.21, CNAME www → cname.vercel-dns.com (beide DNS only)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Nameserver: ${NS}"
