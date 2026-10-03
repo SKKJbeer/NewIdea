@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/AppShell";
 import { Seitenzaehler } from "@/components/Seitenzaehler";
+import { FeedbackKnopf } from "@/components/FeedbackKnopf";
 import "./globals.css";
 import { siteUrlOrLocal } from '@/lib/site';
 
@@ -119,6 +120,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}>
           <Seitenzaehler />
         </Suspense>
+        <FeedbackKnopf />
         <Analytics />
       </body>
     </html>

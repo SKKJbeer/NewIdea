@@ -1012,6 +1012,11 @@ Verkehr in der Reichweitenmessung unter „ohne Verweis".
 
 ---
 
+## Feedback-Knopf — seit v6.17.0
+
+**Nutzer-Auftrag (03.10.2026):** „dass ich auch mal feedback bekomme".
+`FeedbackKnopf` (Grundgerüst, nicht auf /studio und /monitoring) → `POST /api/feedback` (5 je 10 Min. je Adresse, Honigtopf `website`) → `pruefeFeedback()` (rein, getestet) → Eimer `social`, `feedback/<tag>/<zeit>-<zufall>.json`. Lesen: Monitoring „Rückmeldungen" bzw. `GET /api/feedback` (Studio). Gespeichert NUR Text, Art, Seite, Zeit, freiwillige Mail — neue Felder = Datenschutz Abschnitt 8a anpassen. Löschung nach `FEEDBACK_AUFBEWAHRUNG_TAGE` (365) im Daily-Cron. Post-Entwürfe mit Kampagnen-Links: `docs/reichweite-posts.md`.
+
 ## Reichweitenmessung (Aufrufe & Herkunft) — seit v6.5.0
 
 **Zweck:** Beantwortet die zwei Fragen, die vorher unbeantwortbar waren — wie viele

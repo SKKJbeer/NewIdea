@@ -166,6 +166,22 @@ export default function Datenschutz() {
           </section>
 
           <section>
+            <h2 className="font-bold text-slate-200 mb-2">8a. Feedback-Formular</h2>
+            <p>
+              Über den Knopf „Feedback“ kannst du uns eine Rückmeldung schicken. Gespeichert werden
+              ausschließlich: der eingegebene Text, die gewählte Art (Idee, Fehler, Lob, Sonstiges),
+              die Seite, auf der du das Formular geöffnet hast, der Zeitpunkt und — nur wenn du sie
+              freiwillig angibst — deine E-Mail-Adresse, damit wir antworten können. Keine IP-Adresse,
+              keine Browserkennung, kein Cookie. Die IP-Adresse wird lediglich kurzzeitig im
+              Arbeitsspeicher verwendet, um massenhafte automatische Einsendungen zu bremsen, und
+              nicht gespeichert. Speicherort ist der Datenspeicher unseres Dienstleisters Supabase.
+              Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der
+              Verbesserung des Angebots). Rückmeldungen werden spätestens nach 12 Monaten automatisch
+              gelöscht, auf Wunsch sofort.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-bold text-slate-200 mb-2">9. Deine Rechte (Art. 15–22 DSGVO)</h2>
             <p>Du hast das Recht auf:</p>
             <ul className="list-disc list-inside mt-1 space-y-1">
@@ -193,7 +209,7 @@ export default function Datenschutz() {
           </section>
 
           <p className="text-xs text-slate-600 pt-4 border-t border-[#1e1e30]">
-            Stand: Juli 2026. Diese Erklärung wird angepasst, sobald sich der Funktionsumfang der
+            Stand: Oktober 2026. Diese Erklärung wird angepasst, sobald sich der Funktionsumfang der
             Website ändert (z.B. Einführung eines Newsletters).
           </p>
         </div>

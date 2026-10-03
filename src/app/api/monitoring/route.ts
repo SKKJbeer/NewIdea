@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { APP_VERSION } from '@/lib/app-version';
 import { loadUsageSummary, AI_USAGE_SETUP_SQL } from '@/lib/ai-usage';
 import { ladeAufrufStatistik } from '@/lib/aufrufe';
+import { ladeFeedback } from '@/lib/feedback';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { collectSystemHealth } from '@/lib/system-health';
@@ -296,7 +297,14 @@ export async function GET(request: Request) {
     return null;
   });
 
+  // Rückmeldungen über den Feedback-Knopf — die neuesten 30. `null` = nicht lesbar.
+  const feedback = await ladeFeedback(30).catch((err) => {
+    console.warn('Feedback konnte nicht geladen werden:', err);
+    return null;
+  });
+
   const data = {
+    feedback,
     // Das Aufbau-SQL wird erst mitgeschickt, wenn es gebraucht wird — sonst
     // steht eine Anleitung fuer ein Problem da, das niemand hat.
     aufrufe: aufrufe ? { ...aufrufe, setupSql: null } : null,

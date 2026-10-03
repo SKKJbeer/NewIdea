@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.17.0',
+    date: '3. Oktober 2026',
+    label: 'Feedback-Knopf',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Feedback-Knopf auf jeder Seite: Idee, Fehler, Lob — E-Mail freiwillig, keine IP, kein Cookie' },
+      { type: 'new', text: 'Rückmeldungen im Monitoring direkt unter der Reichweite' },
+      { type: 'changed', text: 'Datenschutzerklärung um das Feedback-Formular ergänzt, Löschung nach 12 Monaten' },
+    ],
+  },
+  {
     version: '6.16.1',
     date: '3. Oktober 2026',
     label: 'Belege für zurückgehaltene Preise',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Preisdurchlauf merkt sich je Grund die ersten zehn betroffenen Karten mit Detail — zurückgehaltene Sprünge mit Trend, Ø 7, Ø 30 und bisherigem Wert' },
     ],

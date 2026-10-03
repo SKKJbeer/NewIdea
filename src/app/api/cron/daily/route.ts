@@ -8,6 +8,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { generateArticle, getArticleType } from '@/lib/article-generator';
 import { meldeAnIndexNow } from '@/lib/indexnow';
 import { verdichteAufrufe } from '@/lib/aufrufe';
+import { feedbackAufraeumen } from '@/lib/feedback';
 import { siteUrl, oeffentlicheBasis } from '@/lib/site';
 import { kartenTeil } from '@/lib/sitemap-karten';
 import { generateNextGuide } from '@/lib/guide-generator';
@@ -262,6 +263,9 @@ export async function GET(request: Request) {
   results.aufrufeVerdichtet = verdichtet.fehler
     ? `Fehler: ${verdichtet.fehler}`
     : `${verdichtet.dateien} Aufrufe aus ${verdichtet.tage} Tagen verdichtet`;
+
+  // RÜCKMELDUNGEN nach Ablauf der Frist löschen (Datenschutzerklärung, Abschnitt 8). Wirft nie.
+  results.feedbackGeloescht = await feedbackAufraeumen(today);
 
   return NextResponse.json({
     success: true,

@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.17.0] - 3. Oktober 2026 · Feedback-Knopf
+
+### Neu
+- **Feedback auf jeder Seite:** Knopf unten rechts öffnet ein kurzes Formular (Idee, Fehler, Lob, Sonstiges), E-Mail für eine Antwort freiwillig. Gespeichert werden nur Text, Art, Seite, Zeitpunkt und die freiwillige E-Mail — keine IP, keine Browserkennung, kein Cookie
+- **Rückmeldungen im Monitoring** direkt unter der Reichweite, neueste zuerst
+- Schutz gegen Formular-Roboter (unsichtbares Feld) und Mengenbremse (5 Meldungen je 10 Minuten)
+
+### Geändert
+- Datenschutzerklärung um das Feedback-Formular ergänzt (Abschnitt 8a); Rückmeldungen werden nach spätestens 12 Monaten automatisch gelöscht
+
+---
+
 ## [6.16.1] - 3. Oktober 2026 · Belege für zurückgehaltene Preise
 
 ### Neu

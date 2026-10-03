@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { recentPublishDates } from '@/lib/publish-days';
 import { ReichweitePanel, type AufrufStatistikDaten } from '@/components/ReichweitePanel';
+import { FeedbackPanel, type FeedbackDaten } from '@/components/FeedbackPanel';
 
 interface ApiKeyStatus {
   set: boolean;
@@ -95,6 +96,7 @@ interface SystemHealth {
 
 interface MonitoringData {
   aufrufe: AufrufStatistikDaten | null;
+  feedback: FeedbackDaten[] | null;
   build: { version: string; siteUrl: string | null; siteUrlMissing: boolean; nodeEnv: string };
   apiKeys: Record<string, ApiKeyStatus>;
   affiliates: Record<string, AffiliateStatus>;
@@ -641,6 +643,9 @@ export function MonitoringPanel() {
           Konfiguration beantworten, ob die Maschine laeuft — nicht, ob sie
           jemanden erreicht. */}
       <ReichweitePanel daten={data.aufrufe} />
+
+      {/* Rückmeldungen direkt unter der Reichweite: Wer kommt — und was sagt er? */}
+      <FeedbackPanel eintraege={data.feedback} />
 
       {/* Betriebszustand — echte Ergebnisse vor Konfiguration */}
       {data.health && <HealthSection health={data.health} onRefresh={load} />}
