@@ -40,6 +40,11 @@ jobs:
           B=https://api.vercel.com
           api() { curl -sS -H "Authorization: Bearer ${VT}" -H "Content-Type: application/json" "$@"; }
 
+          # Wer ist der Token? (Benutzername + HTTP-Status — keine Geheimnisse)
+          echo "Token gehört zu: $(api "$B/v2/user" | jq -r '.user.username // .error.message // "?"')"
+          echo "HTTP /v2/teams: $(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${VT}" "$B/v2/teams")"
+          echo "HTTP /v9/projects: $(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${VT}" "$B/v9/projects")"
+
           # Projekt finden: zuerst über den Alias (liefert die Projekt-ID direkt),
           # dann über Namen — in allen sichtbaren Bereichen (persönlich + Teams).
           TEAMS=$(api "$B/v2/teams" | jq -r '.teams[]? | "\(.id) \(.slug)"')
