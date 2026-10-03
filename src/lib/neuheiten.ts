@@ -33,7 +33,7 @@ const DEX = 'https://api.tcgdex.net/v2';
 const KATALOG = 'https://downloads.s3.cardmarket.com/productCatalog/productList/products_singles_6.json';
 const VERSIEGELT = 'https://downloads.s3.cardmarket.com/productCatalog/productList/products_nonsingles_6.json';
 const VERZEICHNIS = 'https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json';
-const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://new-idea-livid.vercel.app)' };
+const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://cardbeacon.de)' };
 
 export const PFAD_NEUHEITEN = 'themen/neuheiten.json';
 export const NEU_FENSTER_TAGE = 120;

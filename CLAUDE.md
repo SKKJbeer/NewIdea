@@ -251,7 +251,7 @@ S6a, ohne Nummer nicht unterscheidbar).
 - **Instagram-Zugang einrichten** (Business-Konto + Facebook-Seite + Meta-App →
   Studio → Reels → „Zugang einrichten" → zwei Werte in Vercel). Bis dahin läuft
   der Autopilot täglich an und meldet „übersprungen"
-- **Bio-Link auf Instagram:** `https://new-idea-livid.vercel.app/?utm_source=instagram&utm_medium=bio`
+- **Bio-Link auf Instagram:** `https://cardbeacon.de/?utm_source=instagram&utm_medium=bio`
 - ~~Aufbau-SQL fuer die Reichweitenmessung~~ — seit v6.10.0 nicht mehr noetig, die Zaehlung laeuft ohne Tabelle
 - Google Search Console anmelden (SEO-Basis ist bereit)
 - Amazon PartnerNet + Cardmarket-Affiliate beantragen → Env-Vars setzen
@@ -855,7 +855,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `CRON_SECRET` | ✅ **Gesetzt** | Absicherung der Cron-Endpoints |
 | `SUPABASE_URL` | ✅ **Gesetzt** | Supabase Projekt-URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ **Gesetzt** | Supabase Schreibrecht (service role) |
-| `NEXT_PUBLIC_SITE_URL` | ⚠️ **NICHT gesetzt** (Monitoring 03.10.: `siteUrlMissing: true`) | Erst setzen, wenn `cardbeacon.de` im Vercel-Projekt steht — schaltet Canonicals UND die 308-Umleitung der Vercel-Adresse ein |
+| `NEXT_PUBLIC_SITE_URL` | ✅ **Gesetzt** (03.10.2026, per Workflow) = `https://cardbeacon.de` | Canonicals, Sitemaps UND die 308-Umleitung der Vercel-Adresse |
 | `STUDIO_PASSWORD` | ✅ **Gesetzt** | Passwort-Schutz für /studio und /monitoring |
 
 **Folge:** Der tägliche Cron (08:00 UTC) speichert echte Preisschnappschüsse in Supabase. Daten werden bereits gesammelt.
@@ -1014,7 +1014,7 @@ Verkehr in der Reichweitenmessung unter „ohne Verweis".
 
 ## Eigene Domain cardbeacon.de — seit v6.18.0
 
-Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudflare.yml`, Secrets `CLOUDFLARE_DOMAIN_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, aus PulseMeter übertragen), Nameserver bei netcup auf rita/rudy.ns.cloudflare.com, `A @ → 76.76.21.21`, `CNAME www → cname.vercel-dns.com` (DNS only). Offen beim Nutzer: Domain im Vercel-Projekt hinzufügen, dann `NEXT_PUBLIC_SITE_URL=https://cardbeacon.de` + Redeploy. Danach: IndexNow-Vollmeldung (`POST /api/studio/indexnow`), Search Console, Links in `docs/reichweite-posts.md` tauschen.
+Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudflare.yml`, Secrets `CLOUDFLARE_DOMAIN_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, aus PulseMeter übertragen), Nameserver bei netcup auf rita/rudy.ns.cloudflare.com, `A @ → 76.76.21.21`, `CNAME www → cname.vercel-dns.com` (DNS only). Seit v6.19.0 LIVE: Domain + www (308) im Vercel-Projekt (Workflow `.github/workflows/domain-vercel.yml`, Secret `VERCEL_TOKEN` — muss auf das TEAM gescoped sein, in dem das Projekt liegt; ein Token mit falschem Scope sieht null Projekte ohne Fehlermeldung), Let's-Encrypt-Zertifikat, `NEXT_PUBLIC_SITE_URL=https://cardbeacon.de`. Offen: Google Search Console (`GOOGLE_SITE_VERIFICATION`).
 **Umleitung:** `next.config.ts` → `redirects()` greift NUR, wenn `domainZiel(NEXT_PUBLIC_SITE_URL)` eine eigene Domain liefert; `/api/*` ausgenommen. Nie an „Domain existiert" koppeln — eine Umleitung auf eine nicht ausgelieferte Domain legt die Seite lahm. **Achtung DNS-Prüfung aus der Sandbox:** direkte UDP/TCP-Abfragen an Nameserver liefern hier für JEDE Domain Fehler — nur DoH (`cloudflare-dns.com/dns-query`, `dns.google/resolve`) taugt.
 
 ## Feedback-Knopf — seit v6.17.0

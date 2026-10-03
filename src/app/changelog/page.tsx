@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.19.0',
+    date: '3. Oktober 2026',
+    label: 'cardbeacon.de ist live',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Eigene Domain cardbeacon.de mit Zertifikat, www leitet auf die Hauptadresse' },
+      { type: 'new', text: 'Vercel-Adresse leitet dauerhaft auf cardbeacon.de um; Canonicals und Sitemaps nennen die neue Domain' },
+      { type: 'changed', text: 'Domain-Workflow findet das Projekt auch im Standard-Team des Vercel-Kontos' },
+    ],
+  },
+  {
     version: '6.18.2',
     date: '3. Oktober 2026',
     label: 'Vercel-Workflow findet das Projekt',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Domain-Workflow sucht das Vercel-Projekt über den Alias und nennt bei Fehlschlag die sichtbaren Teams und Projekte' },
     ],

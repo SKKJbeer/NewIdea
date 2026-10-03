@@ -27,7 +27,7 @@ import {
 const DEX = 'https://api.tcgdex.net/v2';
 const KATALOG_URL = 'https://downloads.s3.cardmarket.com/productCatalog/productList/products_singles_6.json';
 const VERZEICHNIS_URL = 'https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json';
-const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://new-idea-livid.vercel.app)' };
+const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://cardbeacon.de)' };
 
 export const PFAD_AUFBAU = 'sprachen/aufbau.json';
 export const PFAD_ZUORDNUNG = 'sprachen/zuordnung.json';

@@ -4,7 +4,7 @@ Jeder Link trägt eine eigene Kampagne. In **Monitoring → Reichweite → Kampa
 welcher Post wie viele Einstiege gebracht hat. Rückmeldungen kommen über den Feedback-Knopf
 (Monitoring → Rückmeldungen) oder als Kommentar unter dem Post.
 
-Sobald `cardbeacon.de` verbunden ist: Domain in den Links austauschen.
+Alle Links zeigen auf `cardbeacon.de` (seit 03.10.2026 verbunden).
 
 **Tipps, damit es nicht als Werbung gelöscht wird:**
 - Regeln des Subreddits / der Gruppe vorher lesen (viele haben einen „Self-Promotion“-Tag oder einen festen Wochen-Thread).
@@ -31,7 +31,7 @@ Sobald `cardbeacon.de` verbunden ist: Domain in den Links austauschen.
 >
 > What I'd really like to know: what's missing, what's confusing, and are any prices wrong? There's a feedback button at the bottom right, or just reply here.
 >
-> https://new-idea-livid.vercel.app/?utm_source=reddit&utm_medium=post&utm_campaign=feedback-en
+> https://cardbeacon.de/?utm_source=reddit&utm_medium=post&utm_campaign=feedback-en
 
 ---
 
@@ -50,14 +50,14 @@ Sobald `cardbeacon.de` verbunden ist: Domain in den Links austauschen.
 >
 > Kostenlos, ohne Anmeldung, ohne Werbebanner. Mich interessiert ehrlich: Was fehlt, was ist unverständlich, stimmt irgendwo ein Preis nicht? Unten rechts gibt es einen Feedback-Knopf – oder einfach hier kommentieren.
 >
-> https://new-idea-livid.vercel.app/?utm_source=reddit&utm_medium=post&utm_campaign=feedback-de
+> https://cardbeacon.de/?utm_source=reddit&utm_medium=post&utm_campaign=feedback-de
 
 ---
 
 ## 3. Facebook-Gruppen / Discord-Server deutscher Sammler (kurz)
 
 > Kurze Frage an die Runde: Ich habe eine kostenlose Seite gebaut, die Cardmarket-Preise für rund 19.000 Pokémon-Karten jeden Tag aktualisiert (auch JP/KR, wo eindeutig zuordenbar), mit Portfolio ohne Anmeldung. Bevor ich weiterbaue, hätte ich gern eure ehrliche Meinung – was fehlt, was nervt? Feedback-Knopf unten rechts oder hier drunter.
-> https://new-idea-livid.vercel.app/?utm_source=facebook&utm_medium=gruppe&utm_campaign=feedback-de
+> https://cardbeacon.de/?utm_source=facebook&utm_medium=gruppe&utm_campaign=feedback-de
 
 (Für Discord `utm_source=discord&utm_medium=server` einsetzen.)
 
@@ -65,4 +65,4 @@ Sobald `cardbeacon.de` verbunden ist: Domain in den Links austauschen.
 
 ## 4. Instagram-Bio (sobald der Autopilot Zugang hat)
 
-`https://new-idea-livid.vercel.app/?utm_source=instagram&utm_medium=bio`
+`https://cardbeacon.de/?utm_source=instagram&utm_medium=bio`

@@ -127,7 +127,7 @@ export type PreisErgebnis =
   | { ok: false; grund: Fehlgrund; detail: string };
 
 /** Hoefliche Kennung gegenueber einer freien Schnittstelle. */
-const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://new-idea-livid.vercel.app)' };
+const KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://cardbeacon.de)' };
 
 /**
  * Frischer Cardmarket-Preis einer Karte — mit Begruendung, wenn es keinen gibt.

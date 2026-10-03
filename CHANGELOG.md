@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.19.0] - 3. Oktober 2026 · cardbeacon.de ist live
+
+### Neu
+- **Eigene Domain `cardbeacon.de`:** mit Zertifikat (Let's Encrypt), `www` leitet per 308 auf die Hauptadresse
+- Die bisherige Vercel-Adresse leitet jeden Seitenaufruf dauerhaft auf `cardbeacon.de` um; kanonische Adressen, Sitemaps und robots.txt nennen die neue Domain
+
+### Geändert
+- Domain-Workflow findet das Vercel-Projekt auch im Standard-Team des Kontos und nimmt optional einen Team-Slug entgegen
+- Kennung gegenüber TCGdex und Cardmarket-Preisverzeichnis nennt die neue Domain
+
+---
+
 ## [6.18.2] - 3. Oktober 2026 · Vercel-Workflow findet das Projekt
 
 ### Behoben
