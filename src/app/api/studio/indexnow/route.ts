@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 import { meldeAnIndexNow } from '@/lib/indexnow';
 import { kartenAnzahl, kartenTeil, teileFuer } from '@/lib/sitemap-karten';
-import { fetchRecentSets } from '@/lib/pokemon-api';
+import { ladeSetListe } from '@/lib/set-liste';
 import { GUIDES } from '@/lib/guides';
 import { siteUrl } from '@/lib/site';
 
@@ -29,7 +29,8 @@ export async function POST(request: Request) {
   ].map((p) => `${basis}${p}`);
   urls.push(...GUIDES.map((g) => `${basis}/guides/${g.slug}`));
 
-  const sets = await fetchRecentSets(250).catch(() => []);
+  // Dieselbe abgesicherte Liste wie die Sitemap — live fiel sie am 03.10. aus (0 Sets).
+  const sets = (await ladeSetListe(250).catch(() => null))?.sets ?? [];
   urls.push(...sets.map((s) => `${basis}/sets/${s.id}`));
 
   const teile = teileFuer(await kartenAnzahl());

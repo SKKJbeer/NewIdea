@@ -20,14 +20,34 @@ interface Gesichert {
   sets: SetMeta[];
 }
 
+/**
+ * Darf eine frisch geladene Liste die Sicherung ersetzen? (rein, getestet)
+ *
+ * Befund 03.10.2026: Die Sitemap führte nur 24 statt ~176 Sets. `/sets` lädt
+ * mit `limit = 24` und überschrieb damit die Sicherung; fiel pokemontcg.io
+ * danach aus, bekam die Sitemap (limit 250) aus der Sicherung nur noch 24.
+ * Eine kürzere Liste ersetzt deshalb nie eine längere — außer die alte ist
+ * älter als eine Woche (dann könnten Sets darin stehen, die es so nicht mehr gibt).
+ */
+export function sollSichern(neu: SetMeta[], alt: Gesichert | null, jetzt = Date.now()): boolean {
+  if (neu.length === 0) return false;
+  if (!alt || alt.sets.length === 0) return true;
+  if (neu.length >= alt.sets.length) return true;
+  const alter = jetzt - Date.parse(alt.gesichert);
+  return Number.isFinite(alter) && alter > 7 * 86_400_000;
+}
+
 export async function ladeSetListe(limit = 24): Promise<{ sets: SetMeta[]; quelle: 'live' | 'gesichert' | 'keine' }> {
   try {
     const sets = await fetchRecentSets(limit);
     if (sets.length > 0) {
       // Sichern darf den Seitenaufbau nicht aufhalten oder scheitern lassen.
-      schreibeJson(PFAD, { gesichert: new Date().toISOString(), sets } satisfies Gesichert).catch((err) =>
-        console.warn('[set-liste] nicht gesichert:', err instanceof Error ? err.message : err),
-      );
+      leseJson<Gesichert>(PFAD)
+        .catch(() => null)
+        .then((alt) => (sollSichern(sets, alt)
+          ? schreibeJson(PFAD, { gesichert: new Date().toISOString(), sets } satisfies Gesichert)
+          : undefined))
+        .catch((err) => console.warn('[set-liste] nicht gesichert:', err instanceof Error ? err.message : err));
       return { sets, quelle: 'live' };
     }
   } catch (err) {

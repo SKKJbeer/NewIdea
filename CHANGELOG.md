@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.19.1] - 3. Oktober 2026 · Vollständige Set-Liste in Sitemap und IndexNow
+
+### Behoben
+- Die Sitemap führte nur 24 statt rund 176 Set-Seiten: Die kurze Liste der Set-Übersicht überschrieb die gesicherte Gesamtliste, und bei einem Ausfall der Kartendatenbank griff die Sitemap auf diese kurze Sicherung zurück. Eine kürzere Liste ersetzt die Sicherung jetzt nur noch, wenn diese älter als eine Woche ist
+- Die IndexNow-Vollmeldung lud die Sets nur live und meldete bei einem Ausfall keine einzige Set-Seite; sie nutzt jetzt dieselbe abgesicherte Liste wie die Sitemap
+
+---
+
 ## [6.19.0] - 3. Oktober 2026 · cardbeacon.de ist live
 
 ### Neu

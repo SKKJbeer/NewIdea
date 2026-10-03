@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.19.0` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.19.1` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.19.1 | `sollSichern()`: kurze Set-Liste überschreibt die Sicherung nicht mehr (Sitemap hatte 24 statt ~176 Sets); IndexNow-Vollmeldung über `ladeSetListe(250)` |
 | v6.19.0 | cardbeacon.de live: Domain + www im Vercel-Projekt, Let's-Encrypt-Zertifikat, `NEXT_PUBLIC_SITE_URL` gesetzt → 308 von der Vercel-Adresse, Canonicals/Sitemaps auf neuer Domain |
 | v6.18.2 | Vercel-Workflow: Projektsuche über Alias + Diagnose der sichtbaren Teams/Projekte |
 | v6.18.1 | Workflow `.github/workflows/domain-vercel.yml`: Domain + www ans Vercel-Projekt, Verifizierung + HTTPS abwarten, dann `NEXT_PUBLIC_SITE_URL` (Secret `VERCEL_TOKEN`) |

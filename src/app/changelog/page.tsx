@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.19.1',
+    date: '3. Oktober 2026',
+    label: 'Vollständige Set-Liste in Sitemap und IndexNow',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Sitemap führte nur 24 statt rund 176 Set-Seiten — kurze Listen überschreiben die Sicherung nicht mehr' },
+      { type: 'fixed', text: 'IndexNow-Vollmeldung nutzt die abgesicherte Set-Liste statt nur des Live-Abrufs' },
+    ],
+  },
+  {
     version: '6.19.0',
     date: '3. Oktober 2026',
     label: 'cardbeacon.de ist live',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Eigene Domain cardbeacon.de mit Zertifikat, www leitet auf die Hauptadresse' },
       { type: 'new', text: 'Vercel-Adresse leitet dauerhaft auf cardbeacon.de um; Canonicals und Sitemaps nennen die neue Domain' },
