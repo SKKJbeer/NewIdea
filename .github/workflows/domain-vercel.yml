@@ -21,6 +21,10 @@ on:
         description: Bisherige Vercel-Adresse des Projekts
         default: new-idea-livid.vercel.app
         required: true
+      team:
+        description: Team-Slug aus der Adresszeile (vercel.com/<team>/<projekt>), leer = automatisch
+        default: ''
+        required: false
 
 permissions:
   contents: read
@@ -34,6 +38,7 @@ jobs:
           VT: ${{ secrets.VERCEL_TOKEN }}
           DOMAIN: ${{ inputs.domain }}
           ALT: ${{ inputs.projekt_host }}
+          TEAM_SLUG: ${{ inputs.team }}
         run: |
           set -euo pipefail
           [ -n "${VT}" ] || { echo "::error::Secret VERCEL_TOKEN fehlt."; exit 1; }
@@ -52,6 +57,12 @@ jobs:
           # Seit Vercel jedem Konto ein Standard-Team gibt, liegen die Projekte dort;
           # ein darauf beschränkter Token darf die Teamliste nicht lesen (403).
           STANDARD=$(api "$B/v2/user" | jq -r '.user.defaultTeamId // empty')
+          # Angegebenes Team zuerst: Slug → ID (geht auch, wenn die Teamliste gesperrt ist).
+          if [ -n "${TEAM_SLUG}" ]; then
+            ANGABE=$(api "$B/v2/teams/${TEAM_SLUG}?slug=${TEAM_SLUG}" | jq -r '.id // empty')
+            echo "Team ${TEAM_SLUG}: ${ANGABE:-nicht sichtbar für diesen Token}"
+            STANDARD=$(printf '%s\n%s' "${ANGABE}" "${STANDARD}")
+          fi
           SCOPES=$(printf '%s\n\n%s' "$STANDARD" "$(echo "$TEAMS" | awk '{print $1}')")
           PROJEKT=""; TEAM=""
           while IFS= read -r t; do
