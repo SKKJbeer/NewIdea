@@ -40,17 +40,26 @@ jobs:
           B=https://api.vercel.com
           api() { curl -sS -H "Authorization: Bearer ${VT}" -H "Content-Type: application/json" "$@"; }
 
-          # Projekt finden: über die bisherige Adresse, in allen sichtbaren Bereichen
-          # (persönlich + Teams).
-          SCOPES=$(printf '\n%s' "$(api "$B/v2/teams" | jq -r '.teams[]?.id')")
+          # Projekt finden: zuerst über den Alias (liefert die Projekt-ID direkt),
+          # dann über Namen — in allen sichtbaren Bereichen (persönlich + Teams).
+          TEAMS=$(api "$B/v2/teams" | jq -r '.teams[]? | "\(.id) \(.slug)"')
+          echo "Sichtbare Teams: $(echo "$TEAMS" | awk '{print $2}' | paste -sd, - || true)"
+          SCOPES=$(printf '\n%s' "$(echo "$TEAMS" | awk '{print $1}')")
           PROJEKT=""; TEAM=""
           while IFS= read -r t; do
-            q=""; [ -n "$t" ] && q="&teamId=$t"
-            id=$(api "$B/v9/projects?limit=100${q}" | jq -r --arg alt "$ALT" \
-              '.projects[]? | select((.alias // [] | map(.domain) | index($alt)) or (.targets.production.alias // [] | index($alt)) or ((.name + "-livid.vercel.app") == $alt) or (.name == ($alt | split(".")[0]))) | .id' | head -1)
+            q=""; [ -n "$t" ] && q="?teamId=$t"
+            id=$(api "$B/v4/aliases/${ALT}${q}" | jq -r '.projectId // empty')
+            if [ -z "$id" ]; then
+              qa="?limit=100"; [ -n "$t" ] && qa="?limit=100&teamId=$t"
+              liste=$(api "$B/v9/projects${qa}")
+              echo "Projekte im Bereich '${t:-persönlich}': $(echo "$liste" | jq -r '[.projects[]?.name] | join(", ")') $(echo "$liste" | jq -r '.error.message // empty')"
+              id=$(echo "$liste" | jq -r --arg alt "$ALT" '.projects[]? | select(
+                  ([.alias[]?.domain] | index($alt)) or ([.targets.production.alias[]?] | index($alt))
+                  or ($alt | startswith(.name + "-")) or ($alt | startswith(.name + "."))) | .id' | head -1)
+            fi
             if [ -n "$id" ]; then PROJEKT=$id; TEAM=$t; break; fi
           done <<< "$SCOPES"
-          [ -n "$PROJEKT" ] || { echo "::error::Kein Projekt zu ${ALT} gefunden (Token-Bereich prüfen)."; exit 1; }
+          [ -n "$PROJEKT" ] || { echo "::error::Kein Projekt zu ${ALT} gefunden — Token-Bereich (Team) prüfen."; exit 1; }
           Q=""; [ -n "$TEAM" ] && Q="?teamId=$TEAM"
           echo "Projekt gefunden: $(api "$B/v9/projects/${PROJEKT}${Q}" | jq -r '.name')"
 

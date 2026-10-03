@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.18.1` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.18.2` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.18.2 | Vercel-Workflow: Projektsuche über Alias + Diagnose der sichtbaren Teams/Projekte |
 | v6.18.1 | Workflow `.github/workflows/domain-vercel.yml`: Domain + www ans Vercel-Projekt, Verifizierung + HTTPS abwarten, dann `NEXT_PUBLIC_SITE_URL` (Secret `VERCEL_TOKEN`) |
 | v6.18.0 | 308-Umleitung `new-idea-livid.vercel.app` → eigene Domain (`next.config.ts` `redirects()`, gekoppelt an `NEXT_PUBLIC_SITE_URL`, `/api` ausgenommen); cardbeacon.de-Nameserver auf Cloudflare, A → Vercel |
 | v6.17.1 | Workflow `.github/workflows/domain-cloudflare.yml` (manuell): Zone `cardbeacon.de` bei Cloudflare + A/CNAME für Vercel, Secrets `CLOUDFLARE_DOMAIN_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (übertragen aus PulseMeter) |

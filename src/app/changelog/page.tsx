@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.18.2',
+    date: '3. Oktober 2026',
+    label: 'Vercel-Workflow findet das Projekt',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Domain-Workflow sucht das Vercel-Projekt über den Alias und nennt bei Fehlschlag die sichtbaren Teams und Projekte' },
+    ],
+  },
+  {
     version: '6.18.1',
     date: '3. Oktober 2026',
     label: 'Domain bei Vercel per Workflow',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'GitHub-Workflow hängt die eigene Domain ans Vercel-Projekt und setzt die Site-Adresse erst, wenn HTTPS antwortet' },
     ],

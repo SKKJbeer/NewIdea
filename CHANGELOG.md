@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.18.2] - 3. Oktober 2026 · Vercel-Workflow findet das Projekt
+
+### Behoben
+- Der Workflow „Domain bei Vercel einrichten“ fand das Projekt beim ersten Lauf nicht. Er sucht es jetzt direkt über den Alias der bisherigen Adresse und nennt bei einem Fehlschlag die sichtbaren Teams und Projekte
+
+---
+
 ## [6.18.1] - 3. Oktober 2026 · Domain bei Vercel per Workflow
 
 ### Neu
