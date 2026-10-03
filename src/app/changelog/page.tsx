@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.16.1',
+    date: '3. Oktober 2026',
+    label: 'Belege für zurückgehaltene Preise',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Preisdurchlauf merkt sich je Grund die ersten zehn betroffenen Karten mit Detail — zurückgehaltene Sprünge mit Trend, Ø 7, Ø 30 und bisherigem Wert' },
+    ],
+  },
+  {
     version: '6.16.0',
     date: '29. September 2026',
     label: 'Qualitätsschranken und Wiederholungen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Zahlenprobe: jede Prozent- und Euro-Angabe in Bericht und Artikeln muss in den zugrunde liegenden Daten stehen' },
       { type: 'new', text: 'Bericht, Artikel und Guides bis zu dreimal erzeugt, jeweils mit konkretem Korrekturhinweis — sonst keine Veröffentlichung' },

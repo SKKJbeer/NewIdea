@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.16.0` · **Stand:** 29. September 2026 · **Branch:** `main`
+**Version:** `v6.16.1` · **Stand:** 3. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.16.1 | Belege je Grund im Preisdurchlauf (`stand.beispiele`, max. 10 je Grund) — zurückgehaltene Sprünge mit Trend/Ø 7/Ø 30/bisher; Anlass: 12 → 64 zurückgehaltene Preise, nachgeprüft = Quellfehler |
 | v6.16.0 | Qualitätsschranken + Wiederholungen: Zahlenprobe (jede %/€-Angabe belegt), Struktur- und Regelschranken mit bis zu 3 Versuchen für Bericht/Artikel/Guides, Plausibilität der Tagespreise, Wiederholung je Abruf und im Themen-Lauf, Selbstheilung des Wochenberichts, tägliche Gesundheitsprüfung 12:30 UTC mit HTTP 500 |
 | v6.15.4 | Daten-Audit: Preisdurchlauf holt Netzfehler nach (1.000 Karten blieben liegen), Sitemap mit echtem lastmod + Set-Rückfall, kein Sweep-Fehlalarm, Hinweis auf alte Preise in Artikeln/Berichten vor 28.09., Rückblick 27.09. neu |
 | v6.15.3 | Themen-Teaser nennt keine Kartons (Cases) mehr als teuerstes Produkt; KW-40-Bericht mit neuem Ablauf veröffentlicht |

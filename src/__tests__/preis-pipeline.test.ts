@@ -126,3 +126,30 @@ describe('Alte Preise koennen frische nicht mehr ueberschreiben', () => {
     expect(block.slice(0, 1500)).toMatch(/\.order\('id'/);
   });
 });
+
+describe('Belege je Grund (v6.16.1)', () => {
+  it('zählt jede Karte, merkt sich aber höchstens BEISPIELE_JE_GRUND Belege', async () => {
+    const { verbucheOhne, BEISPIELE_JE_GRUND } = await import('@/lib/preis-durchlauf');
+    const stand = neuerStand('2026-10-03');
+    for (let i = 0; i < BEISPIELE_JE_GRUND + 5; i++) verbucheOhne(stand, 'unplausibel', `karte-${i}`);
+    verbucheOhne(stand, 'kein-cardmarket');
+    expect(stand.ohneFrischpreis).toBe(BEISPIELE_JE_GRUND + 6);
+    expect(stand.gruende.unplausibel).toBe(BEISPIELE_JE_GRUND + 5);
+    expect(stand.beispiele?.unplausibel).toHaveLength(BEISPIELE_JE_GRUND);
+    expect(stand.beispiele?.unplausibel?.[0]).toBe('karte-0');
+    expect(stand.gruende['kein-cardmarket']).toBe(1);
+    expect(stand.beispiele?.['kein-cardmarket']).toBeUndefined();
+  });
+
+  it('Beleg einer zurückgehaltenen Messung nennt Trend, beide Schnitte und den bisherigen Wert', async () => {
+    const { unplausibelBeleg } = await import('@/lib/preis-durchlauf');
+    expect(unplausibelBeleg({ id: 'sv05-195', name: 'Scizor ex', price: 2.6 }, { trend: 11.16, avg7: 2.55, avg30: null }))
+      .toBe('sv05-195 Scizor ex: Trend 11.16, Ø7 2.55, Ø30 —, bisher 2.6');
+  });
+
+  it('beide Verbuchungsstellen (Etappe + Nachholrunde) laufen über verbucheOhne', () => {
+    const code = ohneKommentare(lies('src/lib/preis-durchlauf.ts'));
+    expect(code.match(/verbucheOhne\(stand, e\.grund, e\.detail\)/g)).toHaveLength(2);
+    expect(code).not.toMatch(/stand\.gruende\[e\.grund\]/);
+  });
+});

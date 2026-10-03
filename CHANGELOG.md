@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.16.1] - 3. Oktober 2026 · Belege für zurückgehaltene Preise
+
+### Neu
+- **Belege je Grund im Preisdurchlauf:** Für jeden Grund, aus dem eine Karte keinen Tagespreis bekommt (zurückgehaltener Sprung, kein Cardmarket-Preis bei der Quelle, abweichender Name …), stehen die ersten zehn Karten mit Detail in der Diagnose. Bei zurückgehaltenen Sprüngen: neuer Trend, 7- und 30-Tage-Schnitt der Quelle und der bisherige Wert
+
+### Hintergrund
+- Die Zahl der zurückgehaltenen Preise stieg vom 30.09. bis 03.10. von 12 auf 64. Nachgeprüft an allen 4.740 Karten der SV- und ME-Sets: Die Treffer sind Fehler der Quelle (z. B. Trend 11,16 € bei Schnitten um 2,50 €). Mit den Belegen ist das künftig ohne Nachrechnen sichtbar
+
+---
+
 ## [6.16.0] - 29. September 2026 · Qualitätsschranken und Wiederholungen
 
 ### Neu

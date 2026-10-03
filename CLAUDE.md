@@ -143,7 +143,7 @@ täglich bei uns gespeichert und aktualisiert werden. Das ist das Wichtigste bei
 2. Verstoß → Cron-Route antwortet **HTTP 500** (sichtbar als fehlgeschlagener Cron bei Vercel) UND steht im Monitoring **ganz oben** als „PREISE NICHT AKTUELL".
 3. `preis-pipeline.test.ts` bricht den Build, wenn: weniger als 4 Etappen vor 08:00 eingeplant sind, der Sweep wieder Preise überschreibt, alte Werte als Tageswert gespeichert werden, der Index ohne Altersfilter rechnet, die Schwelle unter 50 % sinkt oder die 500-Antwort fehlt.
 
-**Diagnose:** `GET /api/cron/preise` (Studio-Cookie) → `stand.gruende` zeigt, warum Karten keinen Frischpreis bekamen. Stand-Datei: Speicher-Eimer `social`, `marktdaten/durchlauf.json`.
+**Diagnose:** `GET /api/cron/preise` (Studio-Cookie) bzw. Monitoring `health.preise.stand` → `gruende` zeigt, warum Karten keinen Frischpreis bekamen, `beispiele` (seit v6.16.1) je Grund die ersten 10 Karten mit Detail. Gemessen 03.10.: 64 × `unplausibel` = Quellfehler (Trend 3–20× über Ø 1/7/30, die untereinander übereinstimmen). Stand-Datei: Speicher-Eimer `social`, `marktdaten/durchlauf.json`.
 
 **Niemals:** den Durchlauf abschalten, die Schwelle senken ohne Messung, TCGplayer-USD als Ersatz für Cardmarket nehmen, `updated_at` wieder auf „jetzt" setzen.
 

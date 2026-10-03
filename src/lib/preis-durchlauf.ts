@@ -46,6 +46,21 @@ export const MIN_FRISCH_ANTEIL = 0.5;
 /** Ein Durchlauf, der laenger als das zurueckliegt, gilt als ausgefallen. */
 export const MAX_DURCHLAUF_ALTER_TAGE = 1;
 
+/** Grund, aus dem eine Karte keinen Tagespreis bekam. */
+export type Grund = Fehlgrund | 'veraltet' | 'unplausibel';
+
+/** Höchstzahl gespeicherter Belege je Grund — die Stand-Datei bleibt klein. */
+export const BEISPIELE_JE_GRUND = 10;
+
+/** Zählt eine Karte ohne Tagespreis und merkt sich die ersten Belege (rein, getestet). */
+export function verbucheOhne(stand: DurchlaufStand, grund: Grund, detail?: string): void {
+  stand.ohneFrischpreis++;
+  stand.gruende[grund] = (stand.gruende[grund] ?? 0) + 1;
+  if (!detail) return;
+  const liste = ((stand.beispiele ??= {})[grund] ??= []);
+  if (liste.length < BEISPIELE_JE_GRUND) liste.push(detail.slice(0, 200));
+}
+
 export interface DurchlaufStand {
   /** Tag (UTC), fuer den dieser Durchlauf zaehlt. */
   datum: string;
@@ -56,7 +71,7 @@ export interface DurchlaufStand {
   frisch: number;
   /** TCGdex hat die Karte, aber keinen Preis — oder er ist aelter als die Frist. */
   ohneFrischpreis: number;
-  gruende: Partial<Record<Fehlgrund | 'veraltet' | 'unplausibel', number>>;
+  gruende: Partial<Record<Grund, number>>;
   /** Netz- oder Serverfehler bei TCGdex — zaehlen NICHT als „kein Preis". */
   fehler: number;
   /**
@@ -66,6 +81,11 @@ export interface DurchlaufStand {
    * übrigen Etappen des Tages taten nichts.
    */
   nachholen?: string[];
+  /**
+   * Bis zu `BEISPIELE_JE_GRUND` Belege je Grund (Karte + Detail), damit eine
+   * steigende Zahl in `gruende` ohne Nachrechnen erklärbar ist (seit v6.16.1).
+   */
+  beispiele?: Partial<Record<Grund, string[]>>;
   schreibFehler: string | null;
   begonnen: string;
   aktualisiert: string;
@@ -145,7 +165,7 @@ async function mitBegrenzung<T, E>(liste: T[], n: number, f: (t: T) => Promise<E
 
 type Ergebnis =
   | { art: 'frisch'; a: Aktualisierung }
-  | { art: 'ohne'; grund: Fehlgrund | 'veraltet' | 'unplausibel' }
+  | { art: 'ohne'; grund: Grund; detail?: string }
   | { art: 'fehler' };
 
 /** Faktor, ab dem ein Wert gegen seinen Vergleichswert als Sprung gilt. */
@@ -175,6 +195,15 @@ export function preisUnplausibel(
   return altFrisch ? sprung(neu.trend, alt.price) : true;
 }
 
+/** Beleg einer zurückgehaltenen Messung: neuer Trend gegen die Vergleichswerte. */
+export function unplausibelBeleg(
+  z: { id: string; name: string; price: number | string | null },
+  p: { trend: number; avg7: number | null; avg30: number | null },
+): string {
+  const w = (x: number | string | null | undefined) => (x === null || x === undefined || x === '' ? '—' : String(x));
+  return `${z.id} ${z.name}: Trend ${p.trend}, Ø7 ${w(p.avg7)}, Ø30 ${w(p.avg30)}, bisher ${w(z.price)}`;
+}
+
 async function pruefe(z: IndexZeile, dexSets: DexSet[], jetzt: number): Promise<Ergebnis> {
   try {
     // Ein Netz-/Serverfehler bekommt SOFORT einen zweiten Versuch; erst danach
@@ -183,10 +212,12 @@ async function pruefe(z: IndexZeile, dexSets: DexSet[], jetzt: number): Promise<
       () => pruefeFrischenPreis({ name: z.name, setCode: z.set_code, set: z.set_name, number: z.number ?? undefined }, dexSets, ABRUF_MS),
       { max: 2, warteMs: 800 },
     );
-    if (!e.ok) return { art: 'ohne', grund: e.grund };
-    if (!standFrisch(e.preis.updated, jetzt)) return { art: 'ohne', grund: 'veraltet' };
+    if (!e.ok) return { art: 'ohne', grund: e.grund, detail: `${z.id}: ${e.detail}` };
+    if (!standFrisch(e.preis.updated, jetzt)) {
+      return { art: 'ohne', grund: 'veraltet', detail: `${z.id}: Quellstand ${e.preis.updated.slice(0, 10)}` };
+    }
     if (preisUnplausibel(e.preis, { price: Number(z.price), updated_at: z.updated_at }, jetzt)) {
-      return { art: 'ohne', grund: 'unplausibel' };
+      return { art: 'ohne', grund: 'unplausibel', detail: unplausibelBeleg(z, e.preis) };
     }
     return { art: 'frisch', a: aktualisierung(z, e.preis) };
   } catch {
@@ -248,10 +279,8 @@ export async function preisEtappe({
       const frisch: Aktualisierung[] = [];
       ergebnisse.forEach((e, k) => {
         if (e.art === 'frisch') frisch.push(e.a);
-        else if (e.art === 'ohne') {
-          stand.ohneFrischpreis++;
-          stand.gruende[e.grund] = (stand.gruende[e.grund] ?? 0) + 1;
-        } else {
+        else if (e.art === 'ohne') verbucheOhne(stand, e.grund, e.detail);
+        else {
           stand.fehler++;
           (stand.nachholen ??= []).push(teil[k].id);
         }
@@ -322,10 +351,7 @@ async function nachholRunde(
       if (e.art === 'fehler') { bleibt.push(zeilen[k].id); return; }
       stand.fehler = Math.max(0, stand.fehler - 1);
       if (e.art === 'frisch') stand.frisch++;
-      else {
-        stand.ohneFrischpreis++;
-        stand.gruende[e.grund] = (stand.gruende[e.grund] ?? 0) + 1;
-      }
+      else verbucheOhne(stand, e.grund, e.detail);
     });
     // Nicht mehr im Index vorhandene Karten gelten als erledigt.
     const gefunden = new Set(zeilen.map((z) => z.id));
