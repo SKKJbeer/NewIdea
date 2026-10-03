@@ -1,0 +1,101 @@
+# Hängt die eigene Domain ans Vercel-Projekt und setzt NEXT_PUBLIC_SITE_URL.
+#
+# Start: GitHub → Actions → „Domain bei Vercel einrichten" → Run workflow.
+# Braucht das Repository-Secret VERCEL_TOKEN. Der Token wird nur hier gelesen.
+#
+# REIHENFOLGE IST PFLICHT: Die Variable schaltet in next.config.ts die
+# 308-Umleitung der Vercel-Adresse ein. Sie wird deshalb erst gesetzt, wenn die
+# Domain im Projekt steht, bei Vercel als verifiziert gilt UND per HTTPS
+# antwortet. Sonst leitete die Seite auf eine Domain um, die nichts ausliefert.
+# Wirksam wird die Variable mit dem nächsten Deployment (Push auf main).
+name: Domain bei Vercel einrichten
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Domain
+        default: cardbeacon.de
+        required: true
+      projekt_host:
+        description: Bisherige Vercel-Adresse des Projekts
+        default: new-idea-livid.vercel.app
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  einrichten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Domain hinzufügen und Variable setzen
+        env:
+          VT: ${{ secrets.VERCEL_TOKEN }}
+          DOMAIN: ${{ inputs.domain }}
+          ALT: ${{ inputs.projekt_host }}
+        run: |
+          set -euo pipefail
+          [ -n "${VT}" ] || { echo "::error::Secret VERCEL_TOKEN fehlt."; exit 1; }
+          B=https://api.vercel.com
+          api() { curl -sS -H "Authorization: Bearer ${VT}" -H "Content-Type: application/json" "$@"; }
+
+          # Projekt finden: über die bisherige Adresse, in allen sichtbaren Bereichen
+          # (persönlich + Teams).
+          SCOPES=$(printf '\n%s' "$(api "$B/v2/teams" | jq -r '.teams[]?.id')")
+          PROJEKT=""; TEAM=""
+          while IFS= read -r t; do
+            q=""; [ -n "$t" ] && q="&teamId=$t"
+            id=$(api "$B/v9/projects?limit=100${q}" | jq -r --arg alt "$ALT" \
+              '.projects[]? | select((.alias // [] | map(.domain) | index($alt)) or (.targets.production.alias // [] | index($alt)) or ((.name + "-livid.vercel.app") == $alt) or (.name == ($alt | split(".")[0]))) | .id' | head -1)
+            if [ -n "$id" ]; then PROJEKT=$id; TEAM=$t; break; fi
+          done <<< "$SCOPES"
+          [ -n "$PROJEKT" ] || { echo "::error::Kein Projekt zu ${ALT} gefunden (Token-Bereich prüfen)."; exit 1; }
+          Q=""; [ -n "$TEAM" ] && Q="?teamId=$TEAM"
+          echo "Projekt gefunden: $(api "$B/v9/projects/${PROJEKT}${Q}" | jq -r '.name')"
+
+          domain_add() {  # name [redirect]
+            local body="{\"name\":\"$1\"}"
+            [ -n "${2:-}" ] && body="{\"name\":\"$1\",\"redirect\":\"$2\",\"redirectStatusCode\":308}"
+            local r; r=$(api -X POST "$B/v10/projects/${PROJEKT}/domains${Q}" --data "$body")
+            if echo "$r" | jq -e '.name' >/dev/null; then echo "$1 hinzugefügt."
+            elif echo "$r" | jq -r '.error.code' | grep -qE 'domain_already_in_use|domain_already_exists|already'; then echo "$1 war schon da: $(echo "$r" | jq -r '.error.message')"
+            else echo "::error::$1: $(echo "$r" | jq -c '.error')"; exit 1; fi
+          }
+          domain_add "${DOMAIN}"
+          domain_add "www.${DOMAIN}" "${DOMAIN}"
+
+          for i in $(seq 1 12); do
+            v=$(api "$B/v9/projects/${PROJEKT}/domains/${DOMAIN}${Q}" | jq -r '.verified')
+            [ "$v" = "true" ] && break
+            api -X POST "$B/v9/projects/${PROJEKT}/domains/${DOMAIN}/verify${Q}" >/dev/null || true
+            sleep 10
+          done
+          echo "Verifiziert bei Vercel: ${v}"
+          [ "$v" = "true" ] || { echo "::error::Domain nicht verifiziert — Variable NICHT gesetzt."; exit 1; }
+
+          # Zertifikat abwarten: erst wenn https://DOMAIN antwortet, darf umgeleitet werden.
+          ok=""
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://${DOMAIN}/impressum" || true)
+            echo "https://${DOMAIN}/impressum → ${code}"
+            if [ "$code" = "200" ]; then ok=1; break; fi
+            sleep 10
+          done
+          [ -n "$ok" ] || { echo "::error::https://${DOMAIN} antwortet noch nicht mit 200 — Variable NICHT gesetzt. Workflow später erneut starten."; exit 1; }
+
+          WERT="https://${DOMAIN}"
+          vorhanden=$(api "$B/v9/projects/${PROJEKT}/env${Q}" | jq -r '.envs[]? | select(.key=="NEXT_PUBLIC_SITE_URL") | .id' | head -1)
+          if [ -n "$vorhanden" ]; then
+            api -X PATCH "$B/v9/projects/${PROJEKT}/env/${vorhanden}${Q}" --data "{\"value\":\"${WERT}\",\"target\":[\"production\"]}" | jq -e '.key' >/dev/null
+            echo "NEXT_PUBLIC_SITE_URL aktualisiert → ${WERT}"
+          else
+            api -X POST "$B/v10/projects/${PROJEKT}/env${Q}" --data "{\"key\":\"NEXT_PUBLIC_SITE_URL\",\"value\":\"${WERT}\",\"type\":\"plain\",\"target\":[\"production\"]}" | jq -e '.created // .key' >/dev/null
+            echo "NEXT_PUBLIC_SITE_URL angelegt → ${WERT}"
+          fi
+          {
+            echo "## ${DOMAIN} bei Vercel"
+            echo "- Domain + www (308 → ${DOMAIN}) im Projekt, verifiziert"
+            echo "- HTTPS antwortet"
+            echo "- NEXT_PUBLIC_SITE_URL = ${WERT} (wirksam ab dem nächsten Deployment)"
+          } >> "$GITHUB_STEP_SUMMARY"

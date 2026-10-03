@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.18.1] - 3. Oktober 2026 · Domain bei Vercel per Workflow
+
+### Neu
+- **GitHub-Workflow „Domain bei Vercel einrichten“:** hängt die eigene Domain (und `www` mit 308-Umleitung) ans Vercel-Projekt, wartet auf Verifizierung und HTTPS und setzt erst danach `NEXT_PUBLIC_SITE_URL`. Nutzt das Repository-Secret `VERCEL_TOKEN` nur zur Laufzeit
+
+---
+
 ## [6.18.0] - 3. Oktober 2026 · Vorbereitung eigene Domain
 
 ### Neu

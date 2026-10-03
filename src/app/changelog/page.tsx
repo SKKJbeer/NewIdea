@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.18.1',
+    date: '3. Oktober 2026',
+    label: 'Domain bei Vercel per Workflow',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'GitHub-Workflow hängt die eigene Domain ans Vercel-Projekt und setzt die Site-Adresse erst, wenn HTTPS antwortet' },
+    ],
+  },
+  {
     version: '6.18.0',
     date: '3. Oktober 2026',
     label: 'Vorbereitung eigene Domain',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Dauerhafte Umleitung der Vercel-Adresse auf die eigene Domain, sobald diese gesetzt ist — Schnittstellen ausgenommen' },
       { type: 'changed', text: 'cardbeacon.de zeigt per Cloudflare auf Vercel' },
