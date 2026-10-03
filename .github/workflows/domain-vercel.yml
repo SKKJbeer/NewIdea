@@ -49,7 +49,10 @@ jobs:
           # dann über Namen — in allen sichtbaren Bereichen (persönlich + Teams).
           TEAMS=$(api "$B/v2/teams" | jq -r '.teams[]? | "\(.id) \(.slug)"')
           echo "Sichtbare Teams: $(echo "$TEAMS" | awk '{print $2}' | paste -sd, - || true)"
-          SCOPES=$(printf '\n%s' "$(echo "$TEAMS" | awk '{print $1}')")
+          # Seit Vercel jedem Konto ein Standard-Team gibt, liegen die Projekte dort;
+          # ein darauf beschränkter Token darf die Teamliste nicht lesen (403).
+          STANDARD=$(api "$B/v2/user" | jq -r '.user.defaultTeamId // empty')
+          SCOPES=$(printf '%s\n\n%s' "$STANDARD" "$(echo "$TEAMS" | awk '{print $1}')")
           PROJEKT=""; TEAM=""
           while IFS= read -r t; do
             q=""; [ -n "$t" ] && q="?teamId=$t"
