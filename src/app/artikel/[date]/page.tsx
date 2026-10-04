@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ErsatzBild } from '@/components/ErsatzBild';
 import { readArticle, generateArticle, getArticleType, ARTICLE_META, articleLevel, LEVEL_LABEL, readingTime, artikelPreiseVeraltet } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
 import { ArticleCardGallery } from '@/components/ArticleCardGallery';
@@ -182,7 +182,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
             {heroCard && (
               <div className="relative mx-auto shrink-0 sm:mx-0">
                 <div aria-hidden className="absolute inset-0 -z-10 rounded-2xl bg-violet-500/20 blur-2xl" />
-                <Image
+                <ErsatzBild
                   src={heroCard.imageUrl}
                   alt={heroCard.name}
                   width={220}
@@ -262,7 +262,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                   {section.highlight && (
                     <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#2a2a3a] bg-[#070810] p-3">
                       {section.highlight.imageUrl && (
-                        <Image
+                        <ErsatzBild
                           src={section.highlight.imageUrl}
                           alt={section.highlight.name}
                           width={60}

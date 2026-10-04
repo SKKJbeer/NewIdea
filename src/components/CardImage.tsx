@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { ErsatzBild } from './ErsatzBild';
 
 interface CardImageProps {
   src: string;
@@ -30,7 +30,7 @@ export function CardImage({ src, alt, sizes, className = '', priority = false }:
   return (
     <>
       <div className="shimmer absolute inset-0 rounded-[inherit]" aria-hidden />
-      <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className={className} />
+      <ErsatzBild src={src} alt={alt} fill sizes={sizes} priority={priority} className={className} />
     </>
   );
 }

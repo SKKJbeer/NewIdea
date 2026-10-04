@@ -35,15 +35,18 @@ describe('Bild-Hosts: Proxy-Liste und Richtlinie passen zusammen', () => {
     const cfg = lies('next.config.ts');
     const start = cfg.indexOf('const CSP');
     expect(start).toBeGreaterThan(-1);
-    const csp = cfg.slice(start, cfg.indexOf('remotePatterns'));
+    const csp = cfg.slice(start, cfg.indexOf('const SECURITY_HEADERS'));
     expect(csp).toMatch(/img-src/);
     expect(csp).not.toContain('scrydex');
   });
 
-  it('der Optimierer kennt den Host der neueren Set-Logos', () => {
-    // Befund 27.09.2026: images.scrydex.com durch den Optimierer → HTTP 400 →
-    // Platzhalter statt Logo auf /sets (BoosterPackImage nutzt next/image).
-    expect(lies('next.config.ts')).toMatch(/hostname: 'images\.scrydex\.com'/);
+  it('der Bild-Loader kennt dieselben Hosts wie der Proxy', () => {
+    // Seit v6.20.0 laufen alle next/image-Bilder über den eigenen Loader →
+    // /api/img (Vercel-Bildoptimierung: Kontingent verbraucht, 402).
+    // Kennt der Loader einen Host nicht, ginge das Bild am Proxy vorbei.
+    const hosts = (src: string) =>
+      [...src.matchAll(/'([a-z0-9.-]+\.(?:io|com|net))'/g)].map((m) => m[1]).sort();
+    expect(hosts(lies('src/lib/bild-loader.ts'))).toEqual(hosts(route));
   });
 });
 

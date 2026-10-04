@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
+import { BILD_BREITEN } from '@/lib/bild-loader';
+import { tcgdexErsatz } from '@/lib/bild-ersatz';
+
+export const runtime = 'nodejs';
 
 // Bild-Caching-Proxy: Macht uns unabhängig von der Verfügbarkeit der externen
 // Bild-Hosts (TCG-API / Pokémon-CDN). Vercels CDN cacht jede Antwort 30 Tage
@@ -64,9 +69,54 @@ async function holeBild(start: URL): Promise<Response | null> {
   return null;
 }
 
+/** Liest höchstens `max` Bytes — die Kopfzeile `content-length` kann fehlen oder lügen. */
+async function leseBegrenzt(body: ReadableStream<Uint8Array>, max: number): Promise<Buffer | null> {
+  const leser = body.getReader();
+  const teile: Uint8Array[] = [];
+  let summe = 0;
+  for (;;) {
+    const { done, value } = await leser.read();
+    if (done) break;
+    summe += value.byteLength;
+    if (summe > max) {
+      await leser.cancel().catch(() => undefined);
+      return null;
+    }
+    teile.push(value);
+  }
+  return Buffer.concat(teile);
+}
+
+/** Holt ein Bild; bei pokemontcg.io-Ausfall dieselbe Karte von TCGdex (bild-ersatz.ts). */
+async function holeMitErsatz(target: URL): Promise<{ daten: Buffer; typ: string } | null> {
+  const versuche: URL[] = [target];
+  for (let i = 0; i < 2; i++) {
+    const ziel = versuche[i];
+    if (!ziel) break;
+    const upstream = await holeBild(ziel).catch(() => null);
+    const typ = upstream?.headers.get('content-type') || '';
+    if (upstream?.ok && upstream.body && typ.startsWith('image/')) {
+      const daten = await leseBegrenzt(upstream.body, MAX_BYTES);
+      if (daten && daten.length > 0) return { daten, typ };
+    }
+    if (i === 0) {
+      const ersatz = await tcgdexErsatz(target);
+      if (ersatz) versuche.push(new URL(ersatz));
+    }
+  }
+  return null;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const raw = searchParams.get('u') || '';
+  // Breite: nur die festen Stufen des Loaders — sonst ließe sich der
+  // Zwischenspeicher mit beliebig vielen Varianten füllen.
+  const wRoh = searchParams.get('w');
+  const breite = wRoh === null ? null : Number(wRoh);
+  if (breite !== null && !(BILD_BREITEN as readonly number[]).includes(breite)) {
+    return new NextResponse('bad width', { status: 400 });
+  }
 
   let target: URL;
   try {
@@ -79,30 +129,30 @@ export async function GET(request: Request) {
   }
 
   try {
-    const upstream = await holeBild(target);
-    if (!upstream || !upstream.ok || !upstream.body) {
+    const bild = await holeMitErsatz(target);
+    if (!bild) {
       // Fehler NICHT cachen — nächster Request versucht es erneut
       return new NextResponse('upstream error', { status: 502 });
     }
-    const contentType = upstream.headers.get('content-type') || '';
-    if (!contentType.startsWith('image/')) {
-      return new NextResponse('not an image', { status: 502 });
+    let daten = bild.daten;
+    let typ = bild.typ;
+    if (breite !== null && typ !== 'image/svg+xml') {
+      daten = await sharp(daten, { limitInputPixels: 40_000_000 })
+        .resize({ width: breite, withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toBuffer();
+      typ = 'image/webp';
     }
-    // GROESSENGRENZE (seit v6.10.2): Kartenbilder haben unter 2 MB. Ohne
-    // Grenze liesse sich ueber diesen offenen Weg beliebig grosse Last durch
-    // die eigene Funktion leiten.
-    const laenge = Number(upstream.headers.get('content-length') || 0);
-    if (laenge > MAX_BYTES) {
-      return new NextResponse('too large', { status: 502 });
-    }
-    return new NextResponse(upstream.body, {
+    return new NextResponse(new Uint8Array(daten), {
       headers: {
-        'Content-Type': contentType,
+        'Content-Type': typ,
         'Cache-Control':
-          'public, max-age=86400, s-maxage=2592000, stale-while-revalidate=31536000, stale-if-error=31536000',
+          'public, max-age=86400, s-maxage=31536000, stale-while-revalidate=31536000, stale-if-error=31536000',
+        'X-Content-Type-Options': 'nosniff',
       },
     });
-  } catch {
+  } catch (err) {
+    console.warn('[img] fehlgeschlagen:', err instanceof Error ? err.message : err);
     return new NextResponse('fetch failed', { status: 502 });
   }
 }

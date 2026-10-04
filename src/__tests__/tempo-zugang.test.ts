@@ -18,9 +18,10 @@ const ohneKommentare = (p: string) =>
 // Der Bildoptimierer kam nie zum Zug.
 
 describe('Kleine Bilder werden auch klein geladen', () => {
-  it('die Miniatur-Komponente nutzt den Bildoptimierer', () => {
+  it('die Miniatur-Komponente lädt klein (next/image über Loader + Ersatzkette)', () => {
     const thumb = ohneKommentare('src/components/CardThumb.tsx');
-    expect(thumb).toContain("from 'next/image'");
+    expect(thumb).toContain('ErsatzBild');
+    expect(ohneKommentare('src/components/ErsatzBild.tsx')).toContain("from 'next/image'");
     // Feste Masse reservieren den Platz, bevor das Bild da ist.
     expect(thumb).toMatch(/width=\{width\}/);
     expect(thumb).toMatch(/height=\{height\}/);

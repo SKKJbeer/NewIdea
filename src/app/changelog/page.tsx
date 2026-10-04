@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.20.0',
+    date: '4. Oktober 2026',
+    label: 'Kartenbilder ohne Ausfall',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kartenbilder fehlten (Vercel-Bildoptimierung: Kontingent verbraucht) — jetzt eigener Bild-Proxy mit Verkleinerung und Jahresreserve im CDN' },
+      { type: 'new', text: 'Zweite Bildquelle: TCGdex springt ein, wenn pokemontcg.io ausfällt' },
+      { type: 'new', text: 'Ersatzkette im Browser: direkte Quelle, dann Platzhalter — nie ein kaputtes Bild' },
+      { type: 'changed', text: 'Bild-Proxy mit Größengrenze beim Lesen, festen Breitenstufen und Pixelgrenze' },
+    ],
+  },
+  {
     version: '6.19.1',
     date: '3. Oktober 2026',
     label: 'Vollständige Set-Liste in Sitemap und IndexNow',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Sitemap führte nur 24 statt rund 176 Set-Seiten — kurze Listen überschreiben die Sicherung nicht mehr' },
       { type: 'fixed', text: 'IndexNow-Vollmeldung nutzt die abgesicherte Set-Liste statt nur des Live-Abrufs' },

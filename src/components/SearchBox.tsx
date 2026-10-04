@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Loader2, ImageOff, X, Layers } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ErsatzBild } from './ErsatzBild';
 import { formatEur } from '@/lib/format';
 
 interface Suggestion {
@@ -406,7 +406,7 @@ export function SearchBox({
                 >
                   <div className="relative flex h-10 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-[#1a1a28]">
                     {s.imageUrl ? (
-                      <Image src={s.imageUrl} alt={s.name} fill sizes="32px" className="object-contain" />
+                      <ErsatzBild src={s.imageUrl} alt={s.name} fill sizes="32px" className="object-contain" platzhalterGroesse={14} />
                     ) : (
                       <ImageOff size={14} className="text-slate-600" />
                     )}

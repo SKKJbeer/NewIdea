@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ErsatzBild } from './ErsatzBild';
 
 // KARTENMINIATUR — klein angezeigt, also auch klein geladen.
 //
@@ -37,7 +37,8 @@ interface Props {
 export function CardThumb({ src, alt = '', width, height, className = '' }: Props) {
   if (!src) return null;
   return (
-    <Image
+    <ErsatzBild
+      platzhalterGroesse={12}
       src={src}
       alt={alt}
       width={width}

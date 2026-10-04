@@ -78,19 +78,12 @@ const nextConfig: NextConfig = {
     '/api/cron/social': ['./node_modules/ffmpeg-static/**', './src/assets/fonts/**'],
   },
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.pokemontcg.io' },
-      // Neuere Set-Logos liefert die Kartendatenbank von hier. Ohne Eintrag
-      // antwortete der Optimierer mit 400, und /sets zeigte Platzhalter.
-      // Die Inhaltsrichtlinie bleibt unberuehrt: Optimierte Bilder kommen von
-      // der eigenen Adresse.
-      { protocol: 'https', hostname: 'images.scrydex.com' },
-      { protocol: 'https', hostname: 'assets.tcgdex.net' },
-    ],
-    formats: ['image/avif', 'image/webp'],
-    // Optimierte Bilder 31 Tage im Vercel-Cache behalten — reduziert
-    // Origin-Zugriffe auf die externen Bild-Hosts drastisch
-    minimumCacheTTL: 2678400,
+    // EIGENER LOADER statt Vercel-Bildoptimierung (seit v6.20.0): Das
+    // kostenlose Kontingent war verbraucht, Vercel antwortete mit 402, und
+    // Kartenbilder fehlten. Der Loader schickt jedes Bild über /api/img, das
+    // mit sharp verkleinert und ein Jahr im CDN hält. Siehe src/lib/bild-loader.ts.
+    loader: 'custom',
+    loaderFile: './src/lib/bild-loader.ts',
   },
   async headers() {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }];

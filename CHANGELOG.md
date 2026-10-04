@@ -7,6 +7,20 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.20.0] - 4. Oktober 2026 · Kartenbilder ohne Ausfall
+
+### Behoben
+- **Kartenbilder fehlten:** Vercel verweigerte die Bildoptimierung (HTTP 402, kostenloses Kontingent verbraucht) — nur bereits zwischengespeicherte Bilder kamen noch an. Bilder laufen jetzt über den eigenen Bild-Proxy, der auf die angezeigte Größe verkleinert (Miniatur 2 KB statt 164 KB) und jede Größe ein Jahr lang im CDN vorhält, auch wenn die Quelle ausfällt
+
+### Neu
+- **Zweite Bildquelle:** Fällt pokemontcg.io aus, holt der Proxy dieselbe Karte von TCGdex
+- **Ersatzkette im Browser:** Scheitert der Proxy, kommt das Bild direkt von der Quelle; erst danach erscheint ein Platzhalter — nie ein kaputtes Bild-Symbol
+
+### Geändert
+- Proxy liest höchstens 8 MB (auch ohne Längenangabe), erlaubt nur feste Breitenstufen und begrenzt die Bildgröße in Pixeln
+
+---
+
 ## [6.19.1] - 3. Oktober 2026 · Vollständige Set-Liste in Sitemap und IndexNow
 
 ### Behoben
