@@ -9,6 +9,7 @@ import { buildCardmarketHistory } from '@/lib/pokemon-api';
 import { sprachpreiseFuerKarte, type SprachGrund } from '@/lib/sprachpreise';
 import { after } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+import { herkunftErlaubt, leseJsonBegrenzt } from '@/lib/annahme-schutz';
 
 // MENGENBREMSE (seit v6.10.2): Eine Anfrage loest bis zu 50 Abrufe bei der
 // Kartendatenbank (mit unserem Schluessel) und bei TCGdex aus. Ohne Grenze
@@ -67,7 +68,11 @@ export async function POST(request: Request) {
   if (!grenze.allowed) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429, headers: { 'Retry-After': String(grenze.retryAfterSeconds) } });
   }
-  const body = (await request.json().catch(() => ({}))) as {
+  if (!herkunftErlaubt(request)) return NextResponse.json({ error: 'ungueltig' }, { status: 403 });
+  // 50 Karten je Anfrage × ~150 Bytes — 32 KB lassen reichlich Luft.
+  const gelesen = await leseJsonBegrenzt(request, 32_768);
+  if (!gelesen.ok) return NextResponse.json({ error: gelesen.fehler }, { status: gelesen.status });
+  const body = (gelesen.daten ?? {}) as {
     cards?: unknown[];
     cardIds?: unknown[];
   };

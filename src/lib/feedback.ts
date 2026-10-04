@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto';
 import { isValidEmail } from './rate-limit';
+import { textSaeubern, anzahlLinks } from './annahme-schutz';
 import { schreibeJson, leseJson, listeOrdner, loescheDateien } from './social-speicher';
 
 // RÜCKMELDUNGEN VON BESUCHERN (seit v6.17.0).
@@ -23,6 +24,14 @@ const ORDNER = 'feedback';
 export const FEEDBACK_AUFBEWAHRUNG_TAGE = 365;
 export const FEEDBACK_MIN_ZEICHEN = 3;
 export const FEEDBACK_MAX_ZEICHEN = 2000;
+/** Mehr Links als das ist Werbung, keine Rückmeldung. */
+export const FEEDBACK_MAX_LINKS = 3;
+/** Schneller als das füllt kein Mensch das Formular aus. */
+export const FEEDBACK_MIN_DAUER_MS = 1500;
+/** Grenze über ALLE Instanzen je Tag — begrenzt den Speicher auch bei einer Flut. */
+export const FEEDBACK_TAGESGRENZE = 100;
+/** Größte angenommene Anfrage in Bytes (2.000 Zeichen Text + Mail + Seite, großzügig). */
+export const FEEDBACK_MAX_BYTES = 12_000;
 
 export const FEEDBACK_ARTEN = ['idee', 'fehler', 'lob', 'sonstiges'] as const;
 export type FeedbackArt = (typeof FEEDBACK_ARTEN)[number];
@@ -37,7 +46,7 @@ export interface FeedbackEintrag {
 
 export type FeedbackPruefung =
   | { ok: true; eintrag: FeedbackEintrag }
-  | { ok: false; fehler: 'zu-kurz' | 'zu-lang' | 'mail-ungueltig' | 'ungueltig' };
+  | { ok: false; fehler: 'zu-kurz' | 'zu-lang' | 'mail-ungueltig' | 'zu-viele-links' | 'ungueltig' | 'bot' };
 
 /** Prüft eine eingehende Meldung (rein, getestet). Wirft nie. */
 export function pruefeFeedback(koerper: unknown, jetzt = new Date()): FeedbackPruefung {
@@ -45,15 +54,24 @@ export function pruefeFeedback(koerper: unknown, jetzt = new Date()): FeedbackPr
   const d = koerper as Record<string, unknown>;
   // Honigtopf: Das Feld ist für Menschen unsichtbar. Ist es gefüllt, war es
   // ein Formular-Roboter — die Antwort sieht trotzdem nach Erfolg aus.
-  if (typeof d.website === 'string' && d.website.trim() !== '') return { ok: false, fehler: 'ungueltig' };
-  const text = typeof d.text === 'string' ? d.text.replace(/\u0000/g, '').trim() : '';
+  if (typeof d.website === 'string' && d.website.trim() !== '') return { ok: false, fehler: 'bot' };
+  // Zeit zwischen Öffnen und Absenden (vom Formular mitgeschickt). Fehlt sie,
+  // war es nicht unser Formular.
+  if (typeof d.dauerMs !== 'number' || d.dauerMs < FEEDBACK_MIN_DAUER_MS) return { ok: false, fehler: 'bot' };
+  const text = typeof d.text === 'string' ? textSaeubern(d.text) : '';
   if (text.length < FEEDBACK_MIN_ZEICHEN) return { ok: false, fehler: 'zu-kurz' };
   if (text.length > FEEDBACK_MAX_ZEICHEN) return { ok: false, fehler: 'zu-lang' };
-  const mailRoh = typeof d.mail === 'string' ? d.mail.trim() : '';
+  if (anzahlLinks(text) > FEEDBACK_MAX_LINKS) return { ok: false, fehler: 'zu-viele-links' };
+  const mailRoh = typeof d.mail === 'string' ? d.mail.trim().toLowerCase() : '';
   if (mailRoh && !isValidEmail(mailRoh)) return { ok: false, fehler: 'mail-ungueltig' };
   const art = FEEDBACK_ARTEN.includes(d.art as FeedbackArt) ? (d.art as FeedbackArt) : 'sonstiges';
   const pfad = typeof d.pfad === 'string' && /^\/[^\s]{0,200}$/.test(d.pfad) ? d.pfad.split('?')[0] : null;
   return { ok: true, eintrag: { zeit: jetzt.toISOString(), art, text, mail: mailRoh || null, pfad } };
+}
+
+/** Tagesordner — auch für die Tagesgrenze gezählt. */
+export function feedbackOrdner(tag: string): string {
+  return `${ORDNER}/${tag}`;
 }
 
 export async function speichereFeedback(e: FeedbackEintrag): Promise<void> {

@@ -221,7 +221,7 @@ function getWorkflows(cronActive: boolean) {
       endpoint: '/api/newsletter',
       schedule: 'On Demand',
       scheduleLabel: 'Bei Anmeldung / Manuell',
-      description: 'Versendet über Beehiiv; Anmeldungen werden auch ohne Key gesammelt',
+      description: 'Versendet über Beehiiv; ohne BEEHIIV_API_KEY ist keine Anmeldung möglich (die Schnittstelle antwortet ehrlich mit 503)',
       active: !!process.env.BEEHIIV_API_KEY && !!process.env.BEEHIIV_PUBLICATION_ID,
       trigger: 'Formular / Studio',
     },

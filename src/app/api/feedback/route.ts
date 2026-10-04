@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
-import { pruefeFeedback, speichereFeedback, ladeFeedback } from '@/lib/feedback';
+import {
+  pruefeFeedback, speichereFeedback, ladeFeedback, feedbackOrdner,
+  FEEDBACK_MAX_BYTES, FEEDBACK_TAGESGRENZE,
+} from '@/lib/feedback';
+import { herkunftErlaubt, leseJsonBegrenzt, tagesKontingentFrei } from '@/lib/annahme-schutz';
 import { isStudioAuthedFromRequest } from '@/lib/studio-auth';
 
 // RÜCKMELDUNGEN: POST offen (Formular auf jeder Seite), GET nur fürs Studio.
@@ -13,26 +17,34 @@ export const runtime = 'nodejs';
 const bremse = createRateLimiter({ limit: 5, windowMs: 10 * 60_000 });
 
 export async function POST(request: Request) {
+  // 1. Nur von der eigenen Seite (fremde Seiten dürfen Besucher-Browser nicht als Schleuder nutzen).
+  if (!herkunftErlaubt(request)) return NextResponse.json({ error: 'ungueltig' }, { status: 403 });
+
+  // 2. Mengenbremse je Adresse (Arbeitsspeicher — die harte Grenze kommt in Schritt 5).
   const grenze = bremse(clientIp(request));
   if (!grenze.allowed) {
     return NextResponse.json({ error: 'zu-viele' }, { status: 429, headers: { 'Retry-After': String(grenze.retryAfterSeconds) } });
   }
-  let koerper: unknown;
-  try {
-    koerper = await request.json();
-  } catch {
-    // catch erlaubt: unlesbarer Körper heißt schlicht „ungültig"
-    return NextResponse.json({ error: 'ungueltig' }, { status: 400 });
-  }
-  const geprueft = pruefeFeedback(koerper);
+
+  // 3. Körper mit harter Größengrenze, nur JSON.
+  const koerper = await leseJsonBegrenzt(request, FEEDBACK_MAX_BYTES);
+  if (!koerper.ok) return NextResponse.json({ error: koerper.fehler }, { status: koerper.status });
+
+  // 4. Inhalt prüfen. Roboter (Honigtopf, zu schnell) bekommen dieselbe
+  //    Antwort wie ein Erfolg — sonst lernen sie, was sie verrät.
+  const geprueft = pruefeFeedback(koerper.daten);
   if (!geprueft.ok) {
-    // Honigtopf-Treffer bekommen dieselbe Antwort wie ein Erfolg.
-    if (geprueft.fehler === 'ungueltig' && koerper && typeof (koerper as Record<string, unknown>).website === 'string'
-      && ((koerper as Record<string, unknown>).website as string).trim() !== '') {
-      return NextResponse.json({ ok: true });
-    }
+    if (geprueft.fehler === 'bot') return NextResponse.json({ ok: true });
     return NextResponse.json({ error: geprueft.fehler }, { status: 400 });
   }
+
+  // 5. Tagesgrenze über ALLE Instanzen (zählt die Dateien des Tages).
+  const tag = geprueft.eintrag.zeit.slice(0, 10);
+  if (!(await tagesKontingentFrei(feedbackOrdner(tag), FEEDBACK_TAGESGRENZE))) {
+    console.warn(`[feedback] Tagesgrenze ${FEEDBACK_TAGESGRENZE} erreicht (${tag}) — Meldung abgewiesen`);
+    return NextResponse.json({ error: 'zu-viele' }, { status: 429, headers: { 'Retry-After': '3600' } });
+  }
+
   try {
     await speichereFeedback(geprueft.eintrag);
     return NextResponse.json({ ok: true });

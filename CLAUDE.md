@@ -1020,7 +1020,16 @@ Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudf
 ## Feedback-Knopf — seit v6.17.0
 
 **Nutzer-Auftrag (03.10.2026):** „dass ich auch mal feedback bekomme".
-`FeedbackKnopf` (Grundgerüst, nicht auf /studio und /monitoring) → `POST /api/feedback` (5 je 10 Min. je Adresse, Honigtopf `website`) → `pruefeFeedback()` (rein, getestet) → Eimer `social`, `feedback/<tag>/<zeit>-<zufall>.json`. Lesen: Monitoring „Rückmeldungen" bzw. `GET /api/feedback` (Studio). Gespeichert NUR Text, Art, Seite, Zeit, freiwillige Mail — neue Felder = Datenschutz Abschnitt 8a anpassen. Löschung nach `FEEDBACK_AUFBEWAHRUNG_TAGE` (365) im Daily-Cron. Post-Entwürfe mit Kampagnen-Links: `docs/reichweite-posts.md`.
+`FeedbackKnopf` (Grundgerüst, nicht auf /studio und /monitoring) → `POST /api/feedback` (Schutz seit v6.21.0: Herkunft, nur JSON ≤ 12 KB, 5 je 10 Min. je Adresse, **100/Tag über alle Instanzen** per Ordner-Zählung, fail-closed; Roboter = Honigtopf `website` ODER `dauerMs` < 1,5 s → stilles `ok`; > 3 Links abgewiesen; `textSaeubern`) → `pruefeFeedback()` (rein, getestet) → Eimer `social`, `feedback/<tag>/<zeit>-<zufall>.json`. Lesen: Monitoring „Rückmeldungen" bzw. `GET /api/feedback` (Studio). Gespeichert NUR Text, Art, Seite, Zeit, freiwillige Mail — neue Felder = Datenschutz Abschnitt 8a anpassen. Löschung nach `FEEDBACK_AUFBEWAHRUNG_TAGE` (365) im Daily-Cron. Post-Entwürfe mit Kampagnen-Links: `docs/reichweite-posts.md`.
+
+## ⛔ Offene Schreibwege (seit v6.21.0 — PFLICHT für jede neue öffentliche POST-Route)
+
+Security-Review 04.10.2026. Jede Route, die ohne Anmeldung Daten annimmt (Stand: `/api/feedback`, `/api/zaehler`, `/api/newsletter`, `/api/portfolio/prices`), nutzt `src/lib/annahme-schutz.ts`:
+1. `herkunftErlaubt(request)` — fremde Webseiten (Origin/Sec-Fetch-Site) abweisen.
+2. `leseJsonBegrenzt(request, maxBytes)` — NIE `request.json()` (unbegrenzt, nimmt auch `text/plain` von Formularen).
+3. Legt die Route Dateien/Zeilen an: Grenze über ALLE Instanzen (`tagesKontingentFrei`), bei sehr vielen Aufrufen mindestens `instanzTagesgrenze`. Eine Bremse nur im Arbeitsspeicher reicht nie (Stolperstelle 66).
+4. Freitext durch `textSaeubern()`.
+`annahme-schutz.test.ts` prüft alle vier Routen; eine neue offene Route gehört in diese Liste.
 
 ## Reichweitenmessung (Aufrufe & Herkunft) — seit v6.5.0
 

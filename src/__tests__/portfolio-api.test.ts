@@ -175,13 +175,13 @@ describe('POST /api/portfolio/prices — kaputte Eingaben', () => {
     expect(fetchCardById).not.toHaveBeenCalled();
   });
 
-  it('antwortet auf ungültiges JSON mit einem leeren Objekt statt zu werfen', async () => {
-    const req = new Request('https://example.test/api/portfolio/prices', {
-      method: 'POST',
-      body: 'kein json',
+  it('weist ungültiges JSON und fremden Inhaltstyp mit 4xx ab, statt zu werfen (seit v6.21.0)', async () => {
+    const ohneTyp = new Request('https://example.test/api/portfolio/prices', { method: 'POST', body: 'kein json' });
+    expect((await POST(ohneTyp)).status).toBe(415);
+    const kaputt = new Request('https://example.test/api/portfolio/prices', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: 'kein json',
     });
-    await expect(POST(req)).resolves.toBeDefined();
-    expect(await (await POST(req)).json()).toEqual({});
+    expect((await POST(kaputt)).status).toBe(400);
   });
 
   it('überspringt Einträge ohne gültige ID', async () => {

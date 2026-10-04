@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.21.0] - 4. Oktober 2026 · Offene Schreibwege abgesichert
+
+### Behoben
+- **Feedback, Seitenzähler, Newsletter-Anmeldung und Portfolio-Preise** lasen Anfragen ohne Größengrenze, nahmen Anfragen von fremden Webseiten an und begrenzten die Menge nur je Server-Instanz. Jetzt: nur JSON, harte Größengrenze beim Lesen (2–32 KB je Weg), Anfragen fremder Webseiten werden abgewiesen
+- **Feedback:** höchstens 100 Meldungen am Tag über alle Server hinweg (fail-closed, wenn der Speicher nicht lesbar ist); Roboter-Erkennung über unsichtbares Feld und Mindest-Ausfüllzeit; mehr als drei Links gelten als Werbung; Steuer-, Richtungs- und unsichtbare Zeichen werden entfernt
+- **Seitenzähler:** Tagesgrenze je Server-Instanz, damit eine Flut den Speicher nicht volllaufen lässt
+- **Newsletter:** meldete „Anmeldung gespeichert!“, obwohl ohne eingerichteten Versanddienst nichts gespeichert wurde — antwortet jetzt ehrlich, dass die Anmeldung gerade nicht möglich ist
+
+---
+
 ## [6.20.0] - 4. Oktober 2026 · Kartenbilder ohne Ausfall
 
 ### Behoben

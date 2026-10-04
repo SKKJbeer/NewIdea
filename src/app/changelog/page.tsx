@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.21.0',
+    date: '4. Oktober 2026',
+    label: 'Offene Schreibwege abgesichert',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Feedback, Seitenzähler, Newsletter und Portfolio-Preise: nur JSON, harte Größengrenze, keine Anfragen fremder Webseiten' },
+      { type: 'fixed', text: 'Feedback: Tagesgrenze über alle Server, Roboter-Erkennung, Link-Grenze, Zeichen-Säuberung' },
+      { type: 'fixed', text: 'Seitenzähler: Tagesgrenze je Server-Instanz gegen Fluten' },
+      { type: 'fixed', text: 'Newsletter behauptete eine Speicherung, die ohne Versanddienst nicht stattfand' },
+    ],
+  },
+  {
     version: '6.20.0',
     date: '4. Oktober 2026',
     label: 'Kartenbilder ohne Ausfall',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Kartenbilder fehlten (Vercel-Bildoptimierung: Kontingent verbraucht) — jetzt eigener Bild-Proxy mit Verkleinerung und Jahresreserve im CDN' },
       { type: 'new', text: 'Zweite Bildquelle: TCGdex springt ein, wenn pokemontcg.io ausfällt' },

@@ -1,5 +1,6 @@
 import { NextResponse, after } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+import { herkunftErlaubt, leseJsonBegrenzt, instanzTagesgrenze } from '@/lib/annahme-schutz';
 import {
   einordnen,
   pfadBereinigen,
@@ -26,7 +27,14 @@ export const runtime = 'nodejs';
 // Schleife zu stoppen, die die Tabelle aufblaeht.
 const bremse = createRateLimiter({ limit: 120, windowMs: 60_000 });
 
+// Jeder Aufruf legt eine Datei an. Ein Ordner-Zählen je Aufruf wäre zu teuer,
+// deshalb je Instanz höchstens 20.000 am Tag: Eine Flut bleibt begrenzt, echte
+// Besucherzahlen liegen weit darunter (Stand Oktober 2026: einstellig je Tag).
+const tagesgrenze = instanzTagesgrenze(20_000);
+const MAX_BYTES = 2_048;
+
 export async function POST(request: Request) {
+  if (!herkunftErlaubt(request)) return new NextResponse(null, { status: 403 });
   const grenze = bremse(clientIp(request));
   if (!grenze.allowed) {
     // 429 ohne Inhalt: Der Absender ist `sendBeacon` und liest die Antwort
@@ -37,13 +45,11 @@ export async function POST(request: Request) {
     });
   }
 
-  let koerper: unknown;
-  try {
-    koerper = await request.json();
-  } catch {
-    // catch erlaubt: fremder Koerper, unlesbar heisst schlicht „ungueltig"
-    return NextResponse.json({ error: 'ungueltig' }, { status: 400 });
-  }
+  const gelesen = await leseJsonBegrenzt(request, MAX_BYTES);
+  if (!gelesen.ok) return NextResponse.json({ error: gelesen.fehler }, { status: gelesen.status });
+  const koerper = gelesen.daten;
+  // Über der Tagesgrenze: still nicht zählen (204) — der Besucher merkt nichts.
+  if (!tagesgrenze()) return new NextResponse(null, { status: 204 });
 
   const daten = (koerper ?? {}) as Record<string, unknown>;
   const pfad = pfadBereinigen(daten.pfad);

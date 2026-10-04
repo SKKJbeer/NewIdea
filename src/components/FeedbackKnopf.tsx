@@ -23,7 +23,9 @@ const FEHLERTEXT: Record<string, string> = {
   'zu-kurz': 'Bitte ein paar Worte mehr.',
   'zu-lang': 'Bitte höchstens 2.000 Zeichen.',
   'mail-ungueltig': 'Die E-Mail-Adresse sieht nicht gültig aus.',
-  'zu-viele': 'Gerade kamen viele Meldungen — bitte in ein paar Minuten noch einmal.',
+  'zu-viele': 'Gerade kamen viele Meldungen — bitte später noch einmal.',
+  'zu-viele-links': 'Bitte höchstens drei Links.',
+  'zu-gross': 'Bitte höchstens 2.000 Zeichen.',
 };
 
 export function FeedbackKnopf() {
@@ -36,9 +38,11 @@ export function FeedbackKnopf() {
   const [zustand, setZustand] = useState<'bereit' | 'sendet' | 'danke' | 'fehler'>('bereit');
   const [fehler, setFehler] = useState('');
   const feld = useRef<HTMLTextAreaElement>(null);
+  // Zeitpunkt des Öffnens: Die Schnittstelle weist Absendungen unter 1,5 s als Roboter ab.
+  const geoeffnet = useRef(0);
 
   useEffect(() => {
-    if (offen) feld.current?.focus();
+    if (offen) { feld.current?.focus(); geoeffnet.current = Date.now(); }
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOffen(false); };
     window.addEventListener('keydown', esc);
     return () => window.removeEventListener('keydown', esc);
@@ -54,7 +58,7 @@ export function FeedbackKnopf() {
       const r = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ art, text, mail, pfad, website }),
+        body: JSON.stringify({ art, text, mail, pfad, website, dauerMs: Date.now() - geoeffnet.current }),
       });
       if (r.ok) {
         setZustand('danke');
