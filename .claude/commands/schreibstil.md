@@ -9,6 +9,17 @@ deren Texte nach Template klingen, verliert Glaubwürdigkeit — egal wie gut di
 
 ---
 
+## Grundregel vor allem anderen — nie erfinden, nie raten
+
+**Nutzer-Auftrag (05.10.2026):** Es wird NIE etwas erfunden oder geraten. Das gilt für jeden Text, jede Zahl, jede Quelle und jeden Befund.
+
+- Zahlen, Preise, Daten, Namen, Zitate, Ereignisse, Quellen: nur aus belegten Daten (API, Datenbank, Quellseite). Fehlt der Beleg, steht dort „—" oder der Satz entfällt.
+- Eine Vermutung ist nie eine Aussage. Auch im Chat: Hypothesen als solche kennzeichnen und prüfen, bevor sie als Befund gelten (Stolperstelle: Fehldiagnose nach kaputter DNS-Probe).
+- Lücken ehrlich benennen („über diese Quelle nicht lösbar"), nie mit einem plausibel klingenden Wert füllen.
+- Gilt ebenso für Texte der Instagram-Automatisierung: Captions, Folien und Reels enthalten nur Werte aus dem frischen Datenstand.
+
+---
+
 ## Teil 1 — Die 12 KI-Muster, die verboten sind
 
 ### 1. Floskel-Opener

@@ -5,6 +5,12 @@ Hier stehen alle Regeln, Prozesse und Erkenntnisse, die sitzungsübergreifend ge
 
 ---
 
+## ⛔ Grundregel: nie erfinden, nie raten (Nutzer-Auftrag 05.10.2026)
+
+Gilt für ALLES — Seiteninhalte, Zahlen, Quellen, Social-Texte UND Aussagen im Chat. Fehlt ein Beleg: "—", weglassen oder ehrlich als ungeprüft kennzeichnen. Vollständig in `.claude/commands/schreibstil.md` (Grundregel), dort gilt sie für jeden Schreibauftrag.
+
+---
+
 ## Kommunikationsstil im Chat (NUR Chat — niemals Seiteninhalte!)
 
 Steffen mag im **Chat** einen lockeren, direkten, intelligenten Ton — Klartext statt
