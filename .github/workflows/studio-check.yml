@@ -1,0 +1,37 @@
+name: Studio-Check
+
+# Meldet sich mit dem Studio-Passwort aus den Repo-Secrets an und liest Monitoring,
+# Gesundheitsprüfung und Rückmeldungen aus. Das Cookie wird maskiert und nie ausgegeben.
+
+on:
+  workflow_dispatch:
+    inputs:
+      basis:
+        description: Basisadresse
+        default: https://cardbeacon.de
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Anmelden und lesen
+        env:
+          PW: ${{ secrets.STUDIO_PASSWORD }}
+          BASIS: ${{ inputs.basis }}
+        run: |
+          if [ -z "$PW" ]; then echo "STUDIO_PASSWORD fehlt in den Repo-Secrets"; exit 1; fi
+          jar=$(mktemp)
+          code=$(curl -s -o /dev/null -w '%{http_code}' -c "$jar" -X POST "$BASIS/api/studio-auth" \
+            -H 'content-type: application/json' -H "origin: $BASIS" \
+            --data "$(jq -n --arg p "$PW" '{password:$p}')")
+          echo "Anmeldung: HTTP $code"
+          [ "$code" = 200 ] || exit 1
+          awk '$6=="studio_session"{print $7}' "$jar" | while read -r v; do echo "::add-mask::$v"; done
+          echo "== Monitoring =="
+          curl -s -b "$jar" -m 60 "$BASIS/api/monitoring" | tee mon.json | jq -c 'keys' || head -c 2000 mon.json
+          echo "== health =="
+          jq -c '.health // empty' mon.json | head -c 9000
+          echo; echo "== Rückmeldungen =="
+          curl -s -b "$jar" -m 30 "$BASIS/api/feedback" | head -c 3000
+          echo; echo "== Gesundheitsprüfung (Stand) =="
+          curl -s -b "$jar" -m 60 "$BASIS/api/cron/gesundheit" -w '\nHTTP %{http_code}\n' | head -c 6000
