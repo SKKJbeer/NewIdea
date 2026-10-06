@@ -1,0 +1,33 @@
+# Erreichbarkeitsprobe von einem fremden Netz (GitHub-Runner): zählt Verbindungsabbrüche.
+name: Erreichbarkeit
+
+on:
+  workflow_dispatch:
+    inputs:
+      basis:
+        default: https://cardbeacon.de
+      runden:
+        default: '60'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Seiten abrufen und Fehler zählen
+        env:
+          BASIS: ${{ inputs.basis }}
+          RUNDEN: ${{ inputs.runden }}
+        run: |
+          pfade="/ /sets /artikel /marktbericht /trends /guides /suche?q=glurak /karten/sv3pt5-199 /karten/pop5-17 /karten/xy11-21 /karten/si1-3 /sitemap.xml"
+          gesamt=0; fehler=0; langsam=0
+          for i in $(seq 1 "$RUNDEN"); do
+            for p in $pfade; do
+              gesamt=$((gesamt+1))
+              r=$(curl -sS -o /dev/null -w '%{http_code} %{time_total}' -m 30 "$BASIS$p" 2>/tmp/err || true)
+              code=${r%% *}; t=${r#* }
+              if [ "$code" != "200" ]; then fehler=$((fehler+1)); echo "FEHLER $code $t $p $(head -c 120 /tmp/err)"; 
+              elif awk "BEGIN{exit !($t>3)}"; then langsam=$((langsam+1)); echo "langsam $t $p"; fi
+            done
+          done
+          echo "Ergebnis: $gesamt Abrufe, $fehler Fehler, $langsam langsamer als 3 s"
+          echo "## Erreichbarkeit: $gesamt Abrufe, $fehler Fehler, $langsam > 3 s" >> "$GITHUB_STEP_SUMMARY"
