@@ -1,0 +1,147 @@
+# Richtet den dauerhaften Instagram-Zugang ein und trägt ihn in Vercel ein.
+#
+# Start: GitHub → Actions → „Instagram-Zugang einrichten" → Run workflow.
+# Braucht die Repository-Secrets META_APP_ID, META_APP_SECRET, META_KURZ_TOKEN
+# (Token aus dem Graph-API-Explorer, gilt nur eine Stunde) und VERCEL_TOKEN.
+#
+# Ablauf (dieselben Meta-Aufrufe wie der Einrichtungshelfer im Studio):
+#   1. Kurzlebigen Nutzer-Token in einen langlebigen tauschen
+#   2. Facebook-Seiten des Nutzers lesen; die Seite mit verbundenem Instagram-Business-Konto wählen
+#   3. Ablauf des Seiten-Tokens prüfen (muss unbefristet sein, sonst Abbruch)
+#   4. INSTAGRAM_ACCESS_TOKEN + INSTAGRAM_BUSINESS_ACCOUNT_ID in Vercel (Production) setzen
+# Tokens werden maskiert und nie ausgegeben. Wirksam ab dem nächsten Deployment.
+name: Instagram-Zugang einrichten
+
+on:
+  workflow_dispatch:
+    inputs:
+      seite:
+        description: Name der Facebook-Seite (nur nötig, wenn mehrere ein Instagram-Konto haben)
+        default: ''
+        required: false
+      projekt_host:
+        description: Vercel-Adresse des Projekts
+        default: new-idea-livid.vercel.app
+        required: true
+      team:
+        description: Team-Slug bei Vercel, leer = automatisch
+        default: ''
+        required: false
+      graph_version:
+        description: Graph-API-Version
+        default: v23.0
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  einrichten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Token tauschen und in Vercel eintragen
+        env:
+          APP_ID: ${{ secrets.META_APP_ID }}
+          APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          KURZ: ${{ secrets.META_KURZ_TOKEN }}
+          VT: ${{ secrets.VERCEL_TOKEN }}
+          SEITE: ${{ inputs.seite }}
+          ALT: ${{ inputs.projekt_host }}
+          TEAM_SLUG: ${{ inputs.team }}
+          GV: ${{ inputs.graph_version }}
+        run: |
+          set -euo pipefail
+          for v in APP_ID APP_SECRET KURZ VT; do
+            [ -n "${!v}" ] || { echo "::error::Secret für ${v} fehlt (META_APP_ID, META_APP_SECRET, META_KURZ_TOKEN, VERCEL_TOKEN)."; exit 1; }
+          done
+          echo "::add-mask::${APP_SECRET}"
+          echo "::add-mask::${KURZ}"
+          G="https://graph.facebook.com/${GV}"
+          graph() { curl -sS --max-time 30 -G "$@"; }
+
+          # 1. Langlebiger Nutzer-Token
+          r=$(graph "$G/oauth/access_token" \
+            --data-urlencode grant_type=fb_exchange_token \
+            --data-urlencode "client_id=${APP_ID}" \
+            --data-urlencode "client_secret=${APP_SECRET}" \
+            --data-urlencode "fb_exchange_token=${KURZ}")
+          LANG_TOKEN=$(echo "$r" | jq -r '.access_token // empty')
+          [ -n "$LANG_TOKEN" ] || { echo "::error::Token-Tausch fehlgeschlagen: $(echo "$r" | jq -r '.error.message // "unbekannt"') (Kurz-Token abgelaufen? Er gilt nur eine Stunde.)"; exit 1; }
+          echo "::add-mask::${LANG_TOKEN}"
+          echo "Langlebiger Nutzer-Token erhalten."
+
+          # 2. Seiten + Instagram-Konten
+          r=$(graph "$G/me/accounts" \
+            --data-urlencode "fields=id,name,access_token,instagram_business_account{id,username}" \
+            --data-urlencode "access_token=${LANG_TOKEN}")
+          echo "$r" | jq -e '.data' >/dev/null || { echo "::error::Seiten nicht lesbar: $(echo "$r" | jq -r '.error.message // "unbekannt"')"; exit 1; }
+          echo "Gefundene Seiten:"
+          echo "$r" | jq -r '.data[] | "- \(.name) (\(.id)) → Instagram: \(.instagram_business_account.username // "NICHT verbunden")"'
+          AUSWAHL=$(echo "$r" | jq -c --arg s "$SEITE" '[.data[] | select(.instagram_business_account.id != null) | select($s == "" or .name == $s)]')
+          N=$(echo "$AUSWAHL" | jq 'length')
+          if [ "$N" = "0" ]; then
+            echo "::error::Keine Facebook-Seite mit verbundenem Instagram-Business-Konto gefunden. Konto auf Business umstellen, mit der Seite verbinden, Token neu erzeugen und die Seite im Dialog auswählen."
+            exit 1
+          fi
+          if [ "$N" != "1" ]; then
+            echo "::error::${N} Seiten mit Instagram-Konto — bitte den Seitennamen im Feld 'seite' angeben."
+            exit 1
+          fi
+          SEITEN_TOKEN=$(echo "$AUSWAHL" | jq -r '.[0].access_token')
+          IG_ID=$(echo "$AUSWAHL" | jq -r '.[0].instagram_business_account.id')
+          IG_NAME=$(echo "$AUSWAHL" | jq -r '.[0].instagram_business_account.username // "?"')
+          echo "::add-mask::${SEITEN_TOKEN}"
+          echo "Gewählt: Seite '$(echo "$AUSWAHL" | jq -r '.[0].name')' → @${IG_NAME} (${IG_ID})"
+
+          # 3. Ablauf prüfen statt behaupten
+          d=$(graph "$G/debug_token" \
+            --data-urlencode "input_token=${SEITEN_TOKEN}" \
+            --data-urlencode "access_token=${APP_ID}|${APP_SECRET}")
+          VALID=$(echo "$d" | jq -r '.data.is_valid // false')
+          EXP=$(echo "$d" | jq -r '.data.expires_at // "?"')
+          echo "Seiten-Token gültig: ${VALID}, expires_at: ${EXP} (0 = unbefristet)"
+          [ "$VALID" = "true" ] || { echo "::error::Seiten-Token ungültig."; exit 1; }
+          [ "$EXP" = "0" ] || { echo "::error::Seiten-Token ist befristet (expires_at=${EXP}). Autopilot würde später still stehen — Token über Facebook-Login mit langlebigem Nutzer-Token neu erzeugen."; exit 1; }
+          echo "$d" | jq -r '"Berechtigungen: " + ((.data.scopes // []) | join(", "))'
+
+          # 4. Vercel-Projekt finden und Variablen setzen
+          B=https://api.vercel.com
+          api() { curl -sS --max-time 30 -H "Authorization: Bearer ${VT}" -H "Content-Type: application/json" "$@"; }
+          TEAMS=$(api "$B/v2/teams" | jq -r '.teams[]? | .id')
+          STANDARD=$(api "$B/v2/user" | jq -r '.user.defaultTeamId // empty')
+          if [ -n "${TEAM_SLUG}" ]; then
+            ANGABE=$(api "$B/v2/teams/${TEAM_SLUG}?slug=${TEAM_SLUG}" | jq -r '.id // empty')
+            STANDARD=$(printf '%s\n%s' "${ANGABE}" "${STANDARD}")
+          fi
+          PROJEKT=""; TEAM=""
+          while IFS= read -r t; do
+            q=""; [ -n "$t" ] && q="?teamId=$t"
+            id=$(api "$B/v4/aliases/${ALT}${q}" | jq -r '.projectId // empty')
+            if [ -n "$id" ]; then PROJEKT=$id; TEAM=$t; break; fi
+          done <<< "$(printf '%s\n\n%s' "$STANDARD" "$TEAMS")"
+          [ -n "$PROJEKT" ] || { echo "::error::Kein Vercel-Projekt zu ${ALT} gefunden — Token-Bereich (Team) prüfen."; exit 1; }
+          Q=""; [ -n "$TEAM" ] && Q="?teamId=$TEAM"
+          echo "Vercel-Projekt: $(api "$B/v9/projects/${PROJEKT}${Q}" | jq -r '.name')"
+
+          setze() {  # key wert typ
+            local vorhanden body
+            vorhanden=$(api "$B/v9/projects/${PROJEKT}/env${Q}" | jq -r --arg k "$1" '.envs[]? | select(.key==$k) | .id' | head -1)
+            body=$(jq -n --arg k "$1" --arg v "$2" --arg t "$3" '{key:$k,value:$v,type:$t,target:["production"]}')
+            if [ -n "$vorhanden" ]; then
+              api -X PATCH "$B/v9/projects/${PROJEKT}/env/${vorhanden}${Q}" --data "$(echo "$body" | jq 'del(.key)')" | jq -e '.key' >/dev/null \
+                || { echo "::error::$1 konnte nicht aktualisiert werden."; exit 1; }
+              echo "$1 aktualisiert."
+            else
+              api -X POST "$B/v10/projects/${PROJEKT}/env${Q}" --data "$body" | jq -e '.created // .key' >/dev/null \
+                || { echo "::error::$1 konnte nicht angelegt werden."; exit 1; }
+              echo "$1 angelegt."
+            fi
+          }
+          setze INSTAGRAM_ACCESS_TOKEN "${SEITEN_TOKEN}" encrypted
+          setze INSTAGRAM_BUSINESS_ACCOUNT_ID "${IG_ID}" plain
+          {
+            echo "## Instagram-Zugang"
+            echo "- Konto: @${IG_NAME} (${IG_ID})"
+            echo "- Seiten-Token unbefristet, in Vercel gesetzt (Production)"
+            echo "- Wirksam ab dem nächsten Deployment (Push auf main)"
+          } >> "$GITHUB_STEP_SUMMARY"
