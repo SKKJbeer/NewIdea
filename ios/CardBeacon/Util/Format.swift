@@ -9,6 +9,7 @@ enum Format {
         f.locale = Locale(identifier: "de_DE")
         f.numberStyle = .currency
         f.currencyCode = "EUR"
+        f.roundingMode = .halfUp
         return f
     }()
 
@@ -18,6 +19,8 @@ enum Format {
         f.numberStyle = .decimal
         f.minimumFractionDigits = 1
         f.maximumFractionDigits = 1
+        // Halb aufwärts wie Intl auf der Website (4,25 → 4,3), nicht kaufmännisch-gerade.
+        f.roundingMode = .halfUp
         return f
     }()
 
