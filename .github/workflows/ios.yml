@@ -1,4 +1,4 @@
-# iOS-App: Build + Tests bei jeder Änderung unter ios/, TestFlight per Knopfdruck.
+# iOS-App: Build + Tests bei jeder Änderung unter ios/ auf main, danach TestFlight.
 #
 # Build/Test brauchen KEINE Geheimnisse (Simulator, ohne Signatur).
 # TestFlight läuft automatisch bei jeder iOS-Änderung auf main (sobald die Secrets da sind)
@@ -19,6 +19,37 @@ on:
   workflow_dispatch:
     inputs:
       testflight:
+        description: Build zu TestFlight hochladen
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+      - name: Projekt erzeugen
+        working-directory: ios
+        run: xcodegen generate
+      - name: Bauen und testen (Simulator)
+        working-directory: ios
+        run: |
+          set -o pipefail
+          SIM=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.name | test("^iPhone"))][0].udid')
+          echo "Simulator: $SIM"
+          xcodebuild test -project CardBeacon.xcodeproj -scheme CardBeacon \
+            -destination "id=$SIM" CODE_SIGNING_ALLOWED=NO | tail -80
+
+  testflight:
     # Läuft automatisch bei jeder iOS-Änderung auf main — und per Knopfdruck.
     # Fehlen die Apple-Secrets, wird übersprungen (Hinweis statt roter Lauf).
     needs: build
