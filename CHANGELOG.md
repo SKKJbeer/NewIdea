@@ -7,10 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
-## [6.21.1] - 6. Oktober 2026 · Sitemaps schnell
+## [6.21.2] - 6. Oktober 2026 · Sitemap-Zwischenspeicher wirksam
 
 ### Behoben
-- **Sitemap-Abruf:** `/sitemap.xml` brauchte bei jedem Abruf 3–18 s (Messung aus fremdem Netz, 720 Abrufe), die Karten-Teile 1–2 s, weil sie jedes Mal neu berechnet wurden. Das CDN hält sie jetzt 15 Minuten vor (danach bis zu eine Stunde veraltet ausgeliefert, während neu erzeugt wird)
+- **Sitemap-Abruf:** `/sitemap.xml` brauchte bei jedem Abruf 3–18 s (Messung aus fremdem Netz, 720 Abrufe), die Karten-Teile 1–2,5 s, weil sie jedes Mal neu berechnet wurden. Das Ergebnis liegt jetzt 15 Minuten im geteilten Datenspeicher; ein Fehler bei der Datenabfrage wird nicht abgelegt
+
+---
+
+## [6.21.1] - 6. Oktober 2026 · Sitemaps schnell
+
+### Geändert
+- Versuch, die Sitemaps über Cache-Kopfzeilen im CDN zu halten. Wirkungslos: Next setzt für diese Routen selbst `max-age=0` (nachgemessen). Korrigiert in 6.21.2
 
 ---
 

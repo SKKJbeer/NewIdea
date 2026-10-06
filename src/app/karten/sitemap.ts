@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { unstable_cache } from 'next/cache';
 import { siteUrlOrLocal } from '@/lib/site';
 import { kartenAnzahl, kartenTeil, teileFuer } from '@/lib/sitemap-karten';
 
@@ -19,10 +20,14 @@ export async function generateSitemaps() {
   return Array.from({ length: teile }, (_, id) => ({ id }));
 }
 
+// 15 Minuten im geteilten Datenspeicher (v6.21.2): 1–2,5 s je Teil, bei jedem
+// Abruf neu. `kartenTeil` wirft bei Datenbankfehlern — ein Wurf wird nicht abgelegt.
+const teilGespeichert = unstable_cache((teil: number) => kartenTeil(teil), ['sitemap-karten-teil-v1'], { revalidate: 900 });
+
 export default async function sitemap({ id }: { id: Promise<string> }): Promise<MetadataRoute.Sitemap> {
   const teil = Number(await id);
   const basis = siteUrlOrLocal();
-  const karten = await kartenTeil(Number.isFinite(teil) && teil >= 0 ? teil : 0);
+  const karten = await teilGespeichert(Number.isFinite(teil) && teil >= 0 ? teil : 0);
   return karten.map((k) => ({
     url: `${basis}/karten/${encodeURIComponent(k.id)}`,
     lastModified: k.updated_at ? new Date(k.updated_at) : undefined,

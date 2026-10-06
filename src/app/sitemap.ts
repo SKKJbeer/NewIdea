@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { unstable_cache } from 'next/cache';
 import { GUIDES } from '@/lib/guides';
 import { getArticleType } from '@/lib/article-generator';
 import { listSavedArticleMeta } from '@/lib/article-storage';
@@ -34,7 +35,7 @@ function recentPublishDates(count = 26): string[] {
 // ein Wert, der immer „jetzt" sagt, wird ignoriert, und damit auch der echte
 // Hinweis auf einen neuen Artikel. Jetzt: das Datum, an dem sich der Inhalt
 // wirklich geändert hat — oder gar keins, wenn es unbekannt ist.
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+async function bauen(): Promise<MetadataRoute.Sitemap> {
   // Seiten mit Marktdaten ändern sich mit dem täglichen Preisdurchlauf.
   const durchlauf = await leseDurchlaufStand().catch(() => null);
   const preisStand = durchlauf?.fertig ? new Date(durchlauf.aktualisiert) : undefined;
@@ -96,4 +97,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // bisher 40. Siehe `src/lib/sitemap-karten.ts`.
 
   return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages];
+}
+
+// ZWISCHENSPEICHER (v6.21.2). Die Sitemap bleibt `force-dynamic`, rechnete aber
+// bei JEDEM Abruf sieben Datenbankabfragen neu: 3–18 s, gemessen aus fremdem
+// Netz (720 Abrufe, 06.10.2026). Cache-Control-Kopfzeilen aus der
+// next.config.ts blieben wirkungslos — Next setzt sie für diese Route selbst
+// (`max-age=0, must-revalidate`, v6.21.1 gemessen). Wirksam ist nur der geteilte
+// Datenspeicher: instanzübergreifend, 15 Minuten. Ein Wurf wird nicht abgelegt.
+const gespeichert = unstable_cache(bauen, ['sitemap-haupt-v1'], { revalidate: 900 });
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return gespeichert();
 }

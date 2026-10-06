@@ -10,12 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
-    version: '6.21.1',
+    version: '6.21.2',
     date: '6. Oktober 2026',
-    label: 'Sitemaps schnell',
+    label: 'Sitemap-Zwischenspeicher wirksam',
     isLatest: true,
     changes: [
-      { type: 'fixed', text: 'Sitemap-Abruf: /sitemap.xml brauchte 3–18 s, weil sie bei jedem Abruf neu berechnet wurde — jetzt 15 Minuten im CDN' },
+      { type: 'fixed', text: 'Sitemap-Abruf: /sitemap.xml brauchte 3–18 s, weil sie bei jedem Abruf neu berechnet wurde — das Ergebnis liegt jetzt 15 Minuten im geteilten Datenspeicher' },
+    ],
+  },
+  {
+    version: '6.21.1',
+    date: '6. Oktober 2026',
+    label: 'Sitemaps: Cache-Kopfzeilen (wirkungslos)',
+    isLatest: false,
+    changes: [
+      { type: 'changed', text: 'Versuch, die Sitemaps über Cache-Kopfzeilen zu beschleunigen — von Next überschrieben, in 6.21.2 durch einen wirksamen Zwischenspeicher ersetzt' },
     ],
   },
   {
