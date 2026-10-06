@@ -74,6 +74,9 @@ describe('App-API v1: Routen', () => {
   const dateien: string[] = [];
   const lauf = (d: string) => { for (const n of readdirSync(d)) { const p = join(d, n); statSync(p).isDirectory() ? lauf(p) : n === 'route.ts' && dateien.push(p); } };
   lauf(wurzel);
+  it('Markt filtert dünn gehandelte Ausreißer wie Website und Instagram', () => {
+    expect(readFileSync(join(wurzel, 'markt/route.ts'), 'utf8')).toMatch(/ohneDuenneAusreisser\(/);
+  });
   it('fünf Routen vorhanden', () => expect(dateien.length).toBe(5));
   it('nur lesend, ohne Fehlerdetails, mit Cache-Kopfzeile', () => {
     for (const f of dateien) {

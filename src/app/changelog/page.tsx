@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.22.1',
+    date: '6. Oktober 2026',
+    label: 'App-Markt ohne Ausreißer',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'App-Schnittstelle Markt: dünn gehandelte Klassiker über 100 % zählen nicht mehr als Bewegung — gleiche Regel wie Website und Instagram' },
+    ],
+  },
+  {
     version: '6.22.0',
     date: '6. Oktober 2026',
     label: 'Grundlage für die iOS-App',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'App-Schnittstelle /api/v1: Markt, Suche, Kartendetail mit echten Tageswerten, Sets, Status — jeder Preis mit Quellstand' },
       { type: 'new', text: 'iOS-App (SwiftUI): Markt, Suche, Kartendetail mit Preisverlauf, Merkliste auf dem Gerät' },

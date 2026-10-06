@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.22.1] - 6. Oktober 2026 · App-Markt ohne Ausreißer
+
+### Behoben
+- **App-Schnittstelle Markt:** Unter „Aufwärts" stand ein dünn gehandelter Klassiker mit +357 % (Einzelverkauf). Es gilt jetzt dieselbe Regel wie auf der Website und bei Instagram: ältere Karten über 100 % zählen nicht als Marktbewegung
+
+---
+
 ## [6.22.0] - 6. Oktober 2026 · Grundlage für die iOS-App
 
 ### Neu
