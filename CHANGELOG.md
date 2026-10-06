@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.22.0] - 6. Oktober 2026 · Grundlage für die iOS-App
+
+### Neu
+- **App-Schnittstelle `/api/v1`** (nur lesend): Markt (CardBeacon Index, Aufwärts/Abwärts), Suche, Kartendetail mit Cardmarket-Aufschlüsselung und echten Tageswerten, Set-Karten, Status. Jeder Preis trägt seinen Quellstand und ob er frisch ist
+- **iOS-App (SwiftUI)** im Repository unter `ios/`: Markt, Suche, Kartendetail mit Preisverlauf, Merkliste auf dem Gerät, Hinweise und Datenschutz — automatischer Build und Tests bei jeder Änderung
+
+---
+
 ## [6.21.2] - 6. Oktober 2026 · Sitemap-Zwischenspeicher wirksam
 
 ### Behoben

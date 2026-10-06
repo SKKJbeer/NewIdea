@@ -1023,6 +1023,15 @@ Verkehr in der Reichweitenmessung unter „ohne Verweis".
 Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudflare.yml`, Secrets `CLOUDFLARE_DOMAIN_TOKEN`/`CLOUDFLARE_ACCOUNT_ID`, aus PulseMeter übertragen), Nameserver bei netcup auf rita/rudy.ns.cloudflare.com, `A @ → 76.76.21.21`, `CNAME www → cname.vercel-dns.com` (DNS only). Seit v6.19.0 LIVE: Domain + www (308) im Vercel-Projekt (Workflow `.github/workflows/domain-vercel.yml`, Secret `VERCEL_TOKEN` — muss auf das TEAM gescoped sein, in dem das Projekt liegt; ein Token mit falschem Scope sieht null Projekte ohne Fehlermeldung), Let's-Encrypt-Zertifikat, `NEXT_PUBLIC_SITE_URL=https://cardbeacon.de`. Offen: Google Search Console (`GOOGLE_SITE_VERIFICATION`).
 **Umleitung:** `next.config.ts` → `redirects()` greift NUR, wenn `domainZiel(NEXT_PUBLIC_SITE_URL)` eine eigene Domain liefert; `/api/*` ausgenommen. Nie an „Domain existiert" koppeln — eine Umleitung auf eine nicht ausgelieferte Domain legt die Seite lahm. **Achtung DNS-Prüfung aus der Sandbox:** direkte UDP/TCP-Abfragen an Nameserver liefern hier für JEDE Domain Fehler — nur DoH (`cloudflare-dns.com/dns-query`, `dns.google/resolve`) taugt.
 
+## iOS-App — seit v6.22.0
+
+**Nutzer-Auftrag (06.10.2026):** CardBeacon als iOS-App, professionell. Vollständige Architektur: `docs/ios-app.md`.
+- Native SwiftUI (`ios/`, XcodeGen `ios/project.yml`, keine `.xcodeproj` im Repo), iOS 17, Bundle-ID `de.cardbeacon.app`.
+- Daten NUR über `/api/v1` (`src/lib/app-api.ts`): Felder nur ergänzen, nie umbenennen — installierte Apps lassen sich nicht zurückrollen. Formatbruch → `MIN_APP_BUILD` erhöhen. Jeder Preis mit `preisStand` + `frisch`.
+- CI: Workflow `iOS` baut + testet bei jeder Änderung unter `ios/` (macOS-Runner, ohne Signatur); TestFlight per `workflow_dispatch` mit `testflight: true`, Secrets `APPLE_TEAM_ID`, `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_KEY_P8` (Admin-Rolle).
+- Swift kann in der Sandbox NICHT übersetzt werden — Kompilierfehler nur über den CI-Lauf (`get_job_logs`) prüfen.
+- „Pokémon" nicht im App-Namen (Review 5.2.1); Hinweise „Inoffizielle Fan-App", „Keine Anlageberatung" bleiben in der App.
+
 ## Feedback-Knopf — seit v6.17.0
 
 **Nutzer-Auftrag (03.10.2026):** „dass ich auch mal feedback bekomme".

@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.22.0',
+    date: '6. Oktober 2026',
+    label: 'Grundlage für die iOS-App',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'App-Schnittstelle /api/v1: Markt, Suche, Kartendetail mit echten Tageswerten, Sets, Status — jeder Preis mit Quellstand' },
+      { type: 'new', text: 'iOS-App (SwiftUI): Markt, Suche, Kartendetail mit Preisverlauf, Merkliste auf dem Gerät' },
+    ],
+  },
+  {
     version: '6.21.2',
     date: '6. Oktober 2026',
     label: 'Sitemap-Zwischenspeicher wirksam',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Sitemap-Abruf: /sitemap.xml brauchte 3–18 s, weil sie bei jedem Abruf neu berechnet wurde — das Ergebnis liegt jetzt 15 Minuten im geteilten Datenspeicher' },
     ],
