@@ -29,7 +29,9 @@ jobs:
           awk '$6=="studio_session"{print $7}' "$jar" | while read -r v; do echo "::add-mask::$v"; done
           echo "== Monitoring =="
           curl -s -b "$jar" -m 60 "$BASIS/api/monitoring" | tee mon.json | jq -c 'keys' || head -c 2000 mon.json
-          echo "== health =="
+          echo "== aufrufe =="
+          jq -c '.aufrufe // empty' mon.json | head -c 6000
+          echo; echo "== health =="
           jq -c '.health // empty' mon.json | head -c 9000
           echo; echo "== Rückmeldungen =="
           curl -s -b "$jar" -m 30 "$BASIS/api/feedback" | head -c 3000
