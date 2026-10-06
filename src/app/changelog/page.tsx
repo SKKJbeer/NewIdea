@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.21.1',
+    date: '6. Oktober 2026',
+    label: 'Sitemaps schnell',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Sitemap-Abruf: /sitemap.xml brauchte 3–18 s, weil sie bei jedem Abruf neu berechnet wurde — jetzt 15 Minuten im CDN' },
+    ],
+  },
+  {
     version: '6.21.0',
     date: '4. Oktober 2026',
     label: 'Offene Schreibwege abgesichert',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Feedback, Seitenzähler, Newsletter und Portfolio-Preise: nur JSON, harte Größengrenze, keine Anfragen fremder Webseiten' },
       { type: 'fixed', text: 'Feedback: Tagesgrenze über alle Server, Roboter-Erkennung, Link-Grenze, Zeichen-Säuberung' },

@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.21.0` · **Stand:** 4. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.21.1` · **Stand:** 6. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.21.1 | Sitemaps: `Cache-Control: s-maxage=900, stale-while-revalidate=3600` für `/sitemap.xml` und `/karten/sitemap/*` (vorher 3–18 s je Abruf) |
 | v6.21.0 | Security offene Schreibwege: `annahme-schutz.ts` (`herkunftErlaubt`, `leseJsonBegrenzt`, `tagesKontingentFrei`, `instanzTagesgrenze`, `textSaeubern`) in Feedback/Zähler/Newsletter/Portfolio-Preise; Feedback 100/Tag global, Bot-Zeit, ≤ 3 Links; Newsletter ehrlich 503 ohne Beehiiv |
 | v6.20.0 | Bilder: eigener Loader (`bild-loader.ts`) → `/api/img` mit sharp-Verkleinerung, CDN-Jahresreserve, TCGdex-Ersatz (`bild-ersatz.ts`), `ErsatzBild` im Browser; Anlass: Vercel 402 (Bildoptimierungs-Kontingent verbraucht) |
 | v6.19.1 | `sollSichern()`: kurze Set-Liste überschreibt die Sicherung nicht mehr (Sitemap hatte 24 statt ~176 Sets); IndexNow-Vollmeldung über `ladeSetListe(250)` |

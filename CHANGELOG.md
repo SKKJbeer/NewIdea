@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.21.1] - 6. Oktober 2026 · Sitemaps schnell
+
+### Behoben
+- **Sitemap-Abruf:** `/sitemap.xml` brauchte bei jedem Abruf 3–18 s (Messung aus fremdem Netz, 720 Abrufe), die Karten-Teile 1–2 s, weil sie jedes Mal neu berechnet wurden. Das CDN hält sie jetzt 15 Minuten vor (danach bis zu eine Stunde veraltet ausgeliefert, während neu erzeugt wird)
+
+---
+
 ## [6.21.0] - 4. Oktober 2026 · Offene Schreibwege abgesichert
 
 ### Behoben

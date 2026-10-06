@@ -86,7 +86,23 @@ const nextConfig: NextConfig = {
     loaderFile: './src/lib/bild-loader.ts',
   },
   async headers() {
-    return [{ source: '/:path*', headers: SECURITY_HEADERS }];
+    return [
+      { source: '/:path*', headers: SECURITY_HEADERS },
+      // SITEMAPS IM CDN HALTEN (v6.21.1). Sie sind `force-dynamic` (ein beim
+      // Build eingebackener Leerstand bliebe sonst bis zum nächsten Deploy
+      // stehen) und wurden deshalb bei JEDEM Abruf neu berechnet: gemessen aus
+      // fremdem Netz 3–18 s für /sitemap.xml, 1–2 s je Karten-Teil. Kurze
+      // Frist, damit ein Aussetzer nicht lange nachwirkt; Fehlerantworten
+      // (HTTP 5xx) legt das CDN nicht ab.
+      {
+        source: '/sitemap.xml',
+        headers: [{ key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=3600' }],
+      },
+      {
+        source: '/karten/sitemap/:datei',
+        headers: [{ key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=3600' }],
+      },
+    ];
   },
   async redirects() {
     const ziel = domainZiel(process.env.NEXT_PUBLIC_SITE_URL);
