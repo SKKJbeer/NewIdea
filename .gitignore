@@ -41,3 +41,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# iOS (Projekt wird aus ios/project.yml erzeugt)
+ios/*.xcodeproj/
+ios/build/
+ios/DerivedData/

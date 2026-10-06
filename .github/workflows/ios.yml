@@ -1,0 +1,89 @@
+# iOS-App: Build + Tests bei jeder Änderung unter ios/, TestFlight per Knopfdruck.
+#
+# Build/Test brauchen KEINE Geheimnisse (Simulator, ohne Signatur).
+# TestFlight braucht die Repository-Secrets:
+#   APPLE_TEAM_ID                 Team-ID (10 Zeichen)
+#   APP_STORE_CONNECT_KEY_ID      Schlüssel-ID des App-Store-Connect-API-Schlüssels
+#   APP_STORE_CONNECT_ISSUER_ID   Issuer-ID
+#   APP_STORE_CONNECT_KEY_P8      Inhalt der .p8-Datei (Rolle: Admin — nötig für Cloud-Signatur)
+# Die App muss einmal in App Store Connect angelegt sein (Bundle-ID de.cardbeacon.app) —
+# das Anlegen eines App-Eintrags erlaubt Apple nicht über die Schnittstelle.
+name: iOS
+
+on:
+  push:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+    inputs:
+      testflight:
+        description: Build zu TestFlight hochladen
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+      - name: Projekt erzeugen
+        working-directory: ios
+        run: xcodegen generate
+      - name: Bauen und testen (Simulator)
+        working-directory: ios
+        run: |
+          set -o pipefail
+          SIM=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.name | test("^iPhone"))][0].udid')
+          echo "Simulator: $SIM"
+          xcodebuild test -project CardBeacon.xcodeproj -scheme CardBeacon \
+            -destination "id=$SIM" CODE_SIGNING_ALLOWED=NO | tail -80
+
+  testflight:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.testflight
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secrets prüfen
+        env:
+          T: ${{ secrets.APPLE_TEAM_ID }}
+          K: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          I: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          P: ${{ secrets.APP_STORE_CONNECT_KEY_P8 }}
+        run: |
+          for v in T K I P; do [ -n "${!v}" ] || { echo "::error::Apple-Secrets fehlen (APPLE_TEAM_ID, APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_P8)."; exit 1; }; done
+      - name: Werkzeuge
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+      - name: Archivieren und hochladen
+        working-directory: ios
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          KEY_P8: ${{ secrets.APP_STORE_CONNECT_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          KEY="$RUNNER_TEMP/AuthKey_${KEY_ID}.p8"
+          printf '%s' "$KEY_P8" > "$KEY"
+          # Build-Nummer = Lauf-Nummer: jede Hochladung braucht eine neue, steigende Zahl.
+          BUILD=$((GITHUB_RUN_NUMBER + 100))
+          xcodegen generate
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER")
+          xcodebuild archive -project CardBeacon.xcodeproj -scheme CardBeacon -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/CardBeacon.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CURRENT_PROJECT_VERSION="$BUILD" "${AUTH[@]}" | tail -40
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/CardBeacon.xcarchive" \
+            -exportOptionsPlist ExportOptions.plist -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}" | tail -40
+          rm -f "$KEY"
+          echo "## TestFlight: Build $BUILD hochgeladen" >> "$GITHUB_STEP_SUMMARY"
