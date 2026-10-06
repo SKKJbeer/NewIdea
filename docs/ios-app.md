@@ -42,6 +42,10 @@ Datenformen und Regeln: `src/lib/app-api.ts`, Tests: `src/__tests__/app-api.test
 2. **Vier Repository-Secrets** in `SKKJbeer/NewIdea`: `APPLE_TEAM_ID`, `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_KEY_P8` (Schlüssel mit Rolle **Admin**, sonst scheitert die Cloud-Signatur). Dieselben Werte wie in den anderen App-Projekten — Übertragung wie bei den Cloudflare-Secrets.
 3. Für die Prüfung: Datenschutz-Angaben in App Store Connect („Keine Daten erfasst"), Altersfreigabe, Screenshots (6,9"), Support-URL `https://cardbeacon.de/impressum`, Datenschutz-URL `https://cardbeacon.de/datenschutz`.
 
+## Website und App parallel
+
+Beide laufen unabhängig nebeneinander aus EINEM Backend: Die Website bleibt unverändert auf Vercel, die App liest dieselben Daten über `/api/v1`. Ein Website-Deploy ändert nichts an installierten Apps (stabiles Format), ein App-Build ändert nichts an der Website (eigener Workflow, nur bei Änderungen unter `ios/`).
+
 ## Prüfungsrisiken (App Review) und Gegenmaßnahmen
 
 | Risiko | Gegenmaßnahme |
@@ -56,7 +60,7 @@ Datenformen und Regeln: `src/lib/app-api.ts`, Tests: `src/__tests__/app-api.test
 | Phase | Inhalt | Stand |
 |---|---|---|
 | 0 | API v1, SwiftUI-App, CI-Build + Tests auf dem Simulator | erledigt (v6.22.0) |
-| 1 | Secrets + App-Eintrag → erster TestFlight-Build (`iOS` → Run workflow → testflight) | wartet auf Nutzer |
+| 1 | Secrets + App-Eintrag → TestFlight. Danach automatisch: jede iOS-Änderung auf main baut, registriert die Bundle-ID (API) und lädt einen neuen Build zu TestFlight | wartet auf Secrets + App-Eintrag |
 | 2 | Store-Eintrag (Screenshots, Texte), Einreichung zur Prüfung | danach |
 | 3 | Preisalarme per Push (APNs) für gemerkte Karten — braucht Geräte-Token-Ablage und einen Cron | geplant |
 | 4 | Portfolio in der App (Abgleich mit dem Konto-Portfolio der Seite) | geplant |

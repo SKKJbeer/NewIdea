@@ -1,7 +1,8 @@
 # iOS-App: Build + Tests bei jeder Änderung unter ios/, TestFlight per Knopfdruck.
 #
 # Build/Test brauchen KEINE Geheimnisse (Simulator, ohne Signatur).
-# TestFlight braucht die Repository-Secrets:
+# TestFlight läuft automatisch bei jeder iOS-Änderung auf main (sobald die Secrets da sind)
+# und per Knopfdruck. Benötigte Repository-Secrets:
 #   APPLE_TEAM_ID                 Team-ID (10 Zeichen)
 #   APP_STORE_CONNECT_KEY_ID      Schlüssel-ID des App-Store-Connect-API-Schlüssels
 #   APP_STORE_CONNECT_ISSUER_ID   Issuer-ID
@@ -12,60 +13,70 @@ name: iOS
 
 on:
   push:
+    # Nur main: Feature-Branch und main werden immer gemeinsam gepusht — sonst liefe alles doppelt.
+    branches: [main]
     paths: ['ios/**', '.github/workflows/ios.yml']
   workflow_dispatch:
     inputs:
       testflight:
-        description: Build zu TestFlight hochladen
-        type: boolean
-        default: false
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    runs-on: macos-15
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-      - name: Werkzeuge
-        run: |
-          brew install xcodegen
-          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
-          xcodebuild -version
-      - name: Projekt erzeugen
-        working-directory: ios
-        run: xcodegen generate
-      - name: Bauen und testen (Simulator)
-        working-directory: ios
-        run: |
-          set -o pipefail
-          SIM=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.name | test("^iPhone"))][0].udid')
-          echo "Simulator: $SIM"
-          xcodebuild test -project CardBeacon.xcodeproj -scheme CardBeacon \
-            -destination "id=$SIM" CODE_SIGNING_ALLOWED=NO | tail -80
-
-  testflight:
+    # Läuft automatisch bei jeder iOS-Änderung auf main — und per Knopfdruck.
+    # Fehlen die Apple-Secrets, wird übersprungen (Hinweis statt roter Lauf).
     needs: build
-    if: github.event_name == 'workflow_dispatch' && inputs.testflight
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.testflight)
     runs-on: macos-15
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - name: Secrets prüfen
+        id: geheim
         env:
           T: ${{ secrets.APPLE_TEAM_ID }}
           K: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           I: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           P: ${{ secrets.APP_STORE_CONNECT_KEY_P8 }}
         run: |
-          for v in T K I P; do [ -n "${!v}" ] || { echo "::error::Apple-Secrets fehlen (APPLE_TEAM_ID, APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_P8)."; exit 1; }; done
+          for v in T K I P; do
+            if [ -z "${!v}" ]; then
+              echo "::notice::TestFlight übersprungen — Apple-Secrets fehlen (APPLE_TEAM_ID, APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_P8)."
+              echo "da=nein" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+          done
+          echo "da=ja" >> "$GITHUB_OUTPUT"
+      - name: Bundle-ID registrieren, App-Eintrag prüfen
+        if: steps.geheim.outputs.da == 'ja'
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          KEY_P8: ${{ secrets.APP_STORE_CONNECT_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install --quiet pyjwt cryptography
+          TOKEN=$(python3 -c 'import jwt,time,os; print(jwt.encode({"iss":os.environ["ISSUER"],"iat":int(time.time()),"exp":int(time.time())+1100,"aud":"appstoreconnect-v1"},os.environ["KEY_P8"],algorithm="ES256",headers={"kid":os.environ["KEY_ID"],"typ":"JWT"}))')
+          echo "::add-mask::$TOKEN"
+          A=https://api.appstoreconnect.apple.com/v1
+          api() { curl -sS --max-time 30 -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" "$@"; }
+          BID=$(api "$A/bundleIds?filter%5Bidentifier%5D=de.cardbeacon.app" | jq -r '.data[0].id // empty')
+          if [ -z "$BID" ]; then
+            r=$(api -X POST "$A/bundleIds" --data '{"data":{"type":"bundleIds","attributes":{"identifier":"de.cardbeacon.app","name":"CardBeacon","platform":"IOS"}}}')
+            BID=$(echo "$r" | jq -r '.data.id // empty')
+            [ -n "$BID" ] || { echo "::error::Bundle-ID nicht registrierbar: $(echo "$r" | jq -c '.errors')"; exit 1; }
+            echo "Bundle-ID de.cardbeacon.app registriert."
+          else
+            echo "Bundle-ID de.cardbeacon.app vorhanden."
+          fi
+          APP=$(api "$A/apps?filter%5BbundleId%5D=de.cardbeacon.app" | jq -r '.data[0].attributes.name // empty')
+          if [ -z "$APP" ]; then
+            echo "::error::Kein App-Eintrag in App Store Connect für de.cardbeacon.app. Einmalig anlegen: App Store Connect → Apps → + → Neue App (Bundle-ID de.cardbeacon.app). Apple erlaubt das nicht über die Schnittstelle."
+            exit 1
+          fi
+          echo "App-Eintrag: $APP"
       - name: Werkzeuge
+        if: steps.geheim.outputs.da == 'ja'
         run: |
           brew install xcodegen
           sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
       - name: Archivieren und hochladen
+        if: steps.geheim.outputs.da == 'ja'
         working-directory: ios
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
