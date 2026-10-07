@@ -97,8 +97,17 @@ jobs:
           fi
           APP=$(api "$A/apps?filter%5BbundleId%5D=de.cardbeacon.app" | jq -r '.data[0].attributes.name // empty')
           if [ -z "$APP" ]; then
-            echo "::error::Kein App-Eintrag in App Store Connect für de.cardbeacon.app. Einmalig anlegen: App Store Connect → Apps → + → Neue App (Bundle-ID de.cardbeacon.app). Apple erlaubt das nicht über die Schnittstelle."
-            exit 1
+            # Versuch, den App-Eintrag selbst anzulegen. Lehnt Apple das ab, steht die
+            # genaue Antwort im Log — keine Vermutung, sondern die Meldung von Apple.
+            body=$(jq -n --arg b "$BID" '{data:{type:"apps",attributes:{name:"CardBeacon – TCG Marktpreise",primaryLocale:"de-DE",sku:"cardbeacon-ios",bundleId:"de.cardbeacon.app"},relationships:{bundleId:{data:{type:"bundleIds",id:$b}}}}}')
+            r=$(api -X POST "$A/apps" --data "$body")
+            APP=$(echo "$r" | jq -r '.data.attributes.name // empty')
+            if [ -z "$APP" ]; then
+              echo "Antwort von Apple auf das Anlegen: $(echo "$r" | jq -c '.errors')"
+              echo "::error::App-Eintrag fehlt und Apple erlaubt das Anlegen über die Schnittstelle nicht (Antwort oben). Einmalig anlegen: App Store Connect → Apps → + → Neue App, Bundle-ID de.cardbeacon.app."
+              exit 1
+            fi
+            echo "App-Eintrag angelegt: $APP"
           fi
           echo "App-Eintrag: $APP"
       - name: Werkzeuge
