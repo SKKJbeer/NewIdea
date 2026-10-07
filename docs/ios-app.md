@@ -24,6 +24,8 @@ Stand: 6. Oktober 2026 · Bundle-ID `de.cardbeacon.app` · Mindestversion iOS 17
 | `GET /api/v1/suche?q=` | Karten + Sets | Kartenindex (kein langsamer Fremdabruf) |
 | `GET /api/v1/karten/:id` | Karte, Cardmarket-Aufschlüsselung, echte Tageswerte (90 Tage) | Index + TCGdex (Vortag) + `price_snapshots` |
 | `GET /api/v1/sets/:setCode` | Alle Karten eines Sets | Kartenindex |
+| `GET /api/v1/inhalte` | Neuester Marktbericht, Artikel (So/Do), alle Guides | `market_reports`, `articles`, Guides |
+| `GET /api/v1/marktbericht[?woche=]` · `/artikel/:datum` · `/guides/:slug` | Volltexte; `archiv` = Zahlen evtl. veraltet; erzeugt nie | wie Website |
 | `GET /api/v1/preise?ids=` | Aktuelle Preise für bis zu 100 Karten, `fehlend` = ohne Eintrag | Kartenindex |
 | `GET /api/v1/verlauf?ids=&tage=` | Echte Tageswerte je Karte (max. 365 Tage), in Gruppen < 1.000 Zeilen abgefragt | `price_snapshots` |
 

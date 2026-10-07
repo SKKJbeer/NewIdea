@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.24.0',
+    date: '7. Oktober 2026',
+    label: 'Marktberichte, Artikel und Guides in der App',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Lesen in der App: Wochen-Marktbericht, Artikel und Guides — dieselben Texte wie auf der Website' },
+      { type: 'new', text: 'App-Schnittstelle für Inhalte (nur lesend)' },
+    ],
+  },
+  {
     version: '6.23.0',
     date: '7. Oktober 2026',
     label: 'Portfolio in der iOS-App',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Portfolio in der App: Menge, Kaufpreis, Kaufdatum, Depotwert, Gewinn/Verlust und Wertverlauf aus echten Tageswerten — nur auf dem Gerät gespeichert' },
       { type: 'new', text: 'App-Schnittstelle: aktuelle Preise und echte Tageswerte für mehrere Karten auf einmal' },

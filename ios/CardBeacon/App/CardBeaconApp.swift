@@ -31,12 +31,12 @@ struct HauptAnsicht: View {
                     .tabItem { Label("Markt", systemImage: "chart.line.uptrend.xyaxis") }
                 SucheView()
                     .tabItem { Label("Suche", systemImage: "magnifyingglass") }
+                LesenView()
+                    .tabItem { Label("Lesen", systemImage: "book") }
                 PortfolioView()
                     .tabItem { Label("Portfolio", systemImage: "briefcase") }
                 MerklisteView()
                     .tabItem { Label("Merkliste", systemImage: "star") }
-                InfoView()
-                    .tabItem { Label("Info", systemImage: "info.circle") }
             }
         }
     }

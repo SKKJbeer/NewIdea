@@ -178,3 +178,82 @@ export function idGruppen(ids: string[], tage: number, grenze = DB_ZEILEN_GRENZE
   for (let i = 0; i < ids.length; i += je) gruppen.push(ids.slice(i, i + je));
   return gruppen;
 }
+
+// ── Inhalte: Marktbericht, Artikel, Guides (seit v6.24.0) ───────────────────
+// Dieselben Texte wie auf der Website, als schlichte Datenform. Die App rendert
+// `## ` im Bericht als Zwischenüberschrift. `archiv: true` = Zahlen im Text
+// können veraltet sein (Ersatztext oder vor dem frischen Tagesindex erzeugt) —
+// die App zeigt dann denselben Hinweis wie die Seite.
+
+export interface ArtikelDto {
+  datum: string;
+  typ: string;
+  kategorie: string;
+  titel: string;
+  intro: string;
+  abschnitte: Array<{ ueberschrift: string; text: string }>;
+  kernpunkte: string[];
+  quellen: Array<{ label: string; url: string }>;
+  lesezeit: number;
+  archiv: boolean;
+  url: string;
+}
+
+export interface GuideDto {
+  slug: string;
+  titel: string;
+  beschreibung: string;
+  intro: string;
+  abschnitte: Array<{ ueberschrift: string; text: string; tipp: string | null }>;
+  kernpunkte: string[];
+  lesezeit: number;
+  url: string;
+}
+
+const text = (x: unknown): string => (typeof x === 'string' ? x : '');
+
+export function artikelDto(
+  a: { title?: string; intro?: string; sections?: Array<{ heading?: string; content?: string }>; keyPoints?: string[];
+       sources?: Array<{ label: string; url: string }>; readingTimeMin?: number },
+  meta: { datum: string; typ: string; kategorie: string; archiv: boolean },
+  basis: string,
+): ArtikelDto {
+  const abschnitte = (a.sections ?? []).map((s) => ({ ueberschrift: text(s.heading), text: text(s.content) })).filter((s) => s.text);
+  const woerter = [a.intro ?? '', ...abschnitte.map((s) => s.text)].join(' ').split(/\s+/).filter(Boolean).length;
+  return {
+    datum: meta.datum,
+    typ: meta.typ,
+    kategorie: meta.kategorie,
+    titel: text(a.title),
+    intro: text(a.intro),
+    abschnitte,
+    kernpunkte: (a.keyPoints ?? []).filter((k) => typeof k === 'string' && k.trim()),
+    quellen: (a.sources ?? []).filter((q) => q && /^https:\/\//.test(q.url)),
+    lesezeit: a.readingTimeMin && a.readingTimeMin > 0 ? a.readingTimeMin : Math.max(1, Math.round(woerter / 200)),
+    archiv: meta.archiv,
+    url: `${basis}/artikel/${meta.datum}`,
+  };
+}
+
+export function guideDto(
+  g: { slug: string; title: string; metaDescription?: string; intro?: string; readingTimeMin?: number; keyPoints?: string[];
+       sections?: Array<{ heading?: string; content?: string; tip?: string }> },
+  basis: string,
+): GuideDto {
+  return {
+    slug: g.slug,
+    titel: g.title,
+    beschreibung: text(g.metaDescription),
+    intro: text(g.intro),
+    abschnitte: (g.sections ?? []).map((s) => ({ ueberschrift: text(s.heading), text: text(s.content), tipp: s.tip ? s.tip : null }))
+      .filter((s) => s.text),
+    kernpunkte: (g.keyPoints ?? []).filter((k) => typeof k === 'string' && k.trim()),
+    lesezeit: g.readingTimeMin && g.readingTimeMin > 0 ? g.readingTimeMin : 5,
+    url: `${basis}/guides/${g.slug}`,
+  };
+}
+
+/** Datum im Format JJJJ-MM-TT, nicht in der Zukunft (rein). */
+export function gueltigesDatum(roh: string, heute = new Date().toISOString().slice(0, 10)): string | null {
+  return /^\d{4}-\d{2}-\d{2}$/.test(roh) && Number.isFinite(Date.parse(`${roh}T00:00:00Z`)) && roh <= heute ? roh : null;
+}

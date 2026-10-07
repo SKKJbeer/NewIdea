@@ -38,3 +38,10 @@ final class FormatTests: XCTestCase {
         XCTAssertEqual(Format.tag(nil), "unbekannt")
     }
 }
+
+final class FliesstextTests: XCTestCase {
+    func testBloecke() {
+        let b = Fliesstext.bloecke("## Marktlage\nZeile eins\nZeile zwei\n\n- Punkt\n## Ausblick\nText")
+        XCTAssertEqual(b, [.ueberschrift("Marktlage"), .absatz("Zeile eins Zeile zwei"), .punkt("Punkt"), .ueberschrift("Ausblick"), .absatz("Text")])
+    }
+}

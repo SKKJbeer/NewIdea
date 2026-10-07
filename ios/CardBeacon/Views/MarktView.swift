@@ -2,6 +2,8 @@ import SwiftUI
 import Charts
 
 struct MarktView: View {
+    @State private var infoOffen = false
+
     var body: some View {
         NavigationStack {
             Laden(laden: { try await APIClient.shared.markt() }) { markt in
@@ -21,6 +23,13 @@ struct MarktView: View {
                 }
             }
             .navigationTitle("Markt")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { infoOffen = true } label: { Image(systemName: "info.circle") }
+                        .accessibilityLabel("Info und Hinweise")
+                }
+            }
+            .sheet(isPresented: $infoOffen) { InfoView() }
             .navigationDestination(for: Karte.self) { KarteView(karte: $0) }
         }
     }

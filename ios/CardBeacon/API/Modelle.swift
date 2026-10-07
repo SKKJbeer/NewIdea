@@ -118,3 +118,54 @@ struct VerlaufAntwort: Codable {
     let tage: Int
     let verlauf: [String: [Verlaufspunkt]]
 }
+
+struct Inhalte: Codable {
+    struct Bericht: Codable, Hashable { let woche: String; let kw: Int; let erstellt: String }
+    struct ArtikelEintrag: Codable, Hashable, Identifiable { let datum: String; let typ: String; let kategorie: String; let titel: String; var id: String { datum } }
+    struct GuideEintrag: Codable, Hashable, Identifiable { let slug: String; let titel: String; let beschreibung: String; let lesezeit: Int; var id: String { slug } }
+    let bericht: Bericht?
+    let artikel: [ArtikelEintrag]
+    let guides: [GuideEintrag]
+}
+
+struct Marktbericht: Codable {
+    let woche: String
+    let kw: Int
+    let erstellt: String
+    let text: String
+    let archiv: Bool
+    let url: String
+}
+
+struct Abschnitt: Codable, Hashable {
+    let ueberschrift: String
+    let text: String
+    let tipp: String?
+}
+
+struct Quelle: Codable, Hashable { let label: String; let url: String }
+
+struct Artikel: Codable {
+    let datum: String
+    let typ: String
+    let kategorie: String
+    let titel: String
+    let intro: String
+    let abschnitte: [Abschnitt]
+    let kernpunkte: [String]
+    let quellen: [Quelle]
+    let lesezeit: Int
+    let archiv: Bool
+    let url: String
+}
+
+struct Guide: Codable {
+    let slug: String
+    let titel: String
+    let beschreibung: String
+    let intro: String
+    let abschnitte: [Abschnitt]
+    let kernpunkte: [String]
+    let lesezeit: Int
+    let url: String
+}

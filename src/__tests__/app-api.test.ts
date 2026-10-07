@@ -5,6 +5,7 @@ import {
   karteDto, detailDto, bewegungen, istFrisch, standTag, indexDto, suchbegriff,
   APP_FRISCH_MAX_TAGE, BEWEGUNG_MIN_PREIS, type KarteDto,
   idsAusParam, tageAusParam, idGruppen, PORTFOLIO_MAX_IDS,
+  artikelDto, guideDto, gueltigesDatum,
 } from '@/lib/app-api';
 import type { PokemonCard } from '@/types';
 
@@ -78,7 +79,7 @@ describe('App-API v1: Routen', () => {
   it('Markt filtert dünn gehandelte Ausreißer wie Website und Instagram', () => {
     expect(readFileSync(join(wurzel, 'markt/route.ts'), 'utf8')).toMatch(/ohneDuenneAusreisser\(/);
   });
-  it('sieben Routen vorhanden', () => expect(dateien.length).toBe(7));
+  it('elf Routen vorhanden', () => expect(dateien.length).toBe(11));
   it('nur lesend, ohne Fehlerdetails, mit Cache-Kopfzeile', () => {
     for (const f of dateien) {
       const src = readFileSync(f, 'utf8');
@@ -106,5 +107,31 @@ describe('App-API v1: Portfolio-Parameter', () => {
     for (const g of idGruppen(ids, 90)) expect(g.length * 90).toBeLessThanOrEqual(1000);
     expect(idGruppen(ids, 90).flat()).toEqual(ids);
     expect(idGruppen(['a'], 5000)).toEqual([['a']]);
+  });
+});
+
+describe('App-API v1: Inhalte', () => {
+  it('Artikel: Abschnitte ohne Text fallen weg, nur https-Quellen', () => {
+    const d = artikelDto({ title: 'T', intro: 'I', sections: [{ heading: 'A', content: 'x' }, { heading: 'B', content: '' }],
+      keyPoints: ['k', ''], sources: [{ label: 'CM', url: 'https://cardmarket.com' }, { label: 'X', url: 'javascript:alert(1)' }] },
+      { datum: '2026-10-04', typ: 'rueckblick', kategorie: 'Rückblick', archiv: false }, 'https://cardbeacon.de');
+    expect(d.abschnitte).toHaveLength(1);
+    expect(d.kernpunkte).toEqual(['k']);
+    expect(d.quellen).toHaveLength(1);
+    expect(d.lesezeit).toBeGreaterThanOrEqual(1);
+    expect(d.url).toBe('https://cardbeacon.de/artikel/2026-10-04');
+  });
+  it('Guide: Tipp optional', () => {
+    const g = guideDto({ slug: 's', title: 'T', sections: [{ heading: 'H', content: 'c', tip: 't' }, { heading: 'H2', content: 'c2' }] }, 'https://cardbeacon.de');
+    expect(g.abschnitte.map((a) => a.tipp)).toEqual(['t', null]);
+  });
+  it('Datum: Format und nicht in der Zukunft', () => {
+    expect(gueltigesDatum('2026-10-04', '2026-10-07')).toBe('2026-10-04');
+    expect(gueltigesDatum('2026-10-08', '2026-10-07')).toBeNull();
+    expect(gueltigesDatum('../etc', '2026-10-07')).toBeNull();
+  });
+  it('Artikel-Route erzeugt nie (kein KI-Aufruf über die App)', () => {
+    const src = readFileSync(join(process.cwd(), 'src/app/api/v1/artikel/[datum]/route.ts'), 'utf8');
+    expect(src).not.toMatch(/generateArticle/);
   });
 });

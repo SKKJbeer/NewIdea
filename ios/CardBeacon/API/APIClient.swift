@@ -44,6 +44,10 @@ final class APIClient {
     }
     func karte(_ id: String) async throws -> KartenDetail { try await hole("api/v1/karten/\(pfadTeil(id))") }
     func setKarten(_ code: String) async throws -> SetDetail { try await hole("api/v1/sets/\(pfadTeil(code))") }
+    func inhalte() async throws -> Inhalte { try await hole("api/v1/inhalte") }
+    func marktbericht() async throws -> Marktbericht { try await hole("api/v1/marktbericht") }
+    func artikel(_ datum: String) async throws -> Artikel { try await hole("api/v1/artikel/\(pfadTeil(datum))") }
+    func guide(_ slug: String) async throws -> Guide { try await hole("api/v1/guides/\(pfadTeil(slug))") }
     func preise(_ ids: [String]) async throws -> PreisAntwort {
         try await hole("api/v1/preise", query: [URLQueryItem(name: "ids", value: ids.joined(separator: ","))])
     }

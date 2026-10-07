@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.24.0] - 7. Oktober 2026 · Marktberichte, Artikel und Guides in der App
+
+### Neu
+- **Lesen in der App:** Wochen-Marktbericht, Artikel und alle Guides — dieselben Texte wie auf cardbeacon.de, mit Archiv-Hinweis, wenn Zahlen im Text veraltet sein können
+- **App-Schnittstelle:** `/api/v1/inhalte`, `/api/v1/marktbericht`, `/api/v1/artikel/:datum`, `/api/v1/guides/:slug` — nur lesend, ohne Textgenerierung
+
+### Geändert
+- App: Info und Hinweise über das Symbol oben rechts im Markt, damit fünf Bereiche in die Leiste passen
+
+---
+
 ## [6.23.0] - 7. Oktober 2026 · Portfolio in der iOS-App
 
 ### Neu
