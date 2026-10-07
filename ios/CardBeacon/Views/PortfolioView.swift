@@ -17,7 +17,7 @@ struct PortfolioView: View {
                     ContentUnavailableView {
                         Label("Noch keine Karten im Portfolio", systemImage: "briefcase")
                     } description: {
-                        Text("Karte suchen, öffnen und oben rechts „Zum Portfolio" tippen. Das Portfolio liegt nur auf diesem Gerät.")
+                        Text("Karte suchen, öffnen und oben rechts „Zum Portfolio“ tippen. Das Portfolio liegt nur auf diesem Gerät.")
                     }
                 } else {
                     liste
