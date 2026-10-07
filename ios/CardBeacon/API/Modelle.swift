@@ -108,3 +108,13 @@ struct Status: Codable {
     let minAppBuild: Int
     let datenStand: String?
 }
+
+struct PreisAntwort: Codable {
+    let karten: [Karte]
+    let fehlend: [String]
+}
+
+struct VerlaufAntwort: Codable {
+    let tage: Int
+    let verlauf: [String: [Verlaufspunkt]]
+}

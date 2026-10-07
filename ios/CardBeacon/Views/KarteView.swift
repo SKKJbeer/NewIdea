@@ -4,6 +4,8 @@ import Charts
 struct KarteView: View {
     let karte: Karte
     @EnvironmentObject private var merkliste: Merkliste
+    @State private var neuePosition: Position?
+    @State private var marktwert: Double?
 
     var body: some View {
         Laden(laden: { try await APIClient.shared.karte(karte.id) }) { d in
@@ -29,11 +31,19 @@ struct KarteView: View {
                 }
                 .padding()
             }
-            .onAppear { merkliste.aktualisieren(d.alsKarte) }
+            .onAppear { merkliste.aktualisieren(d.alsKarte); marktwert = d.preis }
         }
+        .sheet(item: $neuePosition) { p in PositionFormular(position: p, aktuellerPreis: marktwert ?? karte.preis) }
         .navigationTitle(karte.anzeigeName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    neuePosition = Position(karteId: karte.id, name: karte.anzeigeName, set: karte.set, bild: karte.bild,
+                                            menge: 1, kaufpreis: 0, kaufdatum: Date())
+                } label: { Image(systemName: "briefcase") }
+                .accessibilityLabel("Zum Portfolio")
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { merkliste.umschalten(karte) } label: {
                     Image(systemName: merkliste.enthaelt(karte.id) ? "star.fill" : "star")

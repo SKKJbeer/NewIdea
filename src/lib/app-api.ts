@@ -142,3 +142,39 @@ export function suchbegriff(roh: string | null): string | null {
 
 /** Kopfzeilen für alle v1-Antworten: kurz im CDN, bei Ausfall alter Stand. */
 export const APP_CACHE = 'public, s-maxage=300, stale-while-revalidate=3600, stale-if-error=86400';
+
+// ── Portfolio (seit v6.23.0) ────────────────────────────────────────────────
+// Das Portfolio liegt auf dem Gerät; die App fragt nur Preise und echte
+// Tageswerte für ihre Karten ab. Nichts über den Bestand verlässt das Gerät
+// außer den Karten-IDs.
+
+/** Höchstens so viele Karten je Abfrage. */
+export const PORTFOLIO_MAX_IDS = 100;
+/** Längster abrufbarer Verlauf in Tagen. */
+export const VERLAUF_MAX_TAGE = 365;
+/** PostgREST kappt jede Antwort still bei 1.000 Zeilen (Stolperstelle in sitemap-karten). */
+export const DB_ZEILEN_GRENZE = 1000;
+
+/** `ids=a,b,c` → gültige, eindeutige IDs (rein). Ungültige fallen still weg, zu viele werden gekappt. */
+export function idsAusParam(roh: string | null, max = PORTFOLIO_MAX_IDS): string[] {
+  const ids = (roh ?? '').split(',').map((s) => s.trim()).filter((s) => /^[A-Za-z0-9._-]{1,40}$/.test(s));
+  return [...new Set(ids)].slice(0, max);
+}
+
+/** Tage auf 1 … VERLAUF_MAX_TAGE begrenzen, Standard 90. */
+export function tageAusParam(roh: string | null): number {
+  const n = Number.parseInt(roh ?? '', 10);
+  return Number.isFinite(n) ? Math.min(Math.max(n, 1), VERLAUF_MAX_TAGE) : 90;
+}
+
+/**
+ * IDs so in Gruppen teilen, dass ids × tage unter der Zeilengrenze bleibt —
+ * sonst schneidet die Datenbank den Verlauf still ab und die Kurve endet
+ * mitten im Zeitraum, ohne dass es jemand merkt.
+ */
+export function idGruppen(ids: string[], tage: number, grenze = DB_ZEILEN_GRENZE): string[][] {
+  const je = Math.max(1, Math.floor(grenze / Math.max(1, tage)));
+  const gruppen: string[][] = [];
+  for (let i = 0; i < ids.length; i += je) gruppen.push(ids.slice(i, i + je));
+  return gruppen;
+}

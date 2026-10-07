@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.23.0] - 7. Oktober 2026 · Portfolio in der iOS-App
+
+### Neu
+- **Portfolio in der App:** Karten mit Menge, Kaufpreis und Kaufdatum erfassen; Depotwert, Gewinn/Verlust seit Kauf und Wertverlauf aus echten Tageswerten. Positionen ohne aktuellen Preis werden ausgewiesen statt als Null gezählt, Zukäufe gelten nicht als Gewinn. Gespeichert nur auf dem Gerät
+- **App-Schnittstelle:** `/api/v1/preise` (aktuelle Preise für bis zu 100 Karten) und `/api/v1/verlauf` (echte Tageswerte, in Gruppen unter der Zeilengrenze der Datenbank abgefragt)
+- **TestFlight-Verteilung:** interne Testgruppe erhält jeden Build automatisch
+
+---
+
 ## [6.22.1] - 6. Oktober 2026 · App-Markt ohne Ausreißer
 
 ### Behoben

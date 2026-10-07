@@ -44,6 +44,13 @@ final class APIClient {
     }
     func karte(_ id: String) async throws -> KartenDetail { try await hole("api/v1/karten/\(pfadTeil(id))") }
     func setKarten(_ code: String) async throws -> SetDetail { try await hole("api/v1/sets/\(pfadTeil(code))") }
+    func preise(_ ids: [String]) async throws -> PreisAntwort {
+        try await hole("api/v1/preise", query: [URLQueryItem(name: "ids", value: ids.joined(separator: ","))])
+    }
+    func verlauf(_ ids: [String], tage: Int) async throws -> VerlaufAntwort {
+        try await hole("api/v1/verlauf", query: [URLQueryItem(name: "ids", value: ids.joined(separator: ",")),
+                                                 URLQueryItem(name: "tage", value: String(tage))])
+    }
 
     /// Kartenbild über den eigenen Bild-Proxy: verkleinert, ein Jahr im CDN, mit Ersatzquelle.
     func bildURL(_ quelle: String, breite: Int) -> URL? {

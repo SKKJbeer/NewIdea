@@ -3,12 +3,14 @@ import SwiftUI
 @main
 struct CardBeaconApp: App {
     @StateObject private var merkliste = Merkliste()
+    @StateObject private var portfolio = PortfolioSpeicher()
     @StateObject private var status = AppStatus()
 
     var body: some Scene {
         WindowGroup {
             HauptAnsicht()
                 .environmentObject(merkliste)
+                .environmentObject(portfolio)
                 .environmentObject(status)
                 .preferredColorScheme(.dark)
                 .tint(Theme.akzent)
@@ -29,6 +31,8 @@ struct HauptAnsicht: View {
                     .tabItem { Label("Markt", systemImage: "chart.line.uptrend.xyaxis") }
                 SucheView()
                     .tabItem { Label("Suche", systemImage: "magnifyingglass") }
+                PortfolioView()
+                    .tabItem { Label("Portfolio", systemImage: "briefcase") }
                 MerklisteView()
                     .tabItem { Label("Merkliste", systemImage: "star") }
                 InfoView()

@@ -24,6 +24,8 @@ Stand: 6. Oktober 2026 · Bundle-ID `de.cardbeacon.app` · Mindestversion iOS 17
 | `GET /api/v1/suche?q=` | Karten + Sets | Kartenindex (kein langsamer Fremdabruf) |
 | `GET /api/v1/karten/:id` | Karte, Cardmarket-Aufschlüsselung, echte Tageswerte (90 Tage) | Index + TCGdex (Vortag) + `price_snapshots` |
 | `GET /api/v1/sets/:setCode` | Alle Karten eines Sets | Kartenindex |
+| `GET /api/v1/preise?ids=` | Aktuelle Preise für bis zu 100 Karten, `fehlend` = ohne Eintrag | Kartenindex |
+| `GET /api/v1/verlauf?ids=&tage=` | Echte Tageswerte je Karte (max. 365 Tage), in Gruppen < 1.000 Zeilen abgefragt | `price_snapshots` |
 
 Antworten: `Cache-Control: public, s-maxage=300, stale-while-revalidate=3600, stale-if-error=86400`.
 Fehler ohne Details (`503 nicht-verfuegbar`). Suche: 120 Anfragen/Min je Adresse.
@@ -63,4 +65,4 @@ Beide laufen unabhängig nebeneinander aus EINEM Backend: Die Website bleibt unv
 | 1 | TestFlight: jede iOS-Änderung auf main baut, signiert per API (Zertifikat + Profil je Lauf, danach gelöscht) und lädt einen neuen Build hoch | erledigt — erster Build 112 am 07.10.2026 |
 | 2 | Store-Eintrag (Screenshots, Texte), Einreichung zur Prüfung | danach |
 | 3 | Preisalarme per Push (APNs) für gemerkte Karten — braucht Geräte-Token-Ablage und einen Cron | geplant |
-| 4 | Portfolio in der App (Abgleich mit dem Konto-Portfolio der Seite) | geplant |
+| 4 | Portfolio in der App (lokal, Depotwert, G/V, Verlauf aus echten Tageswerten) | erledigt (v6.23.0); Abgleich mit dem Konto-Portfolio der Seite folgt |

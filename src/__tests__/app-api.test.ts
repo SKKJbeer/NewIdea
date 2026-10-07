@@ -4,6 +4,7 @@ import { join } from 'path';
 import {
   karteDto, detailDto, bewegungen, istFrisch, standTag, indexDto, suchbegriff,
   APP_FRISCH_MAX_TAGE, BEWEGUNG_MIN_PREIS, type KarteDto,
+  idsAusParam, tageAusParam, idGruppen, PORTFOLIO_MAX_IDS,
 } from '@/lib/app-api';
 import type { PokemonCard } from '@/types';
 
@@ -77,7 +78,7 @@ describe('App-API v1: Routen', () => {
   it('Markt filtert dünn gehandelte Ausreißer wie Website und Instagram', () => {
     expect(readFileSync(join(wurzel, 'markt/route.ts'), 'utf8')).toMatch(/ohneDuenneAusreisser\(/);
   });
-  it('fünf Routen vorhanden', () => expect(dateien.length).toBe(5));
+  it('sieben Routen vorhanden', () => expect(dateien.length).toBe(7));
   it('nur lesend, ohne Fehlerdetails, mit Cache-Kopfzeile', () => {
     for (const f of dateien) {
       const src = readFileSync(f, 'utf8');
@@ -86,5 +87,24 @@ describe('App-API v1: Routen', () => {
       expect(src, f).toMatch(/Cache-Control/);
       expect(src, f).not.toMatch(/searchCards\(|fetchCardById/); // kein langsamer Fremdabruf
     }
+  });
+});
+
+describe('App-API v1: Portfolio-Parameter', () => {
+  it('IDs: gültig, eindeutig, gekappt', () => {
+    expect(idsAusParam('sv3pt5-199, sv3pt5-199,bad id,<x>,swsh7-215')).toEqual(['sv3pt5-199', 'swsh7-215']);
+    expect(idsAusParam(Array.from({ length: 150 }, (_, i) => `a-${i}`).join(',')).length).toBe(PORTFOLIO_MAX_IDS);
+    expect(idsAusParam(null)).toEqual([]);
+  });
+  it('Tage begrenzt', () => {
+    expect(tageAusParam('9999')).toBe(365);
+    expect(tageAusParam('0')).toBe(1);
+    expect(tageAusParam(null)).toBe(90);
+  });
+  it('Gruppen bleiben unter der 1.000-Zeilen-Grenze', () => {
+    const ids = Array.from({ length: 50 }, (_, i) => `k-${i}`);
+    for (const g of idGruppen(ids, 90)) expect(g.length * 90).toBeLessThanOrEqual(1000);
+    expect(idGruppen(ids, 90).flat()).toEqual(ids);
+    expect(idGruppen(['a'], 5000)).toEqual([['a']]);
   });
 });

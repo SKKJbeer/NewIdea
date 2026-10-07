@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.22.1` · **Stand:** 6. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.23.0` · **Stand:** 7. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -167,6 +167,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v2.20.0 | Rich-Content-Render-Ebene (Prose/Reveal/ReadingProgress): Guides, Marktbericht & Artikel magazinartig — Initialbuchstaben, Kennzahl-Highlights, Scroll-Einblendung; gilt automatisch für generierten Content |
 
 | v2.21.0 | Betriebszustand im Monitoring (echte Zeilen/Datenstände/Klartext-Fehler + Setup-SQL); Guide-Pipeline-Diagnose: stiller Speicherfehler wird gemeldet, „Jetzt testen"-Auslöser |
+| v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |
 | v6.21.2 | Sitemaps: `unstable_cache` (900 s) um Haupt-Sitemap und Karten-Teile (vorher 3–18 s je Abruf). Kopfzeilen aus next.config.ts (v6.21.1) wirkungslos — Next überschreibt Cache-Control bei Metadaten-Routen |

@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.23.0',
+    date: '7. Oktober 2026',
+    label: 'Portfolio in der iOS-App',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Portfolio in der App: Menge, Kaufpreis, Kaufdatum, Depotwert, Gewinn/Verlust und Wertverlauf aus echten Tageswerten — nur auf dem Gerät gespeichert' },
+      { type: 'new', text: 'App-Schnittstelle: aktuelle Preise und echte Tageswerte für mehrere Karten auf einmal' },
+    ],
+  },
+  {
     version: '6.22.1',
     date: '6. Oktober 2026',
     label: 'App-Markt ohne Ausreißer',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'App-Schnittstelle Markt: dünn gehandelte Klassiker über 100 % zählen nicht mehr als Bewegung — gleiche Regel wie Website und Instagram' },
     ],

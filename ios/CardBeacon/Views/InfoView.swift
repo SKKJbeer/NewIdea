@@ -19,7 +19,7 @@ struct InfoView: View {
                     Text("Inoffizielle Fan-App. Pokémon und alle zugehörigen Namen sind Marken von Nintendo, Creatures Inc. und GAME FREAK inc. Diese App steht in keiner Verbindung zu ihnen.")
                 }
                 Section("Datenschutz") {
-                    Text("Kein Konto, keine Werbung, kein Tracking. Die Merkliste bleibt auf diesem Gerät.")
+                    Text("Kein Konto, keine Werbung, kein Tracking. Portfolio und Merkliste bleiben auf diesem Gerät; für Preise werden nur die Karten-Nummern abgefragt.")
                     Link("Datenschutzerklärung", destination: URL(string: "https://cardbeacon.de/datenschutz")!)
                     Link("Impressum", destination: URL(string: "https://cardbeacon.de/impressum")!)
                 }
