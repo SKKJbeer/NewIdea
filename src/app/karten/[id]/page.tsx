@@ -25,6 +25,7 @@ import { siteUrlOrLocal } from '@/lib/site';
 import { frischPreisFuer, mitFrischpreis, mitIndexPreis } from '@/lib/frischpreis-karte';
 import { cardsFromIndex } from '@/lib/card-index';
 import { sprachpreiseFuerKarte } from '@/lib/sprachpreise';
+import { kaufLinks } from '@/lib/kauf-links';
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -171,8 +172,11 @@ export default async function CardDetailPage({ params }: Props) {
   // Sprachausgaben (JP/KR) laufen parallel zum Verlauf — wirft nie, hoechstens
   // 2 s (Dateien je Instanz 30 min vorgehalten, sprachpreise.ts).
   const sprachenLaden = sprachpreiseFuerKarte(card, 2_000);
+  // Genauer Cardmarket-Link (geprüft, kauf-links.ts) — höchstens 2,5 s, sonst Suche.
+  const linksLaden = kaufLinks({ id: card.id, name: card.name, number: card.number, setCode: card.setCode, set: card.set });
   const stored = await verlaufLaden;
   const sprachen = await sprachenLaden;
+  const links = await linksLaden;
   const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
   // Zusammenführung liegt zentral in price-history.ts — dieselbe Funktion nutzt
   // das Portfolio (Code-Regel 10: keine zweite Umsetzung derselben Logik).
@@ -369,7 +373,7 @@ export default async function CardDetailPage({ params }: Props) {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-2 text-center">Kaufen bei</p>
                 <div className="grid grid-cols-2 gap-2">
                   <a
-                    href={`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(card.name)}`}
+                    href={links.cardmarket.url}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
                     className="flex items-center justify-center gap-1.5 rounded-lg border border-[#2a2a3a] bg-[#1a1a28] hover:border-violet-500/40 hover:bg-[#20202e] text-slate-300 hover:text-white text-xs font-semibold py-2 transition-colors"
@@ -377,7 +381,7 @@ export default async function CardDetailPage({ params }: Props) {
                     <ShoppingCart size={13} /> Cardmarket <ExternalLink size={10} className="opacity-40" />
                   </a>
                   <a
-                    href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.name} Karte`)}`}
+                    href={links.amazonKarte}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
                     className="flex items-center justify-center gap-1.5 rounded-lg border border-[#2a2a3a] bg-[#1a1a28] hover:border-amber-500/40 hover:bg-[#20202e] text-slate-300 hover:text-white text-xs font-semibold py-2 transition-colors"
@@ -420,6 +424,7 @@ export default async function CardDetailPage({ params }: Props) {
             {/* Aufschluesselung folgt der Sprachwahl (Sprachwahl.tsx). */}
             <CmAufschluesselung
               kartenName={card.name}
+              cardmarketUrl={links.cardmarket.url}
               en={card.cmPrices ?? null}
               enStand={cmDataAge}
               sprachen={sprachen}
@@ -464,7 +469,7 @@ export default async function CardDetailPage({ params }: Props) {
                   <p className="text-sm font-semibold text-slate-400 mt-3 text-center leading-snug">{card.set}</p>
                 </div>
                 <a
-                  href={`https://www.amazon.de/s?k=${encodeURIComponent(`Pokemon ${card.set} Booster`)}`}
+                  href={links.amazonBooster}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
                   className="mt-4 flex items-center justify-center gap-2 w-full bg-amber-400 hover:bg-amber-500 text-[#0a0a0f] rounded-md py-2.5 font-semibold text-sm transition-colors"

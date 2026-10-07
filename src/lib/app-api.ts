@@ -343,3 +343,16 @@ export function marktZusatz(l: {
     } : null,
   };
 }
+
+export interface KaufDto {
+  cardmarket: string;
+  /** true = geprüfte Produktseite der Karte, false = Suche nach dem Namen. */
+  cardmarketGenau: boolean;
+  amazonKarte: string;
+  amazonBooster: string;
+}
+
+/** Kauf-Links für die App — dieselben wie auf der Kartenseite (kauf-links.ts). */
+export function kaufDto(l: { cardmarket: { url: string; genau: boolean }; amazonKarte: string; amazonBooster: string }): KaufDto {
+  return { cardmarket: l.cardmarket.url, cardmarketGenau: l.cardmarket.genau, amazonKarte: l.amazonKarte, amazonBooster: l.amazonBooster };
+}

@@ -22,7 +22,7 @@ Stand: 6. Oktober 2026 · Bundle-ID `de.cardbeacon.app` · Mindestversion iOS 17
 | `GET /api/v1/status` | `api`, `minAppBuild`, `datenStand` | Kartenindex |
 | `GET /api/v1/markt` | CardBeacon Index (≤ 3 Tage), Indexreihe, Aufwärts/Abwärts (nur frische Preise ≥ 2 €); seit v6.25.0 `breite`, `vorwoche`, `setBewegung`, `neuheiten` | `market_index`, Tagesstand der 500 wertvollsten Karten, `ladeMarktLage()` |
 | `GET /api/v1/suche?q=` | Karten + Sets | Kartenindex (kein langsamer Fremdabruf) |
-| `GET /api/v1/karten/:id` | Karte, Cardmarket-Aufschlüsselung, echte Tageswerte (90 Tage); seit v6.25.0 `sprachen` (JP/KR oder Grund) und `setInfo` | Index + TCGdex (Vortag) + `price_snapshots` + `sprachpreiseFuerKarte` |
+| `GET /api/v1/karten/:id` | Karte, Cardmarket-Aufschlüsselung, echte Tageswerte (90 Tage); seit v6.25.0 `sprachen` (JP/KR oder Grund) und `setInfo`; seit v6.26.0 `kaufen` (Cardmarket genau/Suche, Amazon) | Index + TCGdex (Vortag) + `price_snapshots` + `sprachpreiseFuerKarte` |
 | `GET /api/v1/sets` | Alle Sets, neueste zuerst, mit Logo und Serie | `ladeSetListe` (mit gesicherter Liste) |
 | `GET /api/v1/sets/:setCode` | Alle Karten eines Sets | Kartenindex |
 | `GET /api/v1/inhalte` | Neuester Marktbericht, Artikel (So/Do), alle Guides | `market_reports`, `articles`, Guides |

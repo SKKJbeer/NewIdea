@@ -887,6 +887,7 @@ Diese Variablen hat der Nutzer bereits in Vercel eingetragen. Nie wieder so tun 
 | `CARDMARKET_APP_SECRET` | Cardmarket OAuth App-Secret | HMAC-SHA1-Signierung aller API-Requests |
 | `CARDMARKET_USER_TOKEN` | Cardmarket OAuth User-Token | Vom eigenen Cardmarket-Account: API → Anwendungen |
 | `CARDMARKET_USER_SECRET` | Cardmarket OAuth User-Secret | Alle 4 nötig — fehlt eine, Fallback auf EN-Preis |
+| `NEXT_PUBLIC_AMAZON_TAG` | ⭐ Amazon-PartnerNet-Kennung (z. B. `name-21`) | Wird an ALLE Amazon-Suchlinks aus `kauf-links-basis.ts` als `&tag=` gehängt — Website und App, ohne App-Update |
 | `NEXT_PUBLIC_AMAZON_URL` | ⭐ Eigener Amazon-Affiliate-Link (Booster) | **Alle Boosterpack-Bilder + Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_CARDMARKET_URL` | ⭐ Eigener Cardmarket-Affiliate-Link | **Alle Cardmarket-Kauflinks auf diesen Link umstellen** |
 | `NEXT_PUBLIC_TRADE_REPUBLIC_URL` | Eigener Trade Republic-Affiliate-Link | Optional — der Link ist seit v2.36.0 als Standard im Code hinterlegt |
@@ -1033,6 +1034,14 @@ Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudf
 - **Signatur (seit 07.10.2026, erster Upload Build 112):** Xcodes automatische Signatur scheitert in CI („team has no devices" — sie verlangt beim Archivieren ein Entwicklungsprofil). Deshalb `ios/scripts/signatur.py`: Apple-Distribution-Zertifikat (Schlüssel entsteht auf dem Runner) + `IOS_APP_STORE`-Profil per API, manuell signieren, hochladen, danach beides bei Apple löschen. `.p12` MUSS klassisches PKCS12 (SHA1/3DES) sein, sonst „MAC verification failed" beim macOS-Import.
 - **Belegt per Apple-Antwort:** App-Einträge lassen sich NICHT per API anlegen (`403 — resource 'apps' does not allow 'CREATE'`). Der Eintrag „CardBeacon – TCG Marktpreise" wurde am 07.10. vom Nutzer angelegt; Bundle-IDs registriert der Workflow selbst.
 - „Pokémon" nicht im App-Namen (Review 5.2.1); Hinweise „Inoffizielle Fan-App", „Keine Anlageberatung" bleiben in der App.
+
+## Kauf-Links genau auf die Karte — seit v6.26.0
+
+**Nutzer-Auftrag (07.10.2026):** Cardmarket-Link soll genau auf die Karte führen, nicht auf eine Namenssuche; Kauf-Links dezent auch in der App.
+- EINE Stelle: `src/lib/kauf-links.ts` (`kaufLinks()`), reine Bausteine in `kauf-links-basis.ts`. Kartenseite, Sprachwahl („Prüfen", nur EN/DE) und `/api/v1/karten/:id` → `kaufen` nutzen sie.
+- Quelle des genauen Ziels: Weiterleitung `prices.pokemontcg.io/cardmarket/<id>` — GEPRÜFT: Name + Nummernkürzel im Pfad (EVS094, MEW199, BS4); bei nur „-V<k>" Gegenprobe über TCGdex-Produktnummern (`versionPasst`: k-te gleichnamige Karte im Set). Sonst Suche. Gemessen 07.10. (250 Karten): 161 genau, Rest Suche. Belegter Quellfehler: sv8-247 Pikachu ex → SSP248 (abgefangen).
+- Cardmarket ist aus Serverumgebungen nicht abrufbar (403) — eine Adresse nur per Produktnummer ist nicht belegt, deshalb nicht verwendet.
+- JP/KR bleiben bei der Suche (eigene Produkte, keine geprüfte Adresse).
 
 ## Feedback-Knopf — seit v6.17.0
 

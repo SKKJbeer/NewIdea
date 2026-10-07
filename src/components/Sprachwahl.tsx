@@ -5,6 +5,7 @@ import { ExternalLink, Languages } from 'lucide-react';
 import type { CardLanguage } from '@/lib/portfolio';
 import type { SprachAngabe } from '@/lib/sprachpreise';
 import { formatEur } from '@/lib/format';
+import { cardmarketSuche } from '@/lib/kauf-links-basis';
 
 // SPRACHWAHL DER KARTENSEITE — EINE Auswahl fuer die ganze Preisspalte.
 //
@@ -64,6 +65,8 @@ function Tabelle({ zeilen }: { zeilen: Zeile[] }) {
 
 interface AufschluesselungProps {
   kartenName: string;
+  /** Geprüfter Cardmarket-Link der Karte (EN/DE-Produkt) — kauf-links.ts. */
+  cardmarketUrl?: string;
   en: { trend?: number; low?: number; avgSell?: number; avg30?: number } | null;
   /** Serverseitig formulierter Datenstand der EN/DE-Werte. */
   enStand: string | null;
@@ -71,10 +74,11 @@ interface AufschluesselungProps {
 }
 
 /** „Cardmarket-Preise" — immer für die gewählte Ausgabe. */
-export function CmAufschluesselung({ kartenName, en, enStand, sprachen }: AufschluesselungProps) {
+export function CmAufschluesselung({ kartenName, cardmarketUrl, en, enStand, sprachen }: AufschluesselungProps) {
   const [sprache] = useSprachwahl();
   const fremd = sprache === 'JP' || sprache === 'KR' ? sprachen.find((s) => s.sprache === sprache) ?? null : null;
-  const pruefen = `https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(kartenName)}`;
+  // JP/KR sind eigene Produkte — dafür bleibt die Suche; EN/DE führt genau auf die Karte.
+  const pruefen = !fremd && cardmarketUrl ? cardmarketUrl : cardmarketSuche(kartenName);
 
   const kopf = (titel: string, zusatz: string) => (
     <div className="mb-3 flex items-start justify-between gap-3">

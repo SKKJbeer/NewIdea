@@ -43,6 +43,7 @@ struct KarteView: View {
                     if let sprachen = d.sprachen, !sprachen.isEmpty { SprachBlock(sprachen: sprachen) }
                     VerlaufBlock(punkte: d.verlauf)
                     if let s = d.setInfo { SetBlock(set: s) }
+                    if let k = d.kaufen { KaufBlock(links: k) }
 
                     if let link = URL(string: d.url) {
                         Link(destination: link) { Label("Auf cardbeacon.de öffnen", systemImage: "safari") }
@@ -102,6 +103,38 @@ private struct SprachBlock: View {
                 .font(.caption2).foregroundStyle(.secondary)
         }
         .kachel()
+    }
+}
+
+/// Dezente Kauf-Links mit Pflichtkennzeichnung.
+private struct KaufBlock: View {
+    let links: KaufLinks
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                knopf(links.cardmarketGenau ? "Cardmarket" : "Cardmarket-Suche", symbol: "cart", ziel: links.cardmarket)
+                knopf("Amazon", symbol: "shippingbox", ziel: links.amazonKarte)
+                knopf("Booster", symbol: "gift", ziel: links.amazonBooster)
+            }
+            Text(links.cardmarketGenau ? "* Affiliate-Links · Cardmarket öffnet genau diese Karte" : "* Affiliate-Links")
+                .font(.caption2).foregroundStyle(.tertiary)
+        }
+    }
+
+    @ViewBuilder private func knopf(_ titel: String, symbol: String, ziel: String) -> some View {
+        if let url = URL(string: ziel) {
+            Link(destination: url) {
+                Label(titel, systemImage: symbol)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(Theme.karteHover, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Theme.rand))
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }
 

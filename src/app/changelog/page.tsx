@@ -10,10 +10,21 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.26.0',
+    date: '7. Oktober 2026',
+    label: 'Cardmarket-Link genau auf die Karte',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Cardmarket-Link führt genau auf die Karte, wo sich das Ziel über Name, Nummer oder Produktnummer belegen lässt — sonst die Suche' },
+      { type: 'new', text: 'Kauf-Links dezent in der App, mit Affiliate-Kennzeichnung' },
+      { type: 'fixed', text: 'Falsche Zuordnungen der Linkquelle werden abgefangen' },
+    ],
+  },
+  {
     version: '6.25.0',
     date: '7. Oktober 2026',
     label: 'iOS-App auf Website-Niveau',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'App-Portfolio: Karten direkt im Portfolio suchen und hinzufügen, Zeitraum für die Wertkurve, beste und schwächste Positionen, Aufteilung nach Set, Sammlungs-Galerie' },
       { type: 'new', text: 'App-Markt mit Marktbreite, Vorwoche, Set-Bewegung und Neuheiten; alle Sets in der Suche' },

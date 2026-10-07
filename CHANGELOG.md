@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.26.0] - 7. Oktober 2026 · Cardmarket-Link genau auf die Karte
+
+### Neu
+- **Cardmarket-Link führt genau auf die Karte** statt auf eine Namenssuche — wo sich das Ziel belegen lässt: Name und Nummer in der Cardmarket-Adresse, bei Varianten Gegenprobe über die Cardmarket-Produktnummern. Sonst wie bisher die Suche. Gemessen an 250 Karten: 161 genau
+- **Kauf-Links in der App:** dezent auf der Kartenseite (Cardmarket, Amazon, Booster) mit Affiliate-Kennzeichnung
+- Amazon-Partnerkennung über eine Einstellung zuschaltbar, gilt für Website und App
+
+### Behoben
+- Falsche Zuordnung der Quelle wird abgefangen (z. B. Pikachu ex Surging Sparks 247 zeigte auf Karte 248)
+
+---
+
 ## [6.25.0] - 7. Oktober 2026 · iOS-App auf Website-Niveau
 
 ### Neu

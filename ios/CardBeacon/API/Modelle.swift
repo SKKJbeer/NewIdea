@@ -58,6 +58,8 @@ struct KartenDetail: Codable, Hashable {
     let verlauf: [Verlaufspunkt]
     let sprachen: [Sprachpreis]?
     let setInfo: SetEintrag?
+    /// Seit v6.26.0 — bei älteren Servern nil.
+    let kaufen: KaufLinks?
 
     var alsKarte: Karte {
         Karte(id: id, name: name, nameDe: nameDe, set: set, setCode: setCode, nummer: nummer, seltenheit: seltenheit,
@@ -217,4 +219,13 @@ struct Sprachpreis: Codable, Hashable, Identifiable {
     let gegenstueck: Gegenstueck?
     let grund: String?
     var id: String { sprache }
+}
+
+/// Kauf-Links (Affiliate) — vom Server, damit Partner-Kennungen ohne App-Update greifen.
+struct KaufLinks: Codable, Hashable {
+    let cardmarket: String
+    /// true = geprüfte Produktseite genau dieser Karte, false = Suche nach dem Namen.
+    let cardmarketGenau: Bool
+    let amazonKarte: String
+    let amazonBooster: String
 }
