@@ -59,8 +59,14 @@ def anlegen(ordner: str) -> None:
     cert = x509.load_der_x509_certificate(der)
 
     passwort = zufall.token_urlsafe(18)
-    p12 = pkcs12.serialize_key_and_certificates(b"cardbeacon-ci", schluessel, cert, None,
-                                                serialization.BestAvailableEncryption(passwort.encode()))
+    # Klassisches PKCS12 (SHA1/3DES): macOS `security import` liest die moderne
+    # AES/PBKDF2-Variante nicht ("MAC verification failed").
+    verschluesselung = (serialization.PrivateFormat.PKCS12.encryption_builder()
+                        .kdf_rounds(50000)
+                        .key_cert_algorithm(pkcs12.PBES.PBESv1SHA1And3KeyTripleDESCBC)
+                        .hmac_hash(hashes.SHA1())
+                        .build(passwort.encode()))
+    p12 = pkcs12.serialize_key_and_certificates(b"cardbeacon-ci", schluessel, cert, None, verschluesselung)
     open(os.path.join(ordner, "signatur.p12"), "wb").write(p12)
 
     name = f"CardBeacon CI {int(time.time())}"
