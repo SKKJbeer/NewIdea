@@ -23,7 +23,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     // JP/KR nur mit eindeutiger Zuordnung (sechs Schranken) — sonst der Grund, nie ein Wert.
     const [sprachen, links] = await Promise.all([
       sprachpreiseFuerKarte(karte).catch(() => []),
-      kaufLinks({ id: karte.id, name: karte.name, number: karte.number, setCode: karte.setCode, set: karte.set }),
+      kaufLinks({ id: karte.id, name: karte.name, number: karte.number, setCode: karte.setCode, set: karte.set }, 4_000),
     ]);
     const set = setListe?.sets.find((s) => s.id === karte.setCode);
     // Der Index-Stand bleibt erhalten; die Aufschlüsselung kommt aus dem Tagesabruf.

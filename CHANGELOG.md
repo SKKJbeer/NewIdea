@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.26.1] - 7. Oktober 2026 · Genauer Cardmarket-Link auch in der App
+
+### Behoben
+- App-Schnittstelle lieferte für Varianten-Karten (z. B. Umbreon VMAX 215) dauerhaft die Suche: Die Gegenprobe wurde nach der Antwort abgebrochen und nie gespeichert. Sie läuft jetzt zu Ende; die App wartet bis zu 4 s auf den genauen Link
+
+---
+
 ## [6.26.0] - 7. Oktober 2026 · Cardmarket-Link genau auf die Karte
 
 ### Neu

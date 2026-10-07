@@ -15,6 +15,7 @@
 // lassen sich also nicht direkt nachladen — nur gegen Name und Nummer prüfen.
 
 import { unstable_cache } from 'next/cache';
+import { after } from 'next/server';
 import { dexKandidaten, dexSetFuer, namenGleich } from './tcgdex';
 import { dexSetsVorgehalten } from './frischpreis-karte';
 
@@ -180,8 +181,13 @@ export async function kaufLinks(
   maxMs = 2_500,
 ): Promise<KaufLinks> {
   const rueckfall: CardmarketLink = { url: cardmarketSuche(karte.name), genau: false };
+  const genau = cardmarketLink(karte);
+  // Die Funktion nach der Antwort weiterlaufen lassen, bis der Speicher gefüllt ist —
+  // sonst friert Vercel sie ein und jeder Aufruf beginnt von vorn (gemessen 07.10.:
+  // die App bekam für Umbreon VMAX 215 dauerhaft nur die Suche).
+  try { after(() => genau.then(() => undefined)); } catch { /* außerhalb einer Anfrage */ }
   const cardmarket = await Promise.race([
-    cardmarketLink(karte),
+    genau,
     new Promise<CardmarketLink>((r) => setTimeout(() => r(rueckfall), maxMs)),
   ]);
   return {

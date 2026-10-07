@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.26.1',
+    date: '7. Oktober 2026',
+    label: 'Genauer Cardmarket-Link auch in der App',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'App-Schnittstelle: genauer Cardmarket-Link für Varianten-Karten wird jetzt gespeichert statt jedes Mal neu gesucht' },
+    ],
+  },
+  {
     version: '6.26.0',
     date: '7. Oktober 2026',
     label: 'Cardmarket-Link genau auf die Karte',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Cardmarket-Link führt genau auf die Karte, wo sich das Ziel über Name, Nummer oder Produktnummer belegen lässt — sonst die Suche' },
       { type: 'new', text: 'Kauf-Links dezent in der App, mit Affiliate-Kennzeichnung' },
