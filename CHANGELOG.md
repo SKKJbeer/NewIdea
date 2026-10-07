@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.26.2] - 7. Oktober 2026 · Kauf-Links: keine Lücken speichern
+
+### Behoben
+- Eine lückenhafte Gegenprobe (Aussetzer der Quelle) wurde 14 Tage gespeichert und hielt einzelne Karten auf der Cardmarket-Suche fest. Lückenhafte Ergebnisse werden nicht mehr gespeichert, der Speicher ist neu aufgesetzt
+
+---
+
 ## [6.26.1] - 7. Oktober 2026 · Genauer Cardmarket-Link auch in der App
 
 ### Behoben

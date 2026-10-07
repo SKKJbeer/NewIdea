@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.26.2',
+    date: '7. Oktober 2026',
+    label: 'Kauf-Links: keine Lücken speichern',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Lückenhafte Prüfergebnisse werden nicht mehr gespeichert — einzelne Karten blieben sonst auf der Cardmarket-Suche' },
+    ],
+  },
+  {
     version: '6.26.1',
     date: '7. Oktober 2026',
     label: 'Genauer Cardmarket-Link auch in der App',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'App-Schnittstelle: genauer Cardmarket-Link für Varianten-Karten wird jetzt gespeichert statt jedes Mal neu gesucht' },
     ],

@@ -106,7 +106,7 @@ async function weiterleitungsZiel(id: string): Promise<string | null> {
   throw new Error(`HTTP ${r.status}`); // vorübergehend → nicht zwischenspeichern
 }
 
-const zielGespeichert = unstable_cache(weiterleitungsZiel, ['cardmarket-ziel-v1'], { revalidate: 14 * 86_400 });
+const zielGespeichert = unstable_cache(weiterleitungsZiel, ['cardmarket-ziel-v2'], { revalidate: 14 * 86_400 });
 
 const DEX = 'https://api.tcgdex.net/v2/en';
 const DEX_KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://cardbeacon.de)' };
@@ -137,10 +137,14 @@ export async function produkteImSet(karte: { name: string; number: string; setCo
     return typeof p === 'number' && p > 0 ? p : null;
   };
   const eigene = details.find((d) => d && kandidaten.has(d.id));
-  return { eigenes: eigene ? produkt(eigene) : null, gleichnamige: details.map(produkt) };
+  const ergebnis = { eigenes: eigene ? produkt(eigene) : null, gleichnamige: details.map(produkt) };
+  // Lückenhaft = nicht belegbar, aber vielleicht nur ein Aussetzer: werfen, damit
+  // es NICHT 14 Tage gespeichert wird (gemessen 07.10.: Umbreon VMAX 215 blieb so auf der Suche).
+  if (!ergebnis.eigenes || ergebnis.gleichnamige.some((p) => !p)) throw new Error(`Produktnummern lückenhaft: ${karte.setCode}-${karte.number}`);
+  return ergebnis;
 }
 
-const produkteGespeichert = unstable_cache(produkteImSet, ['cardmarket-produkte-v1'], { revalidate: 14 * 86_400 });
+const produkteGespeichert = unstable_cache(produkteImSet, ['cardmarket-produkte-v2'], { revalidate: 14 * 86_400 });
 
 export interface CardmarketLink {
   url: string;
