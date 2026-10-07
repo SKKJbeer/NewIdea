@@ -1,0 +1,29 @@
+# TestFlight-Verteilung: interne Gruppe (Team) + öffentlicher Einladungslink.
+name: TestFlight-Tester
+
+on:
+  workflow_dispatch:
+    inputs:
+      aktion:
+        description: einrichten oder neuer-build
+        default: einrichten
+
+permissions:
+  contents: read
+
+jobs:
+  verteilen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gruppen, Tester, Einreichung
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          KEY_P8: ${{ secrets.APP_STORE_CONNECT_KEY_P8 }}
+          CONTACT_PHONE: ${{ secrets.APPLE_CONTACT_PHONE }}
+          AKTION: ${{ inputs.aktion }}
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography
+          python3 ios/scripts/testflight.py "$AKTION"
