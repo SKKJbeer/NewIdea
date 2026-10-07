@@ -60,7 +60,7 @@ Beide laufen unabhängig nebeneinander aus EINEM Backend: Die Website bleibt unv
 | Phase | Inhalt | Stand |
 |---|---|---|
 | 0 | API v1, SwiftUI-App, CI-Build + Tests auf dem Simulator | erledigt (v6.22.0) |
-| 1 | Secrets + App-Eintrag → TestFlight. Danach automatisch: jede iOS-Änderung auf main baut, registriert die Bundle-ID (API) und lädt einen neuen Build zu TestFlight | wartet auf Secrets + App-Eintrag |
+| 1 | TestFlight: jede iOS-Änderung auf main baut, signiert per API (Zertifikat + Profil je Lauf, danach gelöscht) und lädt einen neuen Build hoch | erledigt — erster Build 112 am 07.10.2026 |
 | 2 | Store-Eintrag (Screenshots, Texte), Einreichung zur Prüfung | danach |
 | 3 | Preisalarme per Push (APNs) für gemerkte Karten — braucht Geräte-Token-Ablage und einen Cron | geplant |
 | 4 | Portfolio in der App (Abgleich mit dem Konto-Portfolio der Seite) | geplant |

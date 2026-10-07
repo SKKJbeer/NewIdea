@@ -1030,6 +1030,8 @@ Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudf
 - Daten NUR über `/api/v1` (`src/lib/app-api.ts`): Felder nur ergänzen, nie umbenennen — installierte Apps lassen sich nicht zurückrollen. Formatbruch → `MIN_APP_BUILD` erhöhen. Jeder Preis mit `preisStand` + `frisch`.
 - CI: Workflow `iOS` baut + testet bei jeder Änderung unter `ios/` (macOS-Runner, ohne Signatur); TestFlight per `workflow_dispatch` mit `testflight: true`, Secrets `APPLE_TEAM_ID`, `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_KEY_P8` (Admin-Rolle).
 - Swift kann in der Sandbox NICHT übersetzt werden — Kompilierfehler nur über den CI-Lauf (`get_job_logs`) prüfen.
+- **Signatur (seit 07.10.2026, erster Upload Build 112):** Xcodes automatische Signatur scheitert in CI („team has no devices" — sie verlangt beim Archivieren ein Entwicklungsprofil). Deshalb `ios/scripts/signatur.py`: Apple-Distribution-Zertifikat (Schlüssel entsteht auf dem Runner) + `IOS_APP_STORE`-Profil per API, manuell signieren, hochladen, danach beides bei Apple löschen. `.p12` MUSS klassisches PKCS12 (SHA1/3DES) sein, sonst „MAC verification failed" beim macOS-Import.
+- **Belegt per Apple-Antwort:** App-Einträge lassen sich NICHT per API anlegen (`403 — resource 'apps' does not allow 'CREATE'`). Der Eintrag „CardBeacon – TCG Marktpreise" wurde am 07.10. vom Nutzer angelegt; Bundle-IDs registriert der Workflow selbst.
 - „Pokémon" nicht im App-Namen (Review 5.2.1); Hinweise „Inoffizielle Fan-App", „Keine Anlageberatung" bleiben in der App.
 
 ## Feedback-Knopf — seit v6.17.0
