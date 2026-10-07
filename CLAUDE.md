@@ -1042,6 +1042,7 @@ Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudf
 - Quelle des genauen Ziels: Weiterleitung `prices.pokemontcg.io/cardmarket/<id>` — GEPRÜFT: Name + Nummernkürzel im Pfad (EVS094, MEW199, BS4); bei nur „-V<k>" Gegenprobe über TCGdex-Produktnummern (`versionPasst`: k-te gleichnamige Karte im Set). Sonst Suche. Gemessen 07.10. (250 Karten): 161 genau, Rest Suche. Belegter Quellfehler: sv8-247 Pikachu ex → SSP248 (abgefangen).
 - Cardmarket ist aus Serverumgebungen nicht abrufbar (403) — eine Adresse nur per Produktnummer ist nicht belegt, deshalb nicht verwendet.
 - JP/KR bleiben bei der Suche (eigene Produkte, keine geprüfte Adresse).
+- **Nichts Unbelegtes speichern:** pokemontcg.io antwortet abwechselnd 302/502 für dieselbe Karte. Nur 404 = keine Zuordnung; 5xx und lückenhafte Gegenproben WERFEN (unstable_cache speichert dann nicht). Sonst klebt eine Karte 14 Tage auf der Suche (v6.26.2/3).
 
 ## Feedback-Knopf — seit v6.17.0
 

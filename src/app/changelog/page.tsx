@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.26.3',
+    date: '7. Oktober 2026',
+    label: 'Kauf-Links: Aussetzer der Quelle',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Vorübergehende Fehler der Linkquelle halten Karten nicht mehr auf der Cardmarket-Suche fest' },
+    ],
+  },
+  {
     version: '6.26.2',
     date: '7. Oktober 2026',
     label: 'Kauf-Links: keine Lücken speichern',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Lückenhafte Prüfergebnisse werden nicht mehr gespeichert — einzelne Karten blieben sonst auf der Cardmarket-Suche' },
     ],

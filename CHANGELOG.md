@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.26.3] - 7. Oktober 2026 · Kauf-Links: Aussetzer der Quelle
+
+### Behoben
+- Ein vorübergehender Fehler (HTTP 502) der Linkquelle galt als „keine Zuordnung" und hielt Karten auf der Cardmarket-Suche fest (z. B. Glurak ex 151). Jetzt wird wiederholt und nichts gespeichert, nur „nicht vorhanden" (404) zählt
+
+---
+
 ## [6.26.2] - 7. Oktober 2026 · Kauf-Links: keine Lücken speichern
 
 ### Behoben

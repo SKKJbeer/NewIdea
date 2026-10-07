@@ -96,17 +96,21 @@ export function versionPasst(version: number, eigenes: number | null, gleichnami
 }
 
 async function weiterleitungsZiel(id: string): Promise<string | null> {
-  const r = await fetch(`https://prices.pokemontcg.io/cardmarket/${encodeURIComponent(id)}`, {
-    redirect: 'manual',
-    signal: AbortSignal.timeout(2_500),
-    cache: 'no-store',
-  });
-  if (r.status >= 300 && r.status < 400) return r.headers.get('location');
-  if (r.status === 404 || r.status === 502) return null; // keine Zuordnung bei der Quelle
-  throw new Error(`HTTP ${r.status}`); // vorübergehend → nicht zwischenspeichern
+  // 502 ist bei der Quelle ein Aussetzer, keine fehlende Zuordnung (gemessen 07.10.:
+  // dieselbe Karte abwechselnd 302 und 502). Nur 404 gilt als „keine Zuordnung".
+  for (let versuch = 0; versuch < 2; versuch++) {
+    const r = await fetch(`https://prices.pokemontcg.io/cardmarket/${encodeURIComponent(id)}`, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(2_500),
+      cache: 'no-store',
+    });
+    if (r.status >= 300 && r.status < 400) return r.headers.get('location');
+    if (r.status === 404) return null;
+  }
+  throw new Error('pokemontcg.io antwortet nicht'); // vorübergehend → nicht speichern
 }
 
-const zielGespeichert = unstable_cache(weiterleitungsZiel, ['cardmarket-ziel-v2'], { revalidate: 14 * 86_400 });
+const zielGespeichert = unstable_cache(weiterleitungsZiel, ['cardmarket-ziel-v3'], { revalidate: 14 * 86_400 });
 
 const DEX = 'https://api.tcgdex.net/v2/en';
 const DEX_KOPF = { 'User-Agent': 'CardBeacon/1.0 (+https://cardbeacon.de)' };
