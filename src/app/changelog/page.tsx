@@ -10,10 +10,23 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.25.0',
+    date: '7. Oktober 2026',
+    label: 'iOS-App auf Website-Niveau',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'App-Portfolio: Karten direkt im Portfolio suchen und hinzufügen, Zeitraum für die Wertkurve, beste und schwächste Positionen, Aufteilung nach Set, Sammlungs-Galerie' },
+      { type: 'new', text: 'App-Markt mit Marktbreite, Vorwoche, Set-Bewegung und Neuheiten; alle Sets in der Suche' },
+      { type: 'new', text: 'App-Kartenseite mit japanischen und koreanischen Preisen (nur bei eindeutiger Zuordnung), Set und Teilen' },
+      { type: 'changed', text: 'Merkliste zeigt aktuelle Preise; durchgehend dunkles Erscheinungsbild' },
+      { type: 'fixed', text: 'App: Preiseingabe mit Punkt wurde falsch gelesen' },
+    ],
+  },
+  {
     version: '6.24.0',
     date: '7. Oktober 2026',
     label: 'Marktberichte, Artikel und Guides in der App',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Lesen in der App: Wochen-Marktbericht, Artikel und Guides — dieselben Texte wie auf der Website' },
       { type: 'new', text: 'App-Schnittstelle für Inhalte (nur lesend)' },

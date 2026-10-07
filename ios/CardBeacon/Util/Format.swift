@@ -55,7 +55,29 @@ enum Format {
         return "\(vorzeichen)\(zahl)\u{00A0}%"
     }
 
+    /// „1.234" — Stückzahlen ohne Nachkommastellen.
+    static func anzahl(_ wert: Int) -> String {
+        let f = NumberFormatter()
+        f.locale = Locale(identifier: "de_DE")
+        f.numberStyle = .decimal
+        return f.string(from: NSNumber(value: wert)) ?? String(wert)
+    }
+
+    /// „12,3" — Zahl mit fester Stellenzahl, halb aufwärts.
+    static func zahl(_ wert: Double, stellen: Int = 1) -> String {
+        let f = NumberFormatter()
+        f.locale = Locale(identifier: "de_DE")
+        f.numberStyle = .decimal
+        f.minimumFractionDigits = stellen
+        f.maximumFractionDigits = stellen
+        f.roundingMode = .halfUp
+        return f.string(from: NSNumber(value: wert)) ?? String(wert)
+    }
+
     static func isoTag(_ s: String) -> Date? { tagF.date(from: String(s.prefix(10))) }
+
+    /// „2026-10-05" aus einem Datum (UTC).
+    static func isoText(_ d: Date) -> String { tagF.string(from: d) }
 
     /// „05.10.2026" aus „2026-10-05"; unlesbar → „unbekannt".
     static func tag(_ s: String?) -> String {

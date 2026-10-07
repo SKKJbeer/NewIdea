@@ -56,6 +56,8 @@ struct KartenDetail: Codable, Hashable {
     let url: String
     let aufschluesselung: Aufschluesselung
     let verlauf: [Verlaufspunkt]
+    let sprachen: [Sprachpreis]?
+    let setInfo: SetEintrag?
 
     var alsKarte: Karte {
         Karte(id: id, name: name, nameDe: nameDe, set: set, setCode: setCode, nummer: nummer, seltenheit: seltenheit,
@@ -84,6 +86,25 @@ struct Markt: Codable, Hashable {
     let aufwaerts: [Karte]
     let abwaerts: [Karte]
     let datenStand: String?
+    // Seit API-Ausbau v6.25.0 — bei älteren Servern nil.
+    let breite: Breite?
+    let vorwoche: Vorwoche?
+    let setBewegung: [SetBewegung]?
+    let neuheiten: Neuheiten?
+
+    struct Breite: Codable, Hashable { let steigend: Int; let fallend: Int; let gesamt: Int }
+    struct Vorwoche: Codable, Hashable { let wert: Double; let datum: String }
+    struct SetBewegung: Codable, Hashable, Identifiable {
+        let setCode: String; let name: String; let median: Double; let karten: Int; let datum: String?
+        var id: String { setCode }
+    }
+    struct Neuheiten: Codable, Hashable {
+        struct NeuSet: Codable, Hashable, Identifiable { let setCode: String; let name: String; let datum: String; let logo: String?; var id: String { setCode } }
+        struct JapanSet: Codable, Hashable, Identifiable { let name: String; let nameEn: String?; let datum: String; let karten: Int; var id: String { name + datum } }
+        let neu: [NeuSet]
+        let kommend: [NeuSet]
+        let japan: [JapanSet]
+    }
 }
 
 struct SetTreffer: Codable, Hashable, Identifiable {
@@ -168,4 +189,32 @@ struct Guide: Codable {
     let kernpunkte: [String]
     let lesezeit: Int
     let url: String
+}
+
+struct SetEintrag: Codable, Hashable, Identifiable {
+    let setCode: String
+    let name: String
+    let serie: String
+    let datum: String?
+    let karten: Int
+    let logo: String?
+    let symbol: String?
+    var id: String { setCode }
+    var alsTreffer: SetTreffer { SetTreffer(setCode: setCode, name: name) }
+}
+
+struct SetListe: Codable { let sets: [SetEintrag] }
+
+/// JP/KR-Preis — oder der Grund, warum es keinen gibt (nie geraten).
+struct Sprachpreis: Codable, Hashable, Identifiable {
+    struct Gegenstueck: Codable, Hashable { let name: String; let set: String }
+    let sprache: String
+    let ok: Bool
+    let trend: Double?
+    let ab: Double?
+    let durchschnitt30: Double?
+    let stand: String?
+    let gegenstueck: Gegenstueck?
+    let grund: String?
+    var id: String { sprache }
 }

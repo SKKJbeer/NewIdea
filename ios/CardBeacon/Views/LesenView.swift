@@ -5,43 +5,56 @@ struct LesenView: View {
     var body: some View {
         NavigationStack {
             Laden(laden: { try await APIClient.shared.inhalte() }) { inhalte in
-                List {
-                    if let b = inhalte.bericht {
-                        Section("Marktbericht") {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        if let b = inhalte.bericht {
                             NavigationLink(value: Ziel.bericht) {
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text("Marktbericht KW \(b.kw)").font(.headline)
-                                    Text("Woche ab \(Format.tag(b.woche))").font(.caption).foregroundStyle(.secondary)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Label("Marktbericht", systemImage: "chart.bar.doc.horizontal")
+                                        .font(.caption.weight(.bold)).foregroundStyle(.white.opacity(0.85))
+                                    Text("KW \(b.kw)").font(.system(size: 34, weight: .heavy, design: .rounded))
+                                    Text("Marktlage, Trends, Neuheiten und Ausblick — Woche ab \(Format.tag(b.woche))")
+                                        .font(.subheadline).foregroundStyle(.white.opacity(0.85))
+                                    HStack { Spacer(); Image(systemName: "arrow.right.circle.fill").font(.title2) }
                                 }
+                                .foregroundStyle(.white)
+                                .padding(18)
+                                .background(Theme.verlauf, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                             }
+                            .buttonStyle(.plain)
                         }
-                    }
-                    if !inhalte.artikel.isEmpty {
-                        Section("Artikel") {
-                            ForEach(inhalte.artikel) { a in
-                                NavigationLink(value: Ziel.artikel(a.datum)) {
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(a.titel).font(.subheadline.weight(.semibold)).lineLimit(2)
-                                        Text("\(a.kategorie) · \(Format.tag(a.datum))").font(.caption).foregroundStyle(.secondary)
+                        if !inhalte.artikel.isEmpty {
+                            Abschnittsmarke(text: "Artikel")
+                            VStack(spacing: 0) {
+                                ForEach(inhalte.artikel) { a in
+                                    NavigationLink(value: Ziel.artikel(a.datum)) {
+                                        eintrag(symbol: "newspaper", titel: a.titel, zeile: "\(a.kategorie) · \(Format.tag(a.datum))")
                                     }
+                                    .buttonStyle(.plain)
+                                    if a.id != inhalte.artikel.last?.id { Divider().overlay(Theme.rand) }
                                 }
                             }
+                            .kachel(innen: 12)
                         }
-                    }
-                    if !inhalte.guides.isEmpty {
-                        Section("Guides") {
-                            ForEach(inhalte.guides) { g in
-                                NavigationLink(value: Ziel.guide(g.slug)) {
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(g.titel).font(.subheadline.weight(.semibold)).lineLimit(2)
-                                        Text("\(g.lesezeit) Min. Lesezeit").font(.caption).foregroundStyle(.secondary)
+                        if !inhalte.guides.isEmpty {
+                            Abschnittsmarke(text: "Guides")
+                            VStack(spacing: 0) {
+                                ForEach(inhalte.guides) { g in
+                                    NavigationLink(value: Ziel.guide(g.slug)) {
+                                        eintrag(symbol: "book.closed", titel: g.titel,
+                                                zeile: "\(g.lesezeit) Min. Lesezeit", text: g.beschreibung)
                                     }
+                                    .buttonStyle(.plain)
+                                    if g.id != inhalte.guides.last?.id { Divider().overlay(Theme.rand) }
                                 }
                             }
+                            .kachel(innen: 12)
                         }
                     }
+                    .padding()
                 }
             }
+            .background(Theme.hintergrund)
             .navigationTitle("Lesen")
             .navigationDestination(for: Ziel.self) { ziel in
                 switch ziel {
@@ -51,6 +64,24 @@ struct LesenView: View {
                 }
             }
         }
+    }
+
+    private func eintrag(symbol: String, titel: String, zeile: String, text: String? = nil) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol).foregroundStyle(Theme.akzent).frame(width: 34, height: 34)
+                .background(Theme.akzent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(titel).font(.subheadline.weight(.semibold)).lineLimit(2).multilineTextAlignment(.leading)
+                if let text, !text.isEmpty {
+                    Text(text).font(.caption).foregroundStyle(.secondary).lineLimit(2).multilineTextAlignment(.leading)
+                }
+                Text(zeile).font(.caption2).foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary).padding(.top, 10)
+        }
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
     }
 
     enum Ziel: Hashable {

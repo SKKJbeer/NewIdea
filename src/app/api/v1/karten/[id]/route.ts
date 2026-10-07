@@ -3,7 +3,9 @@ import { cardsFromIndex } from '@/lib/card-index';
 import { getStoredPriceHistory } from '@/lib/price-history';
 import { karteMitFrischpreis } from '@/lib/frischpreis-karte';
 import { siteUrlOrLocal } from '@/lib/site';
-import { APP_CACHE, detailDto } from '@/lib/app-api';
+import { sprachpreiseFuerKarte } from '@/lib/sprachpreise';
+import { ladeSetListe } from '@/lib/set-liste';
+import { APP_CACHE, detailDto, setEintragDto, sprachDto } from '@/lib/app-api';
 
 // Kartendetail (v1): Stammdaten + Preis aus dem eigenen Index, Cardmarket-
 // Aufschlüsselung vom Vortag (TCGdex, Zeitgrenze 4 s, wirft nie), echte
@@ -14,9 +16,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   try {
     const treffer = (await cardsFromIndex([id])).get(id);
     if (!treffer) return NextResponse.json({ error: 'nicht-gefunden' }, { status: 404 });
-    const [karte, verlauf] = await Promise.all([karteMitFrischpreis(treffer), getStoredPriceHistory(id, 90)]);
+    const [karte, verlauf, setListe] = await Promise.all([
+      karteMitFrischpreis(treffer), getStoredPriceHistory(id, 90), ladeSetListe(250).catch(() => null),
+    ]);
+    // JP/KR nur mit eindeutiger Zuordnung (sechs Schranken) — sonst der Grund, nie ein Wert.
+    const sprachen = await sprachpreiseFuerKarte(karte).catch(() => []);
+    const set = setListe?.sets.find((s) => s.id === karte.setCode);
     // Der Index-Stand bleibt erhalten; die Aufschlüsselung kommt aus dem Tagesabruf.
-    return NextResponse.json(detailDto({ ...karte, indexStand: treffer.indexStand }, verlauf, siteUrlOrLocal()), {
+    return NextResponse.json({
+      ...detailDto({ ...karte, indexStand: treffer.indexStand }, verlauf, siteUrlOrLocal()),
+      sprachen: sprachen.map(sprachDto),
+      setInfo: set ? setEintragDto(set) : null,
+    }, {
       headers: { 'Cache-Control': APP_CACHE },
     });
   } catch (err) {

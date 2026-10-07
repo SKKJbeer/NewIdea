@@ -17,9 +17,11 @@ BUNDLE = "de.cardbeacon.app"
 KONTAKT_MAIL = "bierfinanzen@gmail.com"  # steht im Impressum
 LOCALE = "de-DE"
 BESCHREIBUNG = ("CardBeacon zeigt Cardmarket-Preise für Pokémon-Sammelkarten mit Datenstand vom Vortag: "
-                "CardBeacon Index, stärkste Bewegungen, Suche über rund 20.000 Karten, Preisverlauf aus echten "
-                "Tageswerten und eine Merkliste auf dem Gerät. Inoffizielle Fan-App, keine Anlageberatung.")
-TESTEN = ("Markt, Suche (Karten und Sets), Kartendetail mit Preisaufschlüsselung und Verlauf, Merkliste. "
+                "CardBeacon Index, Marktbreite, stärkste Bewegungen, Set-Bewegung, Neuheiten, Suche über rund 20.000 Karten "
+                "und alle Sets, Preisverlauf aus echten Tageswerten, JP/KR-Preise bei eindeutiger Zuordnung, Portfolio "
+                "und Merkliste auf dem Gerät, Marktberichte, Artikel und Guides. Inoffizielle Fan-App, keine Anlageberatung.")
+TESTEN = ("Portfolio (Karte über + suchen und hinzufügen, Zeitraum, Aufteilung, Sammlung), Markt, Suche und Sets, "
+          "Kartendetail mit Sprachpreisen, Lesen (Bericht, Artikel, Guides), Merkliste. "
           "Rückmeldungen bitte über die Feedback-Funktion von TestFlight.")
 OEFFENTLICH = {"publicLinkEnabled": True, "publicLinkLimitEnabled": True, "publicLinkLimit": 1000, "feedbackEnabled": True}
 

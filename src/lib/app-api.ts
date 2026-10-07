@@ -257,3 +257,89 @@ export function guideDto(
 export function gueltigesDatum(roh: string, heute = new Date().toISOString().slice(0, 10)): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(roh) && Number.isFinite(Date.parse(`${roh}T00:00:00Z`)) && roh <= heute ? roh : null;
 }
+
+// ── Ausbau (seit v6.25.0): Marktbreite, Set-Bewegung, Neuheiten, Sets, Sprachpreise ──
+// Alles additiv — ältere App-Builds ignorieren die neuen Felder.
+
+export interface SetEintragDto {
+  setCode: string;
+  name: string;
+  serie: string;
+  datum: string | null;
+  karten: number;
+  logo: string | null;
+  symbol: string | null;
+}
+
+export function setEintragDto(s: { id: string; name: string; series?: string; releaseDate?: string; total?: number; logoUrl?: string; symbolUrl?: string }): SetEintragDto {
+  return {
+    setCode: s.id,
+    name: s.name,
+    serie: s.series ?? '',
+    datum: standTag(s.releaseDate ?? null),
+    karten: Number.isFinite(s.total) ? (s.total as number) : 0,
+    logo: s.logoUrl && /^https:\/\//.test(s.logoUrl) ? s.logoUrl : null,
+    symbol: s.symbolUrl && /^https:\/\//.test(s.symbolUrl) ? s.symbolUrl : null,
+  };
+}
+
+export type SprachDto =
+  | { sprache: 'JP' | 'KR'; ok: true; trend: number; ab: number | null; durchschnitt30: number | null; stand: string | null; gegenstueck: { name: string; set: string } }
+  | { sprache: 'JP' | 'KR'; ok: false; grund: string };
+
+/** Klartext für fehlende Sprachpreise — nie ein geratener Wert. */
+export const SPRACH_GRUND: Record<string, string> = {
+  'keine-zuordnung': 'Keine eindeutige Zuordnung zu einer Karte dieser Sprache',
+  'kein-preis': 'Kein Cardmarket-Preis für diese Ausgabe',
+  veraltet: 'Preis älter als erlaubt — nicht angezeigt',
+  'nicht-geladen': 'Sprachpreise gerade nicht verfügbar',
+};
+
+export function sprachDto(
+  a: { sprache: 'JP' | 'KR'; ok: true; preis: { trend: number; low: number | null; avg30: number | null }; stand: string; gegenstueck: { name: string; set: string } }
+   | { sprache: 'JP' | 'KR'; ok: false; grund: string },
+): SprachDto {
+  if (!a.ok) return { sprache: a.sprache, ok: false, grund: SPRACH_GRUND[a.grund] ?? 'Nicht verfügbar' };
+  return {
+    sprache: a.sprache,
+    ok: true,
+    trend: a.preis.trend,
+    ab: zahl(a.preis.low),
+    durchschnitt30: zahl(a.preis.avg30),
+    stand: standTag(a.stand),
+    gegenstueck: { name: a.gegenstueck.name, set: a.gegenstueck.set },
+  };
+}
+
+export interface MarktZusatzDto {
+  breite: { steigend: number; fallend: number; gesamt: number } | null;
+  vorwoche: { wert: number; datum: string } | null;
+  setBewegung: Array<{ setCode: string; name: string; median: number; karten: number; datum: string | null }>;
+  neuheiten: {
+    neu: Array<{ setCode: string; name: string; datum: string; logo: string | null }>;
+    kommend: Array<{ setCode: string; name: string; datum: string; logo: string | null }>;
+    japan: Array<{ name: string; nameEn: string | null; datum: string; karten: number }>;
+  } | null;
+}
+
+export function marktZusatz(l: {
+  breite: { steigend: number; fallend: number; gesamt: number } | null;
+  vorwoche: { wert: number; datum: string } | null;
+  sets: Array<{ setCode: string; name: string; median: number; karten: number; datum: string | null }>;
+  neuheiten: { sets: Array<{ setCode: string; name: string; datum: string; logo: string | null }>;
+               kommend: Array<{ setCode: string; name: string; datum: string; logo: string | null }>;
+               japan: Array<{ name: string; nameEn: string | null; datum: string; gesamt: number }> } | null;
+}): MarktZusatzDto {
+  const sicher = (u: string | null) => (u && /^https:\/\//.test(u) ? u : null);
+  return {
+    breite: l.breite && l.breite.gesamt > 0 ? l.breite : null,
+    vorwoche: l.vorwoche,
+    setBewegung: [...l.sets].filter((s) => Number.isFinite(s.median)).sort((a, b) => b.median - a.median)
+      .map((s) => ({ setCode: s.setCode, name: s.name, median: s.median, karten: s.karten, datum: s.datum })),
+    neuheiten: l.neuheiten ? {
+      neu: l.neuheiten.sets.map((s) => ({ setCode: s.setCode, name: s.name, datum: s.datum, logo: sicher(s.logo) })),
+      kommend: l.neuheiten.kommend.map((s) => ({ setCode: s.setCode, name: s.name, datum: s.datum, logo: sicher(s.logo) })),
+      japan: l.neuheiten.japan.map((s) => ({ name: s.name, nameEn: s.nameEn, datum: s.datum, karten: s.gesamt })),
+    } : null,
+  };
+}

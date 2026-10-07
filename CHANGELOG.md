@@ -7,6 +7,24 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.25.0] - 7. Oktober 2026 · iOS-App auf Website-Niveau
+
+### Neu
+- **Portfolio direkt bedienbar:** Karte über „+“ oder „Erste Karte hinzufügen“ im Portfolio suchen und erfassen; Zeitraum 1M/3M/1J für die Wertkurve mit Antippen einzelner Tage, Kennzahlen, beste und schwächste Positionen, Aufteilung nach Set, Sammlungs-Galerie, Löschen mit Rückfrage
+- **Markt wie auf der Startseite:** Marktbreite, Index gegen Vorwoche, Set-Bewegung (Median), Neuheiten, Angekündigtes und „in Japan zuerst“
+- **Alle Sets in der Suche:** ohne Suchbegriff alle Sets mit Logo nach Serie; Set-Seiten sortierbar nach Preis, Bewegung und Nummer
+- **Kartenseite:** große Knöpfe für Portfolio und Merkliste, japanische und koreanische Preise (nur bei eindeutiger Zuordnung, sonst der Grund), Set mit Logo, Teilen
+- **App-Schnittstelle:** `/api/v1/sets`; `/api/v1/markt` um Breite, Vorwoche, Set-Bewegung und Neuheiten ergänzt; `/api/v1/karten/:id` um Sprachpreise und Set-Angaben ergänzt (nur neue Felder)
+
+### Geändert
+- Merkliste lädt beim Öffnen die aktuellen Preise statt den Stand vom Merken zu zeigen
+- Durchgehend dunkles Erscheinungsbild wie die Website, Lesen als Magazin-Übersicht
+
+### Behoben
+- Preiseingabe „12.50“ wurde als 1.250 gelesen
+
+---
+
 ## [6.24.0] - 7. Oktober 2026 · Marktberichte, Artikel und Guides in der App
 
 ### Neu

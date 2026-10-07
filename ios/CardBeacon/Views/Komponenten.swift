@@ -104,3 +104,67 @@ struct PreisHinweis: View {
             .multilineTextAlignment(.center)
     }
 }
+
+/// Set-Logo über den Bild-Proxy; ohne Logo ein ruhiger Platzhalter.
+struct SetLogo: View {
+    let url: String?
+    var hoehe: CGFloat = 36
+
+    var body: some View {
+        Group {
+            if let url, let u = APIClient.shared.bildURL(url, breite: 256) {
+                AsyncImage(url: u) { phase in
+                    if case .success(let bild) = phase { bild.resizable().scaledToFit() }
+                    else { Image(systemName: "square.stack.3d.up").foregroundStyle(.secondary) }
+                }
+            } else {
+                Image(systemName: "square.stack.3d.up").foregroundStyle(.secondary)
+            }
+        }
+        .frame(height: hoehe)
+    }
+}
+
+/// Hochformat-Kachel für Karussells: Bild, Name, Preis, Bewegung.
+struct KartenKachel: View {
+    let karte: Karte
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            KartenBild(quelle: karte.bild, breite: 256)
+                .frame(width: 118)
+                .shadow(color: .black.opacity(0.5), radius: 8, y: 4)
+            Text(karte.anzeigeName).font(.caption.weight(.semibold)).lineLimit(1)
+            Text(karte.set).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+            HStack(spacing: 6) {
+                Text(Format.euro(karte.preis)).font(.caption.monospacedDigit().weight(.semibold))
+                Text(Format.prozent(karte.trend30)).font(.caption2.monospacedDigit().weight(.bold))
+                    .padding(.horizontal, 5).padding(.vertical, 2)
+                    .background(Theme.trendFarbe(karte.trend30).opacity(0.15), in: Capsule())
+                    .foregroundStyle(Theme.trendFarbe(karte.trend30))
+            }
+        }
+        .frame(width: 118, alignment: .leading)
+    }
+}
+
+/// Großer Aktionsknopf (Merken, Portfolio).
+struct AktionsKnopf: View {
+    let titel: String
+    let symbol: String
+    var aktiv = false
+    let aktion: () -> Void
+
+    var body: some View {
+        Button(action: aktion) {
+            Label(titel, systemImage: symbol)
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(aktiv ? AnyShapeStyle(Theme.akzent.opacity(0.18)) : AnyShapeStyle(Theme.verlauf),
+                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .foregroundStyle(aktiv ? Theme.akzent : .white)
+        }
+        .buttonStyle(.plain)
+    }
+}

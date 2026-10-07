@@ -5,7 +5,7 @@ import {
   karteDto, detailDto, bewegungen, istFrisch, standTag, indexDto, suchbegriff,
   APP_FRISCH_MAX_TAGE, BEWEGUNG_MIN_PREIS, type KarteDto,
   idsAusParam, tageAusParam, idGruppen, PORTFOLIO_MAX_IDS,
-  artikelDto, guideDto, gueltigesDatum,
+  artikelDto, guideDto, gueltigesDatum, setEintragDto, sprachDto, marktZusatz,
 } from '@/lib/app-api';
 import type { PokemonCard } from '@/types';
 
@@ -79,7 +79,7 @@ describe('App-API v1: Routen', () => {
   it('Markt filtert dünn gehandelte Ausreißer wie Website und Instagram', () => {
     expect(readFileSync(join(wurzel, 'markt/route.ts'), 'utf8')).toMatch(/ohneDuenneAusreisser\(/);
   });
-  it('elf Routen vorhanden', () => expect(dateien.length).toBe(11));
+  it('zwölf Routen vorhanden', () => expect(dateien.length).toBe(12));
   it('nur lesend, ohne Fehlerdetails, mit Cache-Kopfzeile', () => {
     for (const f of dateien) {
       const src = readFileSync(f, 'utf8');
@@ -133,5 +133,23 @@ describe('App-API v1: Inhalte', () => {
   it('Artikel-Route erzeugt nie (kein KI-Aufruf über die App)', () => {
     const src = readFileSync(join(process.cwd(), 'src/app/api/v1/artikel/[datum]/route.ts'), 'utf8');
     expect(src).not.toMatch(/generateArticle/);
+  });
+});
+
+describe('App-API v1: Ausbau', () => {
+  it('Set-Eintrag: nur https-Logos', () => {
+    const s = setEintragDto({ id: 'sv3pt5', name: '151', series: 'SV', releaseDate: '2023/09/22', total: 207, logoUrl: 'http://x', symbolUrl: 'https://s' });
+    expect(s).toMatchObject({ setCode: 'sv3pt5', datum: '2023-09-22', logo: null, symbol: 'https://s', karten: 207 });
+  });
+  it('Sprachpreis: Grund im Klartext statt Wert', () => {
+    expect(sprachDto({ sprache: 'JP', ok: false, grund: 'keine-zuordnung' })).toEqual({ sprache: 'JP', ok: false, grund: 'Keine eindeutige Zuordnung zu einer Karte dieser Sprache' });
+    const d = sprachDto({ sprache: 'KR', ok: true, preis: { trend: 12, low: null, avg30: 10 }, stand: '2026-10-06', gegenstueck: { name: 'X', set: 'SV1' } });
+    expect(d).toMatchObject({ ok: true, trend: 12, ab: null, durchschnitt30: 10, stand: '2026-10-06' });
+  });
+  it('Markt-Zusatz: Set-Bewegung absteigend, leere Breite = null', () => {
+    const z = marktZusatz({ breite: { steigend: 0, fallend: 0, gesamt: 0 }, vorwoche: null,
+      sets: [{ setCode: 'a', name: 'A', median: 1, karten: 30, datum: null }, { setCode: 'b', name: 'B', median: 5, karten: 30, datum: null }], neuheiten: null });
+    expect(z.breite).toBeNull();
+    expect(z.setBewegung.map((s) => s.setCode)).toEqual(['b', 'a']);
   });
 });
