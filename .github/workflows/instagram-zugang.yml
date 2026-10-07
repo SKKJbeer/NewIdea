@@ -44,6 +44,7 @@ jobs:
           APP_ID: ${{ secrets.META_APP_ID }}
           APP_SECRET: ${{ secrets.META_APP_SECRET }}
           KURZ: ${{ secrets.META_KURZ_TOKEN }}
+          SYS: ${{ secrets.META_SYSTEM_TOKEN }}
           VT: ${{ secrets.VERCEL_TOKEN }}
           SEITE: ${{ inputs.seite }}
           ALT: ${{ inputs.projekt_host }}
@@ -51,24 +52,31 @@ jobs:
           GV: ${{ inputs.graph_version }}
         run: |
           set -euo pipefail
-          for v in APP_ID APP_SECRET KURZ VT; do
-            [ -n "${!v}" ] || { echo "::error::Secret für ${v} fehlt (META_APP_ID, META_APP_SECRET, META_KURZ_TOKEN, VERCEL_TOKEN)."; exit 1; }
-          done
-          echo "::add-mask::${APP_SECRET}"
-          echo "::add-mask::${KURZ}"
           G="https://graph.facebook.com/${GV}"
           graph() { curl -sS --max-time 30 -G "$@"; }
-
-          # 1. Langlebiger Nutzer-Token
-          r=$(graph "$G/oauth/access_token" \
-            --data-urlencode grant_type=fb_exchange_token \
-            --data-urlencode "client_id=${APP_ID}" \
-            --data-urlencode "client_secret=${APP_SECRET}" \
-            --data-urlencode "fb_exchange_token=${KURZ}")
-          LANG_TOKEN=$(echo "$r" | jq -r '.access_token // empty')
-          [ -n "$LANG_TOKEN" ] || { echo "::error::Token-Tausch fehlgeschlagen: $(echo "$r" | jq -r '.error.message // "unbekannt"') (Kurz-Token abgelaufen? Er gilt nur eine Stunde.)"; exit 1; }
-          echo "::add-mask::${LANG_TOKEN}"
-          echo "Langlebiger Nutzer-Token erhalten."
+          [ -n "${VT}" ] || { echo "::error::Secret VERCEL_TOKEN fehlt."; exit 1; }
+          if [ -n "${SYS}" ]; then
+            # Weg B: Systemnutzer-Token aus der Business Suite (läuft nicht ab, kein Tausch nötig).
+            echo "::add-mask::${SYS}"
+            LANG_TOKEN="$SYS"
+            echo "Systemnutzer-Token wird verwendet."
+          else
+            # Weg A: Ein-Stunden-Token aus dem Graph-API-Explorer gegen einen langlebigen tauschen.
+            for v in APP_ID APP_SECRET KURZ; do
+              [ -n "${!v}" ] || { echo "::error::Entweder META_SYSTEM_TOKEN oder META_APP_ID + META_APP_SECRET + META_KURZ_TOKEN setzen."; exit 1; }
+            done
+            echo "::add-mask::${APP_SECRET}"
+            echo "::add-mask::${KURZ}"
+            r=$(graph "$G/oauth/access_token" \
+              --data-urlencode grant_type=fb_exchange_token \
+              --data-urlencode "client_id=${APP_ID}" \
+              --data-urlencode "client_secret=${APP_SECRET}" \
+              --data-urlencode "fb_exchange_token=${KURZ}")
+            LANG_TOKEN=$(echo "$r" | jq -r '.access_token // empty')
+            [ -n "$LANG_TOKEN" ] || { echo "::error::Token-Tausch fehlgeschlagen: $(echo "$r" | jq -r '.error.message // "unbekannt"') (Kurz-Token abgelaufen? Er gilt nur eine Stunde.)"; exit 1; }
+            echo "::add-mask::${LANG_TOKEN}"
+            echo "Langlebiger Nutzer-Token erhalten."
+          fi
 
           # 2. Seiten + Instagram-Konten
           r=$(graph "$G/me/accounts" \
@@ -96,7 +104,7 @@ jobs:
           # 3. Ablauf prüfen statt behaupten
           d=$(graph "$G/debug_token" \
             --data-urlencode "input_token=${SEITEN_TOKEN}" \
-            --data-urlencode "access_token=${APP_ID}|${APP_SECRET}")
+            --data-urlencode "access_token=$([ -n "${APP_ID}" ] && [ -n "${APP_SECRET}" ] && echo "${APP_ID}|${APP_SECRET}" || echo "${SEITEN_TOKEN}")")
           VALID=$(echo "$d" | jq -r '.data.is_valid // false')
           EXP=$(echo "$d" | jq -r '.data.expires_at // "?"')
           echo "Seiten-Token gültig: ${VALID}, expires_at: ${EXP} (0 = unbefristet)"
