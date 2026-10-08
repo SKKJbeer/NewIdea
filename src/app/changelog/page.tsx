@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.27.0',
+    date: '8. Oktober 2026',
+    label: 'App: Lesen als Magazin mit Kartenbildern',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Marktbericht in der App mit Kartenbildern, Balkengrafik der stärksten Bewegungen und Abschnitten mit Symbolen' },
+      { type: 'new', text: 'Artikel und Guides in der App mit Bildern der genannten Karten, Tipp-Kästen und Kurzfassung' },
+      { type: 'new', text: 'Lesen-Übersicht als Magazin; Kennzahlen im Text farbig hervorgehoben; Kartenbilder zum Vergrößern' },
+      { type: 'new', text: 'App-Schnittstelle liefert Kartenbilder zu Bericht, Artikeln und Guides' },
+    ],
+  },
+  {
     version: '6.26.3',
     date: '7. Oktober 2026',
     label: 'Kauf-Links: Aussetzer der Quelle',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Vorübergehende Fehler der Linkquelle halten Karten nicht mehr auf der Cardmarket-Suche fest' },
     ],

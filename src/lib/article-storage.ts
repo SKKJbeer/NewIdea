@@ -62,7 +62,7 @@ export async function loadArticle(date: string): Promise<Article | null> {
 }
 
 // Gibt Datum, Typ und Titel aller gespeicherten Artikel zurück — für das Blog-Listing.
-export async function listSavedArticleMeta(): Promise<Array<{ date: string; type: string; title: string }>> {
+export async function listSavedArticleMeta(): Promise<Array<{ date: string; type: string; title: string; intro: string; bild: string | null }>> {
   const sb = getSupabase();
   if (!sb) return [];
   // Titel direkt aus dem JSON lesen statt aus einer eigenen Spalte — die
@@ -70,7 +70,7 @@ export async function listSavedArticleMeta(): Promise<Array<{ date: string; type
   // unnötig viel Übertragung.
   const { data, error } = await sb
     .from('articles')
-    .select('date, type, title:content->>title')
+    .select('date, type, title:content->>title, intro:content->>intro, bild:content->featuredCards->0->>imageUrl')
     .order('date', { ascending: false })
     .limit(60);
   if (error || !data) {
@@ -81,6 +81,8 @@ export async function listSavedArticleMeta(): Promise<Array<{ date: string; type
     date: String(r.date),
     type: String(r.type),
     title: String(r.title || ''),
+    intro: typeof r.intro === 'string' ? r.intro : '',
+    bild: typeof r.bild === 'string' && /^https:\/\//.test(r.bild) ? r.bild : null,
   }));
 }
 

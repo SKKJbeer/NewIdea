@@ -81,6 +81,7 @@ private struct IndexHeld: View {
                 }
                 Text("Median der \(index.fensterTage)-Tage-Bewegung über \(Format.anzahl(index.karten)) Karten aus \(index.sets) Sets")
                     .font(.caption).foregroundStyle(.secondary)
+                EinfachErklaert(text: "Die typische Karte kostet gerade \(Format.zahl(abs(index.wert)))\u{00A0}% \(index.wert >= 0 ? "mehr" : "weniger") als im Schnitt der letzten \(index.fensterTage) Tage. Die Hälfte aller Karten liegt darüber, die andere Hälfte darunter.")
                 let punkte = markt.indexVerlauf.compactMap { p in p.tag.map { (tag: $0, wert: p.wert) } }
                 if punkte.count >= 2 {
                     Chart(punkte, id: \.tag) { p in
@@ -212,6 +213,26 @@ private struct NeuheitenKachel: View {
                 Text(unter).font(.caption2).foregroundStyle(.secondary)
             }
             Spacer()
+        }
+    }
+}
+
+/// Ein Satz für alle, die keine Marktbegriffe kennen — aufklappbar.
+struct EinfachErklaert: View {
+    let text: String
+    @State private var offen = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button { withAnimation(.snappy) { offen.toggle() } } label: {
+                Label("Einfach erklärt", systemImage: offen ? "chevron.up.circle.fill" : "questionmark.circle.fill")
+                    .font(.caption.weight(.semibold)).foregroundStyle(Theme.akzent)
+            }
+            .buttonStyle(.plain)
+            if offen {
+                Text(text).font(.callout).fixedSize(horizontal: false, vertical: true)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
     }
 }

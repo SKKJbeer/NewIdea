@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.27.0] - 8. Oktober 2026 · App: Lesen als Magazin mit Kartenbildern
+
+### Neu
+- **Marktbericht in der App** mit Kopfbereich und aufgefächerten Kartenbildern, Abschnitten als Karten mit Symbol (Marktlage, Trends, Neuheiten, Ausblick), Balkengrafik der stärksten Bewegungen und Bildstreifen der wertvollsten Karten
+- **Artikel und Guides** mit Bildern der genannten Karten, hervorgehobener Karte je Abschnitt, Beispielkarten mit Begründung, Tipp-Kästen und „Das Wichtigste in Kürze"
+- **Lesen-Übersicht als Magazin:** großer Bericht-Aufmacher, Artikel mit Kartenbild und Anreißer, Guides als Kacheln
+- Kennzahlen im Text hervorgehoben (steigend grün, fallend rot), Kartenbilder zum Vergrößern antippen, „Einfach erklärt" beim Index
+- **App-Schnittstelle:** Karten mit Bild in Bericht, Artikeln und Guides; Bilder und Anreißer in der Übersicht (nur neue Felder)
+
+---
+
 ## [6.26.3] - 7. Oktober 2026 · Kauf-Links: Aussetzer der Quelle
 
 ### Behoben

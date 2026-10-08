@@ -4,7 +4,7 @@ import { getArticleType, ARTICLE_META } from '@/lib/article-generator';
 import { loadLatestMarketReport } from '@/lib/market-report-storage';
 import { GUIDES } from '@/lib/guides';
 import { listGeneratedGuides } from '@/lib/guide-storage';
-import { APP_CACHE } from '@/lib/app-api';
+import { APP_CACHE, anreisser } from '@/lib/app-api';
 
 // Übersicht für den Lesen-Tab (v1): neuester Wochenbericht, Artikel (nur
 // Veröffentlichungstage So/Do, nicht in der Zukunft) und alle Guides.
@@ -19,15 +19,22 @@ export async function GET() {
     const guides = [...GUIDES, ...generiert.filter((g) => !GUIDES.some((s) => s.slug === g.slug))];
     return NextResponse.json(
       {
-        bericht: bericht ? { woche: bericht.weekStart, kw: bericht.weekNumber, erstellt: bericht.createdAt } : null,
+        bericht: bericht ? {
+          woche: bericht.weekStart, kw: bericht.weekNumber, erstellt: bericht.createdAt,
+          bilder: [...bericht.topGainers, ...bericht.topValue].map((c) => c.imageUrl).filter((u) => typeof u === 'string' && /^https:\/\//.test(u)).slice(0, 3),
+        } : null,
         artikel: artikel
           .filter((a) => a.date <= heute && getArticleType(a.date) && a.title)
           .slice(0, 40)
           .map((a) => {
             const typ = getArticleType(a.date)!;
-            return { datum: a.date, typ, kategorie: ARTICLE_META[typ].category, titel: a.title };
+            return { datum: a.date, typ, kategorie: ARTICLE_META[typ].category, titel: a.title, anreisser: anreisser(a.intro), bild: a.bild };
           }),
-        guides: guides.map((g) => ({ slug: g.slug, titel: g.title, beschreibung: g.metaDescription, lesezeit: g.readingTimeMin })),
+        guides: guides.map((g) => ({
+          slug: g.slug, titel: g.title, beschreibung: g.metaDescription, lesezeit: g.readingTimeMin,
+          icon: g.icon || null, badge: g.badge || null,
+          bild: g.sections?.flatMap((s) => s.cards ?? []).find((c) => c.imageUrl && /^https:\/\//.test(c.imageUrl))?.imageUrl ?? null,
+        })),
       },
       { headers: { 'Cache-Control': APP_CACHE } },
     );

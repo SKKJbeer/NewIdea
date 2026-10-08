@@ -1,4 +1,5 @@
 import XCTest
+import SwiftUI
 @testable import CardBeacon
 
 final class ModelleTests: XCTestCase {
@@ -43,5 +44,26 @@ final class FliesstextTests: XCTestCase {
     func testBloecke() {
         let b = Fliesstext.bloecke("## Marktlage\nZeile eins\nZeile zwei\n\n- Punkt\n## Ausblick\nText")
         XCTAssertEqual(b, [.ueberschrift("Marktlage"), .absatz("Zeile eins Zeile zwei"), .punkt("Punkt"), .ueberschrift("Ausblick"), .absatz("Text")])
+    }
+}
+
+final class LeseTests: XCTestCase {
+    func testAbschnitteMitVorwort() {
+        let t = Fliesstext.abschnitte("Einleitung\n\n## Marktlage\nA\nB\n## Ausblick\nC")
+        XCTAssertEqual(t.vorwort, "Einleitung")
+        XCTAssertEqual(t.abschnitte.map(\.titel), ["Marktlage", "Ausblick"])
+        XCTAssertEqual(t.abschnitte[0].text, "A\nB")
+    }
+
+    func testKennzahlenWerdenHervorgehoben() {
+        let a = Fliesstext.hervorgehoben("Index +2,6\u{00A0}% bei 1.234,50\u{00A0}€")
+        XCTAssertEqual(String(a.characters), "Index +2,6\u{00A0}% bei 1.234,50\u{00A0}€")
+        let fett = a.runs.filter { $0[AttributeScopes.SwiftUIAttributes.FontAttribute.self] != nil }.count
+        XCTAssertEqual(fett, 2)
+    }
+
+    func testSymbole() {
+        XCTAssertEqual(InhaltSymbol.berichtAbschnitt("Trends"), "flame.fill")
+        XCTAssertEqual(InhaltSymbol.fuer("unbekannt"), "book.closed.fill")
     }
 }

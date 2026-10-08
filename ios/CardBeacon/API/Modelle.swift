@@ -143,9 +143,24 @@ struct VerlaufAntwort: Codable {
 }
 
 struct Inhalte: Codable {
-    struct Bericht: Codable, Hashable { let woche: String; let kw: Int; let erstellt: String }
-    struct ArtikelEintrag: Codable, Hashable, Identifiable { let datum: String; let typ: String; let kategorie: String; let titel: String; var id: String { datum } }
-    struct GuideEintrag: Codable, Hashable, Identifiable { let slug: String; let titel: String; let beschreibung: String; let lesezeit: Int; var id: String { slug } }
+    struct Bericht: Codable, Hashable {
+        let woche: String; let kw: Int; let erstellt: String
+        /// Seit v6.27.0: Kartenbilder des Berichts.
+        let bilder: [String]?
+    }
+    struct ArtikelEintrag: Codable, Hashable, Identifiable {
+        let datum: String; let typ: String; let kategorie: String; let titel: String
+        let anreisser: String?
+        let bild: String?
+        var id: String { datum }
+    }
+    struct GuideEintrag: Codable, Hashable, Identifiable {
+        let slug: String; let titel: String; let beschreibung: String; let lesezeit: Int
+        let icon: String?
+        let badge: String?
+        let bild: String?
+        var id: String { slug }
+    }
     let bericht: Bericht?
     let artikel: [ArtikelEintrag]
     let guides: [GuideEintrag]
@@ -158,12 +173,33 @@ struct Marktbericht: Codable {
     let text: String
     let archiv: Bool
     let url: String
+    /// Seit v6.27.0 — Preise mit Stand der Erstellung des Berichts.
+    let aufwaerts: [InhaltKarte]?
+    let wertvollste: [InhaltKarte]?
+}
+
+/// Karte in Lese-Inhalten. Der Preis ist der Stand beim Schreiben des Textes, nie „aktuell".
+struct InhaltKarte: Codable, Hashable {
+    let name: String
+    let bild: String
+    let preis: Double?
+    let trend30: Double?
+    let seltenheit: String?
+    let set: String?
+    let setCode: String?
+    let id: String?
+    let warum: String?
+    var schluessel: String { id ?? "\(name)|\(bild)" }
 }
 
 struct Abschnitt: Codable, Hashable {
     let ueberschrift: String
     let text: String
     let tipp: String?
+    /// Artikel: hervorgehobene Karte des Abschnitts.
+    let karte: InhaltKarte?
+    /// Guides: Beispielkarten des Abschnitts.
+    let karten: [InhaltKarte]?
 }
 
 struct Quelle: Codable, Hashable { let label: String; let url: String }
@@ -180,6 +216,7 @@ struct Artikel: Codable {
     let lesezeit: Int
     let archiv: Bool
     let url: String
+    let karten: [InhaltKarte]?
 }
 
 struct Guide: Codable {
@@ -191,6 +228,8 @@ struct Guide: Codable {
     let kernpunkte: [String]
     let lesezeit: Int
     let url: String
+    let icon: String?
+    let badge: String?
 }
 
 struct SetEintrag: Codable, Hashable, Identifiable {

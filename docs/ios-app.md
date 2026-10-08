@@ -26,7 +26,7 @@ Stand: 6. Oktober 2026 · Bundle-ID `de.cardbeacon.app` · Mindestversion iOS 17
 | `GET /api/v1/sets` | Alle Sets, neueste zuerst, mit Logo und Serie | `ladeSetListe` (mit gesicherter Liste) |
 | `GET /api/v1/sets/:setCode` | Alle Karten eines Sets | Kartenindex |
 | `GET /api/v1/inhalte` | Neuester Marktbericht, Artikel (So/Do), alle Guides | `market_reports`, `articles`, Guides |
-| `GET /api/v1/marktbericht[?woche=]` · `/artikel/:datum` · `/guides/:slug` | Volltexte; `archiv` = Zahlen evtl. veraltet; erzeugt nie | wie Website |
+| `GET /api/v1/marktbericht[?woche=]` · `/artikel/:datum` · `/guides/:slug` | Volltexte; `archiv` = Zahlen evtl. veraltet; erzeugt nie. Seit v6.27.0 Karten mit Bild (`aufwaerts`/`wertvollste`, `karten`, `abschnitte[].karte`/`.karten`), Preise = Stand des Textes | wie Website |
 | `GET /api/v1/preise?ids=` | Aktuelle Preise für bis zu 100 Karten, `fehlend` = ohne Eintrag | Kartenindex |
 | `GET /api/v1/verlauf?ids=&tage=` | Echte Tageswerte je Karte (max. 365 Tage), in Gruppen < 1.000 Zeilen abgefragt | `price_snapshots` |
 

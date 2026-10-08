@@ -185,13 +185,57 @@ export function idGruppen(ids: string[], tage: number, grenze = DB_ZEILEN_GRENZE
 // können veraltet sein (Ersatztext oder vor dem frischen Tagesindex erzeugt) —
 // die App zeigt dann denselben Hinweis wie die Seite.
 
+/** Bildkarte in Lese-Inhalten. Preis = Stand bei Erstellung des Textes (`stand`), nie als aktuell ausgeben. */
+export interface InhaltKarteDto {
+  name: string;
+  bild: string;
+  preis: number | null;
+  trend30: number | null;
+  seltenheit: string | null;
+  set: string | null;
+  setCode: string | null;
+  /** Karten-ID für die Kartenseite (aktueller Preis), wenn bekannt. */
+  id: string | null;
+  /** Kurze Begründung (Guides). */
+  warum: string | null;
+}
+
+const httpsBild = (u: unknown): string | null => (typeof u === 'string' && /^https:\/\//.test(u) ? u : null);
+
+/** Karten aus Artikeln/Berichten/Guides — ohne Bild keine Karte (rein). */
+export function inhaltKarte(c: {
+  id?: string; name?: string; imageUrl?: string; price?: number; trend?: number; trendPercent?: number; rarity?: string;
+  set?: string; setCode?: string; setId?: string; why?: string; prices?: { market?: number };
+} | null | undefined): InhaltKarteDto | null {
+  if (!c) return null;
+  const bild = httpsBild(c.imageUrl);
+  if (!bild || !c.name) return null;
+  const preis = zahl(c.price ?? c.prices?.market);
+  return {
+    name: c.name,
+    bild,
+    preis: preis !== null && preis > 0 ? preis : null,
+    trend30: zahl(c.trend ?? c.trendPercent),
+    seltenheit: c.rarity || null,
+    set: c.set || null,
+    setCode: c.setCode || c.setId || null,
+    id: c.id && /^[A-Za-z0-9._-]{1,40}$/.test(c.id) ? c.id : null,
+    warum: c.why || null,
+  };
+}
+
+const karten = (liste: unknown[] | undefined, max = 12): InhaltKarteDto[] =>
+  (liste ?? []).map((c) => inhaltKarte(c as Parameters<typeof inhaltKarte>[0])).filter((c): c is InhaltKarteDto => c !== null).slice(0, max);
+
 export interface ArtikelDto {
   datum: string;
   typ: string;
   kategorie: string;
   titel: string;
   intro: string;
-  abschnitte: Array<{ ueberschrift: string; text: string }>;
+  abschnitte: Array<{ ueberschrift: string; text: string; karte?: InhaltKarteDto | null }>;
+  /** Seit v6.27.0: Karten des Artikels mit Bild. */
+  karten?: InhaltKarteDto[];
   kernpunkte: string[];
   quellen: Array<{ label: string; url: string }>;
   lesezeit: number;
@@ -204,21 +248,26 @@ export interface GuideDto {
   titel: string;
   beschreibung: string;
   intro: string;
-  abschnitte: Array<{ ueberschrift: string; text: string; tipp: string | null }>;
+  abschnitte: Array<{ ueberschrift: string; text: string; tipp: string | null; karten?: InhaltKarteDto[] }>;
   kernpunkte: string[];
   lesezeit: number;
   url: string;
+  /** Seit v6.27.0: Lucide-Schlüssel des Guides (App setzt ein passendes Symbol). */
+  icon?: string | null;
+  badge?: string | null;
 }
 
 const text = (x: unknown): string => (typeof x === 'string' ? x : '');
 
 export function artikelDto(
-  a: { title?: string; intro?: string; sections?: Array<{ heading?: string; content?: string }>; keyPoints?: string[];
-       sources?: Array<{ label: string; url: string }>; readingTimeMin?: number },
+  a: { title?: string; intro?: string; sections?: Array<{ heading?: string; content?: string; highlight?: unknown }>; keyPoints?: string[];
+       sources?: Array<{ label: string; url: string }>; readingTimeMin?: number; featuredCards?: unknown[] },
   meta: { datum: string; typ: string; kategorie: string; archiv: boolean },
   basis: string,
 ): ArtikelDto {
-  const abschnitte = (a.sections ?? []).map((s) => ({ ueberschrift: text(s.heading), text: text(s.content) })).filter((s) => s.text);
+  const abschnitte = (a.sections ?? [])
+    .map((s) => ({ ueberschrift: text(s.heading), text: text(s.content), karte: inhaltKarte(s.highlight as Parameters<typeof inhaltKarte>[0]) }))
+    .filter((s) => s.text);
   const woerter = [a.intro ?? '', ...abschnitte.map((s) => s.text)].join(' ').split(/\s+/).filter(Boolean).length;
   return {
     datum: meta.datum,
@@ -227,6 +276,7 @@ export function artikelDto(
     titel: text(a.title),
     intro: text(a.intro),
     abschnitte,
+    karten: karten(a.featuredCards),
     kernpunkte: (a.keyPoints ?? []).filter((k) => typeof k === 'string' && k.trim()),
     quellen: (a.sources ?? []).filter((q) => q && /^https:\/\//.test(q.url)),
     lesezeit: a.readingTimeMin && a.readingTimeMin > 0 ? a.readingTimeMin : Math.max(1, Math.round(woerter / 200)),
@@ -237,7 +287,7 @@ export function artikelDto(
 
 export function guideDto(
   g: { slug: string; title: string; metaDescription?: string; intro?: string; readingTimeMin?: number; keyPoints?: string[];
-       sections?: Array<{ heading?: string; content?: string; tip?: string }> },
+       sections?: Array<{ heading?: string; content?: string; tip?: string; cards?: unknown[] }>; icon?: string; badge?: string },
   basis: string,
 ): GuideDto {
   return {
@@ -245,8 +295,10 @@ export function guideDto(
     titel: g.title,
     beschreibung: text(g.metaDescription),
     intro: text(g.intro),
-    abschnitte: (g.sections ?? []).map((s) => ({ ueberschrift: text(s.heading), text: text(s.content), tipp: s.tip ? s.tip : null }))
+    abschnitte: (g.sections ?? []).map((s) => ({ ueberschrift: text(s.heading), text: text(s.content), tipp: s.tip ? s.tip : null, karten: karten(s.cards, 6) }))
       .filter((s) => s.text),
+    icon: g.icon || null,
+    badge: g.badge || null,
     kernpunkte: (g.keyPoints ?? []).filter((k) => typeof k === 'string' && k.trim()),
     lesezeit: g.readingTimeMin && g.readingTimeMin > 0 ? g.readingTimeMin : 5,
     url: `${basis}/guides/${g.slug}`,
@@ -355,4 +407,17 @@ export interface KaufDto {
 /** Kauf-Links für die App — dieselben wie auf der Kartenseite (kauf-links.ts). */
 export function kaufDto(l: { cardmarket: { url: string; genau: boolean }; amazonKarte: string; amazonBooster: string }): KaufDto {
   return { cardmarket: l.cardmarket.url, cardmarketGenau: l.cardmarket.genau, amazonKarte: l.amazonKarte, amazonBooster: l.amazonBooster };
+}
+
+/** Karten eines Wochenberichts (Stand: Erstellung des Berichts) — rein. */
+export function berichtKarten(b: { topGainers?: unknown[]; topValue?: unknown[] }): { aufwaerts: InhaltKarteDto[]; wertvollste: InhaltKarteDto[] } {
+  return { aufwaerts: karten(b.topGainers, 10), wertvollste: karten(b.topValue, 10) };
+}
+
+/** Kurzer Anreißer aus dem Intro: an einer Wortgrenze, höchstens `max` Zeichen (rein). */
+export function anreisser(t: string, max = 160): string {
+  const s = t.replace(/\s+/g, ' ').trim();
+  if (s.length <= max) return s;
+  const schnitt = s.slice(0, max);
+  return `${schnitt.slice(0, Math.max(schnitt.lastIndexOf(' '), max - 20)).trim()} …`;
 }

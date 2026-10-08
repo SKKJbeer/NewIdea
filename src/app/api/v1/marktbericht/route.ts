@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { loadLatestMarketReport, loadMarketReportByWeek, isPublishableReport } from '@/lib/market-report-storage';
 import { artikelPreiseVeraltet } from '@/lib/article-generator';
 import { siteUrlOrLocal } from '@/lib/site';
-import { APP_CACHE, gueltigesDatum } from '@/lib/app-api';
+import { APP_CACHE, berichtKarten, gueltigesDatum } from '@/lib/app-api';
 
 // Wochen-Marktbericht (v1): neuester oder `?woche=JJJJ-MM-TT`. Abschnitte im
 // Text beginnen mit `## ` (Marktlage, Trends, Neuheiten, Ausblick).
@@ -21,6 +21,8 @@ export async function GET(request: Request) {
         text: b.reportText,
         archiv: artikelPreiseVeraltet({ generatedAt: b.createdAt }),
         url: `${siteUrlOrLocal()}/marktbericht/${b.weekStart}`,
+        // Seit v6.27.0 — Karten des Berichts mit Bild (Preise: Stand der Erstellung).
+        ...berichtKarten(b),
       },
       { headers: { 'Cache-Control': APP_CACHE } },
     );

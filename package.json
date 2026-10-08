@@ -1,6 +1,6 @@
 {
   "name": "pokemarketapp",
-  "version": "6.26.3",
+  "version": "6.27.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

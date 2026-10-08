@@ -7,6 +7,7 @@ struct KarteView: View {
     @EnvironmentObject private var portfolio: PortfolioSpeicher
     @State private var neuePosition: Position?
     @State private var marktwert: Double?
+    @State private var vollbild = false
 
     var body: some View {
         Laden(laden: { try await APIClient.shared.karte(karte.id) }) { d in
@@ -14,8 +15,13 @@ struct KarteView: View {
                 VStack(spacing: 18) {
                     ZStack {
                         Circle().fill(Theme.verlauf).frame(width: 220, height: 220).blur(radius: 70).opacity(0.45)
-                        KartenBild(quelle: d.bild, breite: 640).frame(maxWidth: 250)
-                            .shadow(color: .black.opacity(0.6), radius: 18, y: 10)
+                        Button { vollbild = true } label: {
+                            KartenBild(quelle: d.bild, breite: 640).frame(maxWidth: 250)
+                                .shadow(color: .black.opacity(0.6), radius: 18, y: 10)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Karte groß anzeigen")
+                        .fullScreenCover(isPresented: $vollbild) { KartenVollbild(bild: d.bild, titel: d.nameDe ?? d.name) }
                     }
                     .padding(.top, 6)
 

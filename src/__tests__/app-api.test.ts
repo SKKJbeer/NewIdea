@@ -153,3 +153,36 @@ describe('App-API v1: Ausbau', () => {
     expect(z.setBewegung.map((s) => s.setCode)).toEqual(['b', 'a']);
   });
 });
+
+describe('Lese-Inhalte mit Bildern (v6.27.0)', () => {
+  it('inhaltKarte: nur mit https-Bild und Name, Preis ≤ 0 → null', async () => {
+    const { inhaltKarte } = await import('@/lib/app-api');
+    expect(inhaltKarte({ name: 'X', imageUrl: 'http://a/b.png' })).toBeNull();
+    expect(inhaltKarte({ name: '', imageUrl: 'https://a/b.png' })).toBeNull();
+    const k = inhaltKarte({ id: 'sv1-1', name: 'X', imageUrl: 'https://a/b.png', price: 0, trend: 5, setId: 'sv1', why: 'w' });
+    expect(k).toMatchObject({ id: 'sv1-1', preis: null, trend30: 5, setCode: 'sv1', warum: 'w' });
+  });
+
+  it('artikelDto und guideDto liefern Karten', async () => {
+    const { artikelDto, guideDto } = await import('@/lib/app-api');
+    const a = artikelDto({ title: 'T', intro: 'I', featuredCards: [{ name: 'A', imageUrl: 'https://x/a.png', price: 3 }],
+      sections: [{ heading: 'H', content: 'C', highlight: { name: 'B', imageUrl: 'https://x/b.png' } }] },
+      { datum: '2026-10-08', typ: 'markt', kategorie: 'Markt', archiv: false }, 'https://s');
+    expect(a.karten?.map((k) => k.name)).toEqual(['A']);
+    expect(a.abschnitte[0].karte?.name).toBe('B');
+    const g = guideDto({ slug: 's', title: 'G', icon: 'gem', badge: 'Grading',
+      sections: [{ heading: 'H', content: 'C', cards: [{ name: 'Z', rarity: 'R', why: 'w', imageUrl: 'https://x/z.png', setId: 'base1' }] }] }, 'https://s');
+    expect(g.icon).toBe('gem');
+    expect(g.abschnitte[0].karten?.[0]).toMatchObject({ name: 'Z', setCode: 'base1', warum: 'w' });
+  });
+
+  it('berichtKarten und anreisser', async () => {
+    const { berichtKarten, anreisser } = await import('@/lib/app-api');
+    const b = berichtKarten({ topGainers: [{ id: 'a-1', name: 'A', imageUrl: 'https://x/a.png', prices: { market: 4 }, trendPercent: 12 }], topValue: [] });
+    expect(b.aufwaerts[0]).toMatchObject({ id: 'a-1', preis: 4, trend30: 12 });
+    expect(anreisser('kurz')).toBe('kurz');
+    const lang = anreisser('wort '.repeat(80), 40);
+    expect(lang.length).toBeLessThanOrEqual(42);
+    expect(lang.endsWith('…')).toBe(true);
+  });
+});
