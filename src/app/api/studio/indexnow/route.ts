@@ -5,6 +5,7 @@ import { kartenAnzahl, kartenTeil, teileFuer } from '@/lib/sitemap-karten';
 import { ladeSetListe } from '@/lib/set-liste';
 import { GUIDES } from '@/lib/guides';
 import { siteUrl } from '@/lib/site';
+import { pokemonFuerSitemap } from '@/lib/pokemon-daten';
 
 // EINMALIGE VOLLMELDUNG AN INDEXNOW.
 //
@@ -25,8 +26,10 @@ export async function POST(request: Request) {
 
   const urls: string[] = [
     '/', '/suche', '/einsteiger', '/methodik', '/sets', '/artikel', '/guides',
-    '/marktbericht', '/marktbericht/archiv', '/portfolio', '/merkliste',
+    '/marktbericht', '/marktbericht/archiv', '/portfolio', '/merkliste', '/trends', '/pokemon',
   ].map((p) => `${basis}${p}`);
+  // Pokémon-Seiten (seit v6.28.0) — dieselbe Auswahl wie die Sitemap.
+  urls.push(...(await pokemonFuerSitemap().catch(() => [])).map((p) => `${basis}/pokemon/${p.slug}`));
   urls.push(...GUIDES.map((g) => `${basis}/guides/${g.slug}`));
 
   // Dieselbe abgesicherte Liste wie die Sitemap — live fiel sie am 03.10. aus (0 Sets).

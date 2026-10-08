@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.28.0',
+    date: '8. Oktober 2026',
+    label: 'Pokémon-Seiten, Teilen und Suchmaschinen',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Karten nach Pokémon: Übersicht und je Pokémon eine Seite mit allen Versionen und Preisen' },
+      { type: 'new', text: 'Teilen-Knopf auf Karten-, Pokémon-, Artikel- und Berichtsseiten sowie in der App' },
+      { type: 'new', text: 'Pokémon mit gleichem deutschen und englischen Namen (z. B. Pikachu, Mew) ergänzt' },
+      { type: 'new', text: 'Abläufe für die Bestätigung bei Google und Bing sowie für die IndexNow-Vollmeldung' },
+    ],
+  },
+  {
     version: '6.27.2',
     date: '8. Oktober 2026',
     label: 'Marktbericht: nur echte Bewegungen als Gewinner',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Marktbericht (Website und App): dünn gehandelte Klassiker über 100 % erscheinen nicht mehr unter „Stärkste Aufwärtsbewegungen"' },
     ],

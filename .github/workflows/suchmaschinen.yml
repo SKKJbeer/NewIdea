@@ -1,0 +1,92 @@
+# Bestätigung bei Google Search Console und Bing Webmaster Tools.
+#
+# Ablauf (Nutzer): In der Search Console „URL-Präfix" https://cardbeacon.de,
+# Methode „HTML-Tag", den Wert aus content="…" als Repository-Secret
+# GOOGLE_SITE_VERIFICATION speichern (Bing: msvalidate.01 → BING_SITE_VERIFICATION).
+# Dann diesen Workflow starten. Er setzt die Werte in Vercel (Production), stößt
+# ein neues Deployment an und prüft, ob das Meta-Tag live steht. Danach in der
+# Konsole auf „Bestätigen" klicken. Die Sitemaps stehen in robots.txt — Google
+# findet sie auch ohne Einreichen; in der Konsole einreichen beschleunigt es.
+name: Suchmaschinen bestätigen
+
+on:
+  workflow_dispatch:
+    inputs:
+      projekt_host:
+        description: Vercel-Adresse des Projekts
+        default: new-idea-livid.vercel.app
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  bestaetigen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Werte in Vercel setzen und neu ausliefern
+        env:
+          VT: ${{ secrets.VERCEL_TOKEN }}
+          GOOGLE: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
+          BING: ${{ secrets.BING_SITE_VERIFICATION }}
+          ALT: ${{ inputs.projekt_host }}
+        run: |
+          set -euo pipefail
+          [ -n "${VT}" ] || { echo "::error::Secret VERCEL_TOKEN fehlt."; exit 1; }
+          [ -n "${GOOGLE}${BING}" ] || { echo "::error::Weder GOOGLE_SITE_VERIFICATION noch BING_SITE_VERIFICATION gesetzt."; exit 1; }
+          # Nur der content-Wert ist gemeint — falls das ganze Tag eingefügt wurde, herausschneiden.
+          wert() { printf '%s' "$1" | sed -E 's/.*content="([^"]+)".*/\1/' | tr -d '[:space:]'; }
+          GOOGLE=$(wert "${GOOGLE}"); BING=$(wert "${BING}")
+
+          B=https://api.vercel.com
+          api() { curl -sS --max-time 30 -H "Authorization: Bearer ${VT}" -H "Content-Type: application/json" "$@"; }
+          TEAMS=$(api "$B/v2/teams" | jq -r '.teams[]? | .id')
+          STANDARD=$(api "$B/v2/user" | jq -r '.user.defaultTeamId // empty')
+          PROJEKT=""; TEAM=""
+          while IFS= read -r t; do
+            q=""; [ -n "$t" ] && q="?teamId=$t"
+            id=$(api "$B/v4/aliases/${ALT}${q}" | jq -r '.projectId // empty')
+            if [ -n "$id" ]; then PROJEKT=$id; TEAM=$t; break; fi
+          done <<< "$(printf '%s\n\n%s' "$STANDARD" "$TEAMS")"
+          [ -n "$PROJEKT" ] || { echo "::error::Kein Vercel-Projekt zu ${ALT} gefunden."; exit 1; }
+          Q=""; [ -n "$TEAM" ] && Q="?teamId=$TEAM"
+          NAME=$(api "$B/v9/projects/${PROJEKT}${Q}" | jq -r '.name')
+          echo "Vercel-Projekt: ${NAME}"
+
+          setze() {
+            local vorhanden body
+            vorhanden=$(api "$B/v9/projects/${PROJEKT}/env${Q}" | jq -r --arg k "$1" '.envs[]? | select(.key==$k) | .id' | head -1)
+            body=$(jq -n --arg k "$1" --arg v "$2" '{key:$k,value:$v,type:"plain",target:["production"]}')
+            if [ -n "$vorhanden" ]; then
+              api -X PATCH "$B/v9/projects/${PROJEKT}/env/${vorhanden}${Q}" --data "$(echo "$body" | jq 'del(.key)')" | jq -e '.key' >/dev/null
+              echo "$1 aktualisiert."
+            else
+              api -X POST "$B/v10/projects/${PROJEKT}/env${Q}" --data "$body" | jq -e '.created // .key' >/dev/null
+              echo "$1 angelegt."
+            fi
+          }
+          [ -n "${GOOGLE}" ] && setze GOOGLE_SITE_VERIFICATION "${GOOGLE}"
+          [ -n "${BING}" ] && setze BING_SITE_VERIFICATION "${BING}"
+
+          # Neues Production-Deployment aus dem letzten — sonst wirkt die Variable erst beim nächsten Push.
+          LETZTES=$(api "$B/v6/deployments?projectId=${PROJEKT}&target=production&state=READY&limit=1${Q:+&teamId=$TEAM}" | jq -r '.deployments[0].uid // empty')
+          [ -n "$LETZTES" ] || { echo "::error::Kein Production-Deployment gefunden."; exit 1; }
+          NEU=$(api -X POST "$B/v13/deployments?forceNew=1${Q:+&teamId=$TEAM}" \
+            --data "$(jq -n --arg n "$NAME" --arg d "$LETZTES" '{name:$n,deploymentId:$d,target:"production"}')" | jq -r '.id // .error.message')
+          echo "Neues Deployment: ${NEU}"
+
+          # Warten, bis das Tag live steht (max. 8 Minuten).
+          for i in $(seq 1 48); do
+            seite=$(curl -s --max-time 20 "https://cardbeacon.de/?pruefung=$(date +%s)" || true)
+            ok=1
+            [ -n "${GOOGLE}" ] && ! printf '%s' "$seite" | grep -q "google-site-verification\" content=\"${GOOGLE}\"" && ok=0
+            [ -n "${BING}" ] && ! printf '%s' "$seite" | grep -q "msvalidate.01\" content=\"${BING}\"" && ok=0
+            if [ $ok = 1 ]; then
+              echo "Meta-Tags stehen live."
+              { echo "## Suchmaschinen"; echo "- Meta-Tags live auf https://cardbeacon.de"; echo "- Jetzt in der Search Console bzw. Bing auf **Bestätigen** klicken"; echo "- Sitemap: https://cardbeacon.de/sitemap.xml (plus /karten/sitemap/0–3.xml)"; } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Meta-Tags nach 8 Minuten nicht live — Deployment bei Vercel prüfen."
+          exit 1

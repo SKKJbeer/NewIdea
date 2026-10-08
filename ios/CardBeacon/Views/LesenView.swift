@@ -255,6 +255,7 @@ struct BerichtView: View {
                 }
             }
             .background(Theme.hintergrund)
+            .toolbar { TeilenToolbar(url: b.url, titel: "Pokémon-Marktbericht KW \(b.kw)") }
         }
         .background(Theme.hintergrund)
         .navigationBarTitleDisplayMode(.inline)
@@ -303,6 +304,7 @@ struct ArtikelView: View {
                 }
             }
             .background(Theme.hintergrund)
+            .toolbar { TeilenToolbar(url: a.url, titel: a.titel) }
         }
         .background(Theme.hintergrund)
         .navigationBarTitleDisplayMode(.inline)
@@ -371,6 +373,7 @@ struct GuideView: View {
                 }
             }
             .background(Theme.hintergrund)
+            .toolbar { TeilenToolbar(url: g.url, titel: g.titel) }
         }
         .background(Theme.hintergrund)
         .navigationBarTitleDisplayMode(.inline)
@@ -505,5 +508,26 @@ private struct WeiterLink: View {
         if let u = URL(string: url) {
             Link(destination: u) { Label("Auf cardbeacon.de öffnen", systemImage: "safari") }.font(.callout).padding(.top, 6)
         }
+    }
+}
+
+/// Teilen-Knopf oben rechts; die Adresse trägt die Herkunft „app" für die Reichweitenmessung.
+struct TeilenToolbar: ToolbarContent {
+    let url: String
+    let titel: String
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            if let ziel = Self.mitHerkunft(url) {
+                ShareLink(item: ziel, subject: Text(titel)) { Image(systemName: "square.and.arrow.up") }
+            }
+        }
+    }
+
+    static func mitHerkunft(_ url: String) -> URL? {
+        guard var teile = URLComponents(string: url) else { return nil }
+        teile.queryItems = (teile.queryItems ?? []) + [URLQueryItem(name: "utm_source", value: "app"),
+                                                        URLQueryItem(name: "utm_medium", value: "teilen")]
+        return teile.url
     }
 }

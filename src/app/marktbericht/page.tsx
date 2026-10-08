@@ -1,3 +1,5 @@
+import { TeilenKnopf } from '@/components/TeilenKnopf';
+import { siteUrlOrLocal } from '@/lib/site';
 import Link from 'next/link';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import { SECTION_LABEL } from '@/lib/ui';
@@ -78,6 +80,9 @@ export default async function MarktberichtPage() {
             Was sich in der vergangenen Woche bewegt hat — auf Basis der
             Cardmarket-Preise, mit offengelegter Methodik.
           </p>
+          <div className="mt-5">
+            <TeilenKnopf url={`${siteUrlOrLocal()}/marktbericht`} titel={report ? `Pokémon-Marktbericht KW ${report.weekNumber}` : 'Pokémon-Marktbericht'} klein />
+          </div>
         </div>
       </header>
 

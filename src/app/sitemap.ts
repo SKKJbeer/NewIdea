@@ -8,6 +8,7 @@ import { ladeSetListe } from '@/lib/set-liste';
 import { listGeneratedGuideMeta } from '@/lib/guide-storage';
 import { leseDurchlaufStand } from '@/lib/preis-durchlauf';
 import { siteUrlOrLocal } from '@/lib/site';
+import { pokemonFuerSitemap } from '@/lib/pokemon-daten';
 
 // Keine geratene Adresse — siehe site.ts.
 const BASE_URL = siteUrlOrLocal();
@@ -96,7 +97,14 @@ async function bauen(): Promise<MetadataRoute.Sitemap> {
   // (/karten/sitemap/N.xml, gemeldet in robots.txt) — alle ~20.000 statt
   // bisher 40. Siehe `src/lib/sitemap-karten.ts`.
 
-  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages];
+  // Pokémon-Seiten (seit v6.28.0): eine je Pokémon mit mindestens drei Karten.
+  const pokemon = await pokemonFuerSitemap().catch(() => []);
+  const pokemonPages: MetadataRoute.Sitemap = [
+    seite('/pokemon', 'weekly', 0.8, preisStand),
+    ...pokemon.map((p) => seite(`/pokemon/${p.slug}`, 'weekly', 0.7, preisStand)),
+  ];
+
+  return [...staticPages, ...guidePages, ...articlePages, ...reportPages, ...setPages, ...pokemonPages];
 }
 
 // ZWISCHENSPEICHER (v6.21.2). Die Sitemap bleibt `force-dynamic`, rechnete aber
@@ -105,7 +113,7 @@ async function bauen(): Promise<MetadataRoute.Sitemap> {
 // next.config.ts blieben wirkungslos — Next setzt sie für diese Route selbst
 // (`max-age=0, must-revalidate`, v6.21.1 gemessen). Wirksam ist nur der geteilte
 // Datenspeicher: instanzübergreifend, 15 Minuten. Ein Wurf wird nicht abgelegt.
-const gespeichert = unstable_cache(bauen, ['sitemap-haupt-v1'], { revalidate: 900 });
+const gespeichert = unstable_cache(bauen, ['sitemap-haupt-v2'], { revalidate: 900 });
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return gespeichert();

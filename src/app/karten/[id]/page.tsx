@@ -1,3 +1,4 @@
+import { TeilenKnopf } from '@/components/TeilenKnopf';
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ import { frischPreisFuer, mitFrischpreis, mitIndexPreis } from '@/lib/frischprei
 import { cardsFromIndex } from '@/lib/card-index';
 import { sprachpreiseFuerKarte } from '@/lib/sprachpreise';
 import { kaufLinks } from '@/lib/kauf-links';
+import { pokemonInName } from '@/lib/pokemon-seiten';
 
 const SITE_URL = siteUrlOrLocal();
 
@@ -367,6 +369,9 @@ export default async function CardDetailPage({ params }: Props) {
                 imageUrl={card.imageUrl}
                 price={price}
               />
+              <div className="flex justify-center">
+                <TeilenKnopf url={`${siteUrlOrLocal()}/karten/${card.id}`} titel={`${card.name} – Preis & Wert`} klein />
+              </div>
 
               {/* Sekundär & dezent: Kauf-Links */}
               <div>
@@ -400,6 +405,15 @@ export default async function CardDetailPage({ params }: Props) {
               <h1 className="text-2xl font-black text-white">{card.name}</h1>
               {card.nameDe && card.nameDe.toLowerCase() !== card.name.toLowerCase() && (
                 <p className="text-sm font-semibold text-violet-400 mt-0.5">🇩🇪 {card.nameDe}</p>
+              )}
+              {pokemonInName(card.name).length > 0 && (
+                <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
+                  {pokemonInName(card.name).map((p) => (
+                    <Link key={p.slug} href={`/pokemon/${p.slug}`} className="text-xs font-semibold text-violet-400 hover:text-violet-300">
+                      Alle {p.de}-Karten →
+                    </Link>
+                  ))}
+                </p>
               )}
               <p className="mt-1 text-sm text-slate-600">
                 {card.rarity}

@@ -1044,6 +1044,15 @@ Stand 03.10.2026: Zone bei Cloudflare (Workflow `.github/workflows/domain-cloudf
 - JP/KR bleiben bei der Suche (eigene Produkte, keine geprüfte Adresse).
 - **Nichts Unbelegtes speichern:** pokemontcg.io antwortet abwechselnd 302/502 für dieselbe Karte. Nur 404 = keine Zuordnung; 5xx und lückenhafte Gegenproben WERFEN (unstable_cache speichert dann nicht). Sonst klebt eine Karte 14 Tage auf der Suche (v6.26.2/3).
 
+## Reichweite: Pokémon-Seiten, Teilen, Suchmaschinen — seit v6.28.0
+
+**Nutzer-Auftrag (08.10.2026):** Reichweite — „mache den rest auch noch was du vorschlägst".
+- **Pokémon-Seiten** `/pokemon/[slug]` (deutscher Name, `pokemon-seiten.ts` rein + getestet): Zuordnung NUR über Wortgrenzen (`kartePasstZu`: Mew ≠ Mewtwo, Pikachu ≠ Raichu, Nidoran♀ ≠ ♂). Daten `kartenFuerPokemon()` (ISR, wirft bei DB-Fehler), Übersicht `ladePokemonUebersicht()` (unstable_cache 12 h). Sitemap ab `MIN_KARTEN_FUER_SITEMAP` (3). FAQ-Antworten NUR aus gemessenen Werten mit Stand.
+- `DE_TO_EN` enthält nur Pokémon mit abweichendem deutschen Namen — Pikachu, Mew, Gengar fehlten. `pokemon-namen-weitere.ts` (PokéAPI-CSV) ergänzt sie NUR für die Pokémon-Seiten, die Suchübersetzung bleibt unberührt.
+- **Teilen:** `TeilenKnopf` (Web) / `TeilenToolbar` (App) hängen `utm_source=teilen|app` an — sichtbar in Monitoring → Reichweite.
+- **Google ist NICHT automatisch:** Search Console braucht den Bestätigungscode des Nutzers (Secret `GOOGLE_SITE_VERIFICATION`, Bing `BING_SITE_VERIFICATION`) → Workflow „Suchmaschinen bestätigen" setzt sie in Vercel, deployt neu, prüft das Meta-Tag. Sitemaps stehen in robots.txt.
+- Vorlagen: `docs/reichweite-posts.md` (Abschnitte 4–6), `docs/app-store.md`.
+
 ## Feedback-Knopf — seit v6.17.0
 
 **Nutzer-Auftrag (03.10.2026):** „dass ich auch mal feedback bekomme".

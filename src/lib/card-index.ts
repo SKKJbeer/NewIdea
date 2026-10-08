@@ -485,3 +485,43 @@ export async function cardIndexStand(): Promise<{ zeilen: number; stand: string 
     stand: (data?.[0] as { updated_at?: string } | undefined)?.updated_at ?? null,
   };
 }
+
+/**
+ * Alle Karten eines Pokémon aus dem Index, teuerste zuerst (Pokémon-Seiten).
+ * Grob über ILIKE geholt, genau über Wortgrenzen gefiltert (`kartePasstZu`).
+ * WIRFT bei Datenbankfehlern — eine ISR-Seite darf keinen Leerstand cachen.
+ */
+export async function kartenFuerPokemon(en: string): Promise<IndexTreffer[]> {
+  const { datenbankMuster, kartePasstZu } = await import('./pokemon-seiten');
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from('cards_index')
+    .select('*')
+    .ilike('name', datenbankMuster(en))
+    .order('price', { ascending: false })
+    .limit(1000);
+  if (error) throw new Error(`Kartenindex Pokémon ${en}: ${error.message}`);
+  return ((data as unknown as IndexZeile[]) ?? []).filter((z) => kartePasstZu(z.name, en)).map(zuKarte);
+}
+
+/**
+ * Name, Bild und Preis aller Karten — Grundlage der Pokémon-Übersicht und der
+ * Sitemap. Seitenweise zu 1.000 (PostgREST kappt still bei 1.000 Zeilen).
+ */
+export async function alleKartennamen(): Promise<Array<{ id: string; name: string; image_url: string | null; price: number | null }>> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const aus: Array<{ id: string; name: string; image_url: string | null; price: number | null }> = [];
+  for (let von = 0; von < 50_000; von += 1000) {
+    const { data, error } = await sb
+      .from('cards_index')
+      .select('id,name,image_url,price')
+      .order('id', { ascending: true })
+      .range(von, von + 999);
+    if (error) throw new Error(`Kartenindex Namen: ${error.message}`);
+    aus.push(...((data ?? []) as typeof aus));
+    if (!data || data.length < 1000) break;
+  }
+  return aus;
+}

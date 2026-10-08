@@ -7,6 +7,17 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.28.0] - 8. Oktober 2026 · Pokémon-Seiten, Teilen und Suchmaschinen
+
+### Neu
+- **Karten nach Pokémon:** `/pokemon` als Übersicht und je Pokémon eine Seite mit allen Versionen und Cardmarket-Preis (z. B. `/pokemon/glurak`) — Kennzahlen, wertvollste Karte, Sets, häufige Fragen aus den gemessenen Daten. Verlinkt von jeder Kartenseite, aus Seitenleiste und Fußzeile, in der Sitemap
+- 186 Pokémon mit gleichem Namen auf Deutsch und Englisch (Pikachu, Mew, Gengar …) ergänzt — Quelle PokéAPI
+- **Teilen-Knopf** auf Karten-, Pokémon-, Artikel- und Berichtsseiten sowie in der App (Bericht, Artikel, Guides), mit Herkunftskennung für die Reichweitenmessung
+- **Workflow „Suchmaschinen bestätigen"** (Google Search Console, Bing) und **„IndexNow Vollmeldung"**
+- Vorlagen: Antworten auf „Was ist meine Karte wert?", Forenbeitrag, App-Einladung; App-Store-Texte
+
+---
+
 ## [6.27.2] - 8. Oktober 2026 · Marktbericht: nur echte Bewegungen als Gewinner
 
 ### Behoben

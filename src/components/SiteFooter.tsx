@@ -22,6 +22,7 @@ const GRUPPEN: Array<{ label: string; links: Array<{ href: string; label: string
       { href: '/', label: 'Marktübersicht' },
       { href: '/suche', label: 'Karten' },
       { href: '/sets', label: 'Sets' },
+      { href: '/pokemon', label: 'Nach Pokémon' },
     ],
   },
   {

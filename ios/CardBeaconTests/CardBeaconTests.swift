@@ -67,3 +67,10 @@ final class LeseTests: XCTestCase {
         XCTAssertEqual(InhaltSymbol.fuer("unbekannt"), "book.closed.fill")
     }
 }
+
+final class TeilenTests: XCTestCase {
+    func testHerkunftWirdAngehaengt() {
+        let u = TeilenToolbar.mitHerkunft("https://cardbeacon.de/artikel/2026-10-08")
+        XCTAssertEqual(u?.absoluteString, "https://cardbeacon.de/artikel/2026-10-08?utm_source=app&utm_medium=teilen")
+    }
+}

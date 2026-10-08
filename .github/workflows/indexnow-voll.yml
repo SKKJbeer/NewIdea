@@ -1,0 +1,28 @@
+# Vollmeldung aller Adressen an IndexNow (Bing, Yandex, Seznam …) — nach neuen
+# Seitentypen einmal starten. Meldet sich mit STUDIO_PASSWORD an (Cookie maskiert).
+name: IndexNow Vollmeldung
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  melden:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Anmelden und melden
+        env:
+          PW: ${{ secrets.STUDIO_PASSWORD }}
+          BASIS: https://cardbeacon.de
+        run: |
+          set -euo pipefail
+          [ -n "$PW" ] || { echo "::error::STUDIO_PASSWORD fehlt"; exit 1; }
+          jar=$(mktemp)
+          code=$(curl -s -o /dev/null -w '%{http_code}' -c "$jar" -X POST "$BASIS/api/studio-auth" \
+            -H 'content-type: application/json' -H "origin: $BASIS" \
+            --data "$(jq -n --arg p "$PW" '{password:$p}')")
+          echo "Anmeldung: HTTP $code"; [ "$code" = 200 ] || exit 1
+          awk '$6=="studio_session"{print $7}' "$jar" | while read -r v; do echo "::add-mask::$v"; done
+          curl -s -b "$jar" -m 180 -X POST "$BASIS/api/studio/indexnow" -H "origin: $BASIS" -w '\nHTTP %{http_code}\n' | head -c 3000

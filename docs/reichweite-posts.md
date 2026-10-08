@@ -66,3 +66,42 @@ Alle Links zeigen auf `cardbeacon.de` (seit 03.10.2026 verbunden).
 ## 4. Instagram-Bio (sobald der Autopilot Zugang hat)
 
 `https://cardbeacon.de/?utm_source=instagram&utm_medium=bio`
+
+---
+
+## 4. Antworten auf „Was ist meine Karte wert?" (seit v6.28.0)
+
+Solche Fragen kommen in jeder Sammler-Gruppe täglich. Eine hilfreiche Antwort mit Link wird
+nicht als Werbung gelesen — ein Post mit nur einem Link schon. Immer zuerst die Frage
+beantworten, dann den Link als Quelle.
+
+**Deutsch:**
+> Kommt stark auf die Version an — von {Pokémon} gibt es {Anzahl} Karten, die Spanne ist riesig.
+> Schau mal nach Set-Symbol und Nummer unten links auf der Karte, dann findest du sie hier mit
+> dem aktuellen Cardmarket-Preis (Stand Vortag): https://cardbeacon.de/pokemon/{slug}?utm_source={plattform}&utm_medium=antwort&utm_campaign=wert-frage
+> Zustand macht viel aus — der Trend gilt für gut erhaltene Karten.
+
+**Englisch:**
+> Depends a lot on the exact version — there are {count} {Pokémon} cards and the range is huge.
+> Check the set symbol and number at the bottom of the card; here's every version with the current
+> Cardmarket price (previous day): https://cardbeacon.de/pokemon/{slug}?utm_source={plattform}&utm_medium=antwort&utm_campaign=wert-frage-en
+
+`{Anzahl}` und `{slug}` stehen auf https://cardbeacon.de/pokemon — nie eine Zahl aus dem
+Gedächtnis einsetzen.
+
+---
+
+## 5. Bisafans-Forum / Pokefans (Deutsch, Tauschbörsen-Bereich)
+
+> Für alle, die beim Tauschen schnell einen Richtwert brauchen: Auf cardbeacon.de stehen für rund
+> 19.000 Karten die Cardmarket-Preise vom Vortag, sortiert nach Pokémon (z. B. alle Glurak-Karten
+> auf einer Seite: https://cardbeacon.de/pokemon/glurak?utm_source=bisafans&utm_medium=forum&utm_campaign=tausch).
+> Kostenlos, ohne Anmeldung. Kritik und fehlende Karten gern hier melden.
+
+---
+
+## 6. App-Einladung (sobald der öffentliche TestFlight-Link steht)
+
+> CardBeacon gibt es jetzt auch als iPhone-App (Testphase über Apples TestFlight): Preise vom
+> Vortag, Portfolio auf dem Gerät, Marktbericht mit Kartenbildern. Wer testen mag: {TestFlight-Link}
+> — Rückmeldungen direkt über die TestFlight-App.

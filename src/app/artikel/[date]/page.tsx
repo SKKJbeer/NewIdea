@@ -1,3 +1,4 @@
+import { TeilenKnopf } from '@/components/TeilenKnopf';
 import { notFound } from 'next/navigation';
 import { AffiliateNote } from '@/components/AffiliateNote';
 import Link from 'next/link';
@@ -178,6 +179,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ date: 
                 {article && <span className="text-xs text-slate-600 flex items-center gap-1"><Clock size={11} /> {readingTime(article)} Min Lektüre</span>}
               </div>
               <h1 className="text-2xl sm:text-4xl font-black leading-tight text-white text-balance">{article?.title || meta.label}</h1>
+              <div className="mt-4">
+                <TeilenKnopf url={`${siteUrlOrLocal()}/artikel/${date}`} titel={article?.title || meta.label} klein />
+              </div>
             </div>
             {heroCard && (
               <div className="relative mx-auto shrink-0 sm:mx-0">
