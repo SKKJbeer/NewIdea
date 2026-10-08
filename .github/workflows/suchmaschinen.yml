@@ -27,8 +27,9 @@ jobs:
       - name: Werte in Vercel setzen und neu ausliefern
         env:
           VT: ${{ secrets.VERCEL_TOKEN }}
-          GOOGLE: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
-          BING: ${{ secrets.BING_SITE_VERIFICATION }}
+          # Secret ODER Repository-Variable (beides kommt in der Praxis vor).
+          GOOGLE: ${{ secrets.GOOGLE_SITE_VERIFICATION || vars.GOOGLE_SITE_VERIFICATION }}
+          BING: ${{ secrets.BING_SITE_VERIFICATION || vars.BING_SITE_VERIFICATION }}
           ALT: ${{ inputs.projekt_host }}
         run: |
           set -euo pipefail
