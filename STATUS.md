@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.27.0` · **Stand:** 8. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.27.1` · **Stand:** 8. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -174,6 +174,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v6.26.2 | `kauf-links.ts`: lückenhafte Gegenprobe wirft (nicht gespeichert), Speicherschlüssel v2 |
 | v6.26.3 | `kauf-links.ts`: 502 = Aussetzer (Wiederholung, nicht gespeichert), nur 404 = keine Zuordnung |
 | v6.27.0 | iOS-Lesen als Magazin: `Gestaltung.swift` (LeseKopf, KartenFaecher, AbschnittKarte, TrendBalken, KartenStreifen, KernpunkteKarte, KartenVollbild), Kennzahlen-Hervorhebung; API `inhaltKarte`/`berichtKarten`/`anreisser` |
+| v6.27.1 | `/api/v1/marktbericht`: `ohneDuenneAusreisser` auf topGainers; Seltenheit „Unknown" ausgeblendet |
 | v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |

@@ -159,6 +159,7 @@ describe('Lese-Inhalte mit Bildern (v6.27.0)', () => {
     const { inhaltKarte } = await import('@/lib/app-api');
     expect(inhaltKarte({ name: 'X', imageUrl: 'http://a/b.png' })).toBeNull();
     expect(inhaltKarte({ name: '', imageUrl: 'https://a/b.png' })).toBeNull();
+    expect(inhaltKarte({ name: 'Mew', imageUrl: 'https://a/b.png', rarity: 'Unknown' })?.seltenheit).toBeNull();
     const k = inhaltKarte({ id: 'sv1-1', name: 'X', imageUrl: 'https://a/b.png', price: 0, trend: 5, setId: 'sv1', why: 'w' });
     expect(k).toMatchObject({ id: 'sv1-1', preis: null, trend30: 5, setCode: 'sv1', warum: 'w' });
   });
@@ -184,5 +185,13 @@ describe('Lese-Inhalte mit Bildern (v6.27.0)', () => {
     const lang = anreisser('wort '.repeat(80), 40);
     expect(lang.length).toBeLessThanOrEqual(42);
     expect(lang.endsWith('…')).toBe(true);
+  });
+});
+
+describe('Marktbericht der App: dünne Klassiker raus', () => {
+  it('Route filtert topGainers mit ohneDuenneAusreisser', async () => {
+    const { readFileSync } = await import('node:fs');
+    const r = readFileSync('src/app/api/v1/marktbericht/route.ts', 'utf8');
+    expect(r).toContain('ohneDuenneAusreisser(b.topGainers');
   });
 });

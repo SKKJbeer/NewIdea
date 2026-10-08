@@ -21,7 +21,7 @@ export async function GET() {
       {
         bericht: bericht ? {
           woche: bericht.weekStart, kw: bericht.weekNumber, erstellt: bericht.createdAt,
-          bilder: [...bericht.topGainers, ...bericht.topValue].map((c) => c.imageUrl).filter((u) => typeof u === 'string' && /^https:\/\//.test(u)).slice(0, 3),
+          bilder: [...bericht.topValue, ...bericht.topGainers].map((c) => c.imageUrl).filter((u) => typeof u === 'string' && /^https:\/\//.test(u)).slice(0, 3),
         } : null,
         artikel: artikel
           .filter((a) => a.date <= heute && getArticleType(a.date) && a.title)

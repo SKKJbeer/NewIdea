@@ -216,7 +216,7 @@ export function inhaltKarte(c: {
     bild,
     preis: preis !== null && preis > 0 ? preis : null,
     trend30: zahl(c.trend ?? c.trendPercent),
-    seltenheit: c.rarity || null,
+    seltenheit: c.rarity && c.rarity !== 'Unknown' ? c.rarity : null,
     set: c.set || null,
     setCode: c.setCode || c.setId || null,
     id: c.id && /^[A-Za-z0-9._-]{1,40}$/.test(c.id) ? c.id : null,

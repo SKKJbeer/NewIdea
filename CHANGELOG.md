@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.27.1] - 8. Oktober 2026 · Bericht in der App ohne dünne Ausreißer
+
+### Behoben
+- Bericht in der App zeigte einen dünn gehandelten Klassiker (+191 %) als stärkste Bewegung — gleiche Regel wie Markt, Website und Instagram: Klassiker über 100 % zählen nicht
+- Seltenheit „Unknown" wird nicht mehr angezeigt
+
+---
+
 ## [6.27.0] - 8. Oktober 2026 · App: Lesen als Magazin mit Kartenbildern
 
 ### Neu

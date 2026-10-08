@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.27.1',
+    date: '8. Oktober 2026',
+    label: 'Bericht in der App ohne dünne Ausreißer',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Bericht in der App: dünn gehandelte Klassiker über 100 % erscheinen nicht mehr als Bewegung' },
+      { type: 'fixed', text: 'Seltenheit „Unknown" wird nicht mehr angezeigt' },
+    ],
+  },
+  {
     version: '6.27.0',
     date: '8. Oktober 2026',
     label: 'App: Lesen als Magazin mit Kartenbildern',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Marktbericht in der App mit Kartenbildern, Balkengrafik der stärksten Bewegungen und Abschnitten mit Symbolen' },
       { type: 'new', text: 'Artikel und Guides in der App mit Bildern der genannten Karten, Tipp-Kästen und Kurzfassung' },
