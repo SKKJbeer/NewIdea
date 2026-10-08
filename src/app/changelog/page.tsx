@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.27.2',
+    date: '8. Oktober 2026',
+    label: 'Marktbericht: nur echte Bewegungen als Gewinner',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Marktbericht (Website und App): dünn gehandelte Klassiker über 100 % erscheinen nicht mehr unter „Stärkste Aufwärtsbewegungen"' },
+    ],
+  },
+  {
     version: '6.27.1',
     date: '8. Oktober 2026',
     label: 'Bericht in der App ohne dünne Ausreißer',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Bericht in der App: dünn gehandelte Klassiker über 100 % erscheinen nicht mehr als Bewegung' },
       { type: 'fixed', text: 'Seltenheit „Unknown" wird nicht mehr angezeigt' },

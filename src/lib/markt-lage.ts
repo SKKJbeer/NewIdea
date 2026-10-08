@@ -182,6 +182,17 @@ export function ohneDuenneAusreisser(karten: PokemonCard[], setDatum: ReadonlyMa
   );
 }
 
+/**
+ * Gewinner eines Wochenberichts ohne dünn gehandelte Klassiker — für Speichern UND
+ * Anzeige (Altbestände). Gemessen 08.10.2026: alle fünf gespeicherten Gewinner der
+ * KW 41 waren Klassiker über 100 % (Mew Southern Islands +191 %). Wirft nie.
+ */
+export async function relevanteBerichtsGewinner(karten: PokemonCard[], jetzt = Date.now()): Promise<PokemonCard[]> {
+  const liste = await ladeSetListe(250).catch(() => null);
+  const setDatum = new Map<string, string>((liste?.sets ?? []).map((s) => [s.id, s.releaseDate]));
+  return ohneDuenneAusreisser(karten, setDatum, jetzt);
+}
+
 // ── laden ───────────────────────────────────────────────────────────────────
 
 /** Lädt die Marktlage. Wirft nie — fehlende Teile bleiben leer und fehlen im Text. */

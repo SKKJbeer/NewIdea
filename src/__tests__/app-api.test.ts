@@ -189,9 +189,11 @@ describe('Lese-Inhalte mit Bildern (v6.27.0)', () => {
 });
 
 describe('Marktbericht der App: dünne Klassiker raus', () => {
-  it('Route filtert topGainers mit ohneDuenneAusreisser', async () => {
+  it('Speichern, App und Website filtern Gewinner über relevanteBerichtsGewinner', async () => {
     const { readFileSync } = await import('node:fs');
-    const r = readFileSync('src/app/api/v1/marktbericht/route.ts', 'utf8');
-    expect(r).toContain('ohneDuenneAusreisser(b.topGainers');
+    for (const f of ['src/app/api/v1/marktbericht/route.ts', 'src/lib/market-report-generator.ts',
+      'src/app/marktbericht/page.tsx', 'src/app/marktbericht/[week]/page.tsx']) {
+      expect(readFileSync(f, 'utf8'), f).toContain('relevanteBerichtsGewinner(');
+    }
   });
 });

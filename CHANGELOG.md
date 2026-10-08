@@ -7,6 +7,13 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.27.2] - 8. Oktober 2026 · Marktbericht: nur echte Bewegungen als Gewinner
+
+### Behoben
+- Die Liste „Stärkste Aufwärtsbewegungen" im Marktbericht bestand in KW 41 nur aus dünn gehandelten Klassikern über 100 % (z. B. Mew Southern Islands +191 %). Jetzt gilt beim Speichern und bei der Anzeige auf Website und in der App dieselbe Relevanzregel wie überall sonst
+
+---
+
 ## [6.27.1] - 8. Oktober 2026 · Bericht in der App ohne dünne Ausreißer
 
 ### Behoben

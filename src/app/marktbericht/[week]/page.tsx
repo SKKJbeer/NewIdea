@@ -5,6 +5,7 @@ import { Prose } from '@/components/Prose';
 import { Calendar, ChevronLeft, ChevronRight, ArrowLeft, Zap, TriangleAlert } from 'lucide-react';
 import { ARTIKEL_PREISE_FRISCH_AB } from '@/lib/article-generator';
 import { loadMarketReportByWeek, listMarketReportMeta } from '@/lib/market-report-storage';
+import { relevanteBerichtsGewinner } from '@/lib/markt-lage';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -16,7 +17,9 @@ function formatWeekDate(weekStart: string) {
 
 export async function generateMetadata({ params }: { params: Promise<{ week: string }> }): Promise<Metadata> {
   const { week } = await params;
-  const report = await loadMarketReportByWeek(week).catch(() => null);
+  const rohBericht = await loadMarketReportByWeek(week).catch(() => null);
+  // Dünn gehandelte Klassiker > 100 % sind keine Marktbewegung (markt-lage.ts).
+  const report = rohBericht ? { ...rohBericht, topGainers: await relevanteBerichtsGewinner(rohBericht.topGainers) } : null;
   if (!report) return { title: 'Bericht nicht gefunden' };
   return {
     title: `Marktanalyse KW ${report.weekNumber}`,

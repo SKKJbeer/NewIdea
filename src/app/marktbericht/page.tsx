@@ -12,6 +12,7 @@ import { PriceBars, TrendBars, type BarItem } from '@/components/DataBars';
 import { displayPrice } from '@/lib/pokemon-api';
 import { ThemenTeaser } from '@/components/Themen';
 import { leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
+import { relevanteBerichtsGewinner } from '@/lib/markt-lage';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -22,7 +23,9 @@ function formatWeekDate(weekStart: string) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const report = await loadLatestMarketReport().catch(() => null);
+  const rohBericht = await loadLatestMarketReport().catch(() => null);
+  // Dünn gehandelte Klassiker > 100 % sind keine Marktbewegung (markt-lage.ts).
+  const report = rohBericht ? { ...rohBericht, topGainers: await relevanteBerichtsGewinner(rohBericht.topGainers) } : null;
   const week = report?.weekNumber ?? '—';
   return {
     title: `Marktanalyse KW ${week}`,

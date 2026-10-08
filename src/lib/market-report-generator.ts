@@ -12,7 +12,7 @@ import { isoKalenderwoche } from './kalenderwoche';
 import { describeAiError } from './ai-error';
 import { recordAiUsage } from './ai-usage';
 import type { PokemonCard, MarketSummary } from '@/types';
-import { ladeMarktLage, marktLageText, type MarktLage } from './markt-lage';
+import { relevanteBerichtsGewinner, ladeMarktLage, marktLageText, type MarktLage } from './markt-lage';
 import { splitMovers } from './market-metrics';
 
 /**
@@ -139,7 +139,7 @@ export async function generateAndSaveMarketReport(): Promise<MarketReportResult>
       weekStart,
       weekNumber,
       reportText,
-      topGainers: summary.topGainers.slice(0, 6),
+      topGainers: (await relevanteBerichtsGewinner(summary.topGainers)).slice(0, 6),
       topValue: topValueCards(cards),
       createdAt: new Date().toISOString(),
     });
