@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, ShoppingCart, ExternalLink, ImageOff } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, ExternalLink, ImageOff, Award } from 'lucide-react';
 import { fetchCardById } from '@/lib/pokemon-api';
 import { getStoredPriceHistory, recordPriceSnapshot, mergePriceHistory } from '@/lib/price-history';
 import { PriceChartLazy } from '@/components/PriceChartLazy';
@@ -443,6 +443,34 @@ export default async function CardDetailPage({ params }: Props) {
               enStand={cmDataAge}
               sprachen={sprachen}
             />
+
+            {/* GEGRADETE KARTEN (PSA) — bewusst ohne eigene Zahlen: Es gibt keine
+                kostenlose, lizenzierte Quelle für PSA-Verkaufspreise. Der Link führt
+                auf PSAs eigenes Verzeichnis (Verkäufe bei eBay USA, in US-Dollar). */}
+            <NurEnDe>
+              <div className="rounded-2xl border border-[#2a2a3a] bg-[#13131e] p-4">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+                    <Award size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Gegradet (PSA)</p>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                      Alle Preise oben gelten für ungegradete Karten. Verkaufspreise gegradeter Exemplare (PSA&nbsp;1–10) führt PSA selbst — aus Verkäufen bei eBay USA, in US-Dollar. CardBeacon zeigt dafür keine eigenen Werte.
+                    </p>
+                    <a
+                      href={links.psa}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300"
+                    >
+                      PSA-Verkaufspreise prüfen <ExternalLink size={11} className="opacity-60" />
+                    </a>
+                    <p className="mt-0.5 text-[10px] text-slate-600">Suche bei PSA nach „{card.name}{card.number ? ` ${card.number}` : ''}“ · externe Seite</p>
+                  </div>
+                </div>
+              </div>
+            </NurEnDe>
 
             {/* MARKTKONTEXT — die eigentliche Produktaussage.
                 Steht bewusst VOR den Einzelkennzahlen: Die Frage „ist das viel?"

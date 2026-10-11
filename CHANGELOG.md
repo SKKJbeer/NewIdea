@@ -7,6 +7,15 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.29.0] - 11. Oktober 2026 · Gegradete Karten: PSA-Prüflink
+
+### Neu
+- **„PSA-Verkaufspreise prüfen"** auf jeder Kartenseite (Website und App): führt auf PSAs eigenes Auktionspreis-Verzeichnis (Suche nach Name + Nummer). Dort stehen Verkäufe gegradeter Exemplare (PSA 1–10) bei eBay USA, in US-Dollar
+- Klarer Hinweis, dass alle CardBeacon-Preise für ungegradete Karten gelten und für PSA keine eigenen Werte gezeigt werden — es gibt dafür keine kostenlose, lizenzierte Quelle
+- App-Schnittstelle: `kaufen.psa` (zusätzliches Feld)
+
+---
+
 ## [6.28.1] - 11. Oktober 2026 · App: Vollbild-Kartenbilder und Cardmarket-Prüflink
 
 ### Behoben

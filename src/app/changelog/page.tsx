@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.29.0',
+    date: '11. Oktober 2026',
+    label: 'Gegradete Karten: PSA-Prüflink',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Website und App: „PSA-Verkaufspreise prüfen" auf jeder Kartenseite — PSAs eigenes Verzeichnis (eBay USA, US-Dollar)' },
+      { type: 'new', text: 'Hinweis, dass alle Preise für ungegradete Karten gelten; keine eigenen PSA-Werte ohne lizenzierte Quelle' },
+    ],
+  },
+  {
     version: '6.28.1',
     date: '11. Oktober 2026',
     label: 'App: Vollbild-Kartenbilder und Cardmarket-Prüflink',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'fixed', text: 'Kartenbilder im Vollbild der App blieben leer — unbekannte Bildbreiten werden jetzt auf die nächste Stufe umgeleitet' },
       { type: 'new', text: 'App: „Preis auf Cardmarket prüfen" direkt unter der Preisaufschlüsselung' },

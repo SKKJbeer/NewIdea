@@ -402,11 +402,16 @@ export interface KaufDto {
   cardmarketGenau: boolean;
   amazonKarte: string;
   amazonBooster: string;
+  /** Prüflink zu PSAs Verkaufspreisen gegradeter Karten (eBay USA, USD) — keine eigenen Werte. */
+  psa?: string;
 }
 
 /** Kauf-Links für die App — dieselben wie auf der Kartenseite (kauf-links.ts). */
-export function kaufDto(l: { cardmarket: { url: string; genau: boolean }; amazonKarte: string; amazonBooster: string }): KaufDto {
-  return { cardmarket: l.cardmarket.url, cardmarketGenau: l.cardmarket.genau, amazonKarte: l.amazonKarte, amazonBooster: l.amazonBooster };
+export function kaufDto(l: { cardmarket: { url: string; genau: boolean }; amazonKarte: string; amazonBooster: string; psa?: string }): KaufDto {
+  return {
+    cardmarket: l.cardmarket.url, cardmarketGenau: l.cardmarket.genau, amazonKarte: l.amazonKarte, amazonBooster: l.amazonBooster,
+    ...(l.psa ? { psa: l.psa } : {}),
+  };
 }
 
 /** Karten eines Wochenberichts (Stand: Erstellung des Berichts) — rein. */

@@ -211,6 +211,20 @@ private struct PreisBlock: View {
                 }
                 Text("* Affiliate-Link").font(.caption2).foregroundStyle(.tertiary)
             }
+            if let psa = d.kaufen?.psa, let url = URL(string: psa) {
+                Divider()
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Gegradet (PSA)", systemImage: "rosette").font(.caption.weight(.semibold))
+                    Text("Die Preise oben gelten für ungegradete Karten. Verkaufspreise gegradeter Exemplare (PSA 1–10) führt PSA selbst — aus Verkäufen bei eBay USA, in US-Dollar. CardBeacon zeigt dafür keine eigenen Werte.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                    Link(destination: url) {
+                        Label("PSA-Verkaufspreise prüfen", systemImage: "arrow.up.right.square")
+                            .font(.callout.weight(.semibold))
+                    }
+                    .foregroundStyle(Theme.akzent)
+                    Text("Suche bei PSA · externe Seite").font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
         }
         .kachel()
     }

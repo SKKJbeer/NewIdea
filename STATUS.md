@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.28.1` · **Stand:** 11. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.29.0` · **Stand:** 11. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -19,7 +19,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
 | Artikel-Erzeugung | ✅ Fertig | Geprueft 05.08.: 11 Artikel, echte KI-Titel (kein Fallback), letzter 02.08. (So) — naechster Do 06.08. |
 | Tagesartikel `/artikel/[date]` | ✅ Fertig | Selbstheilend (on-demand-Generierung), ISR 24h, KI + Fallback, 404-Fix |
-| Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO, ISR 1h |
+| Karten-Detail `/karten/[id]` | ✅ Fertig | Preis (EUR), Score, Preis-Chart, JSON-LD SEO, ISR 1h · genauer Cardmarket-Link (v6.26) · PSA-Prüflink für gegradete Karten, keine eigenen PSA-Werte (v6.29.0) |
 | Guides `/guides` | ✅ Fertig | 4 Guides, echte Kartenbilder + Booster-Pack-Artwork |
 | Content Studio `/studio` | ✅ Fertig | HttpOnly-Cookie-Auth (timing-safe, fail-closed), 3 Tabs |
 | Monitoring `/monitoring` | ✅ Fertig | Eigene Seite (mobil-freundlich), Auth-geschützt |
@@ -178,6 +178,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v6.27.2 | `relevanteBerichtsGewinner()` (markt-lage.ts) beim Speichern des Berichts und auf /marktbericht, /marktbericht/[week], App |
 | v6.28.0 | `/pokemon` + `/pokemon/[slug]` (`pokemon-seiten.ts`, `pokemon-daten.ts`, `pokemon-namen-weitere.ts`), `TeilenKnopf`, App `TeilenToolbar`, Workflows `suchmaschinen.yml` + `indexnow-voll.yml`, `docs/app-store.md` |
 | v6.28.1 | `/api/img`: unbekannte Breite → 308 auf `bildBreite()`; App-Vollbild 1080; App-Kartenseite „Preis auf Cardmarket prüfen"; `bild-breiten.test.ts` |
+| v6.29.0 | PSA-Prüflink (Website + App): `psaSuche()` in `kauf-links-basis.ts`, `kaufen.psa` in `/api/v1/karten/:id`, Hinweis „Preise ungegradet, keine eigenen PSA-Werte“ |
 | v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |

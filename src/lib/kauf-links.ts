@@ -19,8 +19,8 @@ import { after } from 'next/server';
 import { dexKandidaten, dexSetFuer, namenGleich } from './tcgdex';
 import { dexSetsVorgehalten } from './frischpreis-karte';
 
-export { cardmarketSuche, amazonSuche } from './kauf-links-basis';
-import { cardmarketSuche, amazonSuche } from './kauf-links-basis';
+export { cardmarketSuche, amazonSuche, psaSuche } from './kauf-links-basis';
+import { cardmarketSuche, amazonSuche, psaSuche } from './kauf-links-basis';
 
 /** Name in der Schreibweise der Cardmarket-Adressen: „Ethan's Pinsir" → „ethans-pinsir". */
 export function adressName(name: string): string {
@@ -177,6 +177,8 @@ export interface KaufLinks {
   amazonKarte: string;
   /** Booster des Sets bei Amazon. */
   amazonBooster: string;
+  /** Prüflink: Verkaufspreise gegradeter Exemplare bei PSA (kein Affiliate). */
+  psa: string;
 }
 
 /**
@@ -202,5 +204,6 @@ export async function kaufLinks(
     cardmarket,
     amazonKarte: amazonSuche(`Pokemon ${karte.name} Karte`),
     amazonBooster: amazonSuche(`Pokemon ${karte.set} Booster`),
+    psa: psaSuche(karte.name, karte.number),
   };
 }

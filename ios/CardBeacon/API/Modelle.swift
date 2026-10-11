@@ -267,4 +267,6 @@ struct KaufLinks: Codable, Hashable {
     let cardmarketGenau: Bool
     let amazonKarte: String
     let amazonBooster: String
+    /// Prüflink zu PSAs Verkaufspreisen gegradeter Karten (eBay USA, USD) — keine eigenen Werte. Ab v6.29.0.
+    let psa: String?
 }

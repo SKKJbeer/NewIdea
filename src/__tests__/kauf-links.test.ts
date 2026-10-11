@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { adressName, amazonSuche, cardmarketSuche, pruefeCardmarketZiel, versionPasst } from '@/lib/kauf-links';
+import { adressName, amazonSuche, cardmarketSuche, psaSuche, pruefeCardmarketZiel, versionPasst } from '@/lib/kauf-links';
+import { kaufDto } from '@/lib/app-api';
 
 const utm = '?utm_source=pokemontcgio&utm_medium=image&utm_campaign=card_prices';
 
@@ -69,5 +70,32 @@ describe('Cardmarket-Ziel prüfen (gemessene Weiterleitungen 07.10.2026)', () =>
     const app = readFileSync('src/app/api/v1/karten/[id]/route.ts', 'utf8');
     expect(app).toContain('kaufLinks(');
     expect(app).toContain('kaufen: kaufDto(links)');
+  });
+});
+
+describe('PSA-Prüflink (gegradete Karten) — nur Link, keine eigenen Werte', () => {
+  it('sucht bei PSA nach Name + Nummer, ohne führende Nullen', () => {
+    expect(psaSuche('Umbreon VMAX', '215')).toBe('https://www.psacard.com/auctionprices/search?q=Umbreon%20VMAX%20215');
+    expect(psaSuche('Charizard', '004')).toBe('https://www.psacard.com/auctionprices/search?q=Charizard%204');
+    expect(psaSuche('Pikachu', 'TG05')).toContain('q=Pikachu%20TG05');
+    expect(psaSuche('Mew', null)).toBe('https://www.psacard.com/auctionprices/search?q=Mew');
+    // Ungewöhnliche Nummern (z. B. mit Schrägstrich) lieber weglassen als falsch suchen.
+    expect(psaSuche('Mew', '1/2')).toBe('https://www.psacard.com/auctionprices/search?q=Mew');
+  });
+
+  it('App bekommt den Link zusätzlich (Feld nur ergänzt)', () => {
+    const dto = kaufDto({ cardmarket: { url: 'c', genau: true }, amazonKarte: 'a', amazonBooster: 'b', psa: 'p' });
+    expect(dto).toEqual({ cardmarket: 'c', cardmarketGenau: true, amazonKarte: 'a', amazonBooster: 'b', psa: 'p' });
+    const swift = readFileSync('ios/CardBeacon/API/Modelle.swift', 'utf8');
+    expect(swift).toMatch(/let psa: String\?/); // optional: ältere Server-Antworten bleiben lesbar
+  });
+
+  it('Kartenseite: Link ohne Affiliate-Kennzeichnung, keine PSA-Zahlen erfunden', () => {
+    const seite = readFileSync('src/app/karten/[id]/page.tsx', 'utf8');
+    const block = seite.slice(seite.indexOf('GEGRADETE KARTEN (PSA)'), seite.indexOf('MARKTKONTEXT'));
+    expect(block).toContain('href={links.psa}');
+    expect(block).not.toContain('sponsored');
+    expect(block).toContain('keine eigenen Werte');
+    expect(block).not.toMatch(/formatEur|\$\s?\d/);
   });
 });
