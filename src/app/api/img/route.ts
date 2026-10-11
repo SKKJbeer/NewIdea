@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { BILD_BREITEN } from '@/lib/bild-loader';
+import { BILD_BREITEN, bildBreite } from '@/lib/bild-loader';
 import { tcgdexErsatz } from '@/lib/bild-ersatz';
 
 export const runtime = 'nodejs';
@@ -115,7 +115,15 @@ export async function GET(request: Request) {
   const wRoh = searchParams.get('w');
   const breite = wRoh === null ? null : Number(wRoh);
   if (breite !== null && !(BILD_BREITEN as readonly number[]).includes(breite)) {
-    return new NextResponse('bad width', { status: 400 });
+    // Ganze Zahl in vernünftigem Rahmen → auf die nächstgrößere Stufe umleiten
+    // (der Zwischenspeicher bleibt bei den festen Stufen). Anlass 11.10.2026: die
+    // App fragte die Vollbildansicht mit w=1024 an und bekam 400 — kein Bild.
+    if (!Number.isInteger(breite) || breite < 1 || breite > 4096) {
+      return new NextResponse('bad width', { status: 400 });
+    }
+    const ziel = new URL(request.url);
+    ziel.searchParams.set('w', String(bildBreite(breite)));
+    return NextResponse.redirect(ziel, 308);
   }
 
   let target: URL;

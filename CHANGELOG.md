@@ -7,6 +7,16 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.28.1] - 11. Oktober 2026 · App: Vollbild-Kartenbilder und Cardmarket-Prüflink
+
+### Behoben
+- **Kartenbilder im Vollbild der App blieben leer:** Die App fragte das Bild in einer Breite an, die der Bild-Proxy nicht kennt (HTTP 400). Unbekannte Breiten leitet der Proxy jetzt auf die nächste feste Stufe um — wirkt auch in bereits installierten Builds
+
+### Neu
+- **„Preis auf Cardmarket prüfen"** direkt unter der Preisaufschlüsselung der Kartenseite in der App (genau diese Karte, wo belegt, sonst die Suche)
+
+---
+
 ## [6.28.0] - 8. Oktober 2026 · Pokémon-Seiten, Teilen und Suchmaschinen
 
 ### Neu

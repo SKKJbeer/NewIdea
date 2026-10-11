@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.28.1',
+    date: '11. Oktober 2026',
+    label: 'App: Vollbild-Kartenbilder und Cardmarket-Prüflink',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: 'Kartenbilder im Vollbild der App blieben leer — unbekannte Bildbreiten werden jetzt auf die nächste Stufe umgeleitet' },
+      { type: 'new', text: 'App: „Preis auf Cardmarket prüfen" direkt unter der Preisaufschlüsselung' },
+    ],
+  },
+  {
     version: '6.28.0',
     date: '8. Oktober 2026',
     label: 'Pokémon-Seiten, Teilen und Suchmaschinen',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Karten nach Pokémon: Übersicht und je Pokémon eine Seite mit allen Versionen und Preisen' },
       { type: 'new', text: 'Teilen-Knopf auf Karten-, Pokémon-, Artikel- und Berichtsseiten sowie in der App' },

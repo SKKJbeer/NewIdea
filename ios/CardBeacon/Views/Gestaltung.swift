@@ -309,7 +309,7 @@ struct KartenVollbild: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Color.black.ignoresSafeArea()
-            KartenBild(quelle: bild, breite: 1024)
+            KartenBild(quelle: bild, breite: 1080)
                 .padding(24)
                 .scaleEffect(zoom)
                 .gesture(MagnificationGesture().onChanged { zoom = min(max($0, 1), 4) }.onEnded { _ in withAnimation(.spring) { zoom = 1 } })

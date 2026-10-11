@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.28.0` · **Stand:** 8. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.28.1` · **Stand:** 11. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -177,6 +177,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v6.27.1 | `/api/v1/marktbericht`: `ohneDuenneAusreisser` auf topGainers; Seltenheit „Unknown" ausgeblendet |
 | v6.27.2 | `relevanteBerichtsGewinner()` (markt-lage.ts) beim Speichern des Berichts und auf /marktbericht, /marktbericht/[week], App |
 | v6.28.0 | `/pokemon` + `/pokemon/[slug]` (`pokemon-seiten.ts`, `pokemon-daten.ts`, `pokemon-namen-weitere.ts`), `TeilenKnopf`, App `TeilenToolbar`, Workflows `suchmaschinen.yml` + `indexnow-voll.yml`, `docs/app-store.md` |
+| v6.28.1 | `/api/img`: unbekannte Breite → 308 auf `bildBreite()`; App-Vollbild 1080; App-Kartenseite „Preis auf Cardmarket prüfen"; `bild-breiten.test.ts` |
 | v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |

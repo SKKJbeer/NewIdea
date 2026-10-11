@@ -192,6 +192,25 @@ private struct PreisBlock: View {
             zeile("Ø 30 Tage", d.aufschluesselung.durchschnitt30)
             Text("„ab“ ist das günstigste einzelne Angebot, oft in schlechterem Zustand — der Trend ist der faire Marktwert.")
                 .font(.caption2).foregroundStyle(.secondary)
+            if let k = d.kaufen, let url = URL(string: k.cardmarket) {
+                Link(destination: url) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.shield")
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Preis auf Cardmarket prüfen").font(.callout.weight(.semibold))
+                            Text(k.cardmarketGenau ? "Öffnet genau diese Karte" : "Öffnet die Cardmarket-Suche nach dem Namen")
+                                .font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                    }
+                    .padding(12)
+                    .background(Theme.akzent.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Theme.akzent.opacity(0.25)))
+                    .foregroundStyle(Theme.akzent)
+                }
+                Text("* Affiliate-Link").font(.caption2).foregroundStyle(.tertiary)
+            }
         }
         .kachel()
     }
