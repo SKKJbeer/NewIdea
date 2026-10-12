@@ -60,7 +60,7 @@ const WARTE_MS = 140;
 // Seitenwechsel neu aufgebaut (Kopfleiste, Suchseite, Einstiegsseite sind drei
 // Instanzen). Läge der Speicher in der Komponente, wäre er nach jedem Klick
 // leer — also genau dann, wenn er gebraucht wird.
-const SPEICHER = new Map<string, { treffer: Suggestion[]; sets: SetVorschlag[]; zeit: number }>();
+const SPEICHER = new Map<string, { treffer: Suggestion[]; sets: SetVorschlag[]; hinweis?: string | null; zeit: number }>();
 const SPEICHER_MAX = 40;
 
 // FRIST — und zwar nicht, um Speicher zu sparen.
@@ -74,7 +74,7 @@ const SPEICHER_MAX = 40;
 // und lang genug, um eine Suchsitzung abzudecken.
 const FRIST_MS = 5 * 60 * 1000;
 
-function ausSpeicherRoh(q: string): { treffer: Suggestion[]; sets: SetVorschlag[] } | undefined {
+function ausSpeicherRoh(q: string): { treffer: Suggestion[]; sets: SetVorschlag[]; hinweis?: string | null } | undefined {
   const e = SPEICHER.get(q);
   if (!e) return undefined;
   if (Date.now() - e.zeit > FRIST_MS) {
@@ -84,9 +84,9 @@ function ausSpeicherRoh(q: string): { treffer: Suggestion[]; sets: SetVorschlag[
   return e;
 }
 
-function merken(q: string, treffer: Suggestion[], sets: SetVorschlag[]) {
+function merken(q: string, treffer: Suggestion[], sets: SetVorschlag[], hinweis: string | null = null) {
   SPEICHER.delete(q);
-  SPEICHER.set(q, { treffer, sets, zeit: Date.now() });
+  SPEICHER.set(q, { treffer, sets, hinweis, zeit: Date.now() });
   // Ältester Eintrag zuerst raus — `Map` merkt sich die Einfügereihenfolge.
   while (SPEICHER.size > SPEICHER_MAX) {
     const aeltester = SPEICHER.keys().next().value;
@@ -112,7 +112,7 @@ function passt(s: Suggestion, q: string): boolean {
  * ersetzt die Liste, sobald er da ist — die Speicher-Antwort kann nur zu
  * WENIG zeigen (die kurze Liste war abgeschnitten), nie etwas Falsches.
  */
-function ausSpeicher(q: string): { treffer: Suggestion[]; sets: SetVorschlag[] } | null {
+function ausSpeicher(q: string): { treffer: Suggestion[]; sets: SetVorschlag[]; hinweis?: string | null } | null {
   const genau = ausSpeicherRoh(q);
   if (genau) return genau;
 
@@ -136,13 +136,15 @@ function ausSpeicher(q: string): { treffer: Suggestion[]; sets: SetVorschlag[] }
 export function SearchBox({
   initialQuery = '',
   autoFocus = false,
-  placeholder = 'Pokémon-Karte suchen, z.B. Charizard …',
+  placeholder = 'Karte suchen, z. B. Glurak 151 oder Nachtara VMAX …',
   searchBtn = 'Suchen',
 }: SearchBoxProps) {
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [sets, setSets] = useState<SetVorschlag[]>([]);
+  // „Gesucht nach „glurak“ (statt „glurk“)." — vom Server, nie im Browser geraten.
+  const [hinweis, setHinweis] = useState<string | null>(null);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [open, setOpen] = useState(false);
   // Die Liste oeffnet sich erst, wenn jemand TIPPT. Auf der Ergebnisseite
@@ -184,6 +186,7 @@ export function SearchBox({
       abbruchRef.current?.abort();
       setSuggestions([]);
       setSets([]);
+      setHinweis(null);
       setLoadingSuggestions(false);
       setOpen(false);
       setAktiv(-1);
@@ -196,6 +199,7 @@ export function SearchBox({
     if (sofort) {
       setSuggestions(sofort.treffer);
       setSets(sofort.sets);
+      setHinweis(sofort.hinweis ?? null);
       setOpen(beruehrt.current && (sofort.treffer.length > 0 || sofort.sets.length > 0));
       setAktiv(-1);
     }
@@ -226,9 +230,11 @@ export function SearchBox({
         // Zeit gar nichts.
         const data: Suggestion[] = Array.isArray(roh) ? roh : (roh?.cards ?? []);
         const gefundeneSets: SetVorschlag[] = Array.isArray(roh) ? [] : (roh?.sets ?? []);
-        merken(q, data, gefundeneSets);
+        const gefundenerHinweis: string | null = Array.isArray(roh) ? null : (typeof roh?.hinweis === 'string' ? roh.hinweis : null);
+        merken(q, data, gefundeneSets, gefundenerHinweis);
         setSuggestions(data);
         setSets(gefundeneSets);
+        setHinweis(gefundenerHinweis);
         setOpen(beruehrt.current && (data.length > 0 || gefundeneSets.length > 0));
         setAktiv(-1);
       } catch (err) {
@@ -346,6 +352,9 @@ export function SearchBox({
 
       {open && (sichtbar.length > 0 || sets.length > 0) && (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-[#2a2a3a] bg-[#13131e] shadow-xl">
+          {hinweis && (
+            <p className="border-b border-[#1e1e30] px-4 py-2 text-[11px] leading-snug text-slate-400">{hinweis}</p>
+          )}
           {/* SETS ZUERST, und ausserhalb des Rollbereichs.
 
               Wer einen Set-Namen tippt, meint das Set — nicht die dreissig

@@ -409,6 +409,8 @@ export interface SetMeta {
   series: string;
   releaseDate: string;
   total: number;
+  /** Gedruckte Gesamtzahl („4/102" → 102), ohne Secret Rares. Fehlt in Sicherungen vor v6.31.0. */
+  printedTotal?: number;
   logoUrl: string;
   symbolUrl: string;
 }
@@ -473,6 +475,7 @@ export async function fetchRecentSets(limit = 24): Promise<SetMeta[]> {
       series: (set.series as string) || '',
       releaseDate: (set.releaseDate as string) || '',
       total: (set.total as number) || 0,
+      printedTotal: (set.printedTotal as number) || undefined,
       logoUrl: images.logo || '',
       symbolUrl: images.symbol || '',
     };

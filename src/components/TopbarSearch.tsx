@@ -34,5 +34,5 @@ const SEITEN_MIT_EIGENER_SUCHE = new Set(['/suche', '/einsteiger']);
 export function TopbarSearch() {
   const pfad = usePathname();
   if (SEITEN_MIT_EIGENER_SUCHE.has(pfad)) return null;
-  return <SearchBox placeholder="Suche Karten, Sets, …" searchBtn="Suchen" />;
+  return <SearchBox placeholder="Karte, Set oder Nummer — deutsch oder englisch" searchBtn="Suchen" />;
 }

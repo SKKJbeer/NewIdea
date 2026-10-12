@@ -1,5 +1,7 @@
 import { displayPrice } from '@/lib/pokemon-api';
-import { cachedSearchCards } from '@/lib/search-cache';
+import { sucheKarten } from '@/lib/search-cache';
+import { hinweisText } from '@/lib/such-motor';
+import { suchMotor } from '@/lib/such-index';
 import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { NextResponse } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
@@ -51,6 +53,11 @@ function mitGrenze<T>(p: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
+async function setsAusMotor(q: string): Promise<SetTreffer[]> {
+  const m = await suchMotor(0).catch(() => null);
+  return m ? m.sets(q, 2).map((s) => ({ setCode: s.setCode, setName: s.set, hoechsterPreis: s.hoechsterPreis })) : [];
+}
+
 function grenze(roh: string | null): number {
   const n = Number.parseInt(roh ?? '', 10);
   if (!Number.isFinite(n)) return N_MAX;
@@ -67,8 +74,8 @@ export async function GET(request: Request) {
     // Karten und Sets NEBENEINANDER, nicht nacheinander: Die Set-Suche geht in
     // dieselbe Datenbank und würde sonst die Antwortzeit verdoppeln.
     const n = grenze(searchParams.get('n'));
-    const [cards, sets, neuOhnePreis] = await mitGrenze(Promise.all([
-      cachedSearchCards(q, n),
+    const [{ karten: cards, hinweis }, setsDb, neuOhnePreis] = await mitGrenze(Promise.all([
+      sucheKarten(q, n),
       // Ein Ausfall der Set-Suche darf die Kartenvorschläge nicht mitreißen —
       // sie sind der Hauptzweck dieser Route.
       searchSetIndex(q, 2).catch(() => [] as SetTreffer[]),
@@ -76,6 +83,8 @@ export async function GET(request: Request) {
       // die Suchleiste zeigt keinen Betrag.
       ohnePreisTreffer(q, n),
     ]), VORSCHLAG_BUDGET_MS);
+    // Sets auch über den deutschen Namen („drachenwandel" → Evolving Skies).
+    const sets = setsDb.length > 0 ? setsDb : await setsAusMotor(q);
     const bekannt = new Set(cards.map((c) => c.id));
     // Ohne Treffer im Index bekommen sie alle Plätze, sonst höchstens zwei.
     const extra = neuOhnePreis.filter((k) => !bekannt.has(k.id)).slice(0, cards.length === 0 ? n : 2);
@@ -93,7 +102,7 @@ export async function GET(request: Request) {
       })),
     ];
     return NextResponse.json(
-      { cards: suggestions, sets },
+      { cards: suggestions, sets, hinweis: hinweisText(hinweis) },
       { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } },
     );
   } catch {

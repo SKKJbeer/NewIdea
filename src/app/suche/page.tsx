@@ -3,7 +3,9 @@ import { SearchBox } from '@/components/SearchBox';
 import { SearchResultsLang } from '@/components/SearchResultsLang';
 import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { searchCards } from '@/lib/pokemon-api';
-import { cachedSearchCards } from '@/lib/search-cache';
+import { sucheKarten } from '@/lib/search-cache';
+import { hinweisText } from '@/lib/such-motor';
+import { suchMotor } from '@/lib/such-index';
 import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { ohnePreisTreffer } from '@/lib/neuheiten';
 import { OhnePreisListe } from '@/components/Themen';
@@ -89,6 +91,8 @@ export default async function SearchPage({
   let sets: SetTreffer[] = [];
   // Karten neuer Sets ohne Preis (z. B. RGB Mew) — eigener, gekennzeichneter Abschnitt.
   let ohnePreis: Awaited<ReturnType<typeof ohnePreisTreffer>> = [];
+  // „Gesucht nach „glurak“ (statt „glurk“)" — sichtbar, damit niemand rätselt, warum etwas anderes kommt.
+  let hinweis: string | null = null;
   let error = false;
   // Der Marktbezug startet GLEICHZEITIG mit der Suche, nicht danach — vorher
   // addierten sich beide Wartezeiten.
@@ -97,11 +101,19 @@ export default async function SearchPage({
   const marktLaden = query.length >= 2 ? getMarketBenchmark().catch(() => null) : Promise.resolve(null);
   if (query.length >= 2) {
     try {
-      [results, sets, ohnePreis] = await Promise.all([
-        cachedSearchCards(query, 40),
+      let suche: Awaited<ReturnType<typeof sucheKarten>>;
+      [suche, sets, ohnePreis] = await Promise.all([
+        sucheKarten(query, 40),
         searchSetIndex(query, 4).catch(() => [] as SetTreffer[]),
         ohnePreisTreffer(query, 16),
       ]);
+      results = suche.karten;
+      hinweis = hinweisText(suche.hinweis);
+      if (sets.length === 0) {
+        // Set über den deutschen Namen („drachenwandel" → Evolving Skies).
+        const m = await suchMotor(0).catch(() => null);
+        sets = m ? m.sets(query, 4).map((x) => ({ setCode: x.setCode, setName: x.set, hoechsterPreis: x.hoechsterPreis })) : [];
+      }
       const bekannt = new Set(results.map((c) => c.id));
       ohnePreis = ohnePreis.filter((k) => !bekannt.has(k.id));
     } catch {
@@ -186,10 +198,14 @@ export default async function SearchPage({
           <div className="text-center text-slate-600 py-16">
             <SearchX size={40} className="mx-auto mb-4 opacity-40" />
             <p className="text-sm">Keine Karten für „<span className="font-semibold text-slate-400">{query}</span>" gefunden.</p>
-            <p className="text-xs mt-1">Tipp: Versuche den englischen Kartennamen (z.&nbsp;B. „Charizard" statt „Glurak").</p>
+            {hinweis && <p className="text-xs mt-1">{hinweis}</p>}
+            <p className="text-xs mt-1">Tipp: Name reicht, deutsch oder englisch — dazu optional Set oder Nummer, z.&nbsp;B. „Glurak 151" oder „Nachtara 215".</p>
           </div>
         ) : (
           <div className="space-y-10">
+            {hinweis && (
+              <p className="rounded-xl border border-violet-500/15 bg-violet-500/5 px-4 py-2.5 text-[13px] text-slate-300">{hinweis}</p>
+            )}
             <SetTrefferListe sets={sets} />
             {results.length > 0 ? (
               <SearchResultsLang cards={results} query={query} cbi={markt?.value ?? null} />

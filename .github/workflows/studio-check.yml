@@ -13,7 +13,7 @@ on:
         description: Optional einen Lauf anstoßen (nur aus der festen Liste)
         type: choice
         default: keiner
-        options: [keiner, themen]
+        options: [keiner, themen, suchindex]
 
 jobs:
   check:
@@ -33,10 +33,11 @@ jobs:
           echo "Anmeldung: HTTP $code"
           [ "$code" = 200 ] || exit 1
           awk '$6=="studio_session"{print $7}' "$jar" | while read -r v; do echo "::add-mask::$v"; done
-          if [ "$LAUF" = themen ]; then
-            echo "== Lauf: themen =="
-            curl -s -b "$jar" -m 310 "$BASIS/api/cron/themen" -w '\nHTTP %{http_code}\n' | head -c 4000
-          fi
+          case "$LAUF" in
+            themen|suchindex)
+              echo "== Lauf: $LAUF =="
+              curl -s -b "$jar" -m 310 "$BASIS/api/cron/$LAUF" -w '\nHTTP %{http_code}\n' | head -c 4000 ;;
+          esac
           echo "== Monitoring =="
           curl -s -b "$jar" -m 60 "$BASIS/api/monitoring" | tee mon.json | jq -c 'keys' || head -c 2000 mon.json
           echo "== aufrufe =="

@@ -42,7 +42,7 @@ const de = {
   search_h1_a: 'Was ist deine Karte',
   search_h1_b: 'wert?',
   search_sub: 'Suche eine Pokémon-Karte und sieh sofort Marktwert, Trend und 30-Tage-Preisverlauf.',
-  search_placeholder: 'Pokémon-Karte suchen, z.B. Charizard …',
+  search_placeholder: 'Karte suchen, z. B. Glurak 151 oder Nachtara VMAX …',
   search_btn: 'Suchen',
   search_min_chars: 'Gib mindestens 2 Zeichen ein, z. B. „Pikachu", „Charizard" oder „Mewtu".',
   search_error: 'Suche momentan nicht verfügbar',

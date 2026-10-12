@@ -118,6 +118,8 @@ struct SetTreffer: Codable, Hashable, Identifiable {
 struct Suchergebnis: Codable {
     let karten: [Karte]
     let sets: [SetTreffer]
+    /// „Gesucht nach „glurak“ (statt „glurk“)." — ab v6.31.0, sonst nil.
+    let hinweis: String?
 }
 
 struct SetDetail: Codable {

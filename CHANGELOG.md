@@ -7,6 +7,21 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.31.0] - 12. Oktober 2026 · Neue Suche: deutsch, Tippfehler, Set und Nummer
+
+### Neu
+- **Suche versteht freie Eingaben:** Wörter in beliebiger Reihenfolge, deutsch oder englisch, dazu optional Set (englisch oder deutsch, z. B. „Nachtara Drachenwandel", „Glurak 151"), Kartennummer („Glurak 4/102", „Pikachu TG05") oder Seltenheit („Glurak SIR", „Mew Promo")
+- **Tippfehler werden korrigiert** — auf echte Wörter aus dem Kartenbestand („glurk" → Glurak, „charizrd" → Charizard, „umbreon vmx" → VMAX), sichtbar als „Gesucht nach …"
+- **Deutsche Namen für alle Karten**, auch Trainer und Items („Forschung des Professors", „Supertrank", „Pokéball", „Porenta") — Quelle TCGdex, täglich neu
+- Zusammen- oder getrennt geschrieben und Akzente spielen keine Rolle („hooh", „pokeball", „farfetchd")
+- Passt ein Wort zu keiner Karte, wird ohne es gesucht und das offen angezeigt („„gold“ nicht berücksichtigt")
+- Sets werden auch über den deutschen Namen gefunden; App-Suche mit denselben Treffern und Hinweisen
+
+### Geändert
+- Täglicher Suchindex (06:40 UTC) mit Schranke und Gesundheitsprüfung; die bisherige Datenbank-Suche bleibt als Rückfall
+
+---
+
 ## [6.30.0] - 12. Oktober 2026 · Neue Karten ohne Preis sichtbar (RGB Mew)
 
 ### Neu

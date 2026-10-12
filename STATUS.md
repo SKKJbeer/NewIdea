@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.30.0` · **Stand:** 12. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.31.0` · **Stand:** 12. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -14,7 +14,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 |---|---|---|
 | Startseite `/` | ✅ Fertig | CBI (Median, ganzer Bestand), Marktbreite, Markttemperatur, Bewegungen, Set-Markt · ISR 1h · keine Vorabrufe mehr (v6.2.0) |
 | Trends `/trends` | ✅ Neu (v6.13.0) | Themen-Cron 01:50 UTC → `social/themen/neuheiten.json`; neue Sets per Cardmarket-Katalog zugeordnet, Kartenindex nur ohne frischeren Preis |
-| Suche `/suche` | ✅ Fertig | Karten UND Sets, nach Passgenauigkeit sortiert (v5.8.0), Autocomplete 140 ms, laufende Abfragen abgebrochen, 8 Zeilen mit Deckel, Tastaturbedienung · live 0,20–0,38 s |
+| Suche `/suche` | ✅ Fertig (v6.31.0 neu: Suchmotor, deutsch/Tippfehler/Set/Nummer) | Karten UND Sets, nach Passgenauigkeit sortiert (v5.8.0), Autocomplete 140 ms, laufende Abfragen abgebrochen, 8 Zeilen mit Deckel, Tastaturbedienung · live 0,20–0,38 s |
 | Marktbericht `/marktbericht` | ✅ Fertig | Geprueft 05.08.: KW 31 live, 3 Berichte gespeichert, Wochen-Cron laeuft (letzter 03.08.) |
 | Blog-Index `/artikel` | ✅ Fertig | Nur So/Do, echte Artikel-Titel, Teaser-Texte, ISR 1h |
 | Artikel-Erzeugung | ✅ Fertig | Geprueft 05.08.: 11 Artikel, echte KI-Titel (kein Fallback), letzter 02.08. (So) — naechster Do 06.08. |
@@ -180,6 +180,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v6.28.1 | `/api/img`: unbekannte Breite → 308 auf `bildBreite()`; App-Vollbild 1080; App-Kartenseite „Preis auf Cardmarket prüfen"; `bild-breiten.test.ts` |
 | v6.29.0 | PSA-Prüflink (Website + App): `psaSuche()` in `kauf-links-basis.ts`, `kaufen.psa` in `/api/v1/karten/:id`, Hinweis „Preise ungegradet, keine eigenen PSA-Werte“ |
 | v6.30.0 | Nutzer-Rückmeldung „rgb mew fehlt“: `NeuSet.ohnePreis` (Themen-Lauf), `OhnePreisListe` auf Set-Seite + `/suche`, Vorschläge über `ohnePreisTreffer()`, Kartenseite `druckeFuerKarte()`; Obermengen-Regel in `ordneKartenZu` (nur mehrdeutig); `kartenNummer()`; Studio-Check kann `themen` anstoßen |
+| v6.31.0 | Suchmotor `such-motor.ts` (rein, 14 Tests: Wortreihenfolge, DE/EN, Set, Nummer + Gesamtzahl, Seltenheit, Tippfehler OSA-Distanz, Zusammenschreibung, Hinweise), Suchindex `such-index.ts` + Cron `/api/cron/suchindex` 06:40 UTC (TCGdex `/de/cards` + `/de/sets`), `sucheKarten()` für Suchseite/Vorschläge/App, `bewerte()` „Suchindex“ |
 | v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |

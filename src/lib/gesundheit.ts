@@ -1,4 +1,5 @@
 import { preisGate, leseDurchlaufStand, type DurchlaufStand } from './preis-durchlauf';
+import { suchIndexStand, MIN_KARTEN } from './such-index';
 import { sprachpreisGate, leseSprachStand } from './sprachpreise';
 import { leseNeuheiten, type NeuheitenDatei } from './neuheiten';
 import { leseFrischpreise, type FrischStand } from './frischpreise';
@@ -42,6 +43,8 @@ export interface Eingaben {
   berichtWoche: string | null;
   artikel: { vorhanden: boolean; ersatz: boolean; altePreise: boolean } | null;
   letzterGuide: string | null;
+  /** Suchindex (06:40 UTC). `undefined` = nicht geprüft (ältere Aufrufer). */
+  suchIndex?: { erstellt: string; karten: number } | null;
 }
 
 const minuten = (d: Date) => d.getUTCHours() * 60 + d.getUTCMinutes();
@@ -97,6 +100,12 @@ export function bewerte(e: Eingaben, jetzt: Date): Pruefpunkt[] {
     const ok = e.letzterGuide !== null && e.letzterGuide.slice(0, 10) === heute;
     p.push({ name: 'Guide', ok, befund: e.letzterGuide ? `Letzter Guide vom ${e.letzterGuide.slice(0, 10)}` : 'Noch kein Guide' });
   }
+  // Suchindex (06:40 UTC) — fehlt er, sucht die Seite nur noch per Datenbank-Muster.
+  if (e.suchIndex !== undefined && m >= 7 * 60 + 10) {
+    const s = e.suchIndex;
+    const ok = !!s && s.erstellt.slice(0, 10) === heute && s.karten >= MIN_KARTEN;
+    p.push({ name: 'Suchindex', ok, befund: s ? `Stand ${s.erstellt.slice(0, 10)}, ${s.karten} Karten` : 'Keine Datei' });
+  }
   return p;
 }
 
@@ -105,7 +114,7 @@ export const PFAD_GESUNDHEIT = 'gesundheit/letzte.json';
 /** Lädt alle Eingaben (wirft nie), bewertet, legt das Ergebnis ab. */
 export async function pruefeGesundheit(jetzt = new Date()): Promise<Gesundheit> {
   const heute = tag(jetzt);
-  const [preisStand, sprach, neuheiten, frisch, index, berichte, artikel, guides] = await Promise.all([
+  const [preisStand, sprach, neuheiten, frisch, index, berichte, artikel, guides, suchIndex] = await Promise.all([
     leseDurchlaufStand().catch(() => null),
     leseSprachStand().catch(() => ({ zuordnung: null, preise: null })),
     leseNeuheiten().catch(() => null),
@@ -114,6 +123,7 @@ export async function pruefeGesundheit(jetzt = new Date()): Promise<Gesundheit> 
     listMarketReportMeta().catch(() => []),
     getArticleType(heute) ? loadArticle(heute).catch(() => null) : Promise.resolve(null),
     listGeneratedGuideMeta().catch(() => []),
+    suchIndexStand().catch(() => null),
   ]);
   const letzterGuide = guides.map((g) => g.createdAt).filter((c): c is string => !!c).sort().pop() ?? null;
   const punkte = bewerte(
@@ -128,6 +138,7 @@ export async function pruefeGesundheit(jetzt = new Date()): Promise<Gesundheit> 
         ? { vorhanden: true, ersatz: artikel.isStatic === true, altePreise: artikelPreiseVeraltet(artikel) }
         : { vorhanden: false, ersatz: false, altePreise: false },
       letzterGuide,
+      suchIndex,
     },
     jetzt,
   );

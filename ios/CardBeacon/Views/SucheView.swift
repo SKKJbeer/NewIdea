@@ -15,7 +15,7 @@ struct SucheView: View {
             }
             .background(Theme.hintergrund)
             .navigationTitle("Suche")
-            .searchable(text: $begriff, placement: .navigationBarDrawer(displayMode: .always), prompt: "Karte oder Set")
+            .searchable(text: $begriff, placement: .navigationBarDrawer(displayMode: .always), prompt: "Karte, Set oder Nummer")
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
             .task(id: begriff) { await suchen() }
@@ -31,6 +31,11 @@ struct SucheView: View {
                 Label(fehler, systemImage: "exclamationmark.triangle").foregroundStyle(Theme.warnung).listRowBackground(Theme.karte)
             }
             if let ergebnis {
+                if let hinweis = ergebnis.hinweis {
+                    Label(hinweis, systemImage: "wand.and.stars")
+                        .font(.footnote).foregroundStyle(.secondary)
+                        .listRowBackground(Theme.karte)
+                }
                 if !ergebnis.sets.isEmpty {
                     Section {
                         ForEach(ergebnis.sets) { s in
@@ -46,7 +51,7 @@ struct SucheView: View {
                 }
                 Section {
                     if ergebnis.karten.isEmpty {
-                        Text("Keine Karten für „\(begriff)“ gefunden. Tipp: englischer Kartenname (z. B. „Charizard“).")
+                        Text("Keine Karten für „\(begriff)“ gefunden. Tipp: Name reicht, deutsch oder englisch — dazu optional Set oder Nummer, z. B. „Glurak 151“.")
                             .font(.callout).foregroundStyle(.secondary)
                     }
                     ForEach(ergebnis.karten) { k in

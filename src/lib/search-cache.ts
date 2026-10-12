@@ -1,6 +1,8 @@
 import { unstable_cache } from 'next/cache';
 import { searchCards } from './pokemon-api';
-import { searchCardIndex } from './card-index';
+import { searchCardIndex, cardsFromIndex } from './card-index';
+import { sucheImMotor } from './such-index';
+import type { SuchHinweis } from './such-motor';
 import type { PokemonCard } from '@/types';
 
 // GETEILTER ZWISCHENSPEICHER FÜR SUCHTREFFER
@@ -95,6 +97,41 @@ export async function cachedSearchCards(query: string, limit = 40): Promise<Poke
     // der Seite — und der Grund steht bereits im Log von `searchCards`.
     return [];
   }
+}
+
+export interface KartenSuche {
+  karten: PokemonCard[];
+  /** Tippfehler-Korrektur / weggelassene Wörter — für „Gesucht nach …" in der Oberfläche. */
+  hinweis: SuchHinweis | null;
+}
+
+/**
+ * DIE Suche für Suchseite, Vorschläge und App (seit v6.31.0).
+ *
+ * 1. Suchmotor (such-motor.ts) über den täglich gebauten Suchindex: Wörter in
+ *    beliebiger Reihenfolge, deutsch/englisch, Set, Nummer, Tippfehler.
+ * 2. Findet der Motor nichts (oder ist auf dieser Instanz noch keiner geladen):
+ *    die bisherige Datenbank-Suche — sie kennt auch Karten, die seit dem
+ *    letzten Indexbau dazugekommen sind.
+ * Angezeigt werden IMMER die Zeilen aus dem Kartenindex (frischer Preis), der
+ * Motor liefert nur die Reihenfolge.
+ */
+export async function sucheKarten(query: string, limit = 40, { nurIndex = false } = {}): Promise<KartenSuche> {
+  const q = query.trim().slice(0, 80);
+  if (q.length < 2) return { karten: [], hinweis: null };
+  const motor = await sucheImMotor(q, limit);
+  if (motor && motor.ids.length > 0) {
+    const zeilen = new Map<string, PokemonCard>();
+    for (let i = 0; i < motor.ids.length; i += 200) {
+      for (const [id, k] of await cardsFromIndex(motor.ids.slice(i, i + 200))) zeilen.set(id, k);
+    }
+    const karten = motor.ids.map((id) => zeilen.get(id)).filter((k): k is PokemonCard => !!k);
+    if (karten.length > 0) return { karten, hinweis: motor.hinweis };
+  }
+  // `nurIndex` (App): kein Rückfall auf die fremde Kartendatenbank — ein
+  // Ausfall des eigenen Index WIRFT, die App zeigt dann einen Fehler.
+  const karten = nurIndex ? await searchCardIndex(q, limit) : await cachedSearchCards(q, limit);
+  return { karten, hinweis: karten.length === 0 ? motor?.hinweis ?? null : null };
 }
 
 /**

@@ -142,6 +142,13 @@ describe('Gesundheitsprüfung (zeitbewusst)', () => {
     expect(p.find((x) => x.name === 'Guide')).toBeUndefined();
     expect(p.find((x) => x.name === 'Frischpreise Top 400')).toBeUndefined();
   });
+  it('Suchindex: ab 07:10 UTC muss der heutige Stand stehen', () => {
+    const jetzt = new Date('2026-09-29T12:30:00Z');
+    expect(bewerte({ ...alles, suchIndex: { erstellt: '2026-09-29T06:41:00Z', karten: 19_800 } }, jetzt).find((x) => x.name === 'Suchindex')?.ok).toBe(true);
+    expect(bewerte({ ...alles, suchIndex: { erstellt: '2026-09-28T06:41:00Z', karten: 19_800 } }, jetzt).find((x) => x.name === 'Suchindex')?.ok).toBe(false);
+    expect(bewerte({ ...alles, suchIndex: null }, jetzt).find((x) => x.name === 'Suchindex')?.ok).toBe(false);
+    expect(bewerte({ ...alles, suchIndex: null }, new Date('2026-09-29T06:00:00Z')).find((x) => x.name === 'Suchindex')).toBeUndefined();
+  });
   it('fehlender Wochenbericht, offene Nachholung und Ersatz-Artikel werden erkannt', () => {
     const p = bewerte(
       { ...alles, berichtWoche: '2026-09-21', artikel: { vorhanden: true, ersatz: true, altePreise: true } },

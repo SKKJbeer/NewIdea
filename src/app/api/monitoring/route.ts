@@ -75,6 +75,16 @@ function getWorkflows(cronActive: boolean) {
       trigger: 'Vercel Cron',
     },
     {
+      name: 'Suchindex',
+      endpoint: '/api/cron/suchindex',
+      schedule: '40 6 * * *',
+      scheduleLabel: 'Täglich 06:40 UTC',
+      description:
+        'Baut den Suchindex (alle Karten mit englischem + deutschem Namen von TCGdex, Set englisch/deutsch, Nummer, Seltenheit). Schranke: ≥ 15.000 Karten, ≥ 60 % mit deutschem Namen — sonst bleibt der alte. Diagnose: ?nur=stand',
+      active: cronActive,
+      trigger: 'Vercel Cron',
+    },
+    {
       name: 'Gesundheitsprüfung aller Daten',
       endpoint: '/api/cron/gesundheit',
       schedule: '30 12 * * *',

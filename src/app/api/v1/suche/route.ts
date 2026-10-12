@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { searchCardIndex, searchSetIndex, type SetTreffer } from '@/lib/card-index';
+import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
+import { sucheKarten } from '@/lib/search-cache';
+import { hinweisText } from '@/lib/such-motor';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
 import { siteUrlOrLocal } from '@/lib/site';
 import { APP_CACHE, karteDto, suchbegriff } from '@/lib/app-api';
@@ -15,12 +17,17 @@ export async function GET(request: Request) {
   if (!bremse(clientIp(request)).allowed) return NextResponse.json({ error: 'zu-viele' }, { status: 429 });
   try {
     const basis = siteUrlOrLocal();
-    const [karten, sets] = await Promise.all([
-      searchCardIndex(q, 40),
+    const [{ karten, hinweis }, sets] = await Promise.all([
+      sucheKarten(q, 40, { nurIndex: true }),
       searchSetIndex(q, 4).catch(() => [] as SetTreffer[]),
     ]);
     return NextResponse.json(
-      { karten: karten.map((k) => karteDto(k, basis)), sets: sets.map((s) => ({ setCode: s.setCode, name: s.setName })) },
+      {
+        karten: karten.map((k) => karteDto(k, basis)),
+        sets: sets.map((s) => ({ setCode: s.setCode, name: s.setName })),
+        // Seit v6.31.0 (zusätzliches Feld): „Gesucht nach „glurak“ (statt „glurk“)." oder null.
+        hinweis: hinweisText(hinweis),
+      },
       { headers: { 'Cache-Control': APP_CACHE } },
     );
   } catch (err) {

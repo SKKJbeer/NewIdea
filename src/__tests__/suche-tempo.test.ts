@@ -40,9 +40,12 @@ describe('Suchtreffer werden instanzuebergreifend wiederverwendet', () => {
   it('die Suchseite und die Vorschlaege nutzen beide den Zwischenspeicher', () => {
     // Die Vorschlaege sind der meistgenutzte Weg zur Kartendatenbank ueberhaupt
     // — sie feuern nach jeder Tipp-Pause.
+    // Seit v6.31.0 über `sucheKarten` (Suchmotor zuerst), die selbst auf
+    // `cachedSearchCards` zurückfällt.
     for (const datei of ['src/app/suche/page.tsx', 'src/app/api/search/suggestions/route.ts']) {
-      expect(ohneKommentare(datei), datei).toContain('cachedSearchCards');
+      expect(ohneKommentare(datei), datei).toContain('sucheKarten(');
     }
+    expect(ohneKommentare('src/lib/search-cache.ts')).toMatch(/sucheKarten[\s\S]*cachedSearchCards\(q, limit\)/);
   });
 
   it('die Wiederholungen in der Quelle bleiben bestehen', () => {
