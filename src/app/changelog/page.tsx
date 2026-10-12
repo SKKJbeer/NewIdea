@@ -10,10 +10,20 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.31.1',
+    date: '12. Oktober 2026',
+    label: 'Suche: Feinschliff nach dem ersten Live-Test',
+    isLatest: true,
+    changes: [
+      { type: 'fixed', text: '„charizard base" zeigt das Grundset-Glurak zuerst — vollständig getippter Set-Name zählt mehr' },
+      { type: 'fixed', text: 'Hinweis widersprach sich bei weggelassenen Wörtern' },
+    ],
+  },
+  {
     version: '6.31.0',
     date: '12. Oktober 2026',
     label: 'Neue Suche: deutsch, Tippfehler, Set und Nummer',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Suche mit freier Wortreihenfolge: Name deutsch oder englisch plus optional Set, Nummer oder Seltenheit („Glurak 151", „Glurak 4/102")' },
       { type: 'new', text: 'Tippfehler-Korrektur auf echte Kartennamen, sichtbar als „Gesucht nach …"' },

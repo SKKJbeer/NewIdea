@@ -7,6 +7,14 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.31.1] - 12. Oktober 2026 · Suche: Feinschliff nach dem ersten Live-Test
+
+### Behoben
+- „charizard base" / „base set charizard" zeigen das Grundset-Glurak zuerst: Ein vollständig getippter Set-Name zählt mehr als ein Set, in dessen Namen das Wort nur vorkommt; „Set" grenzt nicht mehr ein
+- Hinweis widersprach sich bei weggelassenen Wörtern („Gesucht nach … · nicht berücksichtigt" für dasselbe Wort)
+
+---
+
 ## [6.31.0] - 12. Oktober 2026 · Neue Suche: deutsch, Tippfehler, Set und Nummer
 
 ### Neu

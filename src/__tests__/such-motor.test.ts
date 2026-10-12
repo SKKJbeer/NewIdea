@@ -27,9 +27,12 @@ const BESTAND: SuchKarte[] = [
   k('swsh12-138', 'Lugia V', ['Lugia-V'], 'Silver Tempest', 'Silberne Sturmwinde', '138', 'Rare Holo V', 3),
   k('base1-2', 'Articuno', ['Arktos'], 'Fossil', 'Fossil', '2', 'Rare Holo', 30),
   k('ex1-1', 'Altaria', ['Altaria'], 'Dragon', 'Dragon', '1', 'Rare Holo', 4),
+  k('ecard1-40', 'Charizard', ['Glurak'], 'Expedition Base Set', 'Expedition', '40', 'Rare', 900),
+  k('xy1-1', 'Robo Substitute', ['Robo-Ersatz'], 'XY', 'XY', '1', 'Uncommon', 0.1),
 ].map((x) => ({ ...x, gesamt: x.setCode === 'base1' ? 102 : x.setCode === 'ex14' ? 100 : null }));
 const motor = new SuchMotor(BESTAND);
 const ids = (q: string, n = 5) => motor.suche(q, n).ids;
+const GLURAK = ['base1-4', 'ecard1-40'];
 
 describe('Suchmotor: Bausteine', () => {
   it('normal/nummerForm/distanz', () => {
@@ -45,14 +48,14 @@ describe('Suchmotor: Bausteine', () => {
 describe('Suchmotor: Fälle, die vor dem Umbau leer blieben (gemessen 12.10.2026)', () => {
   it('Tippfehler → echtes Wort aus dem Bestand, mit Hinweis', () => {
     const r = motor.suche('glurk');
-    expect(r.ids[0]).toBe('base1-4');
+    expect(GLURAK).toContain(r.ids[0]);
     expect(r.hinweis?.korrigiert).toEqual([{ von: 'glurk', zu: 'glurak' }]);
-    expect(ids('charizrd')).toContain('base1-4');
+    expect(ids('charizrd')).toEqual(expect.arrayContaining(GLURAK));
     expect(ids('umbreon vmx')[0]).toBe('swsh7-215');
   });
   it('Name + Set (englisch oder deutsch), Reihenfolge egal', () => {
     expect(ids('glurak 151').slice(0, 2).sort()).toEqual(['sv3pt5-199', 'sv3pt5-6']);
-    expect(ids('charizard base')[0]).toBe('base1-4');
+    expect(ids('charizard base')[0]).toBe('base1-4'); // vor dem teureren Expedition-Base-Set-Glurak
     expect(ids('base set charizard')[0]).toBe('base1-4');
     expect(ids('nachtara drachenwandel')[0]).toBe('swsh7-215');
     expect(ids('evolving skies umbreon')[0]).toBe('swsh7-215');
@@ -89,12 +92,12 @@ describe('Suchmotor: Rangfolge und Hinweise', () => {
     expect(r.indexOf('sv3pt5-151')).toBeLessThan(r.indexOf('base1-10')); // Mew ex vor Mewtwo
   });
   it('Wortanfang beim Tippen', () => {
-    expect(ids('glur')[0]).toBe('base1-4');
+    expect(GLURAK).toContain(ids('glur')[0]);
     expect(ids('nachtara v')).toContain('swsh7-215');
   });
   it('„gold" wird nicht geraten, sondern ausgewiesen', () => {
     const r = motor.suche('gold glurak');
-    expect(r.ids[0]).toBe('base1-4');
+    expect(GLURAK).toContain(r.ids[0]);
     expect(r.hinweis?.ignoriert).toEqual(['gold']);
     expect(hinweisText(r.hinweis)).toContain('„gold“ nicht berücksichtigt');
   });
@@ -103,8 +106,13 @@ describe('Suchmotor: Rangfolge und Hinweise', () => {
     expect(r.ids.slice(0, 2).sort()).toEqual(['swsh12-138', 'swsh12-186']);
     expect(r.hinweis?.ignoriert.sort()).toEqual(['alt', 'art']);
   });
+  it('weggelassenes Wort steht nicht zugleich als Korrektur im Hinweis', () => {
+    const r = motor.suche('rgb mew');
+    expect(r.ids[0]).toBe('si1-1');
+    expect(r.hinweis?.korrigiert.map((x) => x.von)).not.toContain('rgb');
+  });
   it('Füllwörter stören nicht', () => {
-    expect(ids('glurak karte wert')[0]).toBe('base1-4');
+    expect(GLURAK).toContain(ids('glurak karte wert')[0]);
   });
   it('nichts Passendes → leer, kein beliebiger Treffer', () => {
     expect(motor.suche('xqzv').ids).toEqual([]);

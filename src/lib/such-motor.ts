@@ -243,6 +243,10 @@ export class SuchMotor {
       return { ...tok, map: r.map };
     });
 
+    // Weiche Füllwörter („set", „edition") grenzen nie ein, solange es andere
+    // Suchwörter gibt — sonst schlösse „base set charizard" das Grundset aus
+    // (heißt bei der Quelle nur „Base") und ließe nur „Expedition Base Set" übrig.
+    if (teile.some((x) => !x.weich)) teile = teile.filter((x) => !x.weich);
     // Wörter ohne jeden Treffer: weiche still weglassen, andere mit Hinweis.
     const leer = teile.filter((x) => x.map.size === 0);
     for (const x of leer) if (!x.weich) ignoriert.push(x.t);
@@ -283,11 +287,19 @@ export class SuchMotor {
         const b = fehlt === 0 ? (anfang === 0 ? 12 : 6) : genau > 0 ? 6 - fehlt : anfang > 0 ? 3 - fehlt : 0;
         bonus = Math.max(bonus, b);
       }
+      // Set vollständig getippt („charizard base" → Set „Base", nicht „Expedition Base Set").
+      const k = this.karten[i];
+      for (const setName of [k.set, k.setDe]) {
+        const sw = setName ? woerter(setName).filter((w) => !WEICHE_FUELLWOERTER.has(w)) : [];
+        if (sw.length > 0 && sw.every((w) => suchNamen.includes(w))) { bonus += 3; break; }
+      }
       return { i, wert: punkte + bonus };
     });
     gewertet.sort((a, b) => b.wert - a.wert || this.karten[b.i].preis - this.karten[a.i].preis);
 
-    const hinweis = korrigiert.length || ignoriert.length ? { korrigiert, ignoriert } : null;
+    // Ein korrigiertes Wort, das danach doch weggelassen wurde, steht nur als „nicht berücksichtigt" da.
+    const korrigiertGenutzt = korrigiert.filter((k) => !ignoriert.includes(k.von));
+    const hinweis = korrigiertGenutzt.length || ignoriert.length ? { korrigiert: korrigiertGenutzt, ignoriert } : null;
     return { ids: gewertet.slice(0, limit).map((g) => this.karten[g.i].id), hinweis };
   }
 

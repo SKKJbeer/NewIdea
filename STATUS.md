@@ -1,6 +1,6 @@
 # Projekt-Status — PokéMarket Intelligence
 
-**Version:** `v6.31.0` · **Stand:** 12. Oktober 2026 · **Branch:** `main`
+**Version:** `v6.31.1` · **Stand:** 12. Oktober 2026 · **Branch:** `main`
 
 Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, was ist offen.
 
@@ -181,6 +181,7 @@ Diese Datei ist unser gemeinsames Logbuch: Was ist entschieden, was ist gebaut, 
 | v6.29.0 | PSA-Prüflink (Website + App): `psaSuche()` in `kauf-links-basis.ts`, `kaufen.psa` in `/api/v1/karten/:id`, Hinweis „Preise ungegradet, keine eigenen PSA-Werte“ |
 | v6.30.0 | Nutzer-Rückmeldung „rgb mew fehlt“: `NeuSet.ohnePreis` (Themen-Lauf), `OhnePreisListe` auf Set-Seite + `/suche`, Vorschläge über `ohnePreisTreffer()`, Kartenseite `druckeFuerKarte()`; Obermengen-Regel in `ordneKartenZu` (nur mehrdeutig); `kartenNummer()`; Studio-Check kann `themen` anstoßen |
 | v6.31.0 | Suchmotor `such-motor.ts` (rein, 14 Tests: Wortreihenfolge, DE/EN, Set, Nummer + Gesamtzahl, Seltenheit, Tippfehler OSA-Distanz, Zusammenschreibung, Hinweise), Suchindex `such-index.ts` + Cron `/api/cron/suchindex` 06:40 UTC (TCGdex `/de/cards` + `/de/sets`), `sucheKarten()` für Suchseite/Vorschläge/App, `bewerte()` „Suchindex“ |
+| v6.31.1 | Suchmotor: Bonus für vollständig getippten Set-Namen, weiche Füllwörter („set“) filtern nie, Hinweis ohne Korrektur weggelassener Wörter |
 | v6.23.0 | iOS-Portfolio (`ios/CardBeacon/Util/Portfolio.swift`, `PortfolioView`), `/api/v1/preise` + `/api/v1/verlauf` (`idGruppen` < 1.000 Zeilen), TestFlight-Signatur per API (`ios/scripts/signatur.py`), Verteilung (`ios/scripts/testflight.py`) |
 | v6.22.1 | `/api/v1/markt` mit `ohneDuenneAusreisser` (Klassiker > 100 % raus) |
 | v6.22.0 | iOS-Grundlage: `/api/v1` (status, markt, suche, karten/:id, sets/:setCode; `app-api.ts`), SwiftUI-App `ios/` (XcodeGen), Workflow `iOS` (Build/Test, TestFlight per Knopf), `docs/ios-app.md` |
