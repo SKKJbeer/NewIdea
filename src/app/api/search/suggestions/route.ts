@@ -3,6 +3,7 @@ import { cachedSearchCards } from '@/lib/search-cache';
 import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
 import { NextResponse } from 'next/server';
 import { createRateLimiter, clientIp } from '@/lib/rate-limit';
+import { ohnePreisTreffer } from '@/lib/neuheiten';
 
 // Grosszuegig: Die Suchbox fragt nach jeder Tipp-Pause. 240 je Minute reichen
 // fuer schnelles Tippen, bremsen aber ein Skript, das den Index abzieht.
@@ -65,20 +66,32 @@ export async function GET(request: Request) {
   try {
     // Karten und Sets NEBENEINANDER, nicht nacheinander: Die Set-Suche geht in
     // dieselbe Datenbank und würde sonst die Antwortzeit verdoppeln.
-    const [cards, sets] = await mitGrenze(Promise.all([
-      cachedSearchCards(q, grenze(searchParams.get('n'))),
+    const n = grenze(searchParams.get('n'));
+    const [cards, sets, neuOhnePreis] = await mitGrenze(Promise.all([
+      cachedSearchCards(q, n),
       // Ein Ausfall der Set-Suche darf die Kartenvorschläge nicht mitreißen —
       // sie sind der Hauptzweck dieser Route.
       searchSetIndex(q, 2).catch(() => [] as SetTreffer[]),
+      // Neue Karten ohne Preis (z. B. RGB Mew) — sonst unauffindbar. Preis 0 =
+      // die Suchleiste zeigt keinen Betrag.
+      ohnePreisTreffer(q, n),
     ]), VORSCHLAG_BUDGET_MS);
-    const suggestions = cards.map((c) => ({
-      id: c.id,
-      name: c.name,
-      nameDe: c.nameDe,
-      imageUrl: c.imageUrl,
-      price: displayPrice(c),
-      set: c.set,
-    }));
+    const bekannt = new Set(cards.map((c) => c.id));
+    // Ohne Treffer im Index bekommen sie alle Plätze, sonst höchstens zwei.
+    const extra = neuOhnePreis.filter((k) => !bekannt.has(k.id)).slice(0, cards.length === 0 ? n : 2);
+    const suggestions = [
+      ...cards.slice(0, n - extra.length).map((c) => ({
+        id: c.id,
+        name: c.name,
+        nameDe: c.nameDe,
+        imageUrl: c.imageUrl,
+        price: displayPrice(c),
+        set: c.set,
+      })),
+      ...extra.map((k) => ({
+        id: k.id, name: k.nummer ? `${k.name} (${k.nummer})` : k.name, nameDe: null, imageUrl: k.bild, price: 0, set: k.set,
+      })),
+    ];
     return NextResponse.json(
       { cards: suggestions, sets },
       { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } },

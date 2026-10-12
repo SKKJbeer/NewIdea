@@ -16,7 +16,8 @@ import { CardImage } from '@/components/CardImage';
 import { ambientFor } from '@/lib/collector';
 import type { Metadata } from 'next';
 import type { PokemonCard } from '@/types';
-import { formatEur, formatPercent } from '@/lib/format';
+import { formatEur, formatPercent, kartenNummer } from '@/lib/format';
+import { druckeFuerKarte, leseNeuheiten, neuheitenAktuell } from '@/lib/neuheiten';
 import { jsonLd } from '@/lib/json-ld';
 import { performanceWindows, cardMarketStats, pmiScore } from '@/lib/card-metrics';
 import { PerformanceStrip, MarketStatsPanel, PmiScorePanel } from '@/components/CardMetricPanels';
@@ -129,7 +130,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Die Kartennummer gehört in den Titel: Danach wird gesucht („199/165"),
   // und sie unterscheidet gleichnamige Karten verschiedener Sets voneinander.
   const nummer = card.number
-    ? ` ${card.number}${card.printedTotal ? `/${card.printedTotal}` : ''}`
+    ? ` ${kartenNummer(card.number, card.printedTotal)}`
     : '';
 
   return {
@@ -176,9 +177,15 @@ export default async function CardDetailPage({ params }: Props) {
   const sprachenLaden = sprachpreiseFuerKarte(card, 2_000);
   // Genauer Cardmarket-Link (geprüft, kauf-links.ts) — höchstens 2,5 s, sonst Suche.
   const linksLaden = kaufLinks({ id: card.id, name: card.name, number: card.number, setCode: card.setCode, set: card.set });
+  // Ohne Preis (neue Sets, z. B. RGB Mew): alle Cardmarket-Drucke gleichen
+  // Namens im Set — ohne zu behaupten, welcher Preis zu dieser Karte gehört.
+  const druckeLaden = price > 0
+    ? Promise.resolve(null)
+    : leseNeuheiten().then((d) => (neuheitenAktuell(d) ? druckeFuerKarte(d, card.setCode, card.name) : null)).catch(() => null);
   const stored = await verlaufLaden;
   const sprachen = await sprachenLaden;
   const links = await linksLaden;
+  const drucke = await druckeLaden;
   const anchors = card.realData && card.priceHistory ? card.priceHistory : [];
   // Zusammenführung liegt zentral in price-history.ts — dieselbe Funktion nutzt
   // das Portfolio (Code-Regel 10: keine zweite Umsetzung derselben Logik).
@@ -419,8 +426,7 @@ export default async function CardDetailPage({ params }: Props) {
                 {card.rarity}
                 {card.number && (
                   <span className="ml-2 tabular-nums text-slate-700">
-                    Nr. {card.number}
-                    {card.printedTotal ? `/${card.printedTotal}` : ''}
+                    Nr. {kartenNummer(card.number, card.printedTotal)}
                   </span>
                 )}
               </p>
@@ -443,6 +449,27 @@ export default async function CardDetailPage({ params }: Props) {
               enStand={cmDataAge}
               sprachen={sprachen}
             />
+
+            {drucke && (
+              <div className="rounded-2xl border border-amber-500/10 bg-amber-500/5 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Noch kein eindeutiger Preis</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                  Cardmarket führt „{card.name}“ aus {card.set} in {drucke.length} Drucken mit eigenem Preis. Welcher Preis zu
+                  dieser Karte gehört, lässt sich aus den Quelldaten nicht eindeutig ablesen — deshalb stehen hier alle nebeneinander
+                  (Preis-Trend, Cardmarket-Preisverzeichnis):
+                </p>
+                <p className="mt-2 text-sm font-semibold tabular-nums text-slate-200">{drucke.map((p) => formatEur(p)).join(' · ')}</p>
+                <a
+                  href={links.cardmarket.url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300"
+                >
+                  Drucke auf Cardmarket vergleichen <ExternalLink size={11} className="opacity-60" />
+                </a>
+                <p className="mt-0.5 text-[10px] text-slate-600">* Affiliate-Link</p>
+              </div>
+            )}
 
             {/* GEGRADETE KARTEN (PSA) — bewusst ohne eigene Zahlen: Es gibt keine
                 kostenlose, lizenzierte Quelle für PSA-Verkaufspreise. Der Link führt

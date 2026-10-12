@@ -63,6 +63,19 @@ export interface NeuSet {
   zugeordnet: number;
   ohneZuordnung: number;
   indexGeschrieben: number;
+  /**
+   * Karten mit Bild, die (noch) keinen Preis im Kartenindex haben — z. B. RGB Mew
+   * (me55-R/G/B) oder Secret Rares neuer Sets. Werden gezeigt, aber nie mit Preis.
+   * Fehlt in Dateien vor v6.29.1.
+   */
+  ohnePreis?: OhnePreisKarte[];
+}
+
+export interface OhnePreisKarte {
+  id: string;
+  name: string;
+  nummer: string | null;
+  bild: string;
 }
 
 export interface JapanKarte {
@@ -216,6 +229,58 @@ async function schreibeIndex(zeilen: IndexZeile[], stand: string): Promise<numbe
   return neu.length;
 }
 
+/** Karten-IDs eines Sets mit Preis im Index. WIRFT bei Datenbankfehlern — sonst sähe jede Karte preislos aus. */
+async function preiseImIndex(setCode: string): Promise<Set<string>> {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Kartenindex nicht erreichbar');
+  const { data, error } = await sb.from('cards_index').select('id,price').eq('set_code', setCode).gt('price', 0).limit(1000);
+  if (error) throw new Error(`Kartenindex (${setCode}): ${error.message}`);
+  return new Set(((data ?? []) as Array<{ id: string }>).map((z) => z.id));
+}
+
+/** Karten mit Bild ohne Preis im Index, nach Nummer sortiert (rein). */
+export function ohnePreisKarten(
+  karten: ReadonlyArray<{ id: string; name: string; number?: string | null; imageUrl?: string | null }>,
+  mitPreis: ReadonlySet<string>,
+  max = 80,
+): OhnePreisKarte[] {
+  return karten
+    .filter((c) => c.imageUrl && !mitPreis.has(c.id))
+    .map((c) => ({ id: c.id, name: c.name, nummer: c.number ?? null, bild: c.imageUrl! }))
+    .sort((a, b) => (a.nummer ?? '').localeCompare(b.nummer ?? '', 'en', { numeric: true }))
+    .slice(0, max);
+}
+
+/** Wortform für den Vergleich: klein, ohne Akzente, nur Buchstaben/Ziffern. */
+const wortForm = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+
+/**
+ * Suche in den Karten ohne Preis (rein). Mindestens ein Suchwort (≥ 3 Zeichen)
+ * muss ein ganzes Wort des Namens sein — „rgb mew" findet Mew, nicht Mewtwo.
+ * Mehr passende Wörter zuerst.
+ */
+export function sucheOhnePreis(d: NeuheitenDatei | null, begriff: string, max = 8): Array<OhnePreisKarte & { set: string; setCode: string }> {
+  if (!d) return [];
+  const woerter = wortForm(begriff).filter((w) => w.length >= 3);
+  if (woerter.length === 0) return [];
+  const treffer: Array<{ k: OhnePreisKarte & { set: string; setCode: string }; n: number }> = [];
+  for (const s of d.sets) for (const k of s.ohnePreis ?? []) {
+    const name = new Set(wortForm(k.name));
+    const n = woerter.filter((w) => name.has(w)).length;
+    if (n > 0) treffer.push({ k: { ...k, set: s.name, setCode: s.setCode }, n });
+  }
+  return treffer.sort((a, b) => b.n - a.n).slice(0, max).map((t) => t.k);
+}
+
+/** Cardmarket-Drucke gleichen Namens im Set der Karte — alle Preise, keine Zuordnung (rein). */
+export function druckeFuerKarte(d: NeuheitenDatei | null, setCode: string, name: string): number[] | null {
+  const set = d?.sets.find((s) => s.setCode === setCode);
+  // Zwei Einträge gleichen Namens (z. B. zwei Pikachu ex mit verschiedenen
+  // Attacken) → nicht unterscheidbar, welche Gruppe gemeint ist: nichts zeigen.
+  const gleich = set?.mehrdeutig.filter((x) => x.name === name) ?? [];
+  return gleich.length === 1 && gleich[0].preise.length > 0 ? gleich[0].preise : null;
+}
+
 // ── Lauf ────────────────────────────────────────────────────────────────────
 
 export interface NeuheitenLauf {
@@ -334,6 +399,7 @@ export async function neuheitenLauf(): Promise<NeuheitenLauf> {
           });
         });
         eintrag.indexGeschrieben = await schreibeIndex(zeilen.filter((z) => z.image_url), stand);
+        eintrag.ohnePreis = ohnePreisKarten(pt, await preiseImIndex(v.pt.id));
       } catch (err) {
         fehler = err instanceof Error ? err.message : String(err);
         console.warn(`[neuheiten] ${v.pt.id}: Index nicht geschrieben:`, fehler);
@@ -403,6 +469,25 @@ export function neuheitenAktuell(d: NeuheitenDatei | null, jetzt = Date.now()): 
 
 export async function leseNeuheiten(): Promise<NeuheitenDatei | null> {
   return leseJson<NeuheitenDatei>(PFAD_NEUHEITEN).catch(() => null);
+}
+
+let vorgehalten: { zeit: number; datei: NeuheitenDatei | null } | null = null;
+
+/**
+ * Karten neuer Sets ohne Preis zu einem Suchbegriff — für Suchvorschläge und
+ * Suchseite. Datei 10 Minuten je Instanz vorgehalten (die Vorschläge kommen
+ * bei jeder Tipp-Pause). Wirft nie; veraltete Datei → keine Treffer.
+ */
+export async function ohnePreisTreffer(begriff: string, max = 8): Promise<ReturnType<typeof sucheOhnePreis>> {
+  try {
+    if (!vorgehalten || Date.now() - vorgehalten.zeit > 10 * 60_000) {
+      vorgehalten = { zeit: Date.now(), datei: await leseNeuheiten() };
+    }
+    const d = vorgehalten.datei;
+    return neuheitenAktuell(d) ? sucheOhnePreis(d, begriff, max) : [];
+  } catch {
+    return []; // catch erlaubt: Zugabe zur Suche, die Hauptsuche läuft unabhängig
+  }
 }
 
 /**

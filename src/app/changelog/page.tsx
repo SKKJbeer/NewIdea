@@ -10,10 +10,22 @@ export const metadata: Metadata = {
 
 const RELEASES = [
   {
+    version: '6.30.0',
+    date: '12. Oktober 2026',
+    label: 'Neue Karten ohne Preis sichtbar (RGB Mew)',
+    isLatest: true,
+    changes: [
+      { type: 'new', text: 'Karten neuer Sets ohne Preis (z. B. RGB Mew) auf der Set-Seite und in der Suche — ohne Wert' },
+      { type: 'new', text: 'Kartenseite ohne Preis: alle Cardmarket-Drucke gleichen Namens nebeneinander, Zuordnung ausdrücklich nicht belegt' },
+      { type: 'fixed', text: 'Mew aus 30th Celebration fehlte in „mehrere Drucke" (TCGdex führt nur eine Attacke)' },
+      { type: 'fixed', text: 'Sondernummern ohne Gesamtzahl („R" statt „R/128")' },
+    ],
+  },
+  {
     version: '6.29.0',
     date: '11. Oktober 2026',
     label: 'Gegradete Karten: PSA-Prüflink',
-    isLatest: true,
+    isLatest: false,
     changes: [
       { type: 'new', text: 'Website und App: „PSA-Verkaufspreise prüfen" auf jeder Kartenseite — PSAs eigenes Verzeichnis (eBay USA, US-Dollar)' },
       { type: 'new', text: 'Hinweis, dass alle Preise für ungegradete Karten gelten; keine eigenen PSA-Werte ohne lizenzierte Quelle' },

@@ -208,6 +208,7 @@ S6a, ohne Nummer nicht unterscheidbar).
 | Cron | `/api/cron/themen` 01:50 UTC | nach `/api/cron/sprachen` (braucht deren Zuordnung für „Japan zuerst") |
 | Anzeige | `/trends`, `ThemenTeaser` (Startseite, Marktbericht), Set-Seite (versiegelt, mehrdeutig, `SetImAufbau`) | Datei älter 3 Tage → nicht zeigen |
 
+**Seit v6.30.0 (Nutzer-Rückmeldung „rgb mew fehlt“):** Karten neuer Sets mit Bild, aber ohne Indexpreis stehen in `NeuSet.ohnePreis` → Set-Seite „Noch ohne Preis“, Suche (`ohnePreisTreffer`), nie mit Wert. Kartenseite ohne Preis zeigt `druckeFuerKarte()` (alle Drucke-Preise, nur bei eindeutigem Namen im Set). TCGdex führt teils nicht alle Attacken (30th-065 Mew) → eindeutige Obermenge NUR für `mehrdeutig`, nie für einen Einzelpreis. RGB Mew (me55-R/G/B): weder TCGdex noch pokemontcg.io ordnen ein Cardmarket-Produkt zu — Einzelpreis je Farbe ist nicht belegbar. App-Suche/-Kartenseite lesen nur den Index → dort noch unsichtbar.
 **Regeln:** Mehrdeutige Drucke (normal + SIR mit gleichen Attacken) bekommen KEINEN Einzelpreis, sondern alle Preise nebeneinander. In den Kartenindex wird nur geschrieben, wenn kein frischerer Preis dort steht UND pokemontcg.io die Karte mit gleicher Nummer + Namen führt (abweichende Nummerierung, z. B. Classic Collection: Name im Set auf beiden Seiten genau einmal). Artikel-Kontext (`themenKontext`) enthält NIE Preiszahlen. „Kommend" leer = ehrlicher Leerzustand, keine Gerüchte.
 
 ---

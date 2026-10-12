@@ -112,3 +112,13 @@ export function formatPp(value: number, { digits = 1 } = {}): string {
   const sign = value > 0 ? '+' : '';
   return `${sign}${formatted}\u00a0pp`;
 }
+
+/**
+ * Kartennummer wie gedruckt: „4/102", aber Sonder-Nummern ohne Gesamtzahl
+ * („R" statt „R/128" bei RGB Mew, „TG05" statt „TG05/195") — die Gesamtzahl des
+ * Sets gehört nur zu fortlaufenden Nummern.
+ */
+export function kartenNummer(nummer: string | null | undefined, gesamt?: number | null): string {
+  if (!nummer) return '';
+  return /^\d+$/.test(nummer) && gesamt ? `${nummer}/${gesamt}` : nummer;
+}

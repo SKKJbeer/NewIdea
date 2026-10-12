@@ -129,11 +129,45 @@ export function ordneKartenZu(karten: NeuKarte[], einzel: CmEinzel[], erweiterun
   const ohneProdukt: string[] = [];
   for (const [s, ks] of kartenJeSchluessel) {
     const ps = produkteJeName.get(s) ?? [];
-    if (ps.length === 0) { ohneProdukt.push(...ks.map((k) => k.id)); continue; }
+    if (ps.length === 0) {
+      // TCGdex führt manchmal nicht alle Attacken (30th-065 Mew: nur „Psychic",
+      // Cardmarket „Mew [Psychic | 30C]"). Dann NUR als mehrdeutig mit allen
+      // Preisen — eine unvollständige Angabe begründet nie einen Einzelpreis.
+      const ersatz = obermengenName(ks[0], produkteJeName, kartenJeSchluessel);
+      const eps = ersatz ? produkteJeName.get(ersatz)! : [];
+      if (ersatz && eps.length >= 2) {
+        mehrdeutig.push({ schluessel: ersatz, karten: ks.map((k) => k.id), produkte: [...eps].sort((a, b) => a - b) });
+      } else {
+        ohneProdukt.push(...ks.map((k) => k.id));
+      }
+      continue;
+    }
     if (ks.length === 1 && ps.length === 1) paare.push({ karte: ks[0], produkt: ps[0] });
     else mehrdeutig.push({ schluessel: s, karten: ks.map((k) => k.id), produkte: [...ps].sort((a, b) => a - b) });
   }
   return { paare, mehrdeutig, ohneProdukt };
+}
+
+/**
+ * Der EINE Cardmarket-Name derselben Karte, dessen Fähigkeiten/Attacken eine
+ * echte Obermenge der Angaben der Karte sind — sonst null. Kein Kandidat, wenn
+ * eine andere Karte diesen Namen schon genau trifft (dann gehören die Produkte ihr).
+ */
+function obermengenName(
+  k: Pick<NeuKarte, 'name' | 'faehigkeiten' | 'attacken'>,
+  produkteJeName: ReadonlyMap<string, number[]>,
+  kartenJeSchluessel: ReadonlyMap<string, unknown>,
+): string | null {
+  const eigene = [...k.faehigkeiten, ...k.attacken];
+  if (eigene.length === 0) return null;
+  const kandidaten: string[] = [];
+  for (const name of produkteJeName.keys()) {
+    if (!name.startsWith(`${k.name} [`) || !name.endsWith(']')) continue;
+    const teile = name.slice(k.name.length + 2, -1).split(' | ');
+    if (teile.length > eigene.length && eigene.every((t) => teile.includes(t))) kandidaten.push(name);
+  }
+  if (kandidaten.length !== 1 || kartenJeSchluessel.has(kandidaten[0])) return null;
+  return kandidaten[0];
 }
 
 /** Versiegelte Produkte einer Erweiterung mit Preis, teuerste zuerst. */

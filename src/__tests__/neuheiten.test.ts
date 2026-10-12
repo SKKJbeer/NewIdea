@@ -5,7 +5,8 @@ import {
   erweiterungFuerSet, kartenSchluessel, ordneKartenZu, versiegeltMitPreis, preisKarte, bewegung30, nummernGleich,
   type CmEinzel, type CmVersiegelt, type NeuKarte,
 } from '@/lib/neuheiten-zuordnung';
-import { neuheitenAktuell, themenKontext, type NeuheitenDatei } from '@/lib/neuheiten';
+import { neuheitenAktuell, themenKontext, ohnePreisKarten, sucheOhnePreis, druckeFuerKarte, type NeuheitenDatei } from '@/lib/neuheiten';
+import { kartenNummer } from '@/lib/format';
 
 // NEUE SETS & THEMEN: Nutzer-Auftrag 28.09.2026 — Trends, Hypes, Neuheiten
 // („30 Jahre") sichtbar machen, ohne einen Preis zu raten. Jede Schranke der
@@ -81,6 +82,40 @@ describe('Karten → Cardmarket-Produkte', () => {
   });
 });
 
+describe('TCGdex mit unvollständigen Attacken (gemessen 12.10.2026: 30th-065 Mew)', () => {
+  // Cardmarket: vier Drucke „Mew [Psychic | 30C]" (normal + RGB Mew R/G/B), TCGdex nur „Psychic".
+  const einzel: CmEinzel[] = [
+    { idProduct: 907672, name: 'Mew [Psychic | 30C]', idExpansion: 6601 },
+    { idProduct: 909509, name: 'Mew [Psychic | 30C]', idExpansion: 6601 },
+    { idProduct: 909510, name: 'Mew [Psychic | 30C]', idExpansion: 6601 },
+    { idProduct: 909511, name: 'Mew [Psychic | 30C]', idExpansion: 6601 },
+    { idProduct: 500, name: 'Eevee [Tackle | Quick Attack]', idExpansion: 6601 },
+    { idProduct: 600, name: 'Snorlax [Rest | Body Slam]', idExpansion: 6601 },
+    { idProduct: 601, name: 'Snorlax [Rest | Heavy Press]', idExpansion: 6601 },
+  ];
+  const z = ordneKartenZu([
+    karte('30th-065', 'Mew', ['Psychic']),
+    karte('30th-010', 'Eevee', ['Tackle']),
+    karte('30th-020', 'Snorlax', ['Rest']),
+  ], einzel, 6601);
+
+  it('eindeutige Obermenge mit mehreren Drucken → mehrdeutig mit ALLEN Preisen', () => {
+    expect(z.mehrdeutig).toEqual([{ schluessel: 'Mew [Psychic | 30C]', karten: ['30th-065'], produkte: [907672, 909509, 909510, 909511] }]);
+  });
+  it('unvollständige Angabe begründet nie einen Einzelpreis (ein Produkt → ohne Preis)', () => {
+    expect(z.paare).toEqual([]);
+    expect(z.ohneProdukt).toContain('30th-010');
+  });
+  it('zwei passende Obermengen → keine Zuordnung', () => {
+    expect(z.ohneProdukt).toContain('30th-020');
+  });
+  it('genau passende andere Karte behält ihre Produkte', () => {
+    const z2 = ordneKartenZu([karte('a', 'Mew', ['Psychic']), karte('b', 'Mew', ['Psychic', '30C'])], einzel, 6601);
+    expect(z2.mehrdeutig.map((m) => m.karten)).toEqual([['b']]);
+    expect(z2.ohneProdukt).toEqual(['a']);
+  });
+});
+
 describe('Preise aus dem Verzeichnis', () => {
   const preise = preisKarte([
     { idProduct: 1, trend: 6.5, avg: 6.2, low: 5, avg7: 6.4, avg30: 5.0 },
@@ -144,5 +179,58 @@ describe('Verdrahtung', () => {
   });
   it('Set-Seite zeigt im Aufbau statt 404', () => {
     expect(lies('src/app/sets/[setCode]/page.tsx')).toContain('SetImAufbau');
+  });
+});
+
+describe('Karten ohne Preis (Nutzer-Rückmeldung 12.10.2026: „rgb mew fehlt")', () => {
+  const pt = [
+    { id: 'me55-65', name: 'Mew', number: '65', imageUrl: 'b65' },
+    { id: 'me55-R', name: 'Mew', number: 'R', imageUrl: 'bR' },
+    { id: 'me55-G', name: 'Mew', number: 'G', imageUrl: 'bG' },
+    { id: 'me55-1', name: 'Bulbasaur', number: '1', imageUrl: 'b1' },
+    { id: 'me55-63', name: 'Mewtwo', number: '63', imageUrl: 'b63' },
+    { id: 'me55-X', name: 'Ohne Bild', number: 'X', imageUrl: null },
+  ];
+  const ohne = ohnePreisKarten(pt, new Set(['me55-1']));
+  const datei = {
+    erstellt: '', stand: '', japan: [], kommend: [],
+    sets: [{
+      setCode: 'me55', dexId: '30th', name: '30th Celebration', datum: '2026-09-16', gesamt: 161, logo: null, erweiterung: 6601,
+      versiegelt: [], zugeordnet: 0, ohneZuordnung: 0, indexGeschrieben: 0, ohnePreis: ohne,
+      mehrdeutig: [
+        { name: 'Mew', preise: [0.02, 2517.06, 2653.27, 2777.22] },
+        { name: 'Pikachu ex', preise: [1.12, 38.65] },
+        { name: 'Pikachu ex', preise: [1.15, 46.06] },
+      ],
+    }],
+  } as NeuheitenDatei;
+
+  it('nur Karten mit Bild und ohne Indexpreis, nach Nummer', () => {
+    expect(ohne.map((k) => k.id)).toEqual(['me55-63', 'me55-65', 'me55-G', 'me55-R']);
+  });
+  it('„rgb mew" findet die Mew-Karten, nicht Mewtwo', () => {
+    expect(sucheOhnePreis(datei, 'rgb mew').map((k) => k.id)).toEqual(['me55-65', 'me55-G', 'me55-R']);
+    expect(sucheOhnePreis(datei, 'mewtwo').map((k) => k.id)).toEqual(['me55-63']);
+    expect(sucheOhnePreis(datei, 'xy')).toEqual([]);
+    expect(sucheOhnePreis(null, 'mew')).toEqual([]);
+  });
+  it('Kartenseite: alle Drucke-Preise, aber nur bei eindeutigem Namen', () => {
+    expect(druckeFuerKarte(datei, 'me55', 'Mew')).toEqual([0.02, 2517.06, 2653.27, 2777.22]);
+    expect(druckeFuerKarte(datei, 'me55', 'Pikachu ex')).toBeNull();
+    expect(druckeFuerKarte(datei, 'sv1', 'Mew')).toBeNull();
+  });
+  it('Kartennummer: Gesamtzahl nur bei fortlaufender Nummer', () => {
+    expect(kartenNummer('4', 102)).toBe('4/102');
+    expect(kartenNummer('R', 128)).toBe('R');
+    expect(kartenNummer('TG05', 195)).toBe('TG05');
+    expect(kartenNummer(null, 10)).toBe('');
+  });
+  it('Kartenseite, Set-Seite und Suche binden die Bausteine ein', () => {
+    const karte = readFileSync('src/app/karten/[id]/page.tsx', 'utf8');
+    expect(karte).toContain('druckeFuerKarte(');
+    expect(karte).not.toMatch(/card\.printedTotal \? `\/\$\{card\.printedTotal\}`/);
+    expect(readFileSync('src/app/sets/[setCode]/page.tsx', 'utf8')).toContain('<OhnePreisListe');
+    expect(readFileSync('src/app/suche/page.tsx', 'utf8')).toContain('ohnePreisTreffer(');
+    expect(readFileSync('src/app/api/search/suggestions/route.ts', 'utf8')).toContain('ohnePreisTreffer(');
   });
 });

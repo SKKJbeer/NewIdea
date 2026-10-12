@@ -4,7 +4,7 @@ import { CardThumb } from './CardThumb';
 import { formatEur, formatPercent } from '@/lib/format';
 import { SECTION_LABEL, toneClass } from '@/lib/ui';
 import { bewegung30, ohneCases } from '@/lib/neuheiten-zuordnung';
-import type { ProduktPreis, JapanSet, NeuheitenDatei } from '@/lib/neuheiten';
+import type { ProduktPreis, JapanSet, NeuheitenDatei, OhnePreisKarte } from '@/lib/neuheiten';
 import type { IndexTreffer } from '@/lib/card-index';
 
 // BAUSTEINE DER THEMEN-SEITE (/trends) — auch auf Startseite und im
@@ -90,6 +90,36 @@ export function MehrdeutigListe({ eintraege }: { eintraege: Array<{ name: string
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * Karten eines neuen Sets, für die noch kein Preis eindeutig zugeordnet ist
+ * (z. B. RGB Mew, Secret Rares). Sichtbar, verlinkt — aber ohne Preis.
+ */
+export function OhnePreisListe({ karten }: { karten: OhnePreisKarte[] }) {
+  if (karten.length === 0) return null;
+  return (
+    <section>
+      <p className={`${SECTION_LABEL} mb-2`}>Noch ohne Preis · {karten.length} Karten</p>
+      <p className="mb-3 text-[11px] leading-relaxed text-slate-500">
+        Diese Karten führen die Kartendatenbanken bereits, ein Cardmarket-Preis ist ihnen aber noch nicht eindeutig
+        zugeordnet. CardBeacon zeigt hier deshalb keinen Wert — die Preise erscheinen, sobald die Zuordnung belegt ist.
+      </p>
+      <ul className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-8">
+        {karten.map((k) => (
+          <li key={k.id}>
+            <Link href={`/karten/${k.id}`} prefetch={false} className="group block text-center">
+              <div className="mx-auto w-full max-w-[110px] overflow-hidden rounded-md ring-1 ring-white/5 transition-transform group-hover:-translate-y-0.5">
+                <CardThumb src={k.bild} width={110} height={154} className="h-auto w-full" />
+              </div>
+              <p className="mt-1.5 truncate text-[11px] font-semibold text-slate-300 group-hover:text-white">{k.name}</p>
+              {k.nummer && <p className="text-[10px] tabular-nums text-slate-600">Nr. {k.nummer}</p>}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

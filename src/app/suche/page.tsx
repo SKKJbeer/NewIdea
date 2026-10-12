@@ -5,6 +5,8 @@ import { BoosterPackImage } from '@/components/BoosterPackImage';
 import type { searchCards } from '@/lib/pokemon-api';
 import { cachedSearchCards } from '@/lib/search-cache';
 import { searchSetIndex, type SetTreffer } from '@/lib/card-index';
+import { ohnePreisTreffer } from '@/lib/neuheiten';
+import { OhnePreisListe } from '@/components/Themen';
 import { getMarketBenchmark } from '@/lib/market-context';
 import { Search, SearchX, TriangleAlert } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -85,6 +87,8 @@ export default async function SearchPage({
   // englischen Namen zu versuchen. Der Name WAR englisch; er gehört nur zu
   // einem Set.
   let sets: SetTreffer[] = [];
+  // Karten neuer Sets ohne Preis (z. B. RGB Mew) — eigener, gekennzeichneter Abschnitt.
+  let ohnePreis: Awaited<ReturnType<typeof ohnePreisTreffer>> = [];
   let error = false;
   // Der Marktbezug startet GLEICHZEITIG mit der Suche, nicht danach — vorher
   // addierten sich beide Wartezeiten.
@@ -93,10 +97,13 @@ export default async function SearchPage({
   const marktLaden = query.length >= 2 ? getMarketBenchmark().catch(() => null) : Promise.resolve(null);
   if (query.length >= 2) {
     try {
-      [results, sets] = await Promise.all([
+      [results, sets, ohnePreis] = await Promise.all([
         cachedSearchCards(query, 40),
         searchSetIndex(query, 4).catch(() => [] as SetTreffer[]),
+        ohnePreisTreffer(query, 16),
       ]);
+      const bekannt = new Set(results.map((c) => c.id));
+      ohnePreis = ohnePreis.filter((k) => !bekannt.has(k.id));
     } catch {
       error = true;
     }
@@ -175,7 +182,7 @@ export default async function SearchPage({
             <p className="font-semibold flex items-center justify-center gap-1.5"><TriangleAlert size={14} /> Suche momentan nicht verfügbar</p>
             <p className="text-sm mt-1 text-amber-400/60">Bitte versuche es später erneut.</p>
           </div>
-        ) : results.length === 0 && sets.length === 0 ? (
+        ) : results.length === 0 && sets.length === 0 && ohnePreis.length === 0 ? (
           <div className="text-center text-slate-600 py-16">
             <SearchX size={40} className="mx-auto mb-4 opacity-40" />
             <p className="text-sm">Keine Karten für „<span className="font-semibold text-slate-400">{query}</span>" gefunden.</p>
@@ -186,12 +193,13 @@ export default async function SearchPage({
             <SetTrefferListe sets={sets} />
             {results.length > 0 ? (
               <SearchResultsLang cards={results} query={query} cbi={markt?.value ?? null} />
-            ) : (
+            ) : ohnePreis.length > 0 ? null : (
               <p className="text-center text-sm text-slate-600">
                 Keine einzelne Karte trägt diesen Namen — er gehört zu{' '}
                 {sets.length === 1 ? 'einem Set' : `${sets.length} Sets`}.
               </p>
             )}
+            <OhnePreisListe karten={ohnePreis} />
           </div>
         )}
       </main>

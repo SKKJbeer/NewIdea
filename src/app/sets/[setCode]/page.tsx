@@ -14,7 +14,7 @@ import type { Metadata } from 'next';
 import { jsonLd } from '@/lib/json-ld';
 import { siteUrlOrLocal } from '@/lib/site';
 import { leseNeuheiten, neuheitenAktuell, type NeuSet } from '@/lib/neuheiten';
-import { VersiegeltListe, MehrdeutigListe, tagDe } from '@/components/Themen';
+import { VersiegeltListe, MehrdeutigListe, OhnePreisListe, tagDe } from '@/components/Themen';
 
 // generateStaticParams MIT LEERER LISTE (seit v6.8.5, wie karten/[id]).
 // Ohne die Funktion ist das Segment in Next 16 dynamisch, `revalidate` wirkt
@@ -192,6 +192,7 @@ export default async function SetDetailPage({ params }: Props) {
         )}
                 <CardGrid cards={cards} title={`Alle Karten aus ${setName} — nach Marktwert sortiert`} />
         {neu && neu.mehrdeutig.length > 0 && <MehrdeutigListe eintraege={neu.mehrdeutig} />}
+        {neu?.ohnePreis && <OhnePreisListe karten={neu.ohnePreis} />}
 
         <footer className="border-t border-[#1e1e30] pt-5 space-y-3">
           <div className="rounded-md border border-amber-500/10 bg-amber-500/5 px-4 py-3 text-center">
@@ -237,6 +238,7 @@ function SetImAufbau({ set }: { set: NeuSet }) {
           </section>
         )}
         <MehrdeutigListe eintraege={set.mehrdeutig} />
+        {set.ohnePreis && <OhnePreisListe karten={set.ohnePreis} />}
       </main>
     </div>
   );

@@ -7,6 +7,18 @@ Alle Versionen und Änderungen. Format: [Semantic Versioning](https://semver.org
 
 ---
 
+## [6.30.0] - 12. Oktober 2026 · Neue Karten ohne Preis sichtbar (RGB Mew)
+
+### Neu
+- **Karten neuer Sets ohne Preis** (z. B. die drei RGB-Mew aus 30th Celebration, Secret Rares) stehen jetzt auf der Set-Seite unter „Noch ohne Preis" und werden in der Suche gefunden — ausdrücklich ohne Wert
+- **Kartenseite ohne Preis:** Führt Cardmarket die Karte im Set in mehreren Drucken, stehen alle Preise nebeneinander, mit dem Hinweis, dass die Zuordnung nicht belegt ist (RGB Mew: 0,02 € · 2.517,06 € · 2.653,27 € · 2.777,22 €)
+
+### Behoben
+- Mew aus 30th Celebration fehlte in der Liste „mehrere Drucke", weil TCGdex nur eine der zwei Attacken führt. Bei unvollständigen Angaben gilt jetzt eine eindeutige Obermenge — aber nur für die Liste aller Preise, nie für einen Einzelpreis
+- Sondernummern ohne Gesamtzahl: „Mew R" statt „Mew R/128", „TG05" statt „TG05/195"
+
+---
+
 ## [6.29.0] - 11. Oktober 2026 · Gegradete Karten: PSA-Prüflink
 
 ### Neu
